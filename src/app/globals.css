@@ -1,1 +1,49 @@
 @import "tailwindcss";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+:root {
+  --background: #fafafa;
+  --surface: #ffffff;
+  --foreground: #18181b;
+  --muted: #71717a;
+  --border: #e4e4e7;
+  --brand: #00b8db;
+
+  /* Sidebar escura nos dois temas. */
+  --sidebar: #18181b;
+  --sidebar-foreground: #f4f4f5;
+  --sidebar-muted: #a1a1aa;
+  --sidebar-border: rgb(255 255 255 / 0.1);
+  --sidebar-accent: rgb(255 255 255 / 0.08);
+}
+
+.dark {
+  --background: #18181b;
+  --surface: #27272a;
+  --foreground: #f4f4f5;
+  --muted: #a1a1aa;
+  --border: rgb(255 255 255 / 0.1);
+  --brand: #00b8db;
+
+  /* Um tom abaixo do fundo, para a sidebar continuar se destacando. */
+  --sidebar: #09090b;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-surface: var(--surface);
+  --color-foreground: var(--foreground);
+  --color-muted: var(--muted);
+  --color-border: var(--border);
+  --color-brand: var(--brand);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-muted: var(--sidebar-muted);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --font-sans: var(--font-jakarta);
+  --radius-control: 0.5rem;
+  --radius-card: 0.75rem;
+  --radius-overlay: 1rem;
+}

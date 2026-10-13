@@ -16,7 +16,10 @@ Consulte a documentação do frontend e a do backend.
 frontend-architecture.md
 frontend-rules.md
 frontend-coding-standards.md
+frontend-auth.md
 stack-tecnologico.md
+
+Regras de interface: skill `.claude/skills/orari-ui/SKILL.md`.
 
 ### Backend (`../backend/docs/`)
 

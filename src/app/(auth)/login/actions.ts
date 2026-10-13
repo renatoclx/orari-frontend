@@ -1,9 +1,9 @@
 "use server";
 
 import { redirect } from "next/navigation";
-import { ApiError, apiFetch } from "@/services/api";
+import { ApiError } from "@/services/api";
+import * as authService from "@/services/auth.service";
 import { setSession } from "@/services/session";
-import type { AuthTokens } from "@/types/auth";
 
 export type LoginFormState = {
   /** Mantido para repreencher o campo: o React limpa o formulário após a action. */
@@ -43,10 +43,7 @@ export async function login(
   }
 
   try {
-    const tokens = await apiFetch<AuthTokens>("/auth/login", {
-      method: "POST",
-      body: JSON.stringify({ email, password }),
-    });
+    const tokens = await authService.login(email, password);
     await setSession(tokens);
   } catch (error) {
     if (!(error instanceof ApiError)) throw error;

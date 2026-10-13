@@ -1,7 +1,8 @@
 "use server";
 
 import { redirect } from "next/navigation";
-import { ApiError, apiFetch } from "@/services/api";
+import { ApiError } from "@/services/api";
+import * as authService from "@/services/auth.service";
 import { clearSession, getRefreshToken } from "@/services/session";
 
 /**
@@ -14,10 +15,7 @@ export async function logout(): Promise<void> {
 
   if (refreshToken) {
     try {
-      await apiFetch("/auth/logout", {
-        method: "POST",
-        body: JSON.stringify({ refreshToken }),
-      });
+      await authService.logout(refreshToken);
     } catch (error) {
       if (!(error instanceof ApiError)) throw error;
     }

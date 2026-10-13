@@ -11,8 +11,12 @@ recorrentes, planos contratados pelos clientes e controle de pagamentos.
 
 ## Frontend
 
-- **Next.js 16** (App Router) + **React 19** + **TypeScript**
+- **Next.js 16** (App Router, Server Components, Server Actions) + **React 19** + **TypeScript**
 - **Tailwind CSS v4**
+- **shadcn/ui** (base **Radix UI**) para componentes acessíveis
+- **lucide-react** (ícones), **Sonner** (toasts), **react-day-picker** (calendário)
+- **next-themes** (tema claro/escuro)
+- Autenticação com cookies `httpOnly` e refresh token rotativo
 - **ESLint** (`eslint-config-next`) + **Prettier** (`prettier-plugin-tailwindcss`)
 
 ## Backend

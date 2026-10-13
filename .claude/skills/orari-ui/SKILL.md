@@ -27,14 +27,26 @@ Use apenas os tokens abaixo (definidos em `src/app/globals.css`). Eles já troca
 | `foreground` | texto principal                        |
 | `muted`      | texto secundário, ícones inativos      |
 | `border`     | bordas e divisórias (sempre discretas) |
-| `brand`      | marca e ação principal da tela         |
+| `brand`      | marca: logo, item ativo, foco          |
+| `primary`    | botão da ação principal (texto branco) |
+| `danger`     | ações destrutivas (texto branco)       |
 
 A sidebar é escura nos dois temas e tem tokens próprios: `sidebar` (fundo), `sidebar-foreground`, `sidebar-muted`, `sidebar-border` e `sidebar-accent` (item ativo e hover). Dentro dela, use só esses tokens, nunca `surface`/`muted`.
 
-- `brand` (cyan) é reservado: uma ação principal por tela, item ativo da navegação, foco. Não usar como decoração.
-- Texto sobre `brand` é sempre `text-zinc-900` — branco sobre o cyan não tem contraste suficiente.
+- `brand` (cyan) é a cor da marca: logo, item ativo da navegação, foco e destaques pontuais (ex.: linha do "agora"). Não usar como decoração nem como fundo de botão — branco sobre o cyan não tem contraste suficiente.
+- `primary` (blue-600) é o fundo do botão da ação principal, com texto `text-primary-foreground` (branco). Uma ação principal por tela.
 - Não usar valores soltos (`bg-[#...]`) nem cores da paleta do Tailwind para a interface base. Se faltar uma cor, ela vira um token novo no `globals.css`.
 - Cores de status e de agendamentos ainda não foram definidas: pergunte antes de inventar.
+
+## Botões
+
+Use sempre o componente `Button` de `@/components/ui/Button`:
+
+- `primary`: a ação principal da tela ("Agendar", "Salvar alterações").
+- `secondary` (padrão): alternativas ("Cancelar", "Voltar").
+- `ghost`: ações discretas ("Ver detalhes").
+- `danger`: ações destrutivas ("Excluir").
+- Desabilitado com o atributo `disabled`, em qualquer variante.
 
 ## Tipografia
 
@@ -57,8 +69,24 @@ A sidebar é escura nos dois temas e tem tokens próprios: `sidebar` (fundo), `s
 - Header com atalhos, toggle (switch) de tema claro/escuro e usuário logado.
 - Componentes da estrutura ficam em `src/components/layout/`; o estado da sidebar recolhida fica em cookie, lido no servidor.
 - Celular: header com botão de menu e ícone da logo; a sidebar abre como gaveta por cima do conteúdo.
-- Conteúdo em um container centralizado com largura máxima; o título da página fica alinhado à esquerda do container.
 - Mobile first: escreva o estilo do celular primeiro e amplie com `md:` / `lg:`.
+
+## Padrão de página
+
+Toda página da área administrativa segue o modelo da tela de Agendamentos (`src/app/(admin)/page.tsx`):
+
+- **A página não rola.** A estrutura ocupa a altura da tela (`h-dvh`) e o `<main>` tem padding igual nos quatro lados (`p-4 md:p-8`). Quem rola é o componente principal da página.
+- Raiz da página: `flex min-h-0 flex-1 flex-col gap-4`.
+- Ordem: título (`<h1 className="text-2xl font-semibold">`), barra de ferramentas da página (navegação e ação principal) e o componente principal.
+- O componente principal ocupa a largura toda e a altura que sobra (`min-h-0 flex-1`), tem rolagem própria (`overflow-auto`) e moldura de card (`rounded-card border border-border bg-surface`). Cabeçalhos dentro dele ficam fixos com `sticky top-0`.
+- Barras de rolagem já são finas e discretas pelo `globals.css`; não estilize por componente.
+
+## Barra de ações lateral
+
+- Fixa na borda direita da tela, centralizada na vertical (`fixed top-1/2 right-0 -translate-y-1/2`), com cantos arredondados só à esquerda (`rounded-l-overlay`), sombra e sem borda à direita.
+- Guarda atalhos secundários da página (hoje: calendário em Agendamentos). Novos atalhos entram nela como botões de ícone com `aria-label` e `title`.
+- Painéis abertos por ela (ex.: calendário) usam a Popover API (`popover="auto"` + `popoverTarget`), ficam colados à barra (`right-12`) e flutuam sobre o conteúdo — não ocupam espaço do layout. Não precisam de Client Component.
+- O componente principal não reserva espaço para ela: a barra flutua sobre a borda dele.
 
 ## Toasts
 
@@ -72,6 +100,7 @@ A sidebar é escura nos dois temas e tem tokens próprios: `sidebar` (fundo), `s
 - Em pt-BR, do ponto de vista de quem usa: "Clientes", não "Pessoas do tipo CLIENT".
 - Botões dizem o que fazem: "Agendar", "Salvar alterações" — nunca "Enviar" ou "OK".
 - A mesma palavra segue o fluxo todo: botão "Agendar" → toast "Agendado".
+- Vocabulário do produto: a tela de horários se chama **Agendamentos** (menu e título), não "Agenda".
 - Erros explicam o que aconteceu e como resolver, sem pedir desculpas.
 - Tela vazia convida a agir: "Nenhum cliente ainda. Cadastre o primeiro."
 - Evite separar informações com "·" (ex.: "Ana · Corte · 09:00"); organize pelo layout.

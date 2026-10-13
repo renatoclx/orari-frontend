@@ -21,7 +21,7 @@ export function AdminShell({ defaultCollapsed, children }: AdminShellProps) {
   }
 
   return (
-    <div className="flex min-h-screen bg-background text-foreground">
+    <div className="flex h-dvh overflow-hidden bg-background text-foreground">
       <Sidebar
         collapsed={collapsed}
         onToggleCollapsed={toggleCollapsed}
@@ -31,8 +31,9 @@ export function AdminShell({ defaultCollapsed, children }: AdminShellProps) {
 
       <div className="flex min-w-0 flex-1 flex-col">
         <Header onOpenMobile={() => setMobileOpen(true)} />
-        <main className="flex-1">
-          <div className="mx-auto max-w-5xl px-4 py-8 md:px-8">{children}</div>
+        {/* A página não rola: cada componente cuida da própria rolagem. */}
+        <main className="flex min-h-0 flex-1 flex-col p-4 md:p-8">
+          {children}
         </main>
       </div>
     </div>

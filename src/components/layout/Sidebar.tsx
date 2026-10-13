@@ -15,7 +15,7 @@ import { Logo } from "@/components/layout/Logo";
 
 // Menu provisório: as rotas ainda não existem.
 const navItems = [
-  { href: "/", label: "Agenda", icon: CalendarDays },
+  { href: "/", label: "Agendamentos", icon: CalendarDays },
   { href: "/clientes", label: "Clientes", icon: Users },
   { href: "/servicos", label: "Serviços", icon: ClipboardList },
   { href: "/financeiro", label: "Financeiro", icon: Wallet },
@@ -40,7 +40,7 @@ export function Sidebar({
   return (
     <>
       <aside
-        className={`sticky top-0 hidden h-screen shrink-0 flex-col border-r border-sidebar-border bg-sidebar text-sidebar-foreground motion-safe:transition-[width] md:flex ${
+        className={`hidden h-dvh shrink-0 flex-col border-r border-sidebar-border bg-sidebar text-sidebar-foreground motion-safe:transition-[width] md:flex ${
           collapsed ? "w-16" : "w-60"
         }`}
       >

@@ -10,6 +10,14 @@
   --border: #e4e4e7;
   --brand: #00b8db;
 
+  /* Botões: tons escuros o bastante para texto branco (contraste AA). */
+  --primary: #2563eb;
+  --primary-hover: #1d4ed8;
+  --primary-foreground: #ffffff;
+  --danger: #dc2626;
+  --danger-hover: #b91c1c;
+  --danger-foreground: #ffffff;
+
   /* Sidebar escura nos dois temas. */
   --sidebar: #18181b;
   --sidebar-foreground: #f4f4f5;
@@ -37,6 +45,12 @@
   --color-muted: var(--muted);
   --color-border: var(--border);
   --color-brand: var(--brand);
+  --color-primary: var(--primary);
+  --color-primary-hover: var(--primary-hover);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-danger: var(--danger);
+  --color-danger-hover: var(--danger-hover);
+  --color-danger-foreground: var(--danger-foreground);
   --color-sidebar: var(--sidebar);
   --color-sidebar-foreground: var(--sidebar-foreground);
   --color-sidebar-muted: var(--sidebar-muted);
@@ -46,4 +60,22 @@
   --radius-control: 0.5rem;
   --radius-card: 0.75rem;
   --radius-overlay: 1rem;
+}
+
+/* Barras de rolagem finas e discretas em toda a aplicação. */
+@layer base {
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: color-mix(in srgb, var(--muted) 45%, transparent)
+      transparent;
+  }
+}
+
+/* Períodos sem atendimento na agenda: listras discretas em vez de bloco sólido. */
+@utility bg-unavailable {
+  background-image: repeating-linear-gradient(
+    135deg,
+    var(--border) 0 1px,
+    transparent 1px 8px
+  );
 }

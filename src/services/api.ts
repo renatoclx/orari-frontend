@@ -1,5 +1,7 @@
 import "server-only";
 
+import { getAccessToken } from "@/services/session";
+
 /** Erro de uma chamada à API, com o status HTTP e uma mensagem para a tela. */
 export class ApiError extends Error {
   constructor(
@@ -46,12 +48,16 @@ export async function apiFetch<T>(
     throw new Error("API_URL não definida. Confira o .env.local.");
   }
 
+  // Como um interceptor de requisição: o token da sessão vai em toda chamada.
+  const token = await getAccessToken();
+
   let response: Response;
   try {
     response = await fetch(`${baseUrl}${path}`, {
       ...options,
       headers: {
         "Content-Type": "application/json",
+        ...(token && { Authorization: `Bearer ${token}` }),
         ...options.headers,
       },
       // Dados da empresa mudam o tempo todo: nada de cache entre requisições.

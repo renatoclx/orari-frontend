@@ -26,7 +26,7 @@ export async function login(
   if (!email) {
     fieldErrors.email = "Informe seu e-mail.";
   } else if (!EMAIL_PATTERN.test(email)) {
-    fieldErrors.email = "Informe um e-mail válido, como nome@empresa.com.";
+    fieldErrors.email = "Informe um e-mail válido (Ex: nome@empresa.com).";
   }
 
   if (!password) {

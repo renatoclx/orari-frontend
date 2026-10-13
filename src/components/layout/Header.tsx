@@ -1,9 +1,10 @@
 import { Menu } from "lucide-react";
 import { Logo } from "@/components/layout/Logo";
 import { ThemeToggle } from "@/components/layout/ThemeToggle";
+import { Avatar } from "@/components/ui/Avatar";
 
 // Usuário provisório até a autenticação existir.
-const user = { name: "Renato Jean", role: "Administrador", initials: "RJ" };
+const user = { name: "Renato Jean", role: "Administrador" };
 
 type HeaderProps = {
   onOpenMobile: () => void;
@@ -11,7 +12,7 @@ type HeaderProps = {
 
 export function Header({ onOpenMobile }: HeaderProps) {
   return (
-    <header className="sticky top-0 z-30 flex h-16 items-center gap-2 border-b border-border bg-surface px-4 md:px-8">
+    <header className="flex h-16 shrink-0 items-center gap-2 border-b border-border bg-surface px-4 md:px-8">
       <button
         type="button"
         onClick={onOpenMobile}
@@ -31,12 +32,7 @@ export function Header({ onOpenMobile }: HeaderProps) {
             <p className="text-sm font-medium">{user.name}</p>
             <p className="text-xs text-muted">{user.role}</p>
           </div>
-          <span
-            className="flex size-9 items-center justify-center rounded-full border border-border bg-background text-sm font-medium"
-            aria-hidden="true"
-          >
-            {user.initials}
-          </span>
+          <Avatar name={user.name} />
         </div>
       </div>
     </header>

@@ -2,7 +2,7 @@ import { Menu } from "lucide-react";
 import { CalendarShortcut } from "@/components/layout/CalendarShortcut";
 import { Logo } from "@/components/layout/Logo";
 import { ThemeToggle } from "@/components/layout/ThemeToggle";
-import { PersonAvatar } from "@/components/shared/PersonAvatar";
+import { UserMenu } from "@/components/layout/UserMenu";
 import type { CurrentUser } from "@/types/auth";
 import { formatUserType } from "@/utils/format";
 
@@ -39,7 +39,7 @@ export function Header({ user, onOpenMobile }: HeaderProps) {
               {formatUserType(user.type)}
             </p>
           </div>
-          <PersonAvatar name={user.name} size="lg" />
+          <UserMenu user={user} />
         </div>
       </div>
     </header>

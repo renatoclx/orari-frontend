@@ -55,7 +55,8 @@ export async function login(
 
   // Fora do try: o redirect() funciona lançando um erro especial do Next,
   // que o catch acima "engoliria".
-  redirect("/");
+  // O sinal na URL faz a área administrativa mostrar o toast de boas-vindas.
+  redirect("/?loggedIn=1");
 }
 
 function loginErrorMessage(error: ApiError): string {

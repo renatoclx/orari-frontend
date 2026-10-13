@@ -103,10 +103,12 @@ Toda página da área administrativa segue o modelo da tela de Agendamentos (`sr
 
 ## Toasts
 
+- Biblioteca: **Sonner** (via shadcn). O `<AppToaster />` (`@/components/layout/AppToaster`) já está no layout raiz, **antes** do conteúdo — não adicione outro.
+- Disparar: `import { toast } from "sonner"` → `toast.success("Cliente salvo")`, `toast.error(...)`, `toast.warning(...)`, `toast.info(...)`. Cada tipo já tem cor e ícone próprios (`richColors`).
+- Posição: canto superior direito no computador; rodapé no celular (o `AppToaster` decide sozinho).
 - Para o resultado de uma ação ("Agendado", "Cliente salvo"). Erros de formulário ficam no próprio campo, não em toast.
-- Tipos: sucesso, erro, aviso e informação, cada um com cor e ícone próprios.
-- Posição: canto superior direito no computador; rodapé centralizado no celular.
-- Erro fica até ser fechado; os demais somem sozinhos.
+- Erro fica até ser fechado: `toast.error(mensagem, { duration: Infinity })`; os demais somem sozinhos.
+- Toast depois de um redirecionamento (ex.: despedida do logout): a Server Action redireciona com um sinal na URL (`/login?loggedOut=1`), a página renderiza um componente cliente que dispara o toast com um `id` fixo (evita duplicar) e limpa a URL com `router.replace`. Se quem mostra o toast é um layout (ex.: boas-vindas, `?loggedIn=1`), a leitura é no navegador com `useSearchParams`, porque layouts não recebem `searchParams`.
 
 ## Textos da interface
 

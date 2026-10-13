@@ -8,6 +8,7 @@ import type { AuthTokens, CurrentUser } from "@/types/auth";
 
 export function login(email: string, password: string): Promise<AuthTokens> {
   return apiFetch<AuthTokens>("/auth/login", {
+    authenticated: false,
     method: "POST",
     body: JSON.stringify({ email, password }),
   });
@@ -16,6 +17,7 @@ export function login(email: string, password: string): Promise<AuthTokens> {
 /** Revoga o refresh token no backend (a sessão deixa de poder ser renovada). */
 export function logout(refreshToken: string): Promise<void> {
   return apiFetch<void>("/auth/logout", {
+    authenticated: false,
     method: "POST",
     body: JSON.stringify({ refreshToken }),
   });

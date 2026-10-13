@@ -1,6 +1,10 @@
 import "server-only";
 
+import { redirect } from "next/navigation";
 import { getAccessToken } from "@/services/session";
+
+// Rota que apaga os cookies e leva ao login (páginas não podem apagar cookies).
+const SESSION_EXPIRED_PATH = "/session-expired";
 
 /** Erro de uma chamada à API, com o status HTTP e uma mensagem para a tela. */
 export class ApiError extends Error {
@@ -39,9 +43,14 @@ function errorMessage(body: unknown): string {
  * navegador, e o import de "server-only" faz o build falhar se um Client
  * Component tentar usar este arquivo.
  */
+type ApiFetchOptions = RequestInit & {
+  /** false nas rotas públicas (login, logout): não envia o token. */
+  authenticated?: boolean;
+};
+
 export async function apiFetch<T>(
   path: string,
-  options: RequestInit = {},
+  { authenticated = true, ...options }: ApiFetchOptions = {},
 ): Promise<T> {
   const baseUrl = process.env.API_URL;
   if (!baseUrl) {
@@ -49,7 +58,7 @@ export async function apiFetch<T>(
   }
 
   // Como um interceptor de requisição: o token da sessão vai em toda chamada.
-  const token = await getAccessToken();
+  const token = authenticated ? await getAccessToken() : undefined;
 
   let response: Response;
   try {
@@ -69,6 +78,13 @@ export async function apiFetch<T>(
   }
 
   const body = await readBody(response);
+
+  // Chamada autenticada recusada (sem token, token revogado, usuário excluído,
+  // empresa inativa): a sessão acabou. O redirect lança um erro próprio do
+  // Next, que passa pelos catch que só tratam ApiError.
+  if (response.status === 401 && authenticated) {
+    redirect(SESSION_EXPIRED_PATH);
+  }
 
   if (!response.ok) {
     throw new ApiError(response.status, errorMessage(body));

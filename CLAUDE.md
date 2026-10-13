@@ -124,6 +124,15 @@ Informe:
 
 Não atualize arquivos de documentação sem confirmação do usuário.
 
+## Documentação e registro
+
+- A documentação do projeto (`docs/`, `CLAUDE.md`) e as notas do Obsidian
+  (roadmap, decisões e implementações) são atualizadas **ao terminar um módulo
+  inteiro** (ex.: autenticação, clientes), em uma revisão completa — não a cada
+  passo.
+- Exceção: a skill `orari-ui` é atualizada quando uma decisão de interface é aprovada.
+- Notas do Obsidian: `/home/renato/Documentos/Obsidian Vault/Orari-Frontend-*.md`.
+
 <!-- BEGIN:nextjs-agent-rules -->
 
 # This is NOT the Next.js you know

@@ -3,13 +3,15 @@
 import { useActionState, useState } from "react";
 import { CircleAlert, Eye, EyeOff, LockKeyhole, Mail } from "lucide-react";
 import { login } from "@/app/(auth)/login/actions";
-import { Button } from "@/components/ui/Button";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 
-const inputClass =
-  "w-full rounded-control border border-border bg-surface h-14 px-3 text-base placeholder:text-muted aria-invalid:border-danger";
+// Campos e botão maiores só no login, para leitura confortável (56 px, 16 px).
+const inputClass = "h-14 bg-card text-base md:text-base";
 
 const iconClass =
-  "pointer-events-none absolute top-1/2 left-3.5 size-5 -translate-y-1/2 text-muted";
+  "pointer-events-none absolute top-1/2 left-3.5 size-5 -translate-y-1/2 text-muted-foreground";
 
 export function LoginForm() {
   const [state, formAction, pending] = useActionState(login, undefined);
@@ -25,20 +27,18 @@ export function LoginForm() {
       {state?.message && (
         <p
           role="alert"
-          className="flex items-start gap-2 rounded-control border border-danger/30 bg-danger/10 px-3 py-2 text-sm text-danger"
+          className="flex items-start gap-2 rounded-control border border-destructive/30 bg-destructive/10 px-3 py-2 text-sm text-destructive"
         >
           <CircleAlert className="mt-0.5 size-4 shrink-0" aria-hidden="true" />
           {state.message}
         </p>
       )}
 
-      <div className="space-y-1.5">
-        <label htmlFor="email" className="block text-sm font-medium">
-          E-mail
-        </label>
+      <div className="space-y-2">
+        <Label htmlFor="email">E-mail</Label>
         <div className="relative">
           <Mail className={iconClass} aria-hidden="true" />
-          <input
+          <Input
             id="email"
             name="email"
             type="email"
@@ -52,19 +52,17 @@ export function LoginForm() {
           />
         </div>
         {emailError && (
-          <p id="email-error" className="text-sm text-danger">
+          <p id="email-error" className="text-sm text-destructive">
             {emailError}
           </p>
         )}
       </div>
 
-      <div className="space-y-1.5">
-        <label htmlFor="password" className="block text-sm font-medium">
-          Senha
-        </label>
+      <div className="space-y-2">
+        <Label htmlFor="password">Senha</Label>
         <div className="relative">
           <LockKeyhole className={iconClass} aria-hidden="true" />
-          <input
+          <Input
             id="password"
             name="password"
             type={showPassword ? "text" : "password"}
@@ -79,7 +77,7 @@ export function LoginForm() {
             aria-label="Mostrar senha"
             aria-pressed={showPassword}
             title={showPassword ? "Ocultar senha" : "Mostrar senha"}
-            className="absolute inset-y-0 right-0 flex items-center rounded-r-control px-3 text-muted hover:text-foreground"
+            className="absolute inset-y-0 right-0 flex items-center rounded-r-control px-3 text-muted-foreground hover:text-foreground"
           >
             {showPassword ? (
               <EyeOff className="size-5" aria-hidden="true" />
@@ -89,7 +87,7 @@ export function LoginForm() {
           </button>
         </div>
         {passwordError && (
-          <p id="password-error" className="text-sm text-danger">
+          <p id="password-error" className="text-sm text-destructive">
             {passwordError}
           </p>
         )}
@@ -97,10 +95,8 @@ export function LoginForm() {
 
       <Button
         type="submit"
-        variant="primary"
-        size="lg"
         disabled={pending}
-        className="mt-2 w-full"
+        className="mt-2 h-14 w-full text-base"
       >
         {pending ? "Entrando…" : "Entrar"}
       </Button>

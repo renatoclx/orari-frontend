@@ -41,14 +41,14 @@ export function DayGrid({ professionals, appointments, now }: DayGridProps) {
   const nowTop = toPixels(now);
 
   return (
-    <div className="min-h-0 flex-1 overflow-auto rounded-card border border-border bg-surface">
+    <div className="min-h-0 flex-1 overflow-auto rounded-card border border-border bg-card">
       <div
         className="grid min-w-max"
         style={{
           gridTemplateColumns: `4rem repeat(${professionals.length}, minmax(11rem, 1fr))`,
         }}
       >
-        <div className="sticky top-0 left-0 z-30 border-b border-border bg-surface" />
+        <div className="sticky top-0 left-0 z-30 border-b border-border bg-card" />
         {professionals.map((professional) => {
           const count = appointments.filter(
             (appointment) =>
@@ -59,10 +59,10 @@ export function DayGrid({ professionals, appointments, now }: DayGridProps) {
           return (
             <div
               key={professional.id}
-              className="sticky top-0 z-20 border-b border-l border-border bg-surface px-3 py-2"
+              className="sticky top-0 z-20 border-b border-l border-border bg-card px-3 py-2"
             >
               <p className="text-sm font-semibold">{professional.name}</p>
-              <p className="text-xs text-muted">
+              <p className="text-xs text-muted-foreground">
                 {count} {count === 1 ? "agendamento" : "agendamentos"}
               </p>
             </div>
@@ -70,7 +70,7 @@ export function DayGrid({ professionals, appointments, now }: DayGridProps) {
         })}
 
         <div
-          className="sticky left-0 z-20 bg-surface"
+          className="sticky left-0 z-20 bg-card"
           style={{ height: GRID_HEIGHT }}
         >
           {slots.map((slot) => (
@@ -81,7 +81,7 @@ export function DayGrid({ professionals, appointments, now }: DayGridProps) {
             >
               <time
                 className={`absolute top-1 right-2 text-xs tabular-nums ${
-                  slot % 60 === 0 ? "text-foreground" : "text-muted"
+                  slot % 60 === 0 ? "text-foreground" : "text-muted-foreground"
                 }`}
               >
                 {minutesToTime(slot)}

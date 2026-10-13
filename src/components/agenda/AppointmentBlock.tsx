@@ -40,7 +40,7 @@ export function AppointmentBlock({
       }}
     >
       <div className="flex items-center gap-1.5">
-        <time className="text-xs text-muted tabular-nums">
+        <time className="text-xs text-muted-foreground tabular-nums">
           {appointment.start}
         </time>
         <h3
@@ -66,7 +66,9 @@ export function AppointmentBlock({
         )}
         <span className="sr-only">{statusLabel}</span>
       </div>
-      <p className="truncate text-xs text-muted">{appointment.serviceName}</p>
+      <p className="truncate text-xs text-muted-foreground">
+        {appointment.serviceName}
+      </p>
     </article>
   );
 }

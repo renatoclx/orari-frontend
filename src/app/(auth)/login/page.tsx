@@ -10,7 +10,7 @@ export default function LoginPage() {
     <div className="w-full max-w-sm">
       <div className="mb-8 space-y-2">
         <h1 className="text-2xl font-semibold">Entrar no Orari</h1>
-        <p className="text-sm text-muted">
+        <p className="text-sm text-muted-foreground">
           Acesse os agendamentos da sua empresa.
         </p>
       </div>

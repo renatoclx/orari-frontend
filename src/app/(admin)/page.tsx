@@ -1,4 +1,3 @@
-import { AgendaActionBar } from "@/components/agenda/AgendaActionBar";
 import { AgendaToolbar } from "@/components/agenda/AgendaToolbar";
 import { DayGrid } from "@/components/agenda/DayGrid";
 import {
@@ -19,7 +18,6 @@ export default function AgendaPage() {
         appointments={mockAppointments}
         now={mockNow}
       />
-      <AgendaActionBar />
     </div>
   );
 }

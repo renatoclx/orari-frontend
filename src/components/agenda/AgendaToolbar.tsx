@@ -1,8 +1,5 @@
 import { ChevronLeft, ChevronRight, Plus } from "lucide-react";
-import { Button } from "@/components/ui/Button";
-
-const secondaryButtonClass =
-  "rounded-control border border-border bg-surface text-sm hover:bg-background";
+import { Button } from "@/components/ui/button";
 
 type AgendaToolbarProps = {
   dateLabel: string;
@@ -10,31 +7,24 @@ type AgendaToolbarProps = {
 
 export function AgendaToolbar({ dateLabel }: AgendaToolbarProps) {
   return (
-    <div className="flex flex-wrap items-center gap-3">
+    <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
       <div className="flex items-center gap-1">
-        <button
-          type="button"
-          aria-label="Dia anterior"
-          className={`${secondaryButtonClass} p-2`}
-        >
-          <ChevronLeft className="size-4" aria-hidden="true" />
-        </button>
-        <button
-          type="button"
-          aria-label="Próximo dia"
-          className={`${secondaryButtonClass} p-2`}
-        >
-          <ChevronRight className="size-4" aria-hidden="true" />
-        </button>
-        <button type="button" className={`${secondaryButtonClass} px-3 py-1.5`}>
-          Hoje
-        </button>
+        <Button variant="outline" size="icon" aria-label="Dia anterior">
+          <ChevronLeft aria-hidden="true" />
+        </Button>
+        <Button variant="outline" size="icon" aria-label="Próximo dia">
+          <ChevronRight aria-hidden="true" />
+        </Button>
+        <Button variant="outline">Hoje</Button>
       </div>
 
-      <h2 className="text-lg font-semibold">{dateLabel}</h2>
+      {/* No celular, a data ocupa a primeira linha e os botões descem. */}
+      <h2 className="text-lg font-semibold max-sm:order-first max-sm:w-full">
+        {dateLabel}
+      </h2>
 
-      <Button variant="primary" className="ml-auto">
-        <Plus className="size-4" aria-hidden="true" />
+      <Button className="ml-auto">
+        <Plus aria-hidden="true" />
         Agendar
       </Button>
     </div>

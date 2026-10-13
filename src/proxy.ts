@@ -12,6 +12,12 @@ const HOME_PATH = "/";
  * verdade é a API; aqui o objetivo é não renderizar telas sem sessão.
  */
 export function proxy(request: NextRequest) {
+  // Só para desenvolvimento: AUTH_GUARD=off no .env.local libera a navegação
+  // enquanto o login ainda não fala com a API. Sem a variável, a proteção vale.
+  if (process.env.AUTH_GUARD === "off") {
+    return NextResponse.next();
+  }
+
   const { pathname } = request.nextUrl;
   const hasSession =
     request.cookies.has(ACCESS_TOKEN_COOKIE) ||

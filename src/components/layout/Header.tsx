@@ -17,7 +17,7 @@ export function Header({ onOpenMobile }: HeaderProps) {
         type="button"
         onClick={onOpenMobile}
         aria-label="Abrir menu"
-        className="rounded-control p-2 text-muted hover:text-foreground focus-visible:outline-2 focus-visible:outline-brand md:hidden"
+        className="rounded-control p-2 text-muted hover:text-foreground md:hidden"
       >
         <Menu className="size-5" aria-hidden="true" />
       </button>

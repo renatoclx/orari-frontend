@@ -25,7 +25,7 @@ export function ThemeToggle() {
       aria-label="Tema escuro"
       title="Alternar tema"
       onClick={() => setTheme(isDark ? "light" : "dark")}
-      className="h-7 w-12 shrink-0 rounded-full border border-border bg-background p-0.5 focus-visible:outline-2 focus-visible:outline-brand"
+      className="h-7 w-12 shrink-0 rounded-full border border-border bg-background p-0.5"
     >
       <span className="flex size-6 items-center justify-center rounded-full border border-border bg-surface text-muted motion-safe:transition-transform dark:translate-x-4.5">
         <Sun className="size-3.5 dark:hidden" aria-hidden="true" />

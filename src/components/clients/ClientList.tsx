@@ -3,8 +3,7 @@ import { Avatar } from "@/components/ui/Avatar";
 import type { Client } from "@/types/client";
 import { formatCpf, formatDateOnly, formatPhone } from "@/utils/format";
 
-const iconButtonClass =
-  "rounded-control p-2 text-muted hover:bg-background focus-visible:outline-2 focus-visible:outline-brand";
+const iconButtonClass = "rounded-control p-2 text-muted hover:bg-background";
 
 type ClientListProps = {
   clients: Client[];

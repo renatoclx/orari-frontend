@@ -14,7 +14,7 @@ export function ClientsToolbar() {
           type="search"
           aria-label="Buscar cliente por nome"
           placeholder="Buscar por nome"
-          className="w-full rounded-control border border-border bg-surface py-2 pr-3 pl-9 text-sm placeholder:text-muted focus-visible:outline-2 focus-visible:outline-brand"
+          className="w-full rounded-control border border-border bg-surface py-2 pr-3 pl-9 text-sm placeholder:text-muted"
         />
       </div>
 

@@ -2,7 +2,7 @@ import { ChevronLeft, ChevronRight, Plus } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 
 const secondaryButtonClass =
-  "rounded-control border border-border bg-surface text-sm hover:bg-background focus-visible:outline-2 focus-visible:outline-brand";
+  "rounded-control border border-border bg-surface text-sm hover:bg-background";
 
 type AgendaToolbarProps = {
   dateLabel: string;

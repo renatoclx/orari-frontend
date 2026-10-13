@@ -22,7 +22,7 @@ const navItems = [
 ];
 
 const iconButtonClass =
-  "rounded-control p-1.5 text-sidebar-muted hover:bg-sidebar-accent hover:text-sidebar-foreground focus-visible:outline-2 focus-visible:outline-brand";
+  "rounded-control p-1.5 text-sidebar-muted hover:bg-sidebar-accent hover:text-sidebar-foreground";
 
 type SidebarProps = {
   collapsed: boolean;
@@ -52,7 +52,7 @@ export function Sidebar({
               onClick={onToggleCollapsed}
               aria-label="Expandir menu"
               title="Expandir menu"
-              className="group grid size-9 place-items-center rounded-control hover:bg-sidebar-accent focus-visible:outline-2 focus-visible:outline-brand"
+              className="group grid size-9 place-items-center rounded-control hover:bg-sidebar-accent"
             >
               <span className="col-start-1 row-start-1 group-hover:invisible group-focus-visible:invisible">
                 <Logo variant="icon" />
@@ -130,7 +130,7 @@ function SidebarNav({ collapsed, onNavigate }: SidebarNavProps) {
                 onClick={onNavigate}
                 title={collapsed ? label : undefined}
                 aria-current={active ? "page" : undefined}
-                className={`flex items-center gap-3 rounded-control px-3 py-2 text-sm focus-visible:outline-2 focus-visible:outline-brand ${
+                className={`flex items-center gap-3 rounded-control px-3 py-2 text-sm ${
                   active
                     ? "bg-sidebar-accent font-medium text-sidebar-foreground"
                     : "text-sidebar-muted hover:bg-sidebar-accent hover:text-sidebar-foreground"

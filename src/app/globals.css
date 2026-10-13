@@ -18,6 +18,9 @@
   --danger-hover: #b91c1c;
   --danger-foreground: #ffffff;
 
+  /* Contorno de foco (navegação por teclado). */
+  --focus: #60a5fa;
+
   /* Sidebar escura nos dois temas. */
   --sidebar: #18181b;
   --sidebar-foreground: #f4f4f5;
@@ -51,6 +54,7 @@
   --color-danger: var(--danger);
   --color-danger-hover: var(--danger-hover);
   --color-danger-foreground: var(--danger-foreground);
+  --color-focus: var(--focus);
   --color-sidebar: var(--sidebar);
   --color-sidebar-foreground: var(--sidebar-foreground);
   --color-sidebar-muted: var(--sidebar-muted);
@@ -62,8 +66,38 @@
   --radius-overlay: 1rem;
 }
 
-/* Barras de rolagem finas e discretas em toda a aplicação. */
 @layer base {
+  /* Foco de teclado global: o contorno surge com uma transição curta.
+     O contorno transparente já existe antes do foco para que a cor e o
+     afastamento possam ser animados. */
+  :where(a, button, input, select, textarea, summary, [tabindex]) {
+    outline: 1px solid transparent;
+    outline-offset: 3px;
+    transition:
+      outline-color 150ms ease,
+      outline-offset 150ms ease;
+  }
+
+  :where(
+    a,
+    button,
+    input,
+    select,
+    textarea,
+    summary,
+    [tabindex]
+  ):focus-visible {
+    outline-color: var(--focus);
+    outline-offset: 0;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    :where(a, button, input, select, textarea, summary, [tabindex]) {
+      transition: none;
+    }
+  }
+
+  /* Barras de rolagem finas e discretas em toda a aplicação. */
   * {
     scrollbar-width: thin;
     scrollbar-color: color-mix(in srgb, var(--muted) 45%, transparent)

@@ -27,14 +27,15 @@ Use apenas os tokens abaixo (definidos em `src/app/globals.css`). Eles já troca
 | `foreground` | texto principal                        |
 | `muted`      | texto secundário, ícones inativos      |
 | `border`     | bordas e divisórias (sempre discretas) |
-| `brand`      | marca: logo, item ativo, foco          |
+| `brand`      | marca: logo, item ativo                |
 | `primary`    | botão da ação principal (texto branco) |
 | `danger`     | ações destrutivas (texto branco)       |
 
 A sidebar é escura nos dois temas e tem tokens próprios: `sidebar` (fundo), `sidebar-foreground`, `sidebar-muted`, `sidebar-border` e `sidebar-accent` (item ativo e hover). Dentro dela, use só esses tokens, nunca `surface`/`muted`.
 
-- `brand` (cyan) é a cor da marca: logo, item ativo da navegação, foco e destaques pontuais (ex.: linha do "agora"). Não usar como decoração nem como fundo de botão — branco sobre o cyan não tem contraste suficiente.
+- `brand` (cyan) é a cor da marca: logo, item ativo da navegação e destaques pontuais (ex.: linha do "agora"). Não usar como decoração nem como fundo de botão — branco sobre o cyan não tem contraste suficiente.
 - `primary` (blue-600) é o fundo do botão da ação principal, com texto `text-primary-foreground` (branco). Uma ação principal por tela.
+- Foco de teclado é global (`globals.css`): contorno de 1 px no token `focus` (blue-400), que surge com uma transição curta. **Não adicione classes `focus-visible:outline-*` nos componentes.**
 - Não usar valores soltos (`bg-[#...]`) nem cores da paleta do Tailwind para a interface base. Se faltar uma cor, ela vira um token novo no `globals.css`.
 - Cores de status e de agendamentos ainda não foram definidas: pergunte antes de inventar.
 
@@ -47,6 +48,7 @@ Use sempre o componente `Button` de `@/components/ui/Button`:
 - `ghost`: ações discretas ("Ver detalhes").
 - `danger`: ações destrutivas ("Excluir").
 - Desabilitado com o atributo `disabled`, em qualquer variante.
+- Tamanho: `md` (padrão) no sistema; `size="lg"` (56 px, texto 16 px) só no login, junto com campos de 56 px e texto 16 px.
 
 ## Tipografia
 
@@ -108,6 +110,6 @@ Toda página da área administrativa segue o modelo da tela de Agendamentos (`sr
 ## Acessibilidade
 
 - HTML semântico: `<header>`, `<nav>`, `<main>`, `<button>` para ações, `<a>` para navegação.
-- Todo elemento interativo tem foco visível (`focus-visible:`).
+- Todo elemento interativo tem foco visível: use elementos nativos (`button`, `a`, `input`) ou `tabindex`, que já recebem o contorno global.
 - Botões só com ícone têm `aria-label`; imagens têm `alt`.
 - Respeite `prefers-reduced-motion` (variante `motion-safe:`).

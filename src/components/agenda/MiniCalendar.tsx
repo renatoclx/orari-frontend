@@ -32,14 +32,14 @@ export function MiniCalendar({ year, month, selectedDay }: MiniCalendarProps) {
           <button
             type="button"
             aria-label="Mês anterior"
-            className="rounded-control p-1 text-muted hover:bg-background hover:text-foreground focus-visible:outline-2 focus-visible:outline-brand"
+            className="rounded-control p-1 text-muted hover:bg-background hover:text-foreground"
           >
             <ChevronLeft className="size-4" aria-hidden="true" />
           </button>
           <button
             type="button"
             aria-label="Próximo mês"
-            className="rounded-control p-1 text-muted hover:bg-background hover:text-foreground focus-visible:outline-2 focus-visible:outline-brand"
+            className="rounded-control p-1 text-muted hover:bg-background hover:text-foreground"
           >
             <ChevronRight className="size-4" aria-hidden="true" />
           </button>
@@ -60,7 +60,7 @@ export function MiniCalendar({ year, month, selectedDay }: MiniCalendarProps) {
               key={day}
               type="button"
               aria-current={day === selectedDay ? "date" : undefined}
-              className={`mx-auto flex size-8 items-center justify-center rounded-full tabular-nums focus-visible:outline-2 focus-visible:outline-brand ${
+              className={`mx-auto flex size-8 items-center justify-center rounded-full tabular-nums ${
                 day === selectedDay
                   ? "bg-primary font-semibold text-primary-foreground"
                   : "hover:bg-background"

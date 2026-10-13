@@ -8,12 +8,22 @@ const variantClasses: Record<ButtonVariant, string> = {
   danger: "bg-danger text-danger-foreground hover:bg-danger-hover",
 };
 
+type ButtonSize = "md" | "lg";
+
+const sizeClasses: Record<ButtonSize, string> = {
+  md: "px-4 py-2 text-sm",
+  // Formulários em destaque (ex.: login), onde legibilidade pesa mais.
+  lg: "h-14 px-6 text-base",
+};
+
 type ButtonProps = React.ComponentProps<"button"> & {
   variant?: ButtonVariant;
+  size?: ButtonSize;
 };
 
 export function Button({
   variant = "secondary",
+  size = "md",
   type = "button",
   className = "",
   ...props
@@ -21,7 +31,7 @@ export function Button({
   return (
     <button
       type={type}
-      className={`inline-flex items-center justify-center gap-2 rounded-control px-4 py-2 text-sm font-medium focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand disabled:pointer-events-none disabled:opacity-50 ${variantClasses[variant]} ${className}`}
+      className={`inline-flex items-center justify-center gap-2 rounded-control font-medium disabled:pointer-events-none disabled:opacity-50 ${sizeClasses[size]} ${variantClasses[variant]} ${className}`}
       {...props}
     />
   );

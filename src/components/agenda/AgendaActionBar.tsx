@@ -14,7 +14,7 @@ export function AgendaActionBar() {
           popoverTarget={CALENDAR_ID}
           aria-label="Abrir calendário"
           title="Calendário"
-          className="rounded-control p-2 text-muted hover:bg-background hover:text-foreground focus-visible:outline-2 focus-visible:outline-brand"
+          className="rounded-control p-2 text-muted hover:bg-background hover:text-foreground"
         >
           <CalendarDays className="size-5" aria-hidden="true" />
         </button>

@@ -17,6 +17,7 @@ frontend-architecture.md
 frontend-rules.md
 frontend-coding-standards.md
 frontend-auth.md
+frontend-technical-debt.md
 stack-tecnologico.md
 
 Regras de interface: skill `.claude/skills/orari-ui/SKILL.md`.

@@ -23,6 +23,7 @@ src/
     (auth)/                  telas públicas (sem sidebar)
       layout.tsx             dois painéis: formulário + painel da marca
       login/                 página e Server Action do login
+    session-expired/route.ts apaga os cookies da sessão e leva ao login
   components/
     ui/                      componentes do shadcn/ui (nomes em minúsculas)
     layout/                  estrutura: AdminShell, Sidebar, Header, ActionBar,
@@ -53,10 +54,10 @@ Server Action ───────────┼─→ <assunto>.service.ts �
 Layout ──────────────────┘
 ```
 
-- **`apiFetch`** (`services/api.ts`) é o ponto único de chamada à API: monta a URL com `API_URL`, envia JSON sem cache, anexa o token da sessão e transforma erros em `ApiError` (status + mensagem). Status `0` = API fora do ar.
+- **`apiFetch`** (`services/api.ts`) é o ponto único de chamada à API: monta a URL com `API_URL`, envia JSON sem cache, anexa o token da sessão e transforma erros em `ApiError` (status + mensagem). Status `0` = API fora do ar. Um 401 em chamada autenticada leva ao login (`/session-expired`).
 - **Services por assunto** (`auth.service.ts`, `client.service.ts`...) conhecem os caminhos da API e são chamados pelas telas, layouts e Server Actions — nunca o `apiFetch` direto.
 - Os services importam `server-only`: rodam só no servidor. O navegador nunca fala com a API diretamente.
-- Server Actions tratam `ApiError` (viram mensagem na tela) e deixam estourar erros inesperados.
+- Server Actions tratam `ApiError` (viram mensagem na tela) e deixam estourar erros inesperados — inclusive o `redirect()` do Next, que também é lançado como erro.
 
 ## Server Components x Client Components
 
@@ -70,7 +71,7 @@ Layout ──────────────────┘
 Resumo; detalhes em `frontend-auth.md`.
 
 - Tokens em cookies `httpOnly`; o navegador não acessa o token.
-- `proxy.ts` roda antes de toda tela: sem sessão → `/login`; com sessão em `/login` → `/`.
+- `proxy.ts` roda antes de toda tela: renova a sessão quando o access token venceu e protege as rotas (sem sessão → `/login`; com sessão em `/login` → `/`).
 - Cookies só podem ser gravados/apagados em Server Actions, Route Handlers e no proxy — nunca durante a renderização de uma página.
 
 ## Layout e interface

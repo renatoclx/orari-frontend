@@ -1,16 +1,25 @@
 "use client";
 
 import { useState } from "react";
+import { ActionBar } from "@/components/layout/ActionBar";
 import { Header } from "@/components/layout/Header";
 import { Sidebar } from "@/components/layout/Sidebar";
+import { WelcomeToast } from "@/components/layout/WelcomeToast";
 import { SIDEBAR_COOKIE } from "@/components/layout/sidebar-cookie";
+import { TooltipProvider } from "@/components/ui/tooltip";
+import type { CurrentUser } from "@/types/auth";
 
 type AdminShellProps = {
   defaultCollapsed: boolean;
+  user: CurrentUser;
   children: React.ReactNode;
 };
 
-export function AdminShell({ defaultCollapsed, children }: AdminShellProps) {
+export function AdminShell({
+  defaultCollapsed,
+  user,
+  children,
+}: AdminShellProps) {
   const [collapsed, setCollapsed] = useState(defaultCollapsed);
   const [mobileOpen, setMobileOpen] = useState(false);
 
@@ -21,20 +30,26 @@ export function AdminShell({ defaultCollapsed, children }: AdminShellProps) {
   }
 
   return (
-    <div className="flex min-h-screen bg-background text-foreground">
-      <Sidebar
-        collapsed={collapsed}
-        onToggleCollapsed={toggleCollapsed}
-        mobileOpen={mobileOpen}
-        onCloseMobile={() => setMobileOpen(false)}
-      />
+    <TooltipProvider>
+      <div className="flex h-dvh overflow-hidden bg-background text-foreground">
+        <Sidebar
+          collapsed={collapsed}
+          onToggleCollapsed={toggleCollapsed}
+          mobileOpen={mobileOpen}
+          onCloseMobile={() => setMobileOpen(false)}
+        />
 
-      <div className="flex min-w-0 flex-1 flex-col">
-        <Header onOpenMobile={() => setMobileOpen(true)} />
-        <main className="flex-1">
-          <div className="mx-auto max-w-5xl px-4 py-8 md:px-8">{children}</div>
-        </main>
+        <div className="flex min-w-0 flex-1 flex-col">
+          <Header user={user} onOpenMobile={() => setMobileOpen(true)} />
+          {/* A página não rola: cada componente cuida da própria rolagem. */}
+          <main className="flex min-h-0 flex-1 flex-col p-4 md:p-8">
+            {children}
+          </main>
+        </div>
+
+        <ActionBar />
+        <WelcomeToast userName={user.name} />
       </div>
-    </div>
+    </TooltipProvider>
   );
 }

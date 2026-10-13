@@ -1,22 +1,24 @@
 import { Menu } from "lucide-react";
+import { CalendarShortcut } from "@/components/layout/CalendarShortcut";
 import { Logo } from "@/components/layout/Logo";
 import { ThemeToggle } from "@/components/layout/ThemeToggle";
-
-// Usuário provisório até a autenticação existir.
-const user = { name: "Renato Jean", role: "Administrador", initials: "RJ" };
+import { UserMenu } from "@/components/layout/UserMenu";
+import type { CurrentUser } from "@/types/auth";
+import { formatUserType } from "@/utils/format";
 
 type HeaderProps = {
+  user: CurrentUser;
   onOpenMobile: () => void;
 };
 
-export function Header({ onOpenMobile }: HeaderProps) {
+export function Header({ user, onOpenMobile }: HeaderProps) {
   return (
-    <header className="sticky top-0 z-30 flex h-16 items-center gap-2 border-b border-border bg-surface px-4 md:px-8">
+    <header className="flex h-16 shrink-0 items-center gap-2 border-b border-border bg-card px-4 md:px-8">
       <button
         type="button"
         onClick={onOpenMobile}
         aria-label="Abrir menu"
-        className="rounded-control p-2 text-muted hover:text-foreground focus-visible:outline-2 focus-visible:outline-brand md:hidden"
+        className="rounded-control p-2 text-muted-foreground hover:text-foreground md:hidden"
       >
         <Menu className="size-5" aria-hidden="true" />
       </button>
@@ -25,18 +27,19 @@ export function Header({ onOpenMobile }: HeaderProps) {
       </div>
 
       <div className="ml-auto flex items-center gap-3">
+        {/* No celular, os atalhos da barra lateral ficam aqui. */}
+        <div className="md:hidden">
+          <CalendarShortcut placement="header" />
+        </div>
         <ThemeToggle />
         <div className="flex items-center gap-3">
           <div className="hidden text-right md:block">
             <p className="text-sm font-medium">{user.name}</p>
-            <p className="text-xs text-muted">{user.role}</p>
+            <p className="text-xs text-muted-foreground">
+              {formatUserType(user.type)}
+            </p>
           </div>
-          <span
-            className="flex size-9 items-center justify-center rounded-full border border-border bg-background text-sm font-medium"
-            aria-hidden="true"
-          >
-            {user.initials}
-          </span>
+          <UserMenu user={user} />
         </div>
       </div>
     </header>

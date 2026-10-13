@@ -10,6 +10,7 @@ Complementa o `coding-standards.md` do backend com regras pontuais do frontend.
 # Exemplos
 
 - Componentes em PascalCase: `ClientCard.tsx`
+  - Exceção: `src/components/ui/` mantém os nomes em minúsculas gerados pelo shadcn/ui (`button.tsx`), para que `npx shadcn add` continue atualizando os arquivos.
 - Hooks iniciados com `use`: `useAppointments.ts`
 - Services com sufixo `.service.ts`: `client.service.ts`
 - Tipos em `src/types/`: `client.ts`

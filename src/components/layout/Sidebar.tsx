@@ -12,17 +12,28 @@ import {
   X,
 } from "lucide-react";
 import { Logo } from "@/components/layout/Logo";
+import {
+  Sheet,
+  SheetClose,
+  SheetContent,
+  SheetTitle,
+} from "@/components/ui/sheet";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 // Menu provisório: as rotas ainda não existem.
 const navItems = [
-  { href: "/", label: "Agenda", icon: CalendarDays },
+  { href: "/", label: "Agendamentos", icon: CalendarDays },
   { href: "/clientes", label: "Clientes", icon: Users },
   { href: "/servicos", label: "Serviços", icon: ClipboardList },
   { href: "/financeiro", label: "Financeiro", icon: Wallet },
 ];
 
 const iconButtonClass =
-  "rounded-control p-1.5 text-sidebar-muted hover:bg-sidebar-accent hover:text-sidebar-foreground focus-visible:outline-2 focus-visible:outline-brand";
+  "rounded-control p-1.5 text-sidebar-muted hover:bg-sidebar-accent hover:text-sidebar-foreground";
 
 type SidebarProps = {
   collapsed: boolean;
@@ -40,7 +51,7 @@ export function Sidebar({
   return (
     <>
       <aside
-        className={`sticky top-0 hidden h-screen shrink-0 flex-col border-r border-sidebar-border bg-sidebar text-sidebar-foreground motion-safe:transition-[width] md:flex ${
+        className={`hidden h-dvh shrink-0 flex-col border-r border-sidebar-border bg-sidebar text-sidebar-foreground motion-safe:transition-[width] md:flex ${
           collapsed ? "w-16" : "w-60"
         }`}
       >
@@ -52,7 +63,7 @@ export function Sidebar({
               onClick={onToggleCollapsed}
               aria-label="Expandir menu"
               title="Expandir menu"
-              className="group grid size-9 place-items-center rounded-control hover:bg-sidebar-accent focus-visible:outline-2 focus-visible:outline-brand"
+              className="group grid size-9 place-items-center rounded-control hover:bg-sidebar-accent"
             >
               <span className="col-start-1 row-start-1 group-hover:invisible group-focus-visible:invisible">
                 <Logo variant="icon" />
@@ -81,30 +92,26 @@ export function Sidebar({
         <SidebarNav collapsed={collapsed} />
       </aside>
 
-      {mobileOpen && (
-        <div className="fixed inset-0 z-40 md:hidden">
-          <button
-            type="button"
-            aria-label="Fechar menu"
-            onClick={onCloseMobile}
-            className="absolute inset-0 bg-black/40"
-          />
-          <aside className="relative flex h-full w-64 flex-col bg-sidebar text-sidebar-foreground shadow-lg">
-            <div className="flex h-16 items-center justify-between px-4">
-              <Logo variant="full" />
-              <button
-                type="button"
-                onClick={onCloseMobile}
-                aria-label="Fechar menu"
-                className={iconButtonClass}
-              >
-                <X className="size-5" aria-hidden="true" />
-              </button>
-            </div>
-            <SidebarNav collapsed={false} onNavigate={onCloseMobile} />
-          </aside>
-        </div>
-      )}
+      {/* Gaveta do celular: o Sheet cuida do fundo escuro, do Esc e do foco. */}
+      <Sheet
+        open={mobileOpen}
+        onOpenChange={(open) => !open && onCloseMobile()}
+      >
+        <SheetContent
+          side="left"
+          showCloseButton={false}
+          className="w-64 gap-0 border-sidebar-border bg-sidebar p-0 text-sidebar-foreground data-[side=left]:sm:max-w-64 md:hidden"
+        >
+          <SheetTitle className="sr-only">Menu</SheetTitle>
+          <div className="flex h-16 items-center justify-between px-4">
+            <Logo variant="full" />
+            <SheetClose aria-label="Fechar menu" className={iconButtonClass}>
+              <X className="size-5" aria-hidden="true" />
+            </SheetClose>
+          </div>
+          <SidebarNav collapsed={false} onNavigate={onCloseMobile} />
+        </SheetContent>
+      </Sheet>
     </>
   );
 }
@@ -122,28 +129,36 @@ function SidebarNav({ collapsed, onNavigate }: SidebarNavProps) {
       <ul className="space-y-1">
         {navItems.map(({ href, label, icon: Icon }) => {
           const active = pathname === href;
+          const link = (
+            <Link
+              href={href}
+              onClick={onNavigate}
+              aria-current={active ? "page" : undefined}
+              className={`flex items-center gap-3 rounded-control px-3 py-2 text-sm ${
+                active
+                  ? "bg-sidebar-accent font-medium text-sidebar-foreground"
+                  : "text-sidebar-muted hover:bg-sidebar-accent hover:text-sidebar-foreground"
+              }`}
+            >
+              <Icon
+                className={`size-5 shrink-0 ${active ? "text-brand" : ""}`}
+                aria-hidden="true"
+              />
+              <span className={collapsed ? "sr-only" : undefined}>{label}</span>
+            </Link>
+          );
 
           return (
             <li key={href}>
-              <Link
-                href={href}
-                onClick={onNavigate}
-                title={collapsed ? label : undefined}
-                aria-current={active ? "page" : undefined}
-                className={`flex items-center gap-3 rounded-control px-3 py-2 text-sm focus-visible:outline-2 focus-visible:outline-brand ${
-                  active
-                    ? "bg-sidebar-accent font-medium text-sidebar-foreground"
-                    : "text-sidebar-muted hover:bg-sidebar-accent hover:text-sidebar-foreground"
-                }`}
-              >
-                <Icon
-                  className={`size-5 shrink-0 ${active ? "text-brand" : ""}`}
-                  aria-hidden="true"
-                />
-                <span className={collapsed ? "sr-only" : undefined}>
-                  {label}
-                </span>
-              </Link>
+              {collapsed ? (
+                // Recolhida, o nome aparece numa dica ao lado do ícone.
+                <Tooltip>
+                  <TooltipTrigger asChild>{link}</TooltipTrigger>
+                  <TooltipContent side="right">{label}</TooltipContent>
+                </Tooltip>
+              ) : (
+                link
+              )}
             </li>
           );
         })}

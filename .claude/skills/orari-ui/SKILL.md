@@ -18,23 +18,46 @@ Estas decisões já foram tomadas pelo time. Quando outra skill de design (ex.: 
 
 ## Cores
 
-Use apenas os tokens abaixo (definidos em `src/app/globals.css`). Eles já trocam sozinhos entre claro e escuro, então **não use `dark:` para as cores base** — `bg-surface` já é branco no claro e zinc-800 no escuro.
+Os tokens seguem os nomes do **shadcn/ui**, com os valores do Orari (definidos em `src/app/globals.css`). Eles já trocam sozinhos entre claro e escuro, então **não use `dark:` para as cores base** — `bg-card` já é branco no claro e zinc-800 no escuro.
 
-| Token        | Uso                                    |
-| ------------ | -------------------------------------- |
-| `background` | fundo da página                        |
-| `surface`    | cards, header, modais                  |
-| `foreground` | texto principal                        |
-| `muted`      | texto secundário, ícones inativos      |
-| `border`     | bordas e divisórias (sempre discretas) |
-| `brand`      | marca e ação principal da tela         |
+| Token                            | Uso                                                         |
+| -------------------------------- | ----------------------------------------------------------- |
+| `background` / `foreground`      | fundo da página / texto principal                           |
+| `card` / `popover`               | cards, header, painéis flutuantes                           |
+| `muted-foreground`               | texto secundário, ícones inativos                           |
+| `muted` / `accent` / `secondary` | fundos discretos (hover, badges) — **não** são cor de texto |
+| `border` / `input`               | bordas e divisórias / borda de campos                       |
+| `primary` / `primary-foreground` | ação principal (blue-600, texto branco)                     |
+| `destructive`                    | ações destrutivas e erros                                   |
+| `ring`                           | foco de teclado (blue-400)                                  |
+| `brand`                          | marca: logo, item ativo (cyan) — token próprio do Orari     |
 
-A sidebar é escura nos dois temas e tem tokens próprios: `sidebar` (fundo), `sidebar-foreground`, `sidebar-muted`, `sidebar-border` e `sidebar-accent` (item ativo e hover). Dentro dela, use só esses tokens, nunca `surface`/`muted`.
+A sidebar é escura nos dois temas e tem tokens próprios: `sidebar` (fundo), `sidebar-foreground`, `sidebar-muted` (próprio do Orari), `sidebar-border` e `sidebar-accent` (item ativo e hover). Dentro dela, use só esses tokens.
 
-- `brand` (cyan) é reservado: uma ação principal por tela, item ativo da navegação, foco. Não usar como decoração.
-- Texto sobre `brand` é sempre `text-zinc-900` — branco sobre o cyan não tem contraste suficiente.
+- `brand` (cyan) é a cor da marca: logo, item ativo da navegação e destaques pontuais (ex.: linha do "agora"). Não usar como decoração nem como fundo de botão — branco sobre o cyan não tem contraste suficiente.
+- `primary` (blue-600) é a ação principal. Uma por tela.
+- Foco de teclado é global (`globals.css`): contorno de 1 px no token `ring`, que surge com uma transição curta. **Não adicione classes de foco (`focus-visible:ring-*`, `outline-none`) nos componentes** — ao adicionar um componente do shadcn, remova as dele.
 - Não usar valores soltos (`bg-[#...]`) nem cores da paleta do Tailwind para a interface base. Se faltar uma cor, ela vira um token novo no `globals.css`.
 - Cores de status e de agendamentos ainda não foram definidas: pergunte antes de inventar.
+
+## Componentes (shadcn/ui)
+
+- Primitivos de interface vêm do **shadcn/ui (base Radix)**, em `src/components/ui/` (arquivos em minúsculas, como o shadcn gera). Antes de criar um botão, campo, switch, popover, gaveta, tooltip etc., use o de `@/components/ui/*`; se não existir, adicione com `npx shadcn@latest add <nome>`.
+- Já instalados: `button`, `input`, `label`, `switch`, `avatar`, `sheet`, `tooltip`, `popover`, `calendar`.
+- Combine classes com `cn()` (`@/lib/utils`), que resolve conflitos do Tailwind (ex.: `h-8` do componente + `h-14` passado por fora).
+- Componentes do Orari que usam primitivos ficam fora de `ui/` (ex.: `@/components/shared/PersonAvatar`).
+- Componentes do Radix que recebem funções ou objetos com funções (ex.: `Calendar` com `locale`) precisam ser usados dentro de um Client Component.
+
+## Botões
+
+Use `Button` de `@/components/ui/button`:
+
+- `default`: a ação principal da tela ("Agendar", "Salvar alterações").
+- `outline`: alternativas e navegação ("Cancelar", "Hoje", setas).
+- `ghost`: ações discretas ("Ver detalhes").
+- `destructive`: ações destrutivas ("Excluir").
+- `size="icon"` para botões só com ícone (sempre com `aria-label`).
+- Login: botão e campos com `h-14 text-base` (56 px, texto 16 px), só nessa tela.
 
 ## Tipografia
 
@@ -48,7 +71,7 @@ A sidebar é escura nos dois temas e tem tokens próprios: `sidebar` (fundo), `s
   - `rounded-control`: botões, campos, selects.
   - `rounded-card`: cards e painéis.
   - `rounded-overlay`: modais, menus, toasts.
-- Cards **sem sombra**: separam-se pelo fundo (`bg-surface`) e pela borda (`border border-border`).
+- Cards **sem sombra**: separam-se pelo fundo (`bg-card`) e pela borda (`border border-border`).
 - Sombra só no que flutua sobre o conteúdo (modais, menus, toasts).
 
 ## Layout da área administrativa
@@ -57,21 +80,42 @@ A sidebar é escura nos dois temas e tem tokens próprios: `sidebar` (fundo), `s
 - Header com atalhos, toggle (switch) de tema claro/escuro e usuário logado.
 - Componentes da estrutura ficam em `src/components/layout/`; o estado da sidebar recolhida fica em cookie, lido no servidor.
 - Celular: header com botão de menu e ícone da logo; a sidebar abre como gaveta por cima do conteúdo.
-- Conteúdo em um container centralizado com largura máxima; o título da página fica alinhado à esquerda do container.
 - Mobile first: escreva o estilo do celular primeiro e amplie com `md:` / `lg:`.
+
+## Padrão de página
+
+Toda página da área administrativa segue o modelo da tela de Agendamentos (`src/app/(admin)/page.tsx`):
+
+- **A página não rola.** A estrutura ocupa a altura da tela (`h-dvh`) e o `<main>` tem padding igual nos quatro lados (`p-4 md:p-8`). Quem rola é o componente principal da página.
+- Raiz da página: `flex min-h-0 flex-1 flex-col gap-4`.
+- Ordem: título (`<h1 className="text-2xl font-semibold">`), barra de ferramentas da página (navegação e ação principal) e o componente principal.
+- O componente principal ocupa a largura toda e a altura que sobra (`min-h-0 flex-1`), tem rolagem própria (`overflow-auto`) e moldura de card (`rounded-card border border-border bg-card`). Cabeçalhos dentro dele ficam fixos com `sticky top-0`.
+- Barras de rolagem já são finas e discretas pelo `globals.css`; não estilize por componente.
+
+## Barra de ações lateral
+
+- Componente único `@/components/layout/ActionBar`, renderizado pelo `AdminShell`: aparece em **todas** as telas administrativas a partir do tablet (`md`). Não adicione barras por página.
+- **No celular, a barra some** e os mesmos atalhos aparecem como ícones no header, para não cobrir o conteúdo. Cada atalho é um componente reutilizado nos dois lugares (ex.: `CalendarShortcut` com `placement="bar"` ou `"header"`).
+- Fixa na borda direita da tela, centralizada na vertical, com cantos arredondados só à esquerda (`rounded-l-overlay`), sombra e sem borda à direita.
+- Guarda atalhos secundários (hoje: calendário). Novos atalhos entram nela como botões de ícone com `aria-label` e `title`.
+- Painéis abertos por ela usam o `Popover` do shadcn com `side="left"` e `sideOffset={0}`, colados à barra e flutuando sobre o conteúdo.
+- O componente principal não reserva espaço para ela: a barra flutua sobre a borda dele.
 
 ## Toasts
 
+- Biblioteca: **Sonner** (via shadcn). O `<AppToaster />` (`@/components/layout/AppToaster`) já está no layout raiz, **antes** do conteúdo — não adicione outro.
+- Disparar: `import { toast } from "sonner"` → `toast.success("Cliente salvo")`, `toast.error(...)`, `toast.warning(...)`, `toast.info(...)`. Cada tipo já tem cor e ícone próprios (`richColors`).
+- Posição: canto superior direito no computador; rodapé no celular (o `AppToaster` decide sozinho).
 - Para o resultado de uma ação ("Agendado", "Cliente salvo"). Erros de formulário ficam no próprio campo, não em toast.
-- Tipos: sucesso, erro, aviso e informação, cada um com cor e ícone próprios.
-- Posição: canto superior direito no computador; rodapé centralizado no celular.
-- Erro fica até ser fechado; os demais somem sozinhos.
+- Erro fica até ser fechado: `toast.error(mensagem, { duration: Infinity })`; os demais somem sozinhos.
+- Toast depois de um redirecionamento (ex.: despedida do logout): a Server Action redireciona com um sinal na URL (`/login?loggedOut=1`), a página renderiza um componente cliente que dispara o toast com um `id` fixo (evita duplicar) e limpa a URL com `router.replace`. Se quem mostra o toast é um layout (ex.: boas-vindas, `?loggedIn=1`), a leitura é no navegador com `useSearchParams`, porque layouts não recebem `searchParams`.
 
 ## Textos da interface
 
 - Em pt-BR, do ponto de vista de quem usa: "Clientes", não "Pessoas do tipo CLIENT".
 - Botões dizem o que fazem: "Agendar", "Salvar alterações" — nunca "Enviar" ou "OK".
 - A mesma palavra segue o fluxo todo: botão "Agendar" → toast "Agendado".
+- Vocabulário do produto: a tela de horários se chama **Agendamentos** (menu e título), não "Agenda".
 - Erros explicam o que aconteceu e como resolver, sem pedir desculpas.
 - Tela vazia convida a agir: "Nenhum cliente ainda. Cadastre o primeiro."
 - Evite separar informações com "·" (ex.: "Ana · Corte · 09:00"); organize pelo layout.
@@ -79,6 +123,6 @@ A sidebar é escura nos dois temas e tem tokens próprios: `sidebar` (fundo), `s
 ## Acessibilidade
 
 - HTML semântico: `<header>`, `<nav>`, `<main>`, `<button>` para ações, `<a>` para navegação.
-- Todo elemento interativo tem foco visível (`focus-visible:`).
+- Todo elemento interativo tem foco visível: use elementos nativos (`button`, `a`, `input`) ou `tabindex`, que já recebem o contorno global.
 - Botões só com ícone têm `aria-label`; imagens têm `alt`.
 - Respeite `prefers-reduced-motion` (variante `motion-safe:`).

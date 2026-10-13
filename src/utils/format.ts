@@ -1,3 +1,5 @@
+import type { UserType } from "@/types/auth";
+
 /** "12345678909" → "123.456.789-09" */
 export function formatCpf(cpf: string): string {
   return cpf.replace(/^(\d{3})(\d{3})(\d{3})(\d{2})$/, "$1.$2.$3-$4");
@@ -26,4 +28,15 @@ export function getInitials(name: string): string {
   const first = parts[0]?.[0] ?? "";
   const last = parts.length > 1 ? parts[parts.length - 1][0] : "";
   return (first + last).toUpperCase();
+}
+
+const userTypeLabels: Record<UserType, string> = {
+  SUPER_ADMIN: "Super administrador",
+  ADMIN: "Administrador",
+  USER: "Usuário",
+};
+
+/** "ADMIN" → "Administrador" */
+export function formatUserType(type: UserType): string {
+  return userTypeLabels[type];
 }

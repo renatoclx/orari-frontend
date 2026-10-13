@@ -1,11 +1,28 @@
 import { cookies } from "next/headers";
+import { redirect } from "next/navigation";
 import { AdminShell } from "@/components/layout/AdminShell";
 import { SIDEBAR_COOKIE } from "@/components/layout/sidebar-cookie";
+import { ApiError, apiFetch } from "@/services/api";
+import type { CurrentUser } from "@/types/auth";
 
 export default async function AdminLayout({ children }: LayoutProps<"/">) {
   // Lido no servidor para a sidebar já nascer no estado certo, sem piscar.
   const cookieStore = await cookies();
   const collapsed = cookieStore.get(SIDEBAR_COOKIE)?.value === "true";
 
-  return <AdminShell defaultCollapsed={collapsed}>{children}</AdminShell>;
+  // Buscado uma vez aqui e repassado ao header de todas as telas.
+  let user: CurrentUser;
+  try {
+    user = await apiFetch<CurrentUser>("/auth/me");
+  } catch (error) {
+    // Provisório até o passo 4.7: sem sessão válida, vai para o login.
+    if (error instanceof ApiError && error.status === 401) redirect("/login");
+    throw error;
+  }
+
+  return (
+    <AdminShell defaultCollapsed={collapsed} user={user}>
+      {children}
+    </AdminShell>
+  );
 }

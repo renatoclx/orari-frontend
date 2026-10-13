@@ -6,13 +6,19 @@ import { Header } from "@/components/layout/Header";
 import { Sidebar } from "@/components/layout/Sidebar";
 import { SIDEBAR_COOKIE } from "@/components/layout/sidebar-cookie";
 import { TooltipProvider } from "@/components/ui/tooltip";
+import type { CurrentUser } from "@/types/auth";
 
 type AdminShellProps = {
   defaultCollapsed: boolean;
+  user: CurrentUser;
   children: React.ReactNode;
 };
 
-export function AdminShell({ defaultCollapsed, children }: AdminShellProps) {
+export function AdminShell({
+  defaultCollapsed,
+  user,
+  children,
+}: AdminShellProps) {
   const [collapsed, setCollapsed] = useState(defaultCollapsed);
   const [mobileOpen, setMobileOpen] = useState(false);
 
@@ -33,7 +39,7 @@ export function AdminShell({ defaultCollapsed, children }: AdminShellProps) {
         />
 
         <div className="flex min-w-0 flex-1 flex-col">
-          <Header onOpenMobile={() => setMobileOpen(true)} />
+          <Header user={user} onOpenMobile={() => setMobileOpen(true)} />
           {/* A página não rola: cada componente cuida da própria rolagem. */}
           <main className="flex min-h-0 flex-1 flex-col p-4 md:p-8">
             {children}

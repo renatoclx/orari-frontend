@@ -80,10 +80,10 @@ export function ClientList({ clients, search, footer }: ClientListProps) {
     startTransition(async () => {
       const result = await deleteClientAction(target.id);
       if (result.ok) {
-        toast.success("Cliente excluído.", { description: target.name });
+        toast.success("Cliente inativado.", { description: target.name });
         setDeleting(null);
       } else {
-        toast.error("Não foi possível excluir o cliente.", {
+        toast.error("Não foi possível inativar o cliente.", {
           description: result.message,
         });
       }
@@ -173,7 +173,8 @@ export function ClientList({ clients, search, footer }: ClientListProps) {
           <AlertDialogHeader>
             <AlertDialogTitle>Excluir cliente?</AlertDialogTitle>
             <AlertDialogDescription>
-              O cliente {deleting?.name} deixará de aparecer na lista.
+              O cliente {deleting?.name} será inativado e continuará na lista
+              com o status Inativo.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>

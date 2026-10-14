@@ -26,7 +26,7 @@ export function listPeople(
   return apiFetch<Paginated<PersonListItem>>(`/people?${query}`);
 }
 
-/** Exclusão lógica: a pessoa sai da listagem, o histórico é preservado. */
+/** Exclusão lógica: a pessoa fica inativa (`deletedAt`) e o histórico é preservado. */
 export function deletePerson(id: string): Promise<void> {
   return apiFetch<void>(`/people/${id}`, { method: "DELETE" });
 }

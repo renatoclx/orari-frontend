@@ -63,6 +63,7 @@ Use `Button` de `@/components/ui/button`:
 
 Padrão do sistema (`docs/screen-patterns.md`): cor correspondente à informação e texto pesado em caixa alta (o `Badge` já aplica `font-bold uppercase`; escreva o texto normalmente).
 
+- Status ativo/inativo: use `StatusBadge` (`@/components/shared/StatusBadge`, `active={...}`); não recrie a badge nas telas.
 - `variant="success"` (verde, token `success`): ativo e informações positivas.
 - `variant="destructive"` (vermelho): inativo e informações negativas.
 - Outros significados ainda sem cor definida: pergunte antes de escolher.
@@ -75,12 +76,13 @@ Fonte das regras: `docs/screen-patterns.md` e `docs/screens.md`. Modelo: `src/co
 - Cada tipo tem rotas finas: `app/(admin)/<caminho>/{page,loading}.tsx` e `novo/page.tsx`, que só escolhem o `kind` e delegam a `PeopleListPage`, `PeopleListLoading` e `NewPersonPage`. Para outro tipo, acrescente a entrada em `PEOPLE_KINDS` e as três rotas.
 - Server Actions de pessoas (`app/(admin)/people-actions.ts`) recebem o tipo do navegador e o conferem com `isPeopleType` antes de usar. Usuários são outra entidade (`UserType`): não usam estas telas.
 
-- A página é um Server Component que lê `searchParams` (`q`, `page`) e busca pelo service; o card (`ClientList`) ocupa a largura e a altura que sobram, com a tabela rolando por dentro e o rodapé de paginação fixo (`TablePagination`).
-- Busca durante a digitação: o campo (Client Component) espera ~350 ms e troca `?q=` na URL com `router.replace`; a página é renderizada de novo no servidor, na primeira página.
+- **Componentes compartilhados das listagens e diálogos** (`@/components/shared/`), usados por Pessoas e Serviços: `ListSearch` (busca durante a digitação), `StatusBadge`, `EmptyValue` (mostra "--") e `ConfirmDialog` (confirmação com texto de andamento; `destructive` para o botão vermelho). Antes de escrever um diálogo de confirmação ou uma busca, use estes.
+- A página é um Server Component que lê `searchParams` (`q`, `page`) e busca pelo service; o card (`PersonList`/`ServiceList`) ocupa a largura e a altura que sobram, com a tabela rolando por dentro e o rodapé de paginação fixo (`TablePagination`).
+- Busca durante a digitação: o `ListSearch` espera ~350 ms e troca `?q=` na URL com `router.replace`; a página é renderizada de novo no servidor, na primeira página.
 - Botão "Novo <entidade>" leva à tela de cadastro. Vazios aparecem como "--".
 - Status (ativo/inativo, derivado de `deletedAt`) com `Badge` (`success` / `destructive`).
 - Coluna Ações: "Alterar" em destaque (ícone) e as demais ações num menu de três pontos (`DropdownMenu modal={false}`), na ordem Visualizar, Excluir. Estilo neutro. Alterar e Excluir ficam desabilitados para registros excluídos.
-- Visualizar abre `Dialog` com Fechar; Excluir abre `AlertDialog` com o nome do registro, botão vermelho e "Excluindo…" enquanto executa.
+- Visualizar abre `Dialog` com Fechar; Excluir abre o `ConfirmDialog` com o nome do registro, botão vermelho e "Excluindo…" enquanto executa.
 - Carregamento: `loading.tsx` com `Skeleton`. No celular, a tabela vira lista empilhada.
 
 ## Formulários

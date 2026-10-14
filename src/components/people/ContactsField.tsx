@@ -32,6 +32,9 @@ type ExtraContact = {
 
 const contactTypes = Object.keys(contactTypeLabels) as ContactType[];
 
+// A API aceita até 10 contatos por cadastro; um deles é o contato principal.
+const MAX_EXTRA_CONTACTS = 9;
+
 // "Outros contatos" (screens.md): o formulário aparece ao clicar em adicionar;
 // os contatos adicionados aparecem numa tabela com a opção de excluir.
 export function ContactsField() {
@@ -61,8 +64,18 @@ export function ContactsField() {
     closeForm();
   }
 
+  const limitReached = contacts.length >= MAX_EXTRA_CONTACTS;
+
   return (
     <div className="space-y-4">
+      {/* Vai no envio do formulário, junto com os demais campos. */}
+      <input
+        type="hidden"
+        name="extraContacts"
+        value={JSON.stringify(
+          contacts.map(({ phone, type }) => ({ phone, type })),
+        )}
+      />
       {adding ? (
         // Dentro do formulário principal: o Enter adiciona o contato em vez de
         // enviar o cadastro inteiro.
@@ -137,9 +150,15 @@ export function ContactsField() {
               Nenhum outro contato.
             </p>
           )}
+          {limitReached && (
+            <p className="text-sm text-muted-foreground">
+              Limite de contatos atingido.
+            </p>
+          )}
           <Button
             type="button"
             variant="outline"
+            disabled={limitReached}
             onClick={() => setAdding(true)}
           >
             <Plus aria-hidden="true" />

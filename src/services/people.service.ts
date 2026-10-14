@@ -2,7 +2,11 @@ import "server-only";
 
 import { apiFetch } from "@/services/api";
 import type { Paginated } from "@/types/location";
-import type { PeopleType, PersonListItem } from "@/types/people";
+import type {
+  CreatePersonInput,
+  PeopleType,
+  PersonListItem,
+} from "@/types/people";
 
 type ListPeopleParams = {
   type: PeopleType;
@@ -29,4 +33,29 @@ export function listPeople(
 /** Exclusão lógica: a pessoa fica inativa (`deletedAt`) e o histórico é preservado. */
 export function deletePerson(id: string): Promise<void> {
   return apiFetch<void>(`/people/${id}`, { method: "DELETE" });
+}
+
+/** Cadastro: pessoa, contatos e endereços são criados juntos (ou nada é criado). */
+export function createPerson(
+  input: CreatePersonInput,
+): Promise<Pick<PersonListItem, "id" | "name">> {
+  return apiFetch<Pick<PersonListItem, "id" | "name">>("/people", {
+    method: "POST",
+    body: JSON.stringify(input),
+  });
+}
+
+/** Reativa uma pessoa inativa (limpa o `deletedAt`). */
+export async function restorePerson(id: string): Promise<void> {
+  await apiFetch(`/people/${id}/restore`, { method: "PATCH" });
+}
+
+/** Envia a foto (JPEG ou PNG, até 2 MB); a pessoa precisa já existir. */
+export async function uploadPersonPhoto(
+  id: string,
+  photo: File,
+): Promise<void> {
+  const body = new FormData();
+  body.append("photo", photo, photo.name);
+  await apiFetch(`/people/${id}/photo`, { method: "POST", body });
 }

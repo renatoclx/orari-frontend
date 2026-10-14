@@ -64,6 +64,9 @@ const emptyDraft: Draft = {
 
 const addressTypes = Object.keys(addressTypeLabels) as AddressType[];
 
+// A API aceita até 10 endereços por cadastro.
+const MAX_ADDRESSES = 10;
+
 type AddressesFieldProps = {
   states: State[];
 };
@@ -251,6 +254,8 @@ export function AddressesField({ states }: AddressesFieldProps) {
     closeForm();
   }
 
+  const limitReached = addresses.length >= MAX_ADDRESSES;
+
   const stateOptions = states.map((state) => ({
     value: state.id,
     label: `${state.name} (${state.acronym})`,
@@ -267,6 +272,32 @@ export function AddressesField({ states }: AddressesFieldProps) {
 
   return (
     <div className="space-y-4">
+      {/* Vai no envio do formulário, junto com os demais campos. */}
+      <input
+        type="hidden"
+        name="addresses"
+        value={JSON.stringify(
+          addresses.map(
+            ({
+              type,
+              cep,
+              street,
+              number,
+              neighborhood,
+              complement,
+              cityId,
+            }) => ({
+              type,
+              cep,
+              street,
+              number,
+              neighborhood,
+              complement,
+              cityId,
+            }),
+          ),
+        )}
+      />
       {adding ? (
         // Dentro do formulário principal: o Enter adiciona o endereço em vez
         // de enviar o cadastro inteiro.
@@ -436,9 +467,15 @@ export function AddressesField({ states }: AddressesFieldProps) {
               Nenhum endereço cadastrado.
             </p>
           )}
+          {limitReached && (
+            <p className="text-sm text-muted-foreground">
+              Limite de endereços atingido.
+            </p>
+          )}
           <Button
             type="button"
             variant="outline"
+            disabled={limitReached}
             onClick={() => setAdding(true)}
           >
             <Plus aria-hidden="true" />

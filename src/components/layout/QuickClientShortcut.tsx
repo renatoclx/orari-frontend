@@ -1,8 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useTransition } from "react";
 import { UserPlus } from "lucide-react";
 import { toast } from "sonner";
+import { quickCreateClientAction } from "@/app/(admin)/clientes/actions";
 import {
   validateClientForm,
   type ClientFormErrors,
@@ -24,12 +25,13 @@ import { maskPhone } from "@/utils/masks";
 
 // Atalho de cadastro rápido de cliente (screens.md, "Barra de ações lateral"):
 // um diálogo só com nome e telefone; o restante é completado depois. Usado na
-// barra lateral e no header do celular.
+// barra lateral e no header do celular. O telefone vira o contato principal.
 export function QuickClientShortcut() {
   const [open, setOpen] = useState(false);
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
   const [errors, setErrors] = useState<ClientFormErrors>({});
+  const [pending, startTransition] = useTransition();
 
   function handleOpenChange(next: boolean) {
     setOpen(next);
@@ -54,11 +56,22 @@ export function QuickClientShortcut() {
       return;
     }
 
-    // Provisório: o envio à API entra com a rota de cadastro completo (C4).
-    toast.info("Dados conferidos.", {
-      description: "O envio ao servidor entra na próxima etapa.",
+    startTransition(async () => {
+      const result = await quickCreateClientAction(name, phone);
+
+      if (result.ok) {
+        toast.success("Cliente cadastrado.", { description: name.trim() });
+        handleOpenChange(false);
+        return;
+      }
+
+      if (result.field) {
+        setErrors({ [result.field]: result.message });
+      }
+      toast.error("Não foi possível cadastrar o cliente.", {
+        description: result.message,
+      });
     });
-    handleOpenChange(false);
   }
 
   return (
@@ -152,11 +165,14 @@ export function QuickClientShortcut() {
             <Button
               type="button"
               variant="outline"
+              disabled={pending}
               onClick={() => handleOpenChange(false)}
             >
               Cancelar
             </Button>
-            <Button type="submit">Cadastrar</Button>
+            <Button type="submit" disabled={pending}>
+              {pending ? "Cadastrando…" : "Cadastrar"}
+            </Button>
           </DialogFooter>
         </form>
       </DialogContent>

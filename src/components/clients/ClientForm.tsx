@@ -1,13 +1,15 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState, useTransition } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import {
   clientFieldOrder,
   validateClientForm,
   type ClientFormErrors,
 } from "@/components/clients/client-validation";
+import { createClientAction } from "@/app/(admin)/clientes/actions";
 import { AddressesField } from "@/components/people/AddressesField";
 import { ContactsField } from "@/components/people/ContactsField";
 import { DatePicker } from "@/components/shared/DatePicker";
@@ -83,6 +85,9 @@ export function ClientForm({ states }: ClientFormProps) {
   const [errors, setErrors] = useState<ClientFormErrors>({});
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [clientName, setClientName] = useState("");
+  const [pending, startTransition] = useTransition();
+  const formRef = useRef<HTMLFormElement>(null);
+  const router = useRouter();
 
   function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -107,6 +112,38 @@ export function ClientForm({ states }: ClientFormProps) {
     setConfirmOpen(true);
   }
 
+  // Envia o formulário inteiro (inclusive as listas e a foto) ao servidor.
+  function confirmCreate() {
+    const form = formRef.current;
+    if (!form) return;
+    const data = new FormData(form);
+
+    startTransition(async () => {
+      const result = await createClientAction(data);
+
+      if (result.ok) {
+        toast.success("Cliente cadastrado.", { description: clientName });
+        if (result.photoFailed) {
+          toast.warning("A foto não foi enviada.", {
+            description: "Você poderá adicioná-la depois, na alteração.",
+          });
+        }
+        router.push("/clientes");
+        return;
+      }
+
+      setConfirmOpen(false);
+      if (result.field) {
+        const field = result.field;
+        setErrors({ [field]: result.message });
+        document.getElementById(field)?.focus();
+      }
+      toast.error("Não foi possível cadastrar o cliente.", {
+        description: result.message,
+      });
+    });
+  }
+
   // Corrigir um campo limpa o erro dele.
   function handleChange(event: React.FormEvent<HTMLFormElement>) {
     const field = (event.target as HTMLElement).id as keyof ClientFormErrors;
@@ -118,6 +155,7 @@ export function ClientForm({ states }: ClientFormProps) {
   return (
     <>
       <form
+        ref={formRef}
         noValidate
         onSubmit={handleSubmit}
         onChange={handleChange}
@@ -198,6 +236,7 @@ export function ClientForm({ states }: ClientFormProps) {
                   id="note"
                   name="note"
                   rows={4}
+                  maxLength={1000}
                   // Pelo menos 4 linhas (screens.md); cresce com o conteúdo.
                   className="min-h-28"
                   placeholder="Preferências, cuidados, informações úteis para o atendimento"
@@ -279,7 +318,10 @@ export function ClientForm({ states }: ClientFormProps) {
         </FormFooter>
       </form>
 
-      <AlertDialog open={confirmOpen} onOpenChange={setConfirmOpen}>
+      <AlertDialog
+        open={confirmOpen}
+        onOpenChange={(open) => !pending && setConfirmOpen(open)}
+      >
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>Cadastrar cliente?</AlertDialogTitle>
@@ -288,16 +330,16 @@ export function ClientForm({ states }: ClientFormProps) {
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogCancel disabled={pending}>Cancelar</AlertDialogCancel>
             <AlertDialogAction
-              onClick={() =>
-                // Provisório: o envio à API entra na etapa do salvar (C4).
-                toast.info("Dados conferidos.", {
-                  description: "O envio ao servidor entra na próxima etapa.",
-                })
-              }
+              disabled={pending}
+              onClick={(event) => {
+                // Mantém o diálogo aberto enquanto cadastra ("Cadastrando…").
+                event.preventDefault();
+                confirmCreate();
+              }}
             >
-              Cadastrar
+              {pending ? "Cadastrando…" : "Cadastrar"}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

@@ -2,9 +2,12 @@
 
 import { useState, useTransition } from "react";
 import Link from "next/link";
-import { EllipsisVertical, Eye, Pencil, Trash2 } from "lucide-react";
+import { EllipsisVertical, Eye, Pencil, RotateCcw, Trash2 } from "lucide-react";
 import { toast } from "sonner";
-import { deleteClientAction } from "@/app/(admin)/clientes/actions";
+import {
+  deleteClientAction,
+  reactivateClientAction,
+} from "@/app/(admin)/clientes/actions";
 import { PersonAvatar } from "@/components/shared/PersonAvatar";
 import {
   AlertDialog,
@@ -72,6 +75,7 @@ export function ClientList({ clients, search, footer }: ClientListProps) {
   const [viewing, setViewing] = useState<PersonListItem | null>(null);
   const [deleting, setDeleting] = useState<PersonListItem | null>(null);
   const [pending, startTransition] = useTransition();
+  const [reactivating, startReactivate] = useTransition();
 
   function confirmDelete() {
     if (!deleting) return;
@@ -84,6 +88,19 @@ export function ClientList({ clients, search, footer }: ClientListProps) {
         setDeleting(null);
       } else {
         toast.error("Não foi possível inativar o cliente.", {
+          description: result.message,
+        });
+      }
+    });
+  }
+
+  function reactivate(client: PersonListItem) {
+    startReactivate(async () => {
+      const result = await reactivateClientAction(client.id);
+      if (result.ok) {
+        toast.success("Cliente reativado.", { description: client.name });
+      } else {
+        toast.error("Não foi possível reativar o cliente.", {
           description: result.message,
         });
       }
@@ -117,6 +134,8 @@ export function ClientList({ clients, search, footer }: ClientListProps) {
                         client={client}
                         onView={setViewing}
                         onDelete={setDeleting}
+                        onReactivate={reactivate}
+                        busy={reactivating}
                       />
                     </div>
                     <dl className="mt-1 grid grid-cols-[auto_1fr] gap-x-3 gap-y-0.5 text-sm [&_dd]:whitespace-nowrap">
@@ -144,6 +163,8 @@ export function ClientList({ clients, search, footer }: ClientListProps) {
               clients={clients}
               onView={setViewing}
               onDelete={setDeleting}
+              onReactivate={reactivate}
+              busy={reactivating}
             />
           </>
         )}
@@ -200,12 +221,14 @@ export function ClientList({ clients, search, footer }: ClientListProps) {
 type RowHandlers = {
   onView: (client: PersonListItem) => void;
   onDelete: (client: PersonListItem) => void;
+  onReactivate: (client: PersonListItem) => void;
+  /** Há uma reativação em andamento. */
+  busy: boolean;
 };
 
 function ClientTable({
   clients,
-  onView,
-  onDelete,
+  ...handlers
 }: { clients: PersonListItem[] } & RowHandlers) {
   const headerClass =
     "sticky top-0 z-10 border-b border-border bg-card px-4 py-3 font-medium text-muted-foreground";
@@ -264,11 +287,7 @@ function ClientTable({
               <StatusBadge client={client} />
             </td>
             <td className="px-4 py-2">
-              <ClientActions
-                client={client}
-                onView={onView}
-                onDelete={onDelete}
-              />
+              <ClientActions client={client} {...handlers} />
             </td>
           </tr>
         ))}
@@ -283,6 +302,8 @@ function ClientActions({
   client,
   onView,
   onDelete,
+  onReactivate,
+  busy,
 }: { client: PersonListItem } & RowHandlers) {
   // Excluído: Alterar e Excluir ficam desabilitados (screens.md).
   const removed = client.deletedAt !== null;
@@ -326,6 +347,15 @@ function ClientActions({
             <Eye aria-hidden="true" />
             Visualizar
           </DropdownMenuItem>
+          {removed && (
+            <DropdownMenuItem
+              disabled={busy}
+              onSelect={() => onReactivate(client)}
+            >
+              <RotateCcw aria-hidden="true" />
+              Reativar
+            </DropdownMenuItem>
+          )}
           <DropdownMenuItem
             disabled={removed}
             onSelect={() => onDelete(client)}

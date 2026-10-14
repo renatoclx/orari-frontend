@@ -32,3 +32,41 @@ export type PersonListItem = {
   deletedAt: string | null;
   principalContact: PrincipalContact | null;
 };
+
+/** Contato enviado junto com a pessoa (POST /people). */
+export type NewContactInput = {
+  type: ContactType;
+  phone?: string;
+  email?: string;
+  isPrincipal?: boolean;
+};
+
+/** Endereço enviado junto com a pessoa (POST /people). */
+export type NewAddressInput = {
+  type: AddressType;
+  cep: string;
+  street: string;
+  number: string;
+  neighborhood?: string;
+  complement?: string;
+  cityId: string;
+  isPrincipal?: boolean;
+};
+
+/**
+ * Corpo de POST /people. `phone` cria só o contato principal (tipo fixo MAIN,
+ * sem e-mail); para escolher tipo e e-mail, o principal vai em `contacts`.
+ */
+export type CreatePersonInput = {
+  name: string;
+  type: PeopleType;
+  /** CPF sem máscara. */
+  document?: string;
+  /** "aaaa-mm-dd". */
+  birthDate?: string;
+  profession?: string;
+  note?: string;
+  phone?: string;
+  contacts?: NewContactInput[];
+  addresses?: NewAddressInput[];
+};

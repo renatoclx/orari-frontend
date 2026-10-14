@@ -95,6 +95,8 @@ Fonte das regras: `docs/screen-patterns.md` (padrões) e `docs/screens.md` (camp
 - Itens repetíveis (contatos, endereços de pessoas): `ContactsField` e `AddressesField` (`@/components/people/`): o formulário aparece ao clicar em adicionar, os itens vão para uma tabela com lixeira. Dentro do `<form>`, o Enter nesses sub-formulários adiciona o item (não envia o cadastro).
 - `FormSection` mantém o conteúdo montado quando recolhida (`forceMount`), para não perder o que foi digitado.
 - Textos longos: `Textarea` com `min-h-28` (4 linhas).
+- **Salvar:** o formulário inteiro vai por `FormData` a uma Server Action (`createClientAction`); listas (contatos e endereços adicionais) vão em campos ocultos com JSON e a foto no campo de arquivo. O botão do diálogo de confirmação mostra "Cadastrando…" e a ação valida de novo no servidor. Erro de um campo (ex.: CPF duplicado, 409) aparece no campo; os demais, em aviso. Sucesso: aviso e volta para a listagem.
+- Contato principal do cadastro completo vai em `contacts` com `isPrincipal: true` (assim leva o tipo escolhido e o e-mail); o campo `phone` da API é só para o cadastro rápido (tipo fixo, sem e-mail). Limites da API: 10 contatos, 10 endereços, observação até 1000 caracteres.
 
 ## Tipografia
 

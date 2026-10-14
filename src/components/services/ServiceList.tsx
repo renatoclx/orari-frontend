@@ -63,6 +63,20 @@ function Value({ children }: { children: React.ReactNode }) {
   );
 }
 
+// Círculo de 16 px, sem borda, com a cor do serviço (screens.md).
+function ColorDot({ color }: { color: string | null }) {
+  return color ? (
+    <span
+      className="block size-4 rounded-full"
+      style={{ backgroundColor: color }}
+      role="img"
+      aria-label={`Cor ${color}`}
+    />
+  ) : (
+    <span className="text-muted-foreground">{EMPTY}</span>
+  );
+}
+
 function StatusBadge({ service }: { service: ServiceItem }) {
   return service.isActive ? (
     <Badge variant="success">Ativo</Badge>
@@ -302,6 +316,10 @@ export function ServiceList({ services, search, footer }: ServiceListProps) {
                     <dd>
                       <StatusBadge service={service} />
                     </dd>
+                    <dt className="text-muted-foreground">Cor</dt>
+                    <dd>
+                      <ColorDot color={service.color} />
+                    </dd>
                   </dl>
                 </li>
               ))}
@@ -323,6 +341,9 @@ export function ServiceList({ services, search, footer }: ServiceListProps) {
                     Status
                   </th>
                   <th scope="col" className={headerClass}>
+                    Cor
+                  </th>
+                  <th scope="col" className={headerClass}>
                     Ações
                   </th>
                 </tr>
@@ -341,6 +362,9 @@ export function ServiceList({ services, search, footer }: ServiceListProps) {
                     </td>
                     <td className="px-4 py-3">
                       <StatusBadge service={service} />
+                    </td>
+                    <td className="px-4 py-3">
+                      <ColorDot color={service.color} />
                     </td>
                     <td className="px-4 py-2">
                       <ServiceActions service={service} {...handlers} />

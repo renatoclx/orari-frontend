@@ -143,7 +143,7 @@ Toda página da área administrativa segue o modelo da tela de Agendamentos (`sr
 ## Barra de ações lateral
 
 - Componente único `@/components/layout/ActionBar`, renderizado pelo `AdminShell`: aparece em **todas** as telas administrativas a partir do tablet (`md`). Não adicione barras por página.
-- **No celular, a barra some** e os mesmos atalhos aparecem como ícones no header, para não cobrir o conteúdo. Cada atalho é um componente reutilizado nos dois lugares (ex.: `CalendarShortcut` com `placement="bar"` ou `"header"`). Atalhos atuais: calendário (`CalendarShortcut`), cadastro rápido de cliente (`QuickClientShortcut`, diálogo só com nome e telefone) e cadastro de serviço (`QuickServiceShortcut`, abre o `ServiceFormDialog` de qualquer tela).
+- **No celular, a barra some** e só o calendário aparece, como ícone no header (`CalendarShortcut` com `placement="header"`); os demais atalhos (cliente, serviço) ficam ocultos (screens.md). Atalhos atuais: calendário (`CalendarShortcut`), cadastro rápido de cliente (`QuickClientShortcut`, diálogo só com nome e telefone) e cadastro de serviço (`QuickServiceShortcut`, abre o `ServiceFormDialog` de qualquer tela).
 - Fixa na borda direita da tela, centralizada na vertical, com cantos arredondados só à esquerda (`rounded-l-overlay`), sombra e sem borda à direita.
 - Guarda atalhos secundários (hoje: calendário). Novos atalhos entram nela como botões de ícone com `aria-label` e `title`.
 - Painéis abertos por ela usam o `Popover` do shadcn com `side="left"` e `sideOffset={0}`, colados à barra e flutuando sobre o conteúdo.

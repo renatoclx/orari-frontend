@@ -2,6 +2,7 @@
 
 export type ContactType = "MAIN" | "MESSAGE" | "BRANCH";
 
+/** Mesmos valores do enum do backend; "MAIN" é exibido como "Pessoal". */
 export type AddressType = "MAIN" | "MESSAGE" | "BRANCH";
 
 /** Espelha o enum PeopleType do backend. */

@@ -11,6 +11,7 @@ type ServicesToolbarProps = {
   search: string;
 };
 
+/** Busca por nome e botão de novo serviço (que abre o dialog de cadastro). */
 export function ServicesToolbar({ search }: ServicesToolbarProps) {
   const [creating, setCreating] = useState(false);
 

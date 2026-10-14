@@ -32,6 +32,7 @@ const previewAppointments = [
   },
 ];
 
+// Conteúdo ilustrativo do painel da marca (não são dados reais).
 const weekDays = [
   { label: "S", day: 12, busy: true, today: true },
   { label: "T", day: 13, busy: true },
@@ -42,6 +43,7 @@ const weekDays = [
 
 const professionals = ["CA", "JU", "KE"];
 
+// Estilo dos cartões que flutuam sobre a grade ilustrativa.
 const floatingCard =
   "absolute rounded-card border border-sidebar-border bg-sidebar p-3 shadow-2xl";
 

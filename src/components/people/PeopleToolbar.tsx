@@ -12,6 +12,7 @@ type PeopleToolbarProps = {
   search: string;
 };
 
+/** Busca por nome e botão de novo cadastro do tipo de pessoa. */
 export function PeopleToolbar({ kind, search }: PeopleToolbarProps) {
   return (
     <div className="flex flex-wrap items-center gap-3">

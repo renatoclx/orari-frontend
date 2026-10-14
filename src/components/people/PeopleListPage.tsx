@@ -4,6 +4,7 @@ import type { PeopleKind } from "@/components/people/people-kinds";
 import { TablePagination } from "@/components/shared/TablePagination";
 import { listPeople } from "@/services/people.service";
 
+// Itens por página da listagem (a API aceita até 100).
 const PAGE_SIZE = 10;
 
 type PeopleListPageProps = {

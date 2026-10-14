@@ -35,6 +35,7 @@ import type {
 } from "@/types/people";
 import { onlyDigits } from "@/utils/masks";
 
+/** Campos do formulário de pessoa a que um erro pode se referir. */
 export type PersonField = keyof PersonFormValues;
 
 export type ActionFailure = BaseActionFailure<PersonField>;
@@ -44,9 +45,11 @@ export type ReactivatePersonResult = { ok: true } | ActionFailure;
 export type CreatePersonResult =
   { ok: true; photoFailed: boolean } | ActionFailure;
 
+// Valores aceitos pela API; o que vem do navegador é conferido contra eles.
 const CONTACT_TYPES: ContactType[] = ["MAIN", "MESSAGE", "BRANCH"];
 const ADDRESS_TYPES: AddressType[] = ["MAIN", "MESSAGE", "BRANCH"];
 
+// As listas de contatos e endereços chegam como JSON em campos ocultos do formulário.
 function parseList(raw: string): Record<string, unknown>[] {
   try {
     const value: unknown = JSON.parse(raw);
@@ -61,10 +64,12 @@ function parseList(raw: string): Record<string, unknown>[] {
   }
 }
 
+// Item de lista vindo do navegador: só aceita texto.
 function asString(value: unknown): string {
   return typeof value === "string" ? value.trim() : "";
 }
 
+// O tipo da pessoa vem do navegador e pode ter sido adulterado.
 const INVALID_TYPE: ActionFailure = {
   ok: false,
   message: "Tipo de cadastro inválido.",
@@ -201,6 +206,7 @@ export async function quickCreateClientAction(
   return { ok: true };
 }
 
+/** Exclusão lógica: a pessoa fica inativa e continua na listagem. */
 export async function deletePersonAction(
   id: string,
   type: PeopleType,
@@ -218,6 +224,7 @@ export async function deletePersonAction(
   return { ok: true };
 }
 
+/** Reativa uma pessoa inativa (a API recusa se o CPF já estiver em uso). */
 export async function reactivatePersonAction(
   id: string,
   type: PeopleType,
@@ -234,6 +241,7 @@ export async function reactivatePersonAction(
   return { ok: true };
 }
 
+/** `warnings`: partes da alteração (contato principal, foto) que falharam depois de a pessoa ser salva. */
 export type UpdatePersonResult =
   { ok: true; warnings: string[] } | ActionFailure;
 
@@ -327,6 +335,7 @@ export async function updatePersonAction(
   return { ok: true, warnings };
 }
 
+// Contatos e endereços adicionais: ações aplicadas na hora, na tela de alteração.
 export type SimpleResult = { ok: true } | ActionFailure;
 
 export async function addContactAction(

@@ -6,6 +6,7 @@ import {
 } from "@/services/session-cookies";
 import type { AuthTokens } from "@/types/auth";
 
+// Caminhos usados nos redirecionamentos de proteção das rotas.
 const LOGIN_PATH = "/login";
 const HOME_PATH = "/";
 
@@ -52,6 +53,7 @@ export async function proxy(request: NextRequest) {
   return NextResponse.next();
 }
 
+// "invalid": a API recusou o refresh token; "unavailable": API fora do ar.
 type RefreshResult = AuthTokens | "invalid" | "unavailable";
 
 // Renovações em andamento, por refresh token. O Next pré-carrega várias telas
@@ -59,8 +61,10 @@ type RefreshResult = AuthTokens | "invalid" | "unavailable";
 // só aceita o primeiro uso, elas compartilham uma única chamada à API.
 // Vale para uma instância do servidor (deploy atual).
 const refreshesInFlight = new Map<string, Promise<RefreshResult>>();
+// Janela em que o resultado fica disponível para quem chega logo depois.
 const SHARED_RESULT_MS = 10_000;
 
+// Uma renovação por refresh token, compartilhada entre as requisições simultâneas.
 function refreshOnce(refreshToken: string): Promise<RefreshResult> {
   let refresh = refreshesInFlight.get(refreshToken);
   if (!refresh) {

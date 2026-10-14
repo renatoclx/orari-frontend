@@ -28,6 +28,7 @@ type UserMenuProps = {
   user: CurrentUser;
 };
 
+/** Menu do usuário logado, com a saída (que pede confirmação). */
 export function UserMenu({ user }: UserMenuProps) {
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [pending, startTransition] = useTransition();

@@ -18,6 +18,7 @@ import {
 import { cn } from "cn";
 import { normalizeText } from "@/utils/text";
 
+/** Opção da lista: `value` é o que o formulário guarda; `label`, o que o usuário vê. */
 export type ComboboxOption = {
   value: string;
   label: string;

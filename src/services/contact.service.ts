@@ -12,6 +12,7 @@ export async function listContacts(peopleId: string): Promise<ContactRecord[]> {
   return items;
 }
 
+// Telefone e e-mail são opcionais, mas a API exige ao menos um.
 type ContactInput = {
   type: ContactType;
   phone?: string;
@@ -19,6 +20,7 @@ type ContactInput = {
   isPrincipal?: boolean;
 };
 
+/** Cria um contato de uma pessoa já cadastrada. */
 export async function createContact(
   peopleId: string,
   input: ContactInput,
@@ -29,6 +31,7 @@ export async function createContact(
   });
 }
 
+/** Altera o contato; `email: null` limpa o e-mail. */
 export async function updateContact(
   id: string,
   input: ContactInput,
@@ -39,6 +42,7 @@ export async function updateContact(
   });
 }
 
+/** Exclusão lógica do contato. */
 export async function deleteContact(id: string): Promise<void> {
   await apiFetch(`/contacts/${id}`, { method: "DELETE" });
 }

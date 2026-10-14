@@ -15,6 +15,7 @@ type AdminShellProps = {
   children: React.ReactNode;
 };
 
+/** Moldura da área administrativa: sidebar, header, barra de ações e conteúdo. */
 export function AdminShell({
   defaultCollapsed,
   user,

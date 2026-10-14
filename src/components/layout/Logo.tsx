@@ -6,6 +6,7 @@ type LogoProps = {
   className?: string;
 };
 
+/** Logo completa ou só o ícone (sidebar recolhida e celular). */
 export function Logo({ variant, className = "h-8 w-auto" }: LogoProps) {
   if (variant === "icon") {
     return (

@@ -5,6 +5,7 @@ import { ApiError } from "@/services/api";
 import * as authService from "@/services/auth.service";
 import { setSession } from "@/services/session";
 
+/** Estado do formulário de login, devolvido pela Server Action a cada envio. */
 export type LoginFormState = {
   /** Mantido para repreencher o campo: o React limpa o formulário após a action. */
   email: string;
@@ -13,6 +14,7 @@ export type LoginFormState = {
   message?: string;
 };
 
+// Validação mínima de formato; quem confere o e-mail de verdade é a API.
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 /**

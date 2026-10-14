@@ -2,6 +2,7 @@
 // (screen-patterns.md, "Tabelas").
 const EMPTY = "--";
 
+/** Mostra o valor ou "--" quando não há informação. */
 export function EmptyValue({ children }: { children?: React.ReactNode }) {
   return children ? (
     <>{children}</>

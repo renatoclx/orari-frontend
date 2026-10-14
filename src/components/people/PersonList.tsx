@@ -40,11 +40,13 @@ type PersonListProps = {
   footer: React.ReactNode;
 };
 
+// Celular do contato principal, formatado.
 function formatContact(person: PersonListItem): string | null {
   const phone = person.principalContact?.phone;
   return phone ? formatPhone(phone) : null;
 }
 
+/** Card da listagem: tabela (computador) ou lista empilhada (celular), com as ações de cada pessoa. */
 export function PersonList({ kind, people, search, footer }: PersonListProps) {
   const [viewing, setViewing] = useState<PersonListItem | null>(null);
   const [deleting, setDeleting] = useState<PersonListItem | null>(null);
@@ -337,6 +339,7 @@ function PersonActions({
   );
 }
 
+// Conteúdo do dialog de visualização.
 function PersonDetails({
   person,
   kind,

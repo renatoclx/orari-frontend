@@ -1,6 +1,7 @@
 import { CircleCheck } from "lucide-react";
 import type { AgendaAppointment, AppointmentStatus } from "@/types/agenda";
 
+// Rótulos em pt-BR dos status de agendamento do backend.
 const statusLabels: Record<AppointmentStatus, string> = {
   SCHEDULED: "Agendado",
   CONFIRMED: "Confirmado",
@@ -16,6 +17,7 @@ type AppointmentBlockProps = {
   height: number;
 };
 
+/** Bloco de um agendamento na grade, posicionado por `top` e `height` (em px). */
 export function AppointmentBlock({
   appointment,
   top,

@@ -6,6 +6,7 @@ import type {
 } from "@/types/agenda";
 import { minutesToTime, timeToMinutes } from "@/utils/time";
 
+// Janela visível da agenda e a altura de cada intervalo de 30 minutos.
 const GRID_START = timeToMinutes("07:00");
 const GRID_END = timeToMinutes("20:00");
 const SLOT_MINUTES = 30;
@@ -13,11 +14,13 @@ const SLOT_HEIGHT = 48;
 const PX_PER_MINUTE = SLOT_HEIGHT / SLOT_MINUTES;
 const GRID_HEIGHT = (GRID_END - GRID_START) * PX_PER_MINUTE;
 
+// Um horário por intervalo, para as linhas e os rótulos da grade.
 const slots = Array.from(
   { length: (GRID_END - GRID_START) / SLOT_MINUTES },
   (_, index) => GRID_START + index * SLOT_MINUTES,
 );
 
+// Posição vertical de um horário na grade.
 function toPixels(time: string): number {
   return (timeToMinutes(time) - GRID_START) * PX_PER_MINUTE;
 }
@@ -37,6 +40,7 @@ type DayGridProps = {
   now: string;
 };
 
+/** Grade do dia: uma coluna por profissional, com expediente, pausas e agendamentos. */
 export function DayGrid({ professionals, appointments, now }: DayGridProps) {
   const nowTop = toPixels(now);
 

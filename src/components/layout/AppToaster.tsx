@@ -3,8 +3,10 @@
 import { useSyncExternalStore } from "react";
 import { Toaster } from "@/components/ui/sonner";
 
+// Mesmo ponto de corte do `md` do Tailwind.
 const MOBILE_QUERY = "(max-width: 767px)";
 
+// Faz o React reagir quando a tela muda entre celular e computador.
 function subscribe(onChange: () => void) {
   const media = window.matchMedia(MOBILE_QUERY);
   media.addEventListener("change", onChange);

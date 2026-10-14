@@ -10,6 +10,7 @@ import { Label } from "@/components/ui/label";
 // Campos e botão maiores só no login, para leitura confortável (56 px, 16 px).
 const inputClass = "h-14 bg-card text-base md:text-base";
 
+// Ícone dentro do campo, à esquerda; não captura cliques.
 const iconClass =
   "pointer-events-none absolute top-1/2 left-3.5 size-5 -translate-y-1/2 text-muted-foreground";
 

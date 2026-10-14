@@ -3,6 +3,7 @@ import { ServicesToolbar } from "@/components/services/ServicesToolbar";
 import { TablePagination } from "@/components/shared/TablePagination";
 import { listServices } from "@/services/service.service";
 
+// Itens por página da listagem (a API aceita até 100).
 const PAGE_SIZE = 10;
 const BASE_PATH = "/servicos";
 

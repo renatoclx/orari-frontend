@@ -1,3 +1,4 @@
+// A API trabalha em UTC; a interface exibe no fuso da empresa.
 const TIME_ZONE = "America/Sao_Paulo";
 
 /** "09:30" → 570 */

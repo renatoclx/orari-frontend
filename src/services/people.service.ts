@@ -9,6 +9,7 @@ import type {
   UpdatePersonInput,
 } from "@/types/people";
 
+// A API devolve pessoas ativas e inativas; o status vem de `deletedAt`.
 type ListPeopleParams = {
   type: PeopleType;
   /** Busca parcial pelo nome, sem diferenciar acentos nem maiúsculas. */
@@ -17,6 +18,7 @@ type ListPeopleParams = {
   limit: number;
 };
 
+/** Pessoas de um tipo, com busca por nome e paginação. */
 export function listPeople(
   params: ListPeopleParams,
 ): Promise<Paginated<PersonListItem>> {
@@ -66,6 +68,7 @@ export function getPerson(id: string): Promise<PersonListItem> {
   return apiFetch<PersonListItem>(`/people/${id}`);
 }
 
+/** Dados da pessoa; contatos e endereços têm rotas próprias (a API recusa neste corpo). */
 export async function updatePerson(
   id: string,
   input: UpdatePersonInput,
@@ -76,6 +79,7 @@ export async function updatePerson(
   });
 }
 
+/** Remove a foto da pessoa. */
 export async function removePersonPhoto(id: string): Promise<void> {
   await apiFetch(`/people/${id}/photo`, { method: "DELETE" });
 }

@@ -21,6 +21,7 @@ type CameraCaptureDialogProps = {
 // Lado máximo da foto gerada: mantém o arquivo bem abaixo do limite de 2 MB.
 const MAX_SIDE = 960;
 
+// Traduz o erro do navegador para uma orientação ao usuário.
 function cameraErrorMessage(error: unknown): string {
   const name = error instanceof DOMException ? error.name : "";
   if (name === "NotAllowedError" || name === "SecurityError") {

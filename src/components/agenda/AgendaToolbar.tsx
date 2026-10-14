@@ -5,6 +5,7 @@ type AgendaToolbarProps = {
   dateLabel: string;
 };
 
+/** Navegação entre dias da agenda (ainda sem ação, até a agenda ter estado real). */
 export function AgendaToolbar({ dateLabel }: AgendaToolbarProps) {
   return (
     <div className="flex flex-wrap items-center gap-x-3 gap-y-2">

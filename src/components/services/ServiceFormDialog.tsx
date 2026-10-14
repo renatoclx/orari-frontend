@@ -40,6 +40,7 @@ function priceToCents(price: string | null): string {
   return price ? String(Math.round(Number(price) * 100)) : "";
 }
 
+// Ids dos campos validados: ligam o erro de cada campo ao elemento que recebe o foco.
 const FIELD_IDS = {
   name: "service-name",
   duration: "service-duration",
@@ -63,6 +64,7 @@ export function ServiceFormDialog({
   );
 }
 
+// Formulário em si; separado do Dialog para o estado começar limpo a cada abertura.
 function ServiceForm({
   service,
   onClose,

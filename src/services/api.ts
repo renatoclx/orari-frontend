@@ -23,6 +23,7 @@ type NestErrorBody = {
   message?: string | string[];
 };
 
+// 204 não tem corpo; as demais respostas são JSON ou texto.
 async function readBody(response: Response): Promise<unknown> {
   if (response.status === 204) return undefined;
 
@@ -32,6 +33,7 @@ async function readBody(response: Response): Promise<unknown> {
     : response.text();
 }
 
+// O NestJS devolve `message` como lista quando vários campos falham na validação.
 function errorMessage(body: unknown): string {
   const message = (body as NestErrorBody | undefined)?.message;
   if (Array.isArray(message)) return message.join(" ");
@@ -48,6 +50,7 @@ type ApiFetchOptions = RequestInit & {
   authenticated?: boolean;
 };
 
+/** Chama a API e devolve o corpo; qualquer resposta de erro vira `ApiError`. */
 export async function apiFetch<T>(
   path: string,
   { authenticated = true, ...options }: ApiFetchOptions = {},

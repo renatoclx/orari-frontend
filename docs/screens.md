@@ -41,6 +41,9 @@ descritas em skills.md e screen-patterns.md
 - Menu de acesso rápido que está posicionado a direita, sobre o layout principal, apenas com ícones.
   - Calendário (irá ter ação com a tela de Agendamentos);
   - Cliente (ícone para cadastro rápido de um cliente);
+  - Serviços (ícone para cadastro rápido de um serviço);
+
+No celular, somente o item calendário será exibido, os demais devem permanecer ocultos.
 
 ---
 
@@ -61,7 +64,6 @@ descritas em skills.md e screen-patterns.md
 
 ### Regras Específicas
 
-- Quando não existir a informação, preencher com "--";
 - Status será baseado pelo deletedAt da entidade, não é um campo propriamente dito.
 
 ---
@@ -120,8 +122,6 @@ descritas em skills.md e screen-patterns.md
 ---
 
 ## Alteração
-
-deverão ser respeitados.
 
 ### Campos
 
@@ -234,3 +234,85 @@ deverão ser respeitados.
 - Ao clicar para adicionar um cliente no cadastro rápido:
   - Mostrar dialog apenas com nome e telefone.
   - Os dados posteriores poderão ser adicionados após o cadastro rápido.
+
+---
+
+# Serviços
+
+## Listagem
+
+### Colunas
+
+- Nome
+- Preço
+- Duração (mostrar em minutos. Ex: 60 minutos)
+- Status (corresponde ao isActive)
+- Cor (exibir um pequeno circulo 16x16 sem bordas com a cor do serviço).
+- Ações
+  - Visualizar
+  - Alterar.
+  - Inativar.
+  - Excluir.
+
+### Regras específicas
+
+- O status é controlado pelo isActive.
+
+---
+
+## Cadastro
+
+### Campos
+
+- Nome
+- Descrição
+- Preço
+- Duração
+- Cor (que será exibida no agendamento)
+
+### Regras específicas
+
+- Nome obrigatório.
+- Duração obrigatória.
+- Descrição opcional.
+- Preço opcional.
+  - Utilizar máscara para R$ padrão BRL
+- Cor opcional.
+  - Utilizar campo colorPicker
+- A duração do serviço é informada em minutos.
+- O serviço será cadastrado sempre como ativo.
+
+---
+
+## Alteração
+
+- A alteração seguirá os mesmos padrões do cadastramento.
+
+---
+
+## Inativação e Exclusão.
+
+- A inativação reflete o campo isActive.
+- A exclusão só poderá ser feita caso o serviço não tenha nenhum tipo de relacionamento criado.
+- Dialogs separados para exclusão e inativação.
+
+---
+
+## Layout do Formulário
+
+- Ao clicar em Novo Serviço, usar dialog para realizar as operações de inclusão e alteração
+  Nome;
+  Descrição;
+  Duração - Preço;
+  Cor;
+
+---
+
+## Barra de Ações
+
+- Cadastro rápido de um serviço
+- Ao clicar para adicionar um serviço no cadastro rápido:
+  - Mostrar o dialog de cadastro de serviços.
+  - Executar ações conforme padrão do cadastro.
+
+---

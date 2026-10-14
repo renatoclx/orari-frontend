@@ -20,23 +20,14 @@ import {
 } from "@/components/people/AddressesField";
 import { ContactsField } from "@/components/people/ContactsField";
 import { DatePicker } from "@/components/shared/DatePicker";
+import { FormField } from "@/components/shared/FormField";
 import { FormFooter } from "@/components/shared/FormFooter";
 import { FormSection } from "@/components/shared/FormSection";
 import { MaskedInput } from "@/components/shared/MaskedInput";
 import { PhotoUpload } from "@/components/shared/PhotoUpload";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
+import { ConfirmDialog } from "@/components/shared/ConfirmDialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import {
   Select,
   SelectContent,
@@ -53,38 +44,6 @@ import type {
 } from "@/types/people";
 import { contactTypeLabels } from "@/utils/format";
 import { maskCpf, maskPhone } from "@/utils/masks";
-
-type FieldProps = {
-  id: string;
-  label: string;
-  required?: boolean;
-  error?: string;
-  children: React.ReactNode;
-};
-
-function Field({ id, label, required, error, children }: FieldProps) {
-  return (
-    <div className="space-y-2">
-      <Label htmlFor={id}>
-        {/* Um único filho: o Label espaça os filhos com gap. */}
-        <span>
-          {label}
-          {required && (
-            <span className="ml-0.5 text-destructive" aria-hidden="true">
-              *
-            </span>
-          )}
-        </span>
-      </Label>
-      {children}
-      {error && (
-        <p id={`${id}-error`} role="alert" className="text-sm text-destructive">
-          {error}
-        </p>
-      )}
-    </div>
-  );
-}
 
 /** Dados da pessoa na alteração (vêm do servidor). */
 export type EditablePerson = {
@@ -247,7 +206,7 @@ export function PersonForm({ kind, states, editing }: PersonFormProps) {
                 Dados principais
               </h2>
 
-              <Field id="name" label="Nome" required error={errors.name}>
+              <FormField id="name" label="Nome" required error={errors.name}>
                 <Input
                   id="name"
                   aria-invalid={errors.name ? true : undefined}
@@ -257,10 +216,15 @@ export function PersonForm({ kind, states, editing }: PersonFormProps) {
                   autoComplete="name"
                   placeholder="Nome completo"
                 />
-              </Field>
+              </FormField>
 
               <div className="grid grid-cols-[3fr_2fr] gap-3">
-                <Field id="phone" label="Contato" required error={errors.phone}>
+                <FormField
+                  id="phone"
+                  label="Contato"
+                  required
+                  error={errors.phone}
+                >
                   <MaskedInput
                     id="phone"
                     aria-invalid={errors.phone ? true : undefined}
@@ -273,9 +237,9 @@ export function PersonForm({ kind, states, editing }: PersonFormProps) {
                     autoComplete="tel"
                     placeholder="(11) 91234-5678"
                   />
-                </Field>
+                </FormField>
 
-                <Field id="contactType" label="Tipo do contato">
+                <FormField id="contactType" label="Tipo do contato">
                   <Select
                     name="contactType"
                     defaultValue={editing?.mainContact?.type ?? "MAIN"}
@@ -293,10 +257,10 @@ export function PersonForm({ kind, states, editing }: PersonFormProps) {
                       )}
                     </SelectContent>
                   </Select>
-                </Field>
+                </FormField>
               </div>
 
-              <Field id="email" label="E-mail" error={errors.email}>
+              <FormField id="email" label="E-mail" error={errors.email}>
                 <Input
                   id="email"
                   aria-invalid={errors.email ? true : undefined}
@@ -308,9 +272,9 @@ export function PersonForm({ kind, states, editing }: PersonFormProps) {
                   autoComplete="email"
                   placeholder="nome@exemplo.com"
                 />
-              </Field>
+              </FormField>
 
-              <Field id="note" label="Observações">
+              <FormField id="note" label="Observações">
                 <Textarea
                   id="note"
                   name="note"
@@ -321,7 +285,7 @@ export function PersonForm({ kind, states, editing }: PersonFormProps) {
                   className="min-h-28"
                   placeholder="Preferências, cuidados, informações úteis para o atendimento"
                 />
-              </Field>
+              </FormField>
             </section>
 
             <section aria-labelledby="person-optional" className="space-y-4">
@@ -337,7 +301,11 @@ export function PersonForm({ kind, states, editing }: PersonFormProps) {
                 >
                   <div className="space-y-4">
                     <div className="grid grid-cols-2 gap-3">
-                      <Field id="document" label="CPF" error={errors.document}>
+                      <FormField
+                        id="document"
+                        label="CPF"
+                        error={errors.document}
+                      >
                         <MaskedInput
                           id="document"
                           aria-invalid={errors.document ? true : undefined}
@@ -350,25 +318,25 @@ export function PersonForm({ kind, states, editing }: PersonFormProps) {
                           inputMode="numeric"
                           placeholder="000.000.000-00"
                         />
-                      </Field>
+                      </FormField>
 
-                      <Field id="birthDate" label="Data de nascimento">
+                      <FormField id="birthDate" label="Data de nascimento">
                         <DatePicker
                           id="birthDate"
                           name="birthDate"
                           initialValue={editing?.person.birthDate}
                           maxDate={new Date()}
                         />
-                      </Field>
+                      </FormField>
                     </div>
 
-                    <Field id="profession" label="Profissão">
+                    <FormField id="profession" label="Profissão">
                       <Input
                         id="profession"
                         name="profession"
                         defaultValue={editing?.person.profession ?? ""}
                       />
-                    </Field>
+                    </FormField>
                   </div>
                 </FormSection>
 
@@ -424,32 +392,16 @@ export function PersonForm({ kind, states, editing }: PersonFormProps) {
       </form>
 
       {!editing && (
-        <AlertDialog
+        <ConfirmDialog
           open={confirmOpen}
-          onOpenChange={(open) => !pending && setConfirmOpen(open)}
-        >
-          <AlertDialogContent>
-            <AlertDialogHeader>
-              <AlertDialogTitle>Cadastrar {kind.singular}?</AlertDialogTitle>
-              <AlertDialogDescription>
-                O cadastro de {personName} será criado com os dados informados.
-              </AlertDialogDescription>
-            </AlertDialogHeader>
-            <AlertDialogFooter>
-              <AlertDialogCancel disabled={pending}>Cancelar</AlertDialogCancel>
-              <AlertDialogAction
-                disabled={pending}
-                onClick={(event) => {
-                  // Mantém o diálogo aberto enquanto cadastra ("Cadastrando…").
-                  event.preventDefault();
-                  confirmCreate();
-                }}
-              >
-                {pending ? "Cadastrando…" : "Cadastrar"}
-              </AlertDialogAction>
-            </AlertDialogFooter>
-          </AlertDialogContent>
-        </AlertDialog>
+          onOpenChange={setConfirmOpen}
+          title={`Cadastrar ${kind.singular}?`}
+          description={`O cadastro de ${personName} será criado com os dados informados.`}
+          confirmLabel="Cadastrar"
+          pendingLabel="Cadastrando…"
+          pending={pending}
+          onConfirm={confirmCreate}
+        />
       )}
     </>
   );

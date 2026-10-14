@@ -15,17 +15,9 @@ import {
   setServiceActiveAction,
 } from "@/app/(admin)/service-actions";
 import { ServiceFormDialog } from "@/components/services/ServiceFormDialog";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
-import { Badge } from "@/components/ui/badge";
+import { EmptyValue } from "@/components/shared/EmptyValue";
+import { StatusBadge } from "@/components/shared/StatusBadge";
+import { ConfirmDialog } from "@/components/shared/ConfirmDialog";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -52,17 +44,6 @@ type ServiceListProps = {
   footer: React.ReactNode;
 };
 
-// Quando não existe a informação, a tabela mostra "--" (screens.md).
-const EMPTY = "--";
-
-function Value({ children }: { children: React.ReactNode }) {
-  return children ? (
-    <>{children}</>
-  ) : (
-    <span className="text-muted-foreground">{EMPTY}</span>
-  );
-}
-
 // Círculo de 16 px, sem borda, com a cor do serviço (screens.md).
 function ColorDot({ color }: { color: string | null }) {
   return color ? (
@@ -73,15 +54,7 @@ function ColorDot({ color }: { color: string | null }) {
       aria-label={`Cor ${color}`}
     />
   ) : (
-    <span className="text-muted-foreground">{EMPTY}</span>
-  );
-}
-
-function StatusBadge({ service }: { service: ServiceItem }) {
-  return service.isActive ? (
-    <Badge variant="success">Ativo</Badge>
-  ) : (
-    <Badge variant="destructive">Inativo</Badge>
+    <EmptyValue />
   );
 }
 
@@ -190,13 +163,13 @@ function ServiceDetails({ service }: { service: ServiceItem }) {
           <div key={label} className="contents">
             <dt className="text-muted-foreground">{label}</dt>
             <dd className="tabular-nums">
-              <Value>{value}</Value>
+              <EmptyValue>{value}</EmptyValue>
             </dd>
           </div>
         ))}
         <dt className="text-muted-foreground">Status</dt>
         <dd>
-          <StatusBadge service={service} />
+          <StatusBadge active={service.isActive} />
         </dd>
       </dl>
     </>
@@ -304,9 +277,9 @@ export function ServiceList({ services, search, footer }: ServiceListProps) {
                   <dl className="grid grid-cols-[auto_1fr] gap-x-3 gap-y-0.5 text-sm [&_dd]:whitespace-nowrap">
                     <dt className="text-muted-foreground">Preço</dt>
                     <dd className="tabular-nums">
-                      <Value>
+                      <EmptyValue>
                         {service.price && formatPrice(service.price)}
-                      </Value>
+                      </EmptyValue>
                     </dd>
                     <dt className="text-muted-foreground">Duração</dt>
                     <dd className="tabular-nums">
@@ -314,7 +287,7 @@ export function ServiceList({ services, search, footer }: ServiceListProps) {
                     </dd>
                     <dt className="text-muted-foreground">Status</dt>
                     <dd>
-                      <StatusBadge service={service} />
+                      <StatusBadge active={service.isActive} />
                     </dd>
                     <dt className="text-muted-foreground">Cor</dt>
                     <dd>
@@ -353,15 +326,15 @@ export function ServiceList({ services, search, footer }: ServiceListProps) {
                   <tr key={service.id} className="hover:bg-background">
                     <td className="px-4 py-3 font-medium">{service.name}</td>
                     <td className="px-4 py-3 whitespace-nowrap tabular-nums">
-                      <Value>
+                      <EmptyValue>
                         {service.price && formatPrice(service.price)}
-                      </Value>
+                      </EmptyValue>
                     </td>
                     <td className="px-4 py-3 whitespace-nowrap tabular-nums">
                       {formatDuration(service.duration)}
                     </td>
                     <td className="px-4 py-3">
-                      <StatusBadge service={service} />
+                      <StatusBadge active={service.isActive} />
                     </td>
                     <td className="px-4 py-3">
                       <ColorDot color={service.color} />
@@ -399,63 +372,28 @@ export function ServiceList({ services, search, footer }: ServiceListProps) {
         </DialogContent>
       </Dialog>
 
-      <AlertDialog
+      <ConfirmDialog
         open={deleting !== null}
-        onOpenChange={(open) => !open && !removing && setDeleting(null)}
-      >
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Excluir serviço?</AlertDialogTitle>
-            <AlertDialogDescription>
-              O serviço {deleting?.name} será excluído. Serviços com
-              agendamentos, recorrências ou planos vinculados não podem ser
-              excluídos; nesse caso, inative-o.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel disabled={removing}>Cancelar</AlertDialogCancel>
-            <AlertDialogAction
-              disabled={removing}
-              className="bg-destructive text-white hover:bg-destructive/90"
-              onClick={(event) => {
-                // Mantém o diálogo aberto enquanto exclui ("Excluindo…").
-                event.preventDefault();
-                confirmDelete();
-              }}
-            >
-              {removing ? "Excluindo…" : "Excluir"}
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+        onOpenChange={(open) => !open && setDeleting(null)}
+        title="Excluir serviço?"
+        description={`O serviço ${deleting?.name ?? ""} será excluído. Serviços com agendamentos, recorrências ou planos vinculados não podem ser excluídos; nesse caso, inative-o.`}
+        confirmLabel="Excluir"
+        pendingLabel="Excluindo…"
+        pending={removing}
+        destructive
+        onConfirm={confirmDelete}
+      />
 
-      <AlertDialog
+      <ConfirmDialog
         open={deactivating !== null}
-        onOpenChange={(open) => !open && !pending && setDeactivating(null)}
-      >
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Inativar serviço?</AlertDialogTitle>
-            <AlertDialogDescription>
-              O serviço {deactivating?.name} ficará inativo e não poderá ser
-              usado em novos agendamentos. Você poderá ativá-lo novamente.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel disabled={pending}>Cancelar</AlertDialogCancel>
-            <AlertDialogAction
-              disabled={pending}
-              onClick={(event) => {
-                // Mantém o diálogo aberto enquanto inativa ("Inativando…").
-                event.preventDefault();
-                confirmDeactivate();
-              }}
-            >
-              {pending ? "Inativando…" : "Inativar"}
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+        onOpenChange={(open) => !open && setDeactivating(null)}
+        title="Inativar serviço?"
+        description={`O serviço ${deactivating?.name ?? ""} ficará inativo e não poderá ser usado em novos agendamentos. Você poderá ativá-lo novamente.`}
+        confirmLabel="Inativar"
+        pendingLabel="Inativando…"
+        pending={pending}
+        onConfirm={confirmDeactivate}
+      />
     </div>
   );
 }

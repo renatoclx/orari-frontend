@@ -8,6 +8,7 @@ import {
   validatePersonForm,
   type PersonFormErrors,
 } from "@/components/people/person-validation";
+import { FormField } from "@/components/shared/FormField";
 import { MaskedInput } from "@/components/shared/MaskedInput";
 import { Button } from "@/components/ui/button";
 import {
@@ -20,7 +21,6 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { maskPhone } from "@/utils/masks";
 
 // Atalho de cadastro rápido de cliente (screens.md, "Barra de ações lateral"):
@@ -94,15 +94,7 @@ export function QuickClientShortcut() {
             </DialogDescription>
           </DialogHeader>
 
-          <div className="space-y-2">
-            <Label htmlFor="quick-name">
-              <span>
-                Nome
-                <span className="ml-0.5 text-destructive" aria-hidden="true">
-                  *
-                </span>
-              </span>
-            </Label>
+          <FormField id="quick-name" label="Nome" required error={errors.name}>
             <Input
               id="quick-name"
               value={name}
@@ -115,26 +107,14 @@ export function QuickClientShortcut() {
               aria-invalid={errors.name ? true : undefined}
               aria-describedby={errors.name ? "quick-name-error" : undefined}
             />
-            {errors.name && (
-              <p
-                id="quick-name-error"
-                role="alert"
-                className="text-sm text-destructive"
-              >
-                {errors.name}
-              </p>
-            )}
-          </div>
+          </FormField>
 
-          <div className="space-y-2">
-            <Label htmlFor="quick-phone">
-              <span>
-                Telefone
-                <span className="ml-0.5 text-destructive" aria-hidden="true">
-                  *
-                </span>
-              </span>
-            </Label>
+          <FormField
+            id="quick-phone"
+            label="Telefone"
+            required
+            error={errors.phone}
+          >
             <MaskedInput
               id="quick-phone"
               mask={maskPhone}
@@ -150,16 +130,7 @@ export function QuickClientShortcut() {
               aria-invalid={errors.phone ? true : undefined}
               aria-describedby={errors.phone ? "quick-phone-error" : undefined}
             />
-            {errors.phone && (
-              <p
-                id="quick-phone-error"
-                role="alert"
-                className="text-sm text-destructive"
-              >
-                {errors.phone}
-              </p>
-            )}
-          </div>
+          </FormField>
 
           <DialogFooter>
             <Button

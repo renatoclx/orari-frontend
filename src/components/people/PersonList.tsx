@@ -10,17 +10,9 @@ import {
 } from "@/app/(admin)/people-actions";
 import type { PeopleKind } from "@/components/people/people-kinds";
 import { PersonAvatar } from "@/components/shared/PersonAvatar";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
-import { Badge } from "@/components/ui/badge";
+import { EmptyValue } from "@/components/shared/EmptyValue";
+import { StatusBadge } from "@/components/shared/StatusBadge";
+import { ConfirmDialog } from "@/components/shared/ConfirmDialog";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -48,29 +40,9 @@ type PersonListProps = {
   footer: React.ReactNode;
 };
 
-// Quando não existe a informação, a tabela mostra "--" (screens.md).
-const EMPTY = "--";
-
-function Value({ children }: { children: React.ReactNode }) {
-  return children ? (
-    <>{children}</>
-  ) : (
-    <span className="text-muted-foreground">{EMPTY}</span>
-  );
-}
-
 function formatContact(person: PersonListItem): string | null {
   const phone = person.principalContact?.phone;
   return phone ? formatPhone(phone) : null;
-}
-
-function StatusBadge({ person }: { person: PersonListItem }) {
-  // O status vem do deletedAt; não é um campo da entidade.
-  return person.deletedAt ? (
-    <Badge variant="destructive">Inativo</Badge>
-  ) : (
-    <Badge variant="success">Ativo</Badge>
-  );
 }
 
 export function PersonList({ kind, people, search, footer }: PersonListProps) {
@@ -148,17 +120,17 @@ export function PersonList({ kind, people, search, footer }: PersonListProps) {
                     <dl className="mt-1 grid grid-cols-[auto_1fr] gap-x-3 gap-y-0.5 text-sm [&_dd]:whitespace-nowrap">
                       <dt className="text-muted-foreground">Celular</dt>
                       <dd className="tabular-nums">
-                        <Value>{formatContact(person)}</Value>
+                        <EmptyValue>{formatContact(person)}</EmptyValue>
                       </dd>
                       <dt className="text-muted-foreground">CPF</dt>
                       <dd className="tabular-nums">
-                        <Value>
+                        <EmptyValue>
                           {person.document && formatCpf(person.document)}
-                        </Value>
+                        </EmptyValue>
                       </dd>
                       <dt className="text-muted-foreground">Status</dt>
                       <dd>
-                        <StatusBadge person={person} />
+                        <StatusBadge active={person.deletedAt === null} />
                       </dd>
                     </dl>
                   </div>
@@ -194,34 +166,17 @@ export function PersonList({ kind, people, search, footer }: PersonListProps) {
         </DialogContent>
       </Dialog>
 
-      <AlertDialog
+      <ConfirmDialog
         open={deleting !== null}
-        onOpenChange={(open) => !open && !pending && setDeleting(null)}
-      >
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Excluir {kind.singular}?</AlertDialogTitle>
-            <AlertDialogDescription>
-              O {kind.singular} {deleting?.name} será inativado e continuará na
-              lista com o status Inativo.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel disabled={pending}>Cancelar</AlertDialogCancel>
-            <AlertDialogAction
-              disabled={pending}
-              className="bg-destructive text-white hover:bg-destructive/90"
-              onClick={(event) => {
-                // Mantém o diálogo aberto enquanto exclui ("Excluindo…").
-                event.preventDefault();
-                confirmDelete();
-              }}
-            >
-              {pending ? "Excluindo…" : "Excluir"}
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+        onOpenChange={(open) => !open && setDeleting(null)}
+        title={`Excluir ${kind.singular}?`}
+        description={`O ${kind.singular} ${deleting?.name ?? ""} será inativado e continuará na lista com o status Inativo.`}
+        confirmLabel="Excluir"
+        pendingLabel="Excluindo…"
+        pending={pending}
+        destructive
+        onConfirm={confirmDelete}
+      />
     </div>
   );
 }
@@ -280,21 +235,23 @@ function PersonTable({
               </div>
             </td>
             <td className="px-4 py-3 whitespace-nowrap tabular-nums">
-              <Value>{formatContact(person)}</Value>
+              <EmptyValue>{formatContact(person)}</EmptyValue>
             </td>
             <td className="px-4 py-3 whitespace-nowrap tabular-nums">
-              <Value>{person.document && formatCpf(person.document)}</Value>
+              <EmptyValue>
+                {person.document && formatCpf(person.document)}
+              </EmptyValue>
             </td>
             <td className="hidden px-4 py-3 tabular-nums xl:table-cell">
-              <Value>
+              <EmptyValue>
                 {person.birthDate && formatDateOnly(person.birthDate)}
-              </Value>
+              </EmptyValue>
             </td>
             <td className="hidden px-4 py-3 lg:table-cell">
-              <Value>{person.profession}</Value>
+              <EmptyValue>{person.profession}</EmptyValue>
             </td>
             <td className="px-4 py-3">
-              <StatusBadge person={person} />
+              <StatusBadge active={person.deletedAt === null} />
             </td>
             <td className="px-4 py-2">
               <PersonActions person={person} {...handlers} />
@@ -414,13 +371,13 @@ function PersonDetails({
           <div key={label} className="contents">
             <dt className="text-muted-foreground">{label}</dt>
             <dd className="tabular-nums">
-              <Value>{value}</Value>
+              <EmptyValue>{value}</EmptyValue>
             </dd>
           </div>
         ))}
         <dt className="text-muted-foreground">Status</dt>
         <dd>
-          <StatusBadge person={person} />
+          <StatusBadge active={person.deletedAt === null} />
         </dd>
       </dl>
     </>

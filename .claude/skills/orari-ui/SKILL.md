@@ -59,6 +59,22 @@ Use `Button` de `@/components/ui/button`:
 - `size="icon"` para botões só com ícone (sempre com `aria-label`).
 - Login: botão e campos com `h-14 text-base` (56 px, texto 16 px), só nessa tela.
 
+## Formulários
+
+Fonte das regras: `docs/screen-patterns.md` (padrões) e `docs/screens.md` (campos e layout de cada entidade). Consulte os dois antes de criar uma tela de cadastro ou alteração.
+
+- **Segue o padrão de página:** o card do formulário é o componente principal — ocupa a **largura toda e a altura que sobra** (`flex min-h-0 flex-1 flex-col rounded-card border bg-card`). Nunca limite a largura do card nem o faça acompanhar a altura do conteúdo. Raiz da página: `flex min-h-0 flex-1 flex-col gap-4`, com título e subtítulo acima.
+- Estrutura do card: área de campos (`min-h-0 flex-1 overflow-auto p-4 md:p-6`) + `FormFooter` (`@/components/shared/FormFooter`) fixo no fim, com borda no topo e botões à direita (Cancelar, depois a ação principal). Os botões ficam **dentro** do `<form>`. A legenda "Campos obrigatórios" vai na prop `note` do rodapé.
+- Duas colunas que ocupam a **largura toda do card** (`gap-x-12 gap-y-6 md:grid-cols-2`, sem `max-w`): dados principais à esquerda; opcionais à direita, em `FormSection` (recolhíveis, com `border-t`). No celular, uma coluna.
+- Equilibre a altura das colunas (a seção opcional mais usada pode iniciar aberta: `defaultOpen`) e mantenha espaçamentos moderados.
+- Obrigatórios com `*` em `text-destructive`. Dentro do `Label`, rótulo e asterisco num único `<span>` (o `Label` espaça os filhos).
+- Data: `DatePicker` (`@/components/shared/DatePicker`), com calendário; envia "aaaa-mm-dd".
+- Campos com máscara (celular, CPF, CEP): `MaskedInput` com as máscaras de `@/utils/masks`; exibe formatado e envia só os dígitos.
+- Seleção com busca (estado, cidade): `Combobox` (`@/components/shared/Combobox`). Listas grandes buscam no servidor por `onSearchChange`.
+- Itens repetíveis (contatos, endereços de pessoas): `ContactsField` e `AddressesField` (`@/components/people/`): o formulário aparece ao clicar em adicionar, os itens vão para uma tabela com lixeira. Dentro do `<form>`, o Enter nesses sub-formulários adiciona o item (não envia o cadastro).
+- `FormSection` mantém o conteúdo montado quando recolhida (`forceMount`), para não perder o que foi digitado.
+- Textos longos: `Textarea` com `min-h-28` (4 linhas).
+
 ## Tipografia
 
 - Fonte única: Plus Jakarta Sans (já é a fonte padrão da página; não precisa de classe).

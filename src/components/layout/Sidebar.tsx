@@ -128,7 +128,10 @@ function SidebarNav({ collapsed, onNavigate }: SidebarNavProps) {
     <nav aria-label="Menu principal" className="flex-1 p-2">
       <ul className="space-y-1">
         {navItems.map(({ href, label, icon: Icon }) => {
-          const active = pathname === href;
+          // Subpáginas (ex.: /clientes/novo) mantêm o item do menu ativo.
+          const active =
+            pathname === href ||
+            (href !== "/" && pathname.startsWith(`${href}/`));
           const link = (
             <Link
               href={href}

@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { Plus, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -19,9 +20,11 @@ export function ClientsToolbar() {
         />
       </div>
 
-      <Button className="w-full sm:ml-auto sm:w-auto">
-        <Plus aria-hidden="true" />
-        Cadastrar cliente
+      <Button asChild className="w-full sm:ml-auto sm:w-auto">
+        <Link href="/clientes/novo">
+          <Plus aria-hidden="true" />
+          Cadastrar cliente
+        </Link>
       </Button>
     </div>
   );

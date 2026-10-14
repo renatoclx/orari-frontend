@@ -1,7 +1,8 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { Camera } from "lucide-react";
+import { Camera, Upload } from "lucide-react";
+import { CameraCaptureDialog } from "@/components/shared/CameraCaptureDialog";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 
@@ -14,12 +15,14 @@ type PhotoUploadProps = {
   name?: string;
 };
 
-// Foto da pessoa: uma div circular que mostra a imagem escolhida. Opcional.
-// O envio é feito depois do cadastro (a API recebe a foto numa rota própria).
+// Foto da pessoa: uma div circular que mostra a imagem escolhida ou tirada na
+// câmera do dispositivo. Opcional. O envio é feito depois do cadastro (a API
+// recebe a foto numa rota própria).
 export function PhotoUpload({ name = "photo" }: PhotoUploadProps) {
   const inputRef = useRef<HTMLInputElement>(null);
   const [preview, setPreview] = useState<string>();
   const [error, setError] = useState<string>();
+  const [cameraOpen, setCameraOpen] = useState(false);
 
   // Libera a URL temporária da imagem anterior ao trocar ou sair da tela.
   useEffect(() => {
@@ -33,10 +36,8 @@ export function PhotoUpload({ name = "photo" }: PhotoUploadProps) {
     setPreview(undefined);
   }
 
-  function handleChange(event: React.ChangeEvent<HTMLInputElement>) {
-    const file = event.target.files?.[0];
-    if (!file) return;
-
+  // Valida o arquivo (escolhido ou tirado na câmera) e mostra a prévia.
+  function acceptFile(file: File) {
     if (!ACCEPTED_TYPES.includes(file.type)) {
       clear();
       setError("Use uma imagem JPEG ou PNG.");
@@ -50,6 +51,20 @@ export function PhotoUpload({ name = "photo" }: PhotoUploadProps) {
 
     setError(undefined);
     setPreview(URL.createObjectURL(file));
+  }
+
+  function handleChange(event: React.ChangeEvent<HTMLInputElement>) {
+    const file = event.target.files?.[0];
+    if (file) acceptFile(file);
+  }
+
+  // A foto tirada vai para o campo de arquivo, como se tivesse sido escolhida:
+  // o formulário a envia da mesma forma.
+  function handleCapture(file: File) {
+    const transfer = new DataTransfer();
+    transfer.items.add(file);
+    if (inputRef.current) inputRef.current.files = transfer.files;
+    acceptFile(file);
   }
 
   return (
@@ -80,13 +95,22 @@ export function PhotoUpload({ name = "photo" }: PhotoUploadProps) {
         className="hidden"
       />
 
-      <div className="flex gap-2">
+      <div className="flex flex-wrap justify-center gap-2">
         <Button
           type="button"
           variant="outline"
           onClick={() => inputRef.current?.click()}
         >
+          <Upload aria-hidden="true" />
           {preview ? "Trocar foto" : "Selecionar foto"}
+        </Button>
+        <Button
+          type="button"
+          variant="outline"
+          onClick={() => setCameraOpen(true)}
+        >
+          <Camera aria-hidden="true" />
+          Tirar foto
         </Button>
         {preview && (
           <Button type="button" variant="ghost" onClick={clear}>
@@ -104,6 +128,12 @@ export function PhotoUpload({ name = "photo" }: PhotoUploadProps) {
           Opcional. JPEG ou PNG, até 2 MB.
         </p>
       )}
+
+      <CameraCaptureDialog
+        open={cameraOpen}
+        onOpenChange={setCameraOpen}
+        onCapture={handleCapture}
+      />
     </div>
   );
 }

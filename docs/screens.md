@@ -103,6 +103,7 @@ descritas em skills.md e screen-patterns.md
 ### Regras Específicas
 
 - Foto é opcional.
+- Poderá adicionar uma foto ou tirar uma foto através do dispositivo.
 - Adicionar máscara para campo celular: (##) #####-####.
 - Adicionar máscara para campo de CPF: ###.###.###-##.
 - Os registros serão inseridos na base sem as máscara.
@@ -142,6 +143,7 @@ deverão ser respeitados.
 ### Regras Específicas
 
 - Foto é opcional.
+- Poderá adicionar uma foto ou tirar uma foto através do dispositivo.
 - Adicionar máscara para campo celular: (##) #####-####.
 - Adicionar máscara para campo de CPF: ###.###.###-##.
 - Os registros serão inseridos na base sem as máscara.

@@ -88,7 +88,7 @@ Fonte das regras: `docs/screen-patterns.md` (padrões) e `docs/screens.md` (camp
 - Duas colunas que ocupam a **largura toda do card** (`gap-x-12 gap-y-6 md:grid-cols-2`, sem `max-w`): dados principais à esquerda; opcionais à direita, em `FormSection` (recolhíveis, com `border-t`). No celular, uma coluna.
 - Equilibre a altura das colunas (a seção opcional mais usada pode iniciar aberta: `defaultOpen`) e mantenha espaçamentos moderados.
 - Obrigatórios com `*` em `text-destructive`. Dentro do `Label`, rótulo e asterisco num único `<span>` (o `Label` espaça os filhos).
-- Foto da pessoa: `PhotoUpload` (`@/components/shared/PhotoUpload`), círculo centralizado **acima das colunas**; opcional; JPEG ou PNG até 2 MB (regras do backend); o envio é feito depois do cadastro, por rota própria.
+- Foto da pessoa: `PhotoUpload` (`@/components/shared/PhotoUpload`), círculo centralizado **acima das colunas**; opcional; escolhida do dispositivo ("Selecionar foto") ou tirada na câmera ("Tirar foto", `CameraCaptureDialog`, recorte quadrado em JPEG); JPEG ou PNG até 2 MB (regras do backend); o envio é feito depois do cadastro, por rota própria.
 - Data: `DatePicker` (`@/components/shared/DatePicker`), com calendário; envia "aaaa-mm-dd".
 - Campos com máscara (celular, CPF, CEP): `MaskedInput` com as máscaras de `@/utils/masks`; exibe formatado e envia só os dígitos.
 - Seleção com busca (estado, cidade): `Combobox` (`@/components/shared/Combobox`). Listas grandes buscam no servidor por `onSearchChange`.

@@ -21,7 +21,12 @@ export type AgendaAppointment = {
   /** "HH:mm"; "24:00" quando o atendimento vai até o fim do dia. */
   end: string;
   clientName: string;
+  clientPhotoUrl: string | null;
+  professionalName: string;
   serviceName: string;
   serviceColor: string;
+  /** Duração do serviço, em minutos. */
+  durationMinutes: number;
+  note: string | null;
   status: AppointmentStatus;
 };

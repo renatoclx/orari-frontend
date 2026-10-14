@@ -23,8 +23,12 @@ export function toAgendaAppointment(
     start: toTimeString(item.startAt, timeZone),
     end: endsAfterDay ? "24:00" : toTimeString(item.endAt, timeZone),
     clientName: item.client.name,
+    clientPhotoUrl: item.client.photoUrl,
+    professionalName: item.professional.name,
     serviceName: item.service.name,
     serviceColor: item.service.color ?? DEFAULT_SERVICE_COLOR,
+    durationMinutes: item.service.duration,
+    note: item.note,
     status: item.status,
   };
 }

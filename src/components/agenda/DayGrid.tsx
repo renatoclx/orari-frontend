@@ -1,4 +1,5 @@
-import { ChevronsUpDown } from "lucide-react";
+import { ChevronsUpDown, Plus } from "lucide-react";
+import { Hint } from "@/components/shared/Hint";
 import { AppointmentBlock } from "@/components/agenda/AppointmentBlock";
 import type { GridRange } from "@/components/agenda/agenda-range";
 import type {
@@ -21,6 +22,8 @@ const SLOT_MINUTES = 30;
 const SLOT_HEIGHT = 48;
 const PX_PER_MINUTE = SLOT_HEIGHT / SLOT_MINUTES;
 
+type SlotState = "free" | "past" | "closed" | "occupied";
+
 type DayGridProps = {
   professionals: AgendaProfessional[];
   appointments: AgendaAppointment[];
@@ -37,6 +40,17 @@ type DayGridProps = {
   mobileProfessionalId?: string;
   /** Troca do profissional exibido no celular (menu ao lado do nome). */
   onMobileProfessionalChange?: (professionalId: string) => void;
+  /**
+   * Minutos do dia antes dos quais já passou (o dia todo para dias passados,
+   * o horário atual para hoje, 0 para dias futuros). Não se agenda no passado.
+   */
+  pastMinutes: number;
+  /** Clique em um intervalo livre. */
+  onSlotSelect?: (professionalId: string, time: string) => void;
+  /** Clique em um intervalo que não aceita agendamento (passou ou fechado). */
+  onSlotBlocked?: (reason: "past" | "closed") => void;
+  /** Clique em um agendamento. */
+  onAppointmentSelect?: (appointment: AgendaAppointment) => void;
 };
 
 /** Grade do dia: uma coluna por profissional, com expediente e agendamentos. */
@@ -48,6 +62,10 @@ export function DayGrid({
   now,
   mobileProfessionalId,
   onMobileProfessionalChange,
+  pastMinutes,
+  onSlotSelect,
+  onSlotBlocked,
+  onAppointmentSelect,
 }: DayGridProps) {
   // Colunas dos outros profissionais somem no celular, quando há um escolhido.
   const mobileHidden = (professionalId: string) =>
@@ -61,6 +79,29 @@ export function DayGrid({
     { length: Math.ceil((range.end - range.start) / SLOT_MINUTES) },
     (_, index) => range.start + index * SLOT_MINUTES,
   );
+
+  // Situação de um intervalo: livre, já passou, fora do funcionamento ou
+  // ocupado (se sobrepõe a um agendamento; cancelados liberam o horário).
+  function slotState(professionalId: string, slot: number): SlotState {
+    const end = slot + SLOT_MINUTES;
+    if (slot < pastMinutes) return "past";
+    if (
+      unavailable.some(
+        (gap) =>
+          timeToMinutes(gap.start) < end && timeToMinutes(gap.end) > slot,
+      )
+    ) {
+      return "closed";
+    }
+    const occupied = appointments.some(
+      (appointment) =>
+        appointment.professionalId === professionalId &&
+        appointment.status !== "CANCELLED" &&
+        timeToMinutes(appointment.start) < end &&
+        timeToMinutes(appointment.end) > slot,
+    );
+    return occupied ? "occupied" : "free";
+  }
 
   // Posição vertical de um horário na grade.
   function toPixels(time: string): number {
@@ -113,14 +154,19 @@ export function DayGrid({
                   professionals.length > 1 && (
                     <DropdownMenu modal={false}>
                       <DropdownMenuTrigger asChild>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="shrink-0 md:hidden"
-                          aria-label="Trocar profissional"
+                        <Hint
+                          label="Ver a agenda de outro profissional"
+                          side="bottom"
                         >
-                          <ChevronsUpDown aria-hidden="true" />
-                        </Button>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="shrink-0 md:hidden"
+                            aria-label="Trocar profissional"
+                          >
+                            <ChevronsUpDown aria-hidden="true" />
+                          </Button>
+                        </Hint>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent
                         align="end"
@@ -174,20 +220,58 @@ export function DayGrid({
             className={`relative border-l border-border ${mobileHidden(professional.id)}`}
             style={{ height: gridHeight }}
           >
-            {slots.map((slot) => (
-              <div
-                key={slot}
-                className={`border-t border-border ${
-                  slot % 60 === 0 ? "" : "border-dashed"
-                }`}
-                style={{ height: SLOT_HEIGHT }}
-              />
-            ))}
+            {slots.map((slot) => {
+              const line = `border-t border-border ${
+                slot % 60 === 0 ? "" : "border-dashed"
+              }`;
+              const time = minutesToTime(slot);
+
+              const state = slotState(professional.id, slot);
+
+              if (!onSlotSelect || state === "occupied") {
+                return (
+                  <div
+                    key={slot}
+                    className={line}
+                    style={{ height: SLOT_HEIGHT }}
+                  />
+                );
+              }
+
+              // Passou ou fechado: o clique explica por que não dá para agendar.
+              if (state !== "free") {
+                return (
+                  <button
+                    key={slot}
+                    type="button"
+                    onClick={() => onSlotBlocked?.(state)}
+                    aria-label={`${time} indisponível para ${professional.name}`}
+                    className={`block w-full cursor-not-allowed ${line}`}
+                    style={{ height: SLOT_HEIGHT }}
+                  />
+                );
+              }
+
+              // Intervalo livre: clicável, com o "+" aparecendo ao passar o mouse.
+              return (
+                <button
+                  key={slot}
+                  type="button"
+                  onClick={() => onSlotSelect(professional.id, time)}
+                  aria-label={`Novo agendamento com ${professional.name} às ${time}`}
+                  className={`group/slot flex w-full cursor-pointer items-center justify-center text-xs text-transparent transition-colors hover:bg-brand/10 hover:text-brand focus-visible:bg-brand/10 focus-visible:text-brand ${line}`}
+                  style={{ height: SLOT_HEIGHT }}
+                >
+                  <Plus className="mr-1 size-3.5" aria-hidden="true" />
+                  Agendar às {time}
+                </button>
+              );
+            })}
 
             {unavailable.map((range) => (
               <div
                 key={range.start}
-                className="absolute inset-x-0 bg-unavailable"
+                className="pointer-events-none absolute inset-x-0 bg-unavailable"
                 style={{
                   top: toPixels(range.start),
                   height: toPixels(range.end) - toPixels(range.start),
@@ -204,6 +288,7 @@ export function DayGrid({
                 <AppointmentBlock
                   key={appointment.id}
                   appointment={appointment}
+                  onSelect={onAppointmentSelect}
                   top={toPixels(appointment.start)}
                   height={
                     toPixels(appointment.end) - toPixels(appointment.start)

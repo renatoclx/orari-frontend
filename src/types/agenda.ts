@@ -1,11 +1,4 @@
-// Espelha o enum AppointmentStatus do backend.
-export type AppointmentStatus =
-  | "SCHEDULED"
-  | "CONFIRMED"
-  | "IN_PROGRESS"
-  | "COMPLETED"
-  | "CANCELLED"
-  | "NO_SHOW";
+import type { AppointmentStatus } from "@/types/appointment";
 
 /** Intervalo do dia, em "HH:mm". */
 export type TimeRange = {
@@ -13,19 +6,19 @@ export type TimeRange = {
   end: string;
 };
 
-/** Profissional com o expediente e as pausas que a agenda desenha. */
-export type Professional = {
+/** Profissional como a agenda o exibe (uma coluna da grade). */
+export type AgendaProfessional = {
   id: string;
   name: string;
-  workingHours: TimeRange;
-  breaks: TimeRange[];
 };
 
-/** Agendamento como a agenda o exibe (provisório, até ligar à API). */
+/** Agendamento como a agenda o exibe, com os horários já no fuso da empresa. */
 export type AgendaAppointment = {
   id: string;
   professionalId: string;
+  /** "HH:mm" */
   start: string;
+  /** "HH:mm"; "24:00" quando o atendimento vai até o fim do dia. */
   end: string;
   clientName: string;
   serviceName: string;

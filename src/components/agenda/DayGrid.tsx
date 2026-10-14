@@ -1,48 +1,52 @@
 import { AppointmentBlock } from "@/components/agenda/AppointmentBlock";
+import type { GridRange } from "@/components/agenda/agenda-range";
 import type {
   AgendaAppointment,
-  Professional,
+  AgendaProfessional,
   TimeRange,
 } from "@/types/agenda";
 import { minutesToTime, timeToMinutes } from "@/utils/time";
 
-// Janela visível da agenda e a altura de cada intervalo de 30 minutos.
-const GRID_START = timeToMinutes("07:00");
-const GRID_END = timeToMinutes("20:00");
+// Altura de cada intervalo de 30 minutos.
 const SLOT_MINUTES = 30;
 const SLOT_HEIGHT = 48;
 const PX_PER_MINUTE = SLOT_HEIGHT / SLOT_MINUTES;
-const GRID_HEIGHT = (GRID_END - GRID_START) * PX_PER_MINUTE;
-
-// Um horário por intervalo, para as linhas e os rótulos da grade.
-const slots = Array.from(
-  { length: (GRID_END - GRID_START) / SLOT_MINUTES },
-  (_, index) => GRID_START + index * SLOT_MINUTES,
-);
-
-// Posição vertical de um horário na grade.
-function toPixels(time: string): number {
-  return (timeToMinutes(time) - GRID_START) * PX_PER_MINUTE;
-}
-
-// Tudo que fica fora do expediente ou cai em um intervalo.
-function unavailableRanges(professional: Professional): TimeRange[] {
-  return [
-    { start: minutesToTime(GRID_START), end: professional.workingHours.start },
-    ...professional.breaks,
-    { start: professional.workingHours.end, end: minutesToTime(GRID_END) },
-  ];
-}
 
 type DayGridProps = {
-  professionals: Professional[];
+  professionals: AgendaProfessional[];
   appointments: AgendaAppointment[];
-  now: string;
+  /** Janela visível, em minutos desde a meia-noite. */
+  range: GridRange;
+  /** Trechos fora do horário de funcionamento, sombreados. */
+  unavailable: TimeRange[];
+  /** "HH:mm" do momento atual; nulo quando o dia exibido não é hoje. */
+  now: string | null;
 };
 
-/** Grade do dia: uma coluna por profissional, com expediente, pausas e agendamentos. */
-export function DayGrid({ professionals, appointments, now }: DayGridProps) {
-  const nowTop = toPixels(now);
+/** Grade do dia: uma coluna por profissional, com expediente e agendamentos. */
+export function DayGrid({
+  professionals,
+  appointments,
+  range,
+  unavailable,
+  now,
+}: DayGridProps) {
+  const gridHeight = (range.end - range.start) * PX_PER_MINUTE;
+  // Um horário por intervalo, para as linhas e os rótulos da grade.
+  const slots = Array.from(
+    { length: Math.ceil((range.end - range.start) / SLOT_MINUTES) },
+    (_, index) => range.start + index * SLOT_MINUTES,
+  );
+
+  // Posição vertical de um horário na grade.
+  function toPixels(time: string): number {
+    return (timeToMinutes(time) - range.start) * PX_PER_MINUTE;
+  }
+
+  const nowMinutes = now === null ? null : timeToMinutes(now);
+  const showNow =
+    nowMinutes !== null && nowMinutes >= range.start && nowMinutes <= range.end;
+  const nowTop = showNow ? toPixels(now as string) : 0;
 
   return (
     <div className="min-h-0 flex-1 overflow-auto rounded-card border border-border bg-card">
@@ -75,7 +79,7 @@ export function DayGrid({ professionals, appointments, now }: DayGridProps) {
 
         <div
           className="sticky left-0 z-20 bg-card"
-          style={{ height: GRID_HEIGHT }}
+          style={{ height: gridHeight }}
         >
           {slots.map((slot) => (
             <div
@@ -98,7 +102,7 @@ export function DayGrid({ professionals, appointments, now }: DayGridProps) {
           <div
             key={professional.id}
             className="relative border-l border-border"
-            style={{ height: GRID_HEIGHT }}
+            style={{ height: gridHeight }}
           >
             {slots.map((slot) => (
               <div
@@ -110,7 +114,7 @@ export function DayGrid({ professionals, appointments, now }: DayGridProps) {
               />
             ))}
 
-            {unavailableRanges(professional).map((range) => (
+            {unavailable.map((range) => (
               <div
                 key={range.start}
                 className="absolute inset-x-0 bg-unavailable"
@@ -137,15 +141,17 @@ export function DayGrid({ professionals, appointments, now }: DayGridProps) {
                 />
               ))}
 
-            <div
-              className="pointer-events-none absolute inset-x-0 z-10 h-px bg-brand"
-              style={{ top: nowTop }}
-              aria-hidden="true"
-            >
-              {index === 0 && (
-                <span className="absolute -top-1 -left-1 size-2 rounded-full bg-brand" />
-              )}
-            </div>
+            {showNow && (
+              <div
+                className="pointer-events-none absolute inset-x-0 z-10 h-px bg-brand"
+                style={{ top: nowTop }}
+                aria-hidden="true"
+              >
+                {index === 0 && (
+                  <span className="absolute -top-1 -left-1 size-2 rounded-full bg-brand" />
+                )}
+              </div>
+            )}
           </div>
         ))}
       </div>

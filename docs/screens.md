@@ -44,7 +44,7 @@ descritas em skills.md e screen-patterns.md
 
 ---
 
-# Clientes
+# Clientes, Funcionários e Profissionais
 
 ## Listagem
 

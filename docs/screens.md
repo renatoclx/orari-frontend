@@ -32,6 +32,16 @@ descritas em skills.md e screen-patterns.md
 
 ---
 
+---
+
+# Barra de ações lateral
+
+- Menu de acesso rápido que está posicionado a direita, sobre o layout principal, apenas com ícones.
+  - Calendário (irá ter ação com a tela de Agendamentos);
+  - Cliente (ícone para cadastro rápido de um cliente);
+
+---
+
 # Clientes
 
 ## Listagem
@@ -206,3 +216,9 @@ deverão ser respeitados.
 - A tabela deve ser posicionada abaixo dos campos cadastrais e do botão Adicionar.
 
 ---
+
+## Cadastro rápido
+
+- Ao clicar para adicionar um cliente no cadastro rápido:
+  - Mostrar dialog apenas com nome e telefone.
+  - Os dados posteriores poderão ser adicionados após o cadastro rápido.

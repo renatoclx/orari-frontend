@@ -59,6 +59,18 @@ Use `Button` de `@/components/ui/button`:
 - `size="icon"` para botões só com ícone (sempre com `aria-label`).
 - Login: botão e campos com `h-14 text-base` (56 px, texto 16 px), só nessa tela.
 
+## Listagens
+
+Fonte das regras: `docs/screen-patterns.md` e `docs/screens.md`. Modelo: `src/app/(admin)/clientes/`.
+
+- A página é um Server Component que lê `searchParams` (`q`, `page`) e busca pelo service; o card (`ClientList`) ocupa a largura e a altura que sobram, com a tabela rolando por dentro e o rodapé de paginação fixo (`TablePagination`).
+- Busca durante a digitação: o campo (Client Component) espera ~350 ms e troca `?q=` na URL com `router.replace`; a página é renderizada de novo no servidor, na primeira página.
+- Botão "Novo <entidade>" leva à tela de cadastro. Vazios aparecem como "--".
+- Status (ativo/inativo, derivado de `deletedAt`) com `Badge` neutro: cores de status ainda não foram definidas.
+- Coluna Ações: "Alterar" em destaque (ícone) e as demais ações num menu de três pontos (`DropdownMenu modal={false}`), na ordem Visualizar, Excluir. Estilo neutro. Alterar e Excluir ficam desabilitados para registros excluídos.
+- Visualizar abre `Dialog` com Fechar; Excluir abre `AlertDialog` com o nome do registro, botão vermelho e "Excluindo…" enquanto executa.
+- Carregamento: `loading.tsx` com `Skeleton`. No celular, a tabela vira lista empilhada.
+
 ## Formulários
 
 Fonte das regras: `docs/screen-patterns.md` (padrões) e `docs/screens.md` (campos e layout de cada entidade). Consulte os dois antes de criar uma tela de cadastro ou alteração.
@@ -92,6 +104,7 @@ Fonte das regras: `docs/screen-patterns.md` (padrões) e `docs/screens.md` (camp
 
 ## Layout da área administrativa
 
+- Itens de menu podem ser grupos (ex.: "Pessoas", com Clientes, Funcionários e Profissionais): expandida, a seção abre; recolhida, vira um menu ao lado do ícone.
 - Sidebar escura com a logo colorida no topo (`/logo/logo-full-color.svg` aberta, `/logo/logo-icon-color.svg` recolhida). O botão de recolher é um ícone pequeno ao lado da logo; recolhida, a logo vira o botão de expandir ao passar o mouse.
 - Header com atalhos, toggle (switch) de tema claro/escuro e usuário logado.
 - Componentes da estrutura ficam em `src/components/layout/`; o estado da sidebar recolhida fica em cookie, lido no servidor.
@@ -111,7 +124,7 @@ Toda página da área administrativa segue o modelo da tela de Agendamentos (`sr
 ## Barra de ações lateral
 
 - Componente único `@/components/layout/ActionBar`, renderizado pelo `AdminShell`: aparece em **todas** as telas administrativas a partir do tablet (`md`). Não adicione barras por página.
-- **No celular, a barra some** e os mesmos atalhos aparecem como ícones no header, para não cobrir o conteúdo. Cada atalho é um componente reutilizado nos dois lugares (ex.: `CalendarShortcut` com `placement="bar"` ou `"header"`).
+- **No celular, a barra some** e os mesmos atalhos aparecem como ícones no header, para não cobrir o conteúdo. Cada atalho é um componente reutilizado nos dois lugares (ex.: `CalendarShortcut` com `placement="bar"` ou `"header"`). Atalhos atuais: calendário (`CalendarShortcut`) e cadastro rápido de cliente (`QuickClientShortcut`, diálogo só com nome e telefone).
 - Fixa na borda direita da tela, centralizada na vertical, com cantos arredondados só à esquerda (`rounded-l-overlay`), sombra e sem borda à direita.
 - Guarda atalhos secundários (hoje: calendário). Novos atalhos entram nela como botões de ícone com `aria-label` e `title`.
 - Painéis abertos por ela usam o `Popover` do shadcn com `side="left"` e `sideOffset={0}`, colados à barra e flutuando sobre o conteúdo.

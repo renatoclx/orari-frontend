@@ -55,3 +55,16 @@ export const addressTypeLabels: Record<AddressType, string> = {
   MESSAGE: "Recados",
   BRANCH: "Filial",
 };
+
+/** "50.00" → "R$ 50,00" */
+export function formatPrice(price: string | number): string {
+  return new Intl.NumberFormat("pt-BR", {
+    style: "currency",
+    currency: "BRL",
+  }).format(Number(price));
+}
+
+/** 60 → "60 minutos"; 1 → "1 minuto" */
+export function formatDuration(minutes: number): string {
+  return `${minutes} ${minutes === 1 ? "minuto" : "minutos"}`;
+}

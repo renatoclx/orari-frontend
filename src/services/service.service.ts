@@ -2,7 +2,7 @@ import "server-only";
 
 import { apiFetch } from "@/services/api";
 import type { Paginated } from "@/types/location";
-import type { ServiceItem } from "@/types/service";
+import type { ServiceInput, ServiceItem } from "@/types/service";
 
 type ListServicesParams = {
   /** Busca parcial pelo nome, sem diferenciar acentos nem maiúsculas. */
@@ -23,4 +23,21 @@ export function listServices(
   if (name) query.set("name", name);
 
   return apiFetch<Paginated<ServiceItem>>(`/services?${query}`);
+}
+
+export function createService(input: ServiceInput): Promise<ServiceItem> {
+  return apiFetch<ServiceItem>("/services", {
+    method: "POST",
+    body: JSON.stringify(input),
+  });
+}
+
+export function updateService(
+  id: string,
+  input: ServiceInput,
+): Promise<ServiceItem> {
+  return apiFetch<ServiceItem>(`/services/${id}`, {
+    method: "PATCH",
+    body: JSON.stringify(input),
+  });
 }

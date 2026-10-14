@@ -14,3 +14,13 @@ export type ServiceItem = {
   createdAt: string;
   updatedAt: string | null;
 };
+
+/** Corpo de POST e PATCH /services. `null` limpa um campo opcional (PATCH). */
+export type ServiceInput = {
+  name: string;
+  description: string | null;
+  /** Em reais, com até 2 casas decimais. */
+  price: number | null;
+  duration: number;
+  color: string | null;
+};

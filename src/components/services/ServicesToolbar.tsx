@@ -2,7 +2,9 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Search } from "lucide-react";
+import { Plus, Search } from "lucide-react";
+import { ServiceFormDialog } from "@/components/services/ServiceFormDialog";
+import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
 const BASE_PATH = "/servicos";
@@ -17,6 +19,7 @@ type ServicesToolbarProps = {
 export function ServicesToolbar({ search }: ServicesToolbarProps) {
   const router = useRouter();
   const [value, setValue] = useState(search);
+  const [creating, setCreating] = useState(false);
 
   useEffect(() => {
     const term = value.trim();
@@ -47,6 +50,16 @@ export function ServicesToolbar({ search }: ServicesToolbarProps) {
           className="bg-card pl-8"
         />
       </div>
+
+      <Button
+        className="w-full sm:ml-auto sm:w-auto"
+        onClick={() => setCreating(true)}
+      >
+        <Plus aria-hidden="true" />
+        Novo serviço
+      </Button>
+
+      <ServiceFormDialog open={creating} onOpenChange={setCreating} />
     </div>
   );
 }

@@ -31,3 +31,19 @@ export function maskCep(value: string): string {
   const digits = onlyDigits(value).slice(0, 8);
   return digits.replace(/^(\d{5})(\d)/, "$1-$2");
 }
+
+/** "5000" (centavos) → "R$ 50,00"; "123456" → "R$ 1.234,56"; "" → "" */
+export function maskCurrency(value: string): string {
+  // Até 10 dígitos: o campo do banco é Decimal(10,2).
+  const digits = onlyDigits(value).slice(0, 10).replace(/^0+/, "");
+  if (!digits) return "";
+
+  const padded = digits.padStart(3, "0");
+  const integer = padded.slice(0, -2).replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+  return `R$ ${integer},${padded.slice(-2)}`;
+}
+
+/** Número inteiro de minutos, até 4 dígitos, sem zeros à esquerda. */
+export function maskMinutes(value: string): string {
+  return onlyDigits(value).slice(0, 4).replace(/^0+/, "");
+}

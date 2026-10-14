@@ -1,10 +1,11 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { isPeopleType, PEOPLE_KINDS } from "@/components/people/people-kinds";
 import {
-  validateClientForm,
-  type ClientFormValues,
-} from "@/components/clients/client-validation";
+  validatePersonForm,
+  type PersonFormValues,
+} from "@/components/people/person-validation";
 import { ApiError } from "@/services/api";
 import {
   createPerson,
@@ -17,21 +18,22 @@ import type {
   ContactType,
   NewAddressInput,
   NewContactInput,
+  PeopleType,
 } from "@/types/people";
 import { onlyDigits } from "@/utils/masks";
 
-export type ClientField = keyof ClientFormValues;
+export type PersonField = keyof PersonFormValues;
 
 export type ActionFailure = {
   ok: false;
   message: string;
   /** Campo do formulário a que o erro se refere, quando houver. */
-  field?: ClientField;
+  field?: PersonField;
 };
 
-export type DeleteClientResult = { ok: true } | ActionFailure;
-export type ReactivateClientResult = { ok: true } | ActionFailure;
-export type CreateClientResult =
+export type DeletePersonResult = { ok: true } | ActionFailure;
+export type ReactivatePersonResult = { ok: true } | ActionFailure;
+export type CreatePersonResult =
   { ok: true; photoFailed: boolean } | ActionFailure;
 
 const CONTACT_TYPES: ContactType[] = ["MAIN", "MESSAGE", "BRANCH"];
@@ -65,24 +67,33 @@ function asString(value: unknown): string {
   return typeof value === "string" ? value.trim() : "";
 }
 
+const INVALID_TYPE: ActionFailure = {
+  ok: false,
+  message: "Tipo de cadastro inválido.",
+};
+
 /**
- * Cadastro completo do cliente. O formulário entra como FormData (os campos,
+ * Cadastro completo da pessoa (cliente, funcionário ou profissional). O formulário entra como FormData (os campos,
  * mais as listas de contatos e endereços em JSON e a foto, se houver). Valida
  * de novo no servidor, cria pessoa + contatos + endereços numa chamada e, só
  * depois, envia a foto: a API recebe a foto numa rota própria.
  */
-export async function createClientAction(
+export async function createPersonAction(
+  type: PeopleType,
   data: FormData,
-): Promise<CreateClientResult> {
-  const values: ClientFormValues = {
+): Promise<CreatePersonResult> {
+  // O tipo vem do navegador: confere antes de usar.
+  if (!isPeopleType(type)) return INVALID_TYPE;
+
+  const values: PersonFormValues = {
     name: text(data, "name"),
     phone: text(data, "phone"),
     email: text(data, "email"),
     document: text(data, "document"),
   };
 
-  const errors = validateClientForm(values);
-  const invalid = (Object.keys(errors) as ClientField[]).find(
+  const errors = validatePersonForm(values);
+  const invalid = (Object.keys(errors) as PersonField[]).find(
     (field) => errors[field],
   );
   if (invalid) {
@@ -122,7 +133,7 @@ export async function createClientAction(
         complement: asString(item.complement),
       }),
       cityId: asString(item.cityId),
-      // O primeiro endereço é o principal (o exibido para o cliente).
+      // O primeiro endereço é o principal (o exibido para a pessoa).
       isPrincipal: index === 0,
     }),
   );
@@ -135,7 +146,7 @@ export async function createClientAction(
   try {
     const person = await createPerson({
       name: values.name,
-      type: "CLIENT",
+      type,
       ...(values.document && { document: onlyDigits(values.document) }),
       ...(birthDate && { birthDate }),
       ...(profession && { profession }),
@@ -164,7 +175,7 @@ export async function createClientAction(
     }
   }
 
-  revalidatePath("/clientes");
+  revalidatePath(PEOPLE_KINDS[type].path);
   return { ok: true, photoFailed };
 }
 
@@ -173,7 +184,7 @@ export async function quickCreateClientAction(
   name: string,
   phone: string,
 ): Promise<{ ok: true } | ActionFailure> {
-  const errors = validateClientForm({
+  const errors = validatePersonForm({
     name,
     phone,
     email: "",
@@ -193,13 +204,16 @@ export async function quickCreateClientAction(
     return failure(error);
   }
 
-  revalidatePath("/clientes");
+  revalidatePath(PEOPLE_KINDS.CLIENT.path);
   return { ok: true };
 }
 
-export async function deleteClientAction(
+export async function deletePersonAction(
   id: string,
-): Promise<DeleteClientResult> {
+  type: PeopleType,
+): Promise<DeletePersonResult> {
+  if (!isPeopleType(type)) return INVALID_TYPE;
+
   try {
     await deletePerson(id);
   } catch (error) {
@@ -207,14 +221,17 @@ export async function deleteClientAction(
     return failure(error);
   }
 
-  // A listagem é renderizada no servidor: recarrega com o cliente inativo.
-  revalidatePath("/clientes");
+  // A listagem é renderizada no servidor: recarrega com a pessoa inativa.
+  revalidatePath(PEOPLE_KINDS[type].path);
   return { ok: true };
 }
 
-export async function reactivateClientAction(
+export async function reactivatePersonAction(
   id: string,
-): Promise<ReactivateClientResult> {
+  type: PeopleType,
+): Promise<ReactivatePersonResult> {
+  if (!isPeopleType(type)) return INVALID_TYPE;
+
   try {
     await restorePerson(id);
   } catch (error) {
@@ -222,6 +239,6 @@ export async function reactivateClientAction(
     return failure(error);
   }
 
-  revalidatePath("/clientes");
+  revalidatePath(PEOPLE_KINDS[type].path);
   return { ok: true };
 }

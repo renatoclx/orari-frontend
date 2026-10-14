@@ -4,12 +4,13 @@ import { useRef, useState, useTransition } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
+import { createPersonAction } from "@/app/(admin)/people-actions";
+import type { PeopleKind } from "@/components/people/people-kinds";
 import {
-  clientFieldOrder,
-  validateClientForm,
-  type ClientFormErrors,
-} from "@/components/clients/client-validation";
-import { createClientAction } from "@/app/(admin)/clientes/actions";
+  personFieldOrder,
+  validatePersonForm,
+  type PersonFormErrors,
+} from "@/components/people/person-validation";
 import { AddressesField } from "@/components/people/AddressesField";
 import { ContactsField } from "@/components/people/ContactsField";
 import { DatePicker } from "@/components/shared/DatePicker";
@@ -75,16 +76,17 @@ function Field({ id, label, required, error, children }: FieldProps) {
   );
 }
 
-type ClientFormProps = {
+type PersonFormProps = {
+  kind: PeopleKind;
   states: State[];
 };
 
 // Duas colunas ocupando a largura do card (screens.md, "Layout do formulário"):
 // à esquerda os dados principais; à direita os opcionais, em seções recolhíveis.
-export function ClientForm({ states }: ClientFormProps) {
-  const [errors, setErrors] = useState<ClientFormErrors>({});
+export function PersonForm({ kind, states }: PersonFormProps) {
+  const [errors, setErrors] = useState<PersonFormErrors>({});
   const [confirmOpen, setConfirmOpen] = useState(false);
-  const [clientName, setClientName] = useState("");
+  const [personName, setPersonName] = useState("");
   const [pending, startTransition] = useTransition();
   const formRef = useRef<HTMLFormElement>(null);
   const router = useRouter();
@@ -99,16 +101,16 @@ export function ClientForm({ states }: ClientFormProps) {
       document: String(data.get("document") ?? ""),
     };
 
-    const found = validateClientForm(values);
+    const found = validatePersonForm(values);
     setErrors(found);
 
-    const firstInvalid = clientFieldOrder.find((field) => found[field]);
+    const firstInvalid = personFieldOrder.find((field) => found[field]);
     if (firstInvalid) {
       document.getElementById(firstInvalid)?.focus();
       return;
     }
 
-    setClientName(values.name.trim());
+    setPersonName(values.name.trim());
     setConfirmOpen(true);
   }
 
@@ -119,16 +121,18 @@ export function ClientForm({ states }: ClientFormProps) {
     const data = new FormData(form);
 
     startTransition(async () => {
-      const result = await createClientAction(data);
+      const result = await createPersonAction(kind.type, data);
 
       if (result.ok) {
-        toast.success("Cliente cadastrado.", { description: clientName });
+        toast.success(`${kind.singularTitle} cadastrado.`, {
+          description: personName,
+        });
         if (result.photoFailed) {
           toast.warning("A foto não foi enviada.", {
             description: "Você poderá adicioná-la depois, na alteração.",
           });
         }
-        router.push("/clientes");
+        router.push(kind.path);
         return;
       }
 
@@ -138,7 +142,7 @@ export function ClientForm({ states }: ClientFormProps) {
         setErrors({ [field]: result.message });
         document.getElementById(field)?.focus();
       }
-      toast.error("Não foi possível cadastrar o cliente.", {
+      toast.error(`Não foi possível cadastrar o ${kind.singular}.`, {
         description: result.message,
       });
     });
@@ -146,7 +150,7 @@ export function ClientForm({ states }: ClientFormProps) {
 
   // Corrigir um campo limpa o erro dele.
   function handleChange(event: React.FormEvent<HTMLFormElement>) {
-    const field = (event.target as HTMLElement).id as keyof ClientFormErrors;
+    const field = (event.target as HTMLElement).id as keyof PersonFormErrors;
     if (errors[field]) {
       setErrors((current) => ({ ...current, [field]: undefined }));
     }
@@ -169,8 +173,8 @@ export function ClientForm({ states }: ClientFormProps) {
           </div>
 
           <div className="grid gap-x-12 gap-y-6 md:grid-cols-2">
-            <section aria-labelledby="client-main" className="space-y-4">
-              <h2 id="client-main" className="font-semibold">
+            <section aria-labelledby="person-main" className="space-y-4">
+              <h2 id="person-main" className="font-semibold">
                 Dados principais
               </h2>
 
@@ -244,8 +248,8 @@ export function ClientForm({ states }: ClientFormProps) {
               </Field>
             </section>
 
-            <section aria-labelledby="client-optional" className="space-y-4">
-              <h2 id="client-optional" className="font-semibold">
+            <section aria-labelledby="person-optional" className="space-y-4">
+              <h2 id="person-optional" className="font-semibold">
                 Informações opcionais
               </h2>
 
@@ -295,7 +299,7 @@ export function ClientForm({ states }: ClientFormProps) {
 
                 <FormSection
                   title="Endereços"
-                  description="Onde o cliente pode ser encontrado"
+                  description={`Onde o ${kind.singular} pode ser encontrado`}
                 >
                   <AddressesField states={states} />
                 </FormSection>
@@ -312,7 +316,7 @@ export function ClientForm({ states }: ClientFormProps) {
           }
         >
           <Button variant="outline" asChild>
-            <Link href="/clientes">Cancelar</Link>
+            <Link href={kind.path}>Cancelar</Link>
           </Button>
           <Button type="submit">Salvar</Button>
         </FormFooter>
@@ -324,9 +328,9 @@ export function ClientForm({ states }: ClientFormProps) {
       >
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Cadastrar cliente?</AlertDialogTitle>
+            <AlertDialogTitle>Cadastrar {kind.singular}?</AlertDialogTitle>
             <AlertDialogDescription>
-              O cadastro de {clientName} será criado com os dados informados.
+              O cadastro de {personName} será criado com os dados informados.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>

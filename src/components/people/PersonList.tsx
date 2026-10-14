@@ -5,9 +5,10 @@ import Link from "next/link";
 import { EllipsisVertical, Eye, Pencil, RotateCcw, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import {
-  deleteClientAction,
-  reactivateClientAction,
-} from "@/app/(admin)/clientes/actions";
+  deletePersonAction,
+  reactivatePersonAction,
+} from "@/app/(admin)/people-actions";
+import type { PeopleKind } from "@/components/people/people-kinds";
 import { PersonAvatar } from "@/components/shared/PersonAvatar";
 import {
   AlertDialog,
@@ -38,8 +39,9 @@ import {
 import type { PersonListItem } from "@/types/people";
 import { formatCpf, formatDateOnly, formatPhone } from "@/utils/format";
 
-type ClientListProps = {
-  clients: PersonListItem[];
+type PersonListProps = {
+  kind: PeopleKind;
+  people: PersonListItem[];
   /** Termo da busca atual, para a mensagem de lista vazia. */
   search: string;
   /** Rodapé fixo do card (paginação). */
@@ -57,21 +59,21 @@ function Value({ children }: { children: React.ReactNode }) {
   );
 }
 
-function formatContact(client: PersonListItem): string | null {
-  const phone = client.principalContact?.phone;
+function formatContact(person: PersonListItem): string | null {
+  const phone = person.principalContact?.phone;
   return phone ? formatPhone(phone) : null;
 }
 
-function StatusBadge({ client }: { client: PersonListItem }) {
+function StatusBadge({ person }: { person: PersonListItem }) {
   // O status vem do deletedAt; não é um campo da entidade.
-  return client.deletedAt ? (
+  return person.deletedAt ? (
     <Badge variant="destructive">Inativo</Badge>
   ) : (
     <Badge variant="success">Ativo</Badge>
   );
 }
 
-export function ClientList({ clients, search, footer }: ClientListProps) {
+export function PersonList({ kind, people, search, footer }: PersonListProps) {
   const [viewing, setViewing] = useState<PersonListItem | null>(null);
   const [deleting, setDeleting] = useState<PersonListItem | null>(null);
   const [pending, startTransition] = useTransition();
@@ -82,25 +84,29 @@ export function ClientList({ clients, search, footer }: ClientListProps) {
     const target = deleting;
 
     startTransition(async () => {
-      const result = await deleteClientAction(target.id);
+      const result = await deletePersonAction(target.id, kind.type);
       if (result.ok) {
-        toast.success("Cliente inativado.", { description: target.name });
+        toast.success(`${kind.singularTitle} inativado.`, {
+          description: target.name,
+        });
         setDeleting(null);
       } else {
-        toast.error("Não foi possível inativar o cliente.", {
+        toast.error(`Não foi possível inativar o ${kind.singular}.`, {
           description: result.message,
         });
       }
     });
   }
 
-  function reactivate(client: PersonListItem) {
+  function reactivate(person: PersonListItem) {
     startReactivate(async () => {
-      const result = await reactivateClientAction(client.id);
+      const result = await reactivatePersonAction(person.id, kind.type);
       if (result.ok) {
-        toast.success("Cliente reativado.", { description: client.name });
+        toast.success(`${kind.singularTitle} reativado.`, {
+          description: person.name,
+        });
       } else {
-        toast.error("Não foi possível reativar o cliente.", {
+        toast.error(`Não foi possível reativar o ${kind.singular}.`, {
           description: result.message,
         });
       }
@@ -110,48 +116,49 @@ export function ClientList({ clients, search, footer }: ClientListProps) {
   return (
     <div className="flex min-h-0 flex-1 flex-col rounded-card border border-border bg-card">
       <div className="min-h-0 flex-1 overflow-auto">
-        {clients.length === 0 ? (
+        {people.length === 0 ? (
           <p className="flex h-full items-center justify-center p-8 text-center text-sm text-muted-foreground">
             {search
-              ? `Nenhum cliente encontrado para “${search}”.`
-              : "Nenhum cliente cadastrado. Cadastre o primeiro!"}
+              ? `Nenhum ${kind.singular} encontrado para “${search}”.`
+              : `Nenhum ${kind.singular} cadastrado. Cadastre o primeiro!`}
           </p>
         ) : (
           <>
             {/* Celular: lista empilhada. A partir do md, tabela. */}
             <ul className="divide-y divide-border md:hidden">
-              {clients.map((client) => (
-                <li key={client.id} className="flex items-start gap-3 p-4">
+              {people.map((person) => (
+                <li key={person.id} className="flex items-start gap-3 p-4">
                   <PersonAvatar
-                    name={client.name}
-                    photoUrl={client.photoUrl}
+                    name={person.name}
+                    photoUrl={person.photoUrl}
                     size="lg"
                   />
                   <div className="min-w-0 flex-1">
                     <div className="flex items-start justify-between gap-2">
-                      <p className="truncate pt-2 font-medium">{client.name}</p>
-                      <ClientActions
-                        client={client}
+                      <p className="truncate pt-2 font-medium">{person.name}</p>
+                      <PersonActions
+                        person={person}
                         onView={setViewing}
                         onDelete={setDeleting}
                         onReactivate={reactivate}
                         busy={reactivating}
+                        basePath={kind.path}
                       />
                     </div>
                     <dl className="mt-1 grid grid-cols-[auto_1fr] gap-x-3 gap-y-0.5 text-sm [&_dd]:whitespace-nowrap">
                       <dt className="text-muted-foreground">Celular</dt>
                       <dd className="tabular-nums">
-                        <Value>{formatContact(client)}</Value>
+                        <Value>{formatContact(person)}</Value>
                       </dd>
                       <dt className="text-muted-foreground">CPF</dt>
                       <dd className="tabular-nums">
                         <Value>
-                          {client.document && formatCpf(client.document)}
+                          {person.document && formatCpf(person.document)}
                         </Value>
                       </dd>
                       <dt className="text-muted-foreground">Status</dt>
                       <dd>
-                        <StatusBadge client={client} />
+                        <StatusBadge person={person} />
                       </dd>
                     </dl>
                   </div>
@@ -159,12 +166,13 @@ export function ClientList({ clients, search, footer }: ClientListProps) {
               ))}
             </ul>
 
-            <ClientTable
-              clients={clients}
+            <PersonTable
+              people={people}
               onView={setViewing}
               onDelete={setDeleting}
               onReactivate={reactivate}
               busy={reactivating}
+              basePath={kind.path}
             />
           </>
         )}
@@ -177,7 +185,7 @@ export function ClientList({ clients, search, footer }: ClientListProps) {
         onOpenChange={(open) => !open && setViewing(null)}
       >
         <DialogContent>
-          {viewing && <ClientDetails client={viewing} />}
+          {viewing && <PersonDetails person={viewing} kind={kind} />}
           <DialogFooter>
             <Button variant="outline" onClick={() => setViewing(null)}>
               Fechar
@@ -192,10 +200,10 @@ export function ClientList({ clients, search, footer }: ClientListProps) {
       >
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Excluir cliente?</AlertDialogTitle>
+            <AlertDialogTitle>Excluir {kind.singular}?</AlertDialogTitle>
             <AlertDialogDescription>
-              O cliente {deleting?.name} será inativado e continuará na lista
-              com o status Inativo.
+              O {kind.singular} {deleting?.name} será inativado e continuará na
+              lista com o status Inativo.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
@@ -219,17 +227,19 @@ export function ClientList({ clients, search, footer }: ClientListProps) {
 }
 
 type RowHandlers = {
-  onView: (client: PersonListItem) => void;
-  onDelete: (client: PersonListItem) => void;
-  onReactivate: (client: PersonListItem) => void;
+  onView: (person: PersonListItem) => void;
+  onDelete: (person: PersonListItem) => void;
+  onReactivate: (person: PersonListItem) => void;
+  /** Caminho da listagem (base do link de alteração). */
+  basePath: string;
   /** Há uma reativação em andamento. */
   busy: boolean;
 };
 
-function ClientTable({
-  clients,
+function PersonTable({
+  people,
   ...handlers
-}: { clients: PersonListItem[] } & RowHandlers) {
+}: { people: PersonListItem[] } & RowHandlers) {
   const headerClass =
     "sticky top-0 z-10 border-b border-border bg-card px-4 py-3 font-medium text-muted-foreground";
 
@@ -261,33 +271,33 @@ function ClientTable({
         </tr>
       </thead>
       <tbody className="divide-y divide-border">
-        {clients.map((client) => (
-          <tr key={client.id} className="hover:bg-background">
+        {people.map((person) => (
+          <tr key={person.id} className="hover:bg-background">
             <td className="px-4 py-3">
               <div className="flex items-center gap-3">
-                <PersonAvatar name={client.name} photoUrl={client.photoUrl} />
-                <span className="font-medium">{client.name}</span>
+                <PersonAvatar name={person.name} photoUrl={person.photoUrl} />
+                <span className="font-medium">{person.name}</span>
               </div>
             </td>
             <td className="px-4 py-3 whitespace-nowrap tabular-nums">
-              <Value>{formatContact(client)}</Value>
+              <Value>{formatContact(person)}</Value>
             </td>
             <td className="px-4 py-3 whitespace-nowrap tabular-nums">
-              <Value>{client.document && formatCpf(client.document)}</Value>
+              <Value>{person.document && formatCpf(person.document)}</Value>
             </td>
             <td className="hidden px-4 py-3 tabular-nums xl:table-cell">
               <Value>
-                {client.birthDate && formatDateOnly(client.birthDate)}
+                {person.birthDate && formatDateOnly(person.birthDate)}
               </Value>
             </td>
             <td className="hidden px-4 py-3 lg:table-cell">
-              <Value>{client.profession}</Value>
+              <Value>{person.profession}</Value>
             </td>
             <td className="px-4 py-3">
-              <StatusBadge client={client} />
+              <StatusBadge person={person} />
             </td>
             <td className="px-4 py-2">
-              <ClientActions client={client} {...handlers} />
+              <PersonActions person={person} {...handlers} />
             </td>
           </tr>
         ))}
@@ -298,15 +308,16 @@ function ClientTable({
 
 // Coluna Ações (screen-patterns.md): "Alterar" em destaque; as demais ações no
 // menu de três pontos, em ordem fixa. Estilo neutro, só ícones.
-function ClientActions({
-  client,
+function PersonActions({
+  person,
   onView,
   onDelete,
   onReactivate,
   busy,
-}: { client: PersonListItem } & RowHandlers) {
+  basePath,
+}: { person: PersonListItem } & RowHandlers) {
   // Excluído: Alterar e Excluir ficam desabilitados (screens.md).
-  const removed = client.deletedAt !== null;
+  const removed = person.deletedAt !== null;
 
   return (
     <div className="flex shrink-0 items-center justify-end gap-1">
@@ -315,15 +326,15 @@ function ClientActions({
           variant="ghost"
           size="icon"
           disabled
-          aria-label={`Alterar ${client.name}`}
+          aria-label={`Alterar ${person.name}`}
         >
           <Pencil aria-hidden="true" />
         </Button>
       ) : (
         <Button variant="ghost" size="icon" asChild>
           <Link
-            href={`/clientes/${client.id}/editar`}
-            aria-label={`Alterar ${client.name}`}
+            href={`${basePath}/${person.id}/editar`}
+            aria-label={`Alterar ${person.name}`}
             title="Alterar"
           >
             <Pencil aria-hidden="true" />
@@ -337,20 +348,20 @@ function ClientActions({
           <Button
             variant="ghost"
             size="icon"
-            aria-label={`Mais ações para ${client.name}`}
+            aria-label={`Mais ações para ${person.name}`}
           >
             <EllipsisVertical aria-hidden="true" />
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
-          <DropdownMenuItem onSelect={() => onView(client)}>
+          <DropdownMenuItem onSelect={() => onView(person)}>
             <Eye aria-hidden="true" />
             Visualizar
           </DropdownMenuItem>
           {removed && (
             <DropdownMenuItem
               disabled={busy}
-              onSelect={() => onReactivate(client)}
+              onSelect={() => onReactivate(person)}
             >
               <RotateCcw aria-hidden="true" />
               Reativar
@@ -358,7 +369,7 @@ function ClientActions({
           )}
           <DropdownMenuItem
             disabled={removed}
-            onSelect={() => onDelete(client)}
+            onSelect={() => onDelete(person)}
           >
             <Trash2 aria-hidden="true" />
             Excluir
@@ -369,27 +380,33 @@ function ClientActions({
   );
 }
 
-function ClientDetails({ client }: { client: PersonListItem }) {
+function PersonDetails({
+  person,
+  kind,
+}: {
+  person: PersonListItem;
+  kind: PeopleKind;
+}) {
   const rows: [string, React.ReactNode][] = [
-    ["Celular", formatContact(client)],
-    ["E-mail", client.principalContact?.email],
-    ["CPF", client.document && formatCpf(client.document)],
+    ["Celular", formatContact(person)],
+    ["E-mail", person.principalContact?.email],
+    ["CPF", person.document && formatCpf(person.document)],
     [
       "Data de nascimento",
-      client.birthDate && formatDateOnly(client.birthDate),
+      person.birthDate && formatDateOnly(person.birthDate),
     ],
-    ["Profissão", client.profession],
-    ["Observações", client.note],
+    ["Profissão", person.profession],
+    ["Observações", person.note],
   ];
 
   return (
     <>
       <DialogHeader>
         <DialogTitle className="flex items-center gap-3">
-          <PersonAvatar name={client.name} photoUrl={client.photoUrl} />
-          {client.name}
+          <PersonAvatar name={person.name} photoUrl={person.photoUrl} />
+          {person.name}
         </DialogTitle>
-        <DialogDescription>Dados do cliente.</DialogDescription>
+        <DialogDescription>Dados do {kind.singular}.</DialogDescription>
       </DialogHeader>
 
       <dl className="grid grid-cols-[auto_1fr] gap-x-4 gap-y-2 text-sm">
@@ -403,7 +420,7 @@ function ClientDetails({ client }: { client: PersonListItem }) {
         ))}
         <dt className="text-muted-foreground">Status</dt>
         <dd>
-          <StatusBadge client={client} />
+          <StatusBadge person={person} />
         </dd>
       </dl>
     </>

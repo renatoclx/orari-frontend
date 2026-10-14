@@ -3,11 +3,11 @@
 import { useState, useTransition } from "react";
 import { UserPlus } from "lucide-react";
 import { toast } from "sonner";
-import { quickCreateClientAction } from "@/app/(admin)/clientes/actions";
+import { quickCreateClientAction } from "@/app/(admin)/people-actions";
 import {
-  validateClientForm,
-  type ClientFormErrors,
-} from "@/components/clients/client-validation";
+  validatePersonForm,
+  type PersonFormErrors,
+} from "@/components/people/person-validation";
 import { MaskedInput } from "@/components/shared/MaskedInput";
 import { Button } from "@/components/ui/button";
 import {
@@ -30,7 +30,7 @@ export function QuickClientShortcut() {
   const [open, setOpen] = useState(false);
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
-  const [errors, setErrors] = useState<ClientFormErrors>({});
+  const [errors, setErrors] = useState<PersonFormErrors>({});
   const [pending, startTransition] = useTransition();
 
   function handleOpenChange(next: boolean) {
@@ -45,7 +45,7 @@ export function QuickClientShortcut() {
   function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
 
-    const found = validateClientForm({ name, phone, email: "", document: "" });
+    const found = validatePersonForm({ name, phone, email: "", document: "" });
     setErrors(found);
     if (found.name) {
       document.getElementById("quick-name")?.focus();

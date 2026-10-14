@@ -1,6 +1,6 @@
 import { onlyDigits } from "@/utils/masks";
 
-export type ClientFormValues = {
+export type PersonFormValues = {
   name: string;
   /** Contato principal; aceita com ou sem máscara. */
   phone: string;
@@ -9,10 +9,10 @@ export type ClientFormValues = {
   document: string;
 };
 
-export type ClientFormErrors = Partial<Record<keyof ClientFormValues, string>>;
+export type PersonFormErrors = Partial<Record<keyof PersonFormValues, string>>;
 
 // Ordem em que os campos aparecem na tela: o foco vai para o primeiro inválido.
-export const clientFieldOrder: (keyof ClientFormValues)[] = [
+export const personFieldOrder: (keyof PersonFormValues)[] = [
   "name",
   "phone",
   "email",
@@ -25,11 +25,11 @@ const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
  * Obrigatórios (screens.md): nome e um contato (celular). Os opcionais só são
  * conferidos quando preenchidos, para não falharem depois, no cadastro.
  */
-export function validateClientForm(values: ClientFormValues): ClientFormErrors {
-  const errors: ClientFormErrors = {};
+export function validatePersonForm(values: PersonFormValues): PersonFormErrors {
+  const errors: PersonFormErrors = {};
 
   if (!values.name.trim()) {
-    errors.name = "Informe o nome do cliente.";
+    errors.name = "Informe o nome.";
   }
 
   const phone = onlyDigits(values.phone);

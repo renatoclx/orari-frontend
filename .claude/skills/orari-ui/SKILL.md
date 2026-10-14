@@ -69,7 +69,11 @@ Padrão do sistema (`docs/screen-patterns.md`): cor correspondente à informaç�
 
 ## Listagens
 
-Fonte das regras: `docs/screen-patterns.md` e `docs/screens.md`. Modelo: `src/app/(admin)/clientes/`.
+Fonte das regras: `docs/screen-patterns.md` e `docs/screens.md`. Modelo: `src/components/people/` (`PeopleListPage`, `PersonList`, `PeopleToolbar`).
+
+- **Pessoas (cliente, funcionário, profissional) compartilham as mesmas telas.** A diferença está só em `PEOPLE_KINDS` (`@/components/people/people-kinds`): tipo, caminho, singular e plural. Textos usam `kind.singular` / `kind.plural`; nunca escreva "cliente" direto em componente de `people/`.
+- Cada tipo tem rotas finas: `app/(admin)/<caminho>/{page,loading}.tsx` e `novo/page.tsx`, que só escolhem o `kind` e delegam a `PeopleListPage`, `PeopleListLoading` e `NewPersonPage`. Para outro tipo, acrescente a entrada em `PEOPLE_KINDS` e as três rotas.
+- Server Actions de pessoas (`app/(admin)/people-actions.ts`) recebem o tipo do navegador e o conferem com `isPeopleType` antes de usar. Usuários são outra entidade (`UserType`): não usam estas telas.
 
 - A página é um Server Component que lê `searchParams` (`q`, `page`) e busca pelo service; o card (`ClientList`) ocupa a largura e a altura que sobram, com a tabela rolando por dentro e o rodapé de paginação fixo (`TablePagination`).
 - Busca durante a digitação: o campo (Client Component) espera ~350 ms e troca `?q=` na URL com `router.replace`; a página é renderizada de novo no servidor, na primeira página.

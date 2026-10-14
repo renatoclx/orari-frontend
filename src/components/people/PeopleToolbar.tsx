@@ -5,9 +5,11 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Plus, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import type { PeopleKind } from "@/components/people/people-kinds";
 import { Input } from "@/components/ui/input";
 
-type ClientsToolbarProps = {
+type PeopleToolbarProps = {
+  kind: PeopleKind;
   /** Termo da busca na URL (?q=). */
   search: string;
 };
@@ -15,7 +17,7 @@ type ClientsToolbarProps = {
 // A busca atualiza a listagem durante a digitação (screen-patterns.md): depois
 // de uma pequena pausa, o termo vai para a URL e a página é renderizada de novo
 // no servidor, a partir da primeira página.
-export function ClientsToolbar({ search }: ClientsToolbarProps) {
+export function PeopleToolbar({ kind, search }: PeopleToolbarProps) {
   const router = useRouter();
   const [value, setValue] = useState(search);
 
@@ -26,11 +28,11 @@ export function ClientsToolbar({ search }: ClientsToolbarProps) {
     const timer = setTimeout(() => {
       const params = new URLSearchParams();
       if (term) params.set("q", term);
-      router.replace(term ? `/clientes?${params}` : "/clientes");
+      router.replace(term ? `${kind.path}?${params}` : kind.path);
     }, 350);
 
     return () => clearTimeout(timer);
-  }, [value, search, router]);
+  }, [value, search, router, kind.path]);
 
   return (
     <div className="flex flex-wrap items-center gap-3">
@@ -43,16 +45,16 @@ export function ClientsToolbar({ search }: ClientsToolbarProps) {
           type="search"
           value={value}
           onChange={(event) => setValue(event.target.value)}
-          aria-label="Buscar cliente por nome"
+          aria-label={`Buscar ${kind.singular} por nome`}
           placeholder="Buscar por nome"
           className="bg-card pl-8"
         />
       </div>
 
       <Button asChild className="w-full sm:ml-auto sm:w-auto">
-        <Link href="/clientes/novo">
+        <Link href={`${kind.path}/novo`}>
           <Plus aria-hidden="true" />
-          Novo cliente
+          Novo {kind.singular}
         </Link>
       </Button>
     </div>

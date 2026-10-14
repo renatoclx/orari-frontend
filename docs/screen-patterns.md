@@ -74,6 +74,14 @@ específica, prevalece a documentação da entidade.
 
 ---
 
+## Badges
+
+- Todas as badges exibidas na aplicação devem seguir um padrão básico.
+  - Cor correspondente a informação (Ex. Verde para ativo).
+  - Texto interno pesado e em caixa alta.
+
+---
+
 ## Telas de Cadastros
 
 Todas as telas de cadastro deverão possuir:

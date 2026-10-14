@@ -27,8 +27,9 @@ descritas em skills.md e screen-patterns.md
 
 - No sidebar menu, a opção pessoas deverá contar com um dropdown contendo os tipos de pessoas
   que serão possíveis cadastrar. Sendo eles:
-  - Clientes / Funcionários / Profissionais
+  - Clientes / Funcionários / Profissionais / Usuários
 - Cada tipo de Pessoa irá referenciar um PeopleType no backend.
+- Usuário é uma entidade separada, que possui referência diferente (UserType)
 
 ---
 
@@ -36,6 +37,7 @@ descritas em skills.md e screen-patterns.md
 
 # Barra de ações lateral
 
+- As informações por entidade a serem adicionadas estarão destacadas com `Barra de Ações`
 - Menu de acesso rápido que está posicionado a direita, sobre o layout principal, apenas com ícones.
   - Calendário (irá ter ação com a tela de Agendamentos);
   - Cliente (ícone para cadastro rápido de um cliente);
@@ -68,6 +70,8 @@ descritas em skills.md e screen-patterns.md
 
 ### Campos
 
+- Avatar (foto)
+  - div circular para exibir a foto selecionada.
 - Nome.
 - Contato.
 - Tipo do contato.
@@ -98,6 +102,7 @@ descritas em skills.md e screen-patterns.md
 
 ### Regras Específicas
 
+- Foto é opcional.
 - Adicionar máscara para campo celular: (##) #####-####.
 - Adicionar máscara para campo de CPF: ###.###.###-##.
 - Os registros serão inseridos na base sem as máscara.
@@ -119,6 +124,8 @@ deverão ser respeitados.
 
 ### Campos
 
+- Avatar (foto)
+  - div circular para exibir a foto selecionada.
 - Nome.
 - Contato.
 - Tipo do contato.
@@ -134,6 +141,7 @@ deverão ser respeitados.
 
 ### Regras Específicas
 
+- Foto é opcional.
 - Adicionar máscara para campo celular: (##) #####-####.
 - Adicionar máscara para campo de CPF: ###.###.###-##.
 - Os registros serão inseridos na base sem as máscara.
@@ -161,6 +169,7 @@ deverão ser respeitados.
 
 - O formulário é o componente principal da página: ocupa a largura toda e a
   altura que sobra, e fica dividido em duas colunas de mesma largura:
+  - Antes da divisão das colunas, deve estar o campo de upload de foto centralizado, acima das colunas
   - Coluna 1 (dados principais): Nome; Contato e Tipo do contato (lado a
     lado); E-mail; Observações.
   - Coluna 2 (opcionais, em seções recolhíveis): Mais informações (aberta por
@@ -217,8 +226,9 @@ deverão ser respeitados.
 
 ---
 
-## Cadastro rápido
+## Barra de Ações
 
+- Cadastro rápido de um cliente
 - Ao clicar para adicionar um cliente no cadastro rápido:
   - Mostrar dialog apenas com nome e telefone.
   - Os dados posteriores poderão ser adicionados após o cadastro rápido.

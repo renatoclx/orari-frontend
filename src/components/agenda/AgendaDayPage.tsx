@@ -67,6 +67,7 @@ export async function AgendaDayPage({ searchParams }: AgendaDayPageProps) {
     <div className="flex min-h-0 flex-1 flex-col gap-4">
       <h1 className="text-2xl font-semibold">Agendamentos</h1>
       <AgendaToolbar
+        date={date}
         dateLabel={formatLongDate(new Date(`${date}T12:00:00Z`))}
       />
 

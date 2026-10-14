@@ -142,6 +142,16 @@ Toda página da área administrativa segue o modelo da tela de Agendamentos (`sr
 - O componente principal ocupa a largura toda e a altura que sobra (`min-h-0 flex-1`), tem rolagem própria (`overflow-auto`) e moldura de card (`rounded-card border border-border bg-card`). Cabeçalhos dentro dele ficam fixos com `sticky top-0`.
 - Barras de rolagem já são finas e discretas pelo `globals.css`; não estilize por componente.
 
+## Agenda
+
+Fonte: `docs/screens.md` (seção Agendamentos). Modelo: `src/components/agenda/`.
+
+- O dia exibido fica na URL (`/?date=aaaa-mm-dd`); anterior, próximo e hoje são links, e o calendário do atalho (`CalendarShortcut`) leva ao dia escolhido. Sem estado do dia no navegador.
+- Datas e horários sempre no fuso da empresa (`utils/time.ts`: `dayBounds`, `toTimeString`); a API trabalha em UTC.
+- Rótulo e ícone de cada status vêm de `appointment-status.ts` (bloco e legenda usam a mesma fonte). Concluído, cancelado e não compareceu ficam esmaecidos; a legenda fica no rodapé da página, à direita.
+- A faixa da grade é calculada em `agenda-range.ts` (expediente ± 2 h, ampliada por agendamentos fora dela). Cor do serviço vem do cadastro; sem cor, cinza neutro.
+- O carregamento usa `Suspense` com `key` no dia, no `page.tsx` (um `loading.tsx` na raiz de `(admin)` valeria para todas as telas).
+
 ## Barra de ações lateral
 
 - Componente único `@/components/layout/ActionBar`, renderizado pelo `AdminShell`: aparece em **todas** as telas administrativas a partir do tablet (`md`). Não adicione barras por página.

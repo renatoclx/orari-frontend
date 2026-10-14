@@ -1,6 +1,7 @@
 import { Menu } from "lucide-react";
 import { CalendarShortcut } from "@/components/layout/CalendarShortcut";
 import { Logo } from "@/components/layout/Logo";
+import { QuickClientShortcut } from "@/components/layout/QuickClientShortcut";
 import { ThemeToggle } from "@/components/layout/ThemeToggle";
 import { UserMenu } from "@/components/layout/UserMenu";
 import type { CurrentUser } from "@/types/auth";
@@ -28,8 +29,9 @@ export function Header({ user, onOpenMobile }: HeaderProps) {
 
       <div className="ml-auto flex items-center gap-3">
         {/* No celular, os atalhos da barra lateral ficam aqui. */}
-        <div className="md:hidden">
+        <div className="flex items-center md:hidden">
           <CalendarShortcut placement="header" />
+          <QuickClientShortcut />
         </div>
         <ThemeToggle />
         <div className="flex items-center gap-3">

@@ -50,7 +50,9 @@ export async function AgendaDayPage({ searchParams }: AgendaDayPageProps) {
   // Profissional inativo fica fora da grade (a agenda dele será remanejada).
   const professionals = people.items
     .filter((person) => person.deletedAt === null)
-    .map((person) => ({ id: person.id, name: person.name }));
+    .map((person) => ({ id: person.id, name: person.name }))
+    // Ordem alfabética (pt-BR, ignorando acentos), da esquerda para a direita.
+    .sort((a, b) => a.name.localeCompare(b.name, "pt-BR"));
   const visible = new Set(professionals.map((person) => person.id));
 
   const agendaAppointments = appointments

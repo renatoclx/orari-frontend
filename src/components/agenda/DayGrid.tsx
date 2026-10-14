@@ -122,7 +122,10 @@ export function DayGrid({
                           <ChevronsUpDown aria-hidden="true" />
                         </Button>
                       </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end">
+                      <DropdownMenuContent
+                        align="end"
+                        className="max-w-[calc(100vw-2rem)] min-w-72"
+                      >
                         <DropdownMenuRadioGroup
                           value={mobileProfessionalId}
                           onValueChange={onMobileProfessionalChange}

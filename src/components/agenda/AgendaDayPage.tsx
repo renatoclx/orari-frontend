@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { AgendaLegend } from "@/components/agenda/AgendaLegend";
 import { AgendaToolbar } from "@/components/agenda/AgendaToolbar";
-import { DayGrid } from "@/components/agenda/DayGrid";
+import { AgendaDayView } from "@/components/agenda/AgendaDayView";
 import { toAgendaAppointment } from "@/components/agenda/agenda-data";
 import {
   computeGridRange,
@@ -82,7 +82,7 @@ export async function AgendaDayPage({ searchParams }: AgendaDayPageProps) {
           </Link>
         </p>
       ) : (
-        <DayGrid
+        <AgendaDayView
           professionals={professionals}
           appointments={agendaAppointments}
           range={range}

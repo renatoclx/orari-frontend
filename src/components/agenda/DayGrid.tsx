@@ -21,6 +21,11 @@ type DayGridProps = {
   unavailable: TimeRange[];
   /** "HH:mm" do momento atual; nulo quando o dia exibido não é hoje. */
   now: string | null;
+  /**
+   * No celular, só a coluna deste profissional aparece (as demais ficam
+   * ocultas por CSS). Sem isso, todas aparecem em qualquer tela.
+   */
+  mobileProfessionalId?: string;
 };
 
 /** Grade do dia: uma coluna por profissional, com expediente e agendamentos. */
@@ -30,7 +35,14 @@ export function DayGrid({
   range,
   unavailable,
   now,
+  mobileProfessionalId,
 }: DayGridProps) {
+  // Colunas dos outros profissionais somem no celular, quando há um escolhido.
+  const mobileHidden = (professionalId: string) =>
+    mobileProfessionalId !== undefined &&
+    professionalId !== mobileProfessionalId
+      ? "max-md:hidden"
+      : "";
   const gridHeight = (range.end - range.start) * PX_PER_MINUTE;
   // Um horário por intervalo, para as linhas e os rótulos da grade.
   const slots = Array.from(
@@ -51,10 +63,14 @@ export function DayGrid({
   return (
     <div className="min-h-0 flex-1 overflow-auto rounded-card border border-border bg-card">
       <div
-        className="grid min-w-max"
-        style={{
-          gridTemplateColumns: `4rem repeat(${professionals.length}, minmax(11rem, 1fr))`,
-        }}
+        // Celular: horários + uma coluna. A partir do md: uma coluna por
+        // profissional, cada uma com largura mínima (a grade rola na horizontal).
+        className="grid grid-cols-[4rem_1fr] md:min-w-max md:grid-cols-(--agenda-columns)"
+        style={
+          {
+            "--agenda-columns": `4rem repeat(${professionals.length}, minmax(11rem, 1fr))`,
+          } as React.CSSProperties
+        }
       >
         <div className="sticky top-0 left-0 z-30 border-b border-border bg-card" />
         {professionals.map((professional) => {
@@ -67,7 +83,7 @@ export function DayGrid({
           return (
             <div
               key={professional.id}
-              className="sticky top-0 z-20 border-b border-l border-border bg-card px-3 py-2"
+              className={`sticky top-0 z-20 border-b border-l border-border bg-card px-3 py-2 ${mobileHidden(professional.id)}`}
             >
               <p className="text-sm font-semibold">{professional.name}</p>
               <p className="text-xs text-muted-foreground">
@@ -101,7 +117,7 @@ export function DayGrid({
         {professionals.map((professional, index) => (
           <div
             key={professional.id}
-            className="relative border-l border-border"
+            className={`relative border-l border-border ${mobileHidden(professional.id)}`}
             style={{ height: gridHeight }}
           >
             {slots.map((slot) => (
@@ -147,9 +163,12 @@ export function DayGrid({
                 style={{ top: nowTop }}
                 aria-hidden="true"
               >
-                {index === 0 && (
-                  <span className="absolute -top-1 -left-1 size-2 rounded-full bg-brand" />
-                )}
+                {/* Uma bolinha só: na primeira coluna; no celular, na visível. */}
+                <span
+                  className={`absolute -top-1 -left-1 size-2 rounded-full bg-brand ${
+                    index === 0 ? "" : "md:hidden"
+                  }`}
+                />
               </div>
             )}
           </div>

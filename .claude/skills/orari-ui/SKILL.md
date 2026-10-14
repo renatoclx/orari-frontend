@@ -38,7 +38,7 @@ A sidebar é escura nos dois temas e tem tokens próprios: `sidebar` (fundo), `s
 - `primary` (blue-600) é a ação principal. Uma por tela.
 - Foco de teclado é global (`globals.css`): contorno de 1 px no token `ring`, que surge com uma transição curta. **Não adicione classes de foco (`focus-visible:ring-*`, `outline-none`) nos componentes** — ao adicionar um componente do shadcn, remova as dele.
 - Não usar valores soltos (`bg-[#...]`) nem cores da paleta do Tailwind para a interface base. Se faltar uma cor, ela vira um token novo no `globals.css`.
-- Cores de status e de agendamentos ainda não foram definidas: pergunte antes de inventar.
+- Cores dos status da **agenda** (agendado, confirmado…) ainda não foram definidas: pergunte antes de inventar. Os status de cadastro (ativo/inativo) seguem o padrão de badges.
 
 ## Componentes (shadcn/ui)
 
@@ -59,6 +59,14 @@ Use `Button` de `@/components/ui/button`:
 - `size="icon"` para botões só com ícone (sempre com `aria-label`).
 - Login: botão e campos com `h-14 text-base` (56 px, texto 16 px), só nessa tela.
 
+## Badges
+
+Padrão do sistema (`docs/screen-patterns.md`): cor correspondente à informação e texto pesado em caixa alta (o `Badge` já aplica `font-bold uppercase`; escreva o texto normalmente).
+
+- `variant="success"` (verde, token `success`): ativo e informações positivas.
+- `variant="destructive"` (vermelho): inativo e informações negativas.
+- Outros significados ainda sem cor definida: pergunte antes de escolher.
+
 ## Listagens
 
 Fonte das regras: `docs/screen-patterns.md` e `docs/screens.md`. Modelo: `src/app/(admin)/clientes/`.
@@ -66,7 +74,7 @@ Fonte das regras: `docs/screen-patterns.md` e `docs/screens.md`. Modelo: `src/ap
 - A página é um Server Component que lê `searchParams` (`q`, `page`) e busca pelo service; o card (`ClientList`) ocupa a largura e a altura que sobram, com a tabela rolando por dentro e o rodapé de paginação fixo (`TablePagination`).
 - Busca durante a digitação: o campo (Client Component) espera ~350 ms e troca `?q=` na URL com `router.replace`; a página é renderizada de novo no servidor, na primeira página.
 - Botão "Novo <entidade>" leva à tela de cadastro. Vazios aparecem como "--".
-- Status (ativo/inativo, derivado de `deletedAt`) com `Badge` neutro: cores de status ainda não foram definidas.
+- Status (ativo/inativo, derivado de `deletedAt`) com `Badge` (`success` / `destructive`).
 - Coluna Ações: "Alterar" em destaque (ícone) e as demais ações num menu de três pontos (`DropdownMenu modal={false}`), na ordem Visualizar, Excluir. Estilo neutro. Alterar e Excluir ficam desabilitados para registros excluídos.
 - Visualizar abre `Dialog` com Fechar; Excluir abre `AlertDialog` com o nome do registro, botão vermelho e "Excluindo…" enquanto executa.
 - Carregamento: `loading.tsx` com `Skeleton`. No celular, a tabela vira lista empilhada.
@@ -80,6 +88,7 @@ Fonte das regras: `docs/screen-patterns.md` (padrões) e `docs/screens.md` (camp
 - Duas colunas que ocupam a **largura toda do card** (`gap-x-12 gap-y-6 md:grid-cols-2`, sem `max-w`): dados principais à esquerda; opcionais à direita, em `FormSection` (recolhíveis, com `border-t`). No celular, uma coluna.
 - Equilibre a altura das colunas (a seção opcional mais usada pode iniciar aberta: `defaultOpen`) e mantenha espaçamentos moderados.
 - Obrigatórios com `*` em `text-destructive`. Dentro do `Label`, rótulo e asterisco num único `<span>` (o `Label` espaça os filhos).
+- Foto da pessoa: `PhotoUpload` (`@/components/shared/PhotoUpload`), círculo centralizado **acima das colunas**; opcional; JPEG ou PNG até 2 MB (regras do backend); o envio é feito depois do cadastro, por rota própria.
 - Data: `DatePicker` (`@/components/shared/DatePicker`), com calendário; envia "aaaa-mm-dd".
 - Campos com máscara (celular, CPF, CEP): `MaskedInput` com as máscaras de `@/utils/masks`; exibe formatado e envia só os dígitos.
 - Seleção com busca (estado, cidade): `Combobox` (`@/components/shared/Combobox`). Listas grandes buscam no servidor por `onSearchChange`.
@@ -91,7 +100,7 @@ Fonte das regras: `docs/screen-patterns.md` (padrões) e `docs/screens.md` (camp
 
 - Fonte única: Plus Jakarta Sans (já é a fonte padrão da página; não precisa de classe).
 - Horários, datas e valores usam `tabular-nums`, para alinharem em coluna.
-- Nada de rótulos em CAIXA ALTA.
+- Nada de rótulos em CAIXA ALTA — exceto as badges (ver "Badges").
 
 ## Forma
 

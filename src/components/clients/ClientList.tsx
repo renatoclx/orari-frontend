@@ -62,9 +62,9 @@ function formatContact(client: PersonListItem): string | null {
 function StatusBadge({ client }: { client: PersonListItem }) {
   // O status vem do deletedAt; não é um campo da entidade.
   return client.deletedAt ? (
-    <Badge variant="outline">Inativo</Badge>
+    <Badge variant="destructive">Inativo</Badge>
   ) : (
-    <Badge variant="secondary">Ativo</Badge>
+    <Badge variant="success">Ativo</Badge>
   );
 }
 

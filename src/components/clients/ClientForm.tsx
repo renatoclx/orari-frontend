@@ -14,6 +14,7 @@ import { DatePicker } from "@/components/shared/DatePicker";
 import { FormFooter } from "@/components/shared/FormFooter";
 import { FormSection } from "@/components/shared/FormSection";
 import { MaskedInput } from "@/components/shared/MaskedInput";
+import { PhotoUpload } from "@/components/shared/PhotoUpload";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -124,6 +125,11 @@ export function ClientForm({ states }: ClientFormProps) {
         className="flex min-h-0 flex-1 flex-col rounded-card border border-border bg-card"
       >
         <div className="min-h-0 flex-1 overflow-auto p-4 md:p-6">
+          {/* Foto centralizada, acima das colunas (screens.md). */}
+          <div className="mb-6 flex justify-center">
+            <PhotoUpload />
+          </div>
+
           <div className="grid gap-x-12 gap-y-6 md:grid-cols-2">
             <section aria-labelledby="client-main" className="space-y-4">
               <h2 id="client-main" className="font-semibold">

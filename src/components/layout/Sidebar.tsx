@@ -46,7 +46,8 @@ type NavGroup = {
 };
 
 // Menu provisório: várias rotas ainda não existem. "Pessoas" agrupa os tipos de
-// pessoa (cada um referencia um PeopleType no backend).
+// pessoa (cada um referencia um PeopleType no backend); "Usuários" é outra
+// entidade (UserType), listada junto por facilidade de acesso.
 const navItems: (NavLink | NavGroup)[] = [
   { href: "/", label: "Agendamentos", icon: CalendarDays },
   {
@@ -56,6 +57,7 @@ const navItems: (NavLink | NavGroup)[] = [
       { href: "/clientes", label: "Clientes" },
       { href: "/funcionarios", label: "Funcionários" },
       { href: "/profissionais", label: "Profissionais" },
+      { href: "/usuarios", label: "Usuários" },
     ],
   },
   { href: "/servicos", label: "Serviços", icon: ClipboardList },

@@ -1,4 +1,4 @@
-import { ChevronsUpDown, Plus } from "lucide-react";
+import { CalendarClock, ChevronsUpDown, Plus } from "lucide-react";
 import { Hint } from "@/components/shared/Hint";
 import { AppointmentBlock } from "@/components/agenda/AppointmentBlock";
 import type { GridRange } from "@/components/agenda/agenda-range";
@@ -22,15 +22,19 @@ const SLOT_MINUTES = 30;
 const SLOT_HEIGHT = 48;
 const PX_PER_MINUTE = SLOT_HEIGHT / SLOT_MINUTES;
 
-type SlotState = "free" | "past" | "closed" | "occupied";
+// "closed": fora do expediente (aceita encaixe). "gap": dentro do expediente,
+// entre duas janelas de atendimento (não aceita agendamento nem encaixe).
+type SlotState = "free" | "past" | "closed" | "gap" | "occupied";
 
 type DayGridProps = {
   professionals: AgendaProfessional[];
   appointments: AgendaAppointment[];
   /** Janela visível, em minutos desde a meia-noite. */
   range: GridRange;
-  /** Trechos fora do horário de funcionamento, sombreados. */
+  /** Trechos fora do expediente, hachurados. */
   unavailable: TimeRange[];
+  /** Intervalos entre janelas de atendimento (almoço), em cinza. */
+  breaks: TimeRange[];
   /** "HH:mm" do momento atual; nulo quando o dia exibido não é hoje. */
   now: string | null;
   /**
@@ -45,10 +49,19 @@ type DayGridProps = {
    * o horário atual para hoje, 0 para dias futuros). Não se agenda no passado.
    */
   pastMinutes: number;
+  /**
+   * Profissionais exibidos no computador (padrão ou filtro). As demais colunas
+   * ficam ocultas só ali: o celular continua com um profissional por vez.
+   */
+  desktopVisibleIds: string[];
   /** Clique em um intervalo livre. */
   onSlotSelect?: (professionalId: string, time: string) => void;
-  /** Clique em um intervalo que não aceita agendamento (passou ou fechado). */
-  onSlotBlocked?: (reason: "past" | "closed") => void;
+  /** Clique em um intervalo que já passou: não aceita agendamento. */
+  onSlotPast?: () => void;
+  /** Clique em um intervalo dentro do expediente, entre janelas de atendimento. */
+  onSlotGap?: () => void;
+  /** Clique em um intervalo fora do funcionamento: abre o encaixe. */
+  onSlotOverbooking?: (professionalId: string, time: string) => void;
   /** Clique em um agendamento. */
   onAppointmentSelect?: (appointment: AgendaAppointment) => void;
 };
@@ -59,12 +72,16 @@ export function DayGrid({
   appointments,
   range,
   unavailable,
+  breaks,
   now,
   mobileProfessionalId,
   onMobileProfessionalChange,
   pastMinutes,
+  desktopVisibleIds,
   onSlotSelect,
-  onSlotBlocked,
+  onSlotPast,
+  onSlotGap,
+  onSlotOverbooking,
   onAppointmentSelect,
 }: DayGridProps) {
   // Colunas dos outros profissionais somem no celular, quando há um escolhido.
@@ -73,6 +90,12 @@ export function DayGrid({
     professionalId !== mobileProfessionalId
       ? "max-md:hidden"
       : "";
+  // Fora do padrão ou do filtro: a coluna some do computador.
+  const desktopHidden = (professionalId: string) =>
+    desktopVisibleIds.includes(professionalId) ? "" : "md:hidden";
+  const firstVisibleId = professionals.find((item) =>
+    desktopVisibleIds.includes(item.id),
+  )?.id;
   const gridHeight = (range.end - range.start) * PX_PER_MINUTE;
   // Um horário por intervalo, para as linhas e os rótulos da grade.
   const slots = Array.from(
@@ -85,14 +108,11 @@ export function DayGrid({
   function slotState(professionalId: string, slot: number): SlotState {
     const end = slot + SLOT_MINUTES;
     if (slot < pastMinutes) return "past";
-    if (
-      unavailable.some(
-        (gap) =>
-          timeToMinutes(gap.start) < end && timeToMinutes(gap.end) > slot,
-      )
-    ) {
-      return "closed";
-    }
+    const overlaps = (gap: TimeRange) =>
+      timeToMinutes(gap.start) < end && timeToMinutes(gap.end) > slot;
+    // Fora do expediente aceita encaixe; entre janelas, nada.
+    if (unavailable.some(overlaps)) return "closed";
+    if (breaks.some(overlaps)) return "gap";
     const occupied = appointments.some(
       (appointment) =>
         appointment.professionalId === professionalId &&
@@ -121,7 +141,7 @@ export function DayGrid({
         className="grid grid-cols-[4rem_1fr] md:min-w-max md:grid-cols-(--agenda-columns)"
         style={
           {
-            "--agenda-columns": `4rem repeat(${professionals.length}, minmax(11rem, 1fr))`,
+            "--agenda-columns": `4rem repeat(${Math.max(1, desktopVisibleIds.length)}, minmax(11rem, 1fr))`,
           } as React.CSSProperties
         }
       >
@@ -136,7 +156,7 @@ export function DayGrid({
           return (
             <div
               key={professional.id}
-              className={`sticky top-0 z-20 border-b border-l border-border bg-card px-3 py-2 ${mobileHidden(professional.id)}`}
+              className={`sticky top-0 z-20 border-b border-l border-border bg-card px-3 py-2 ${mobileHidden(professional.id)} ${desktopHidden(professional.id)}`}
             >
               <div className="flex items-center justify-between gap-2">
                 <div className="min-w-0">
@@ -214,10 +234,10 @@ export function DayGrid({
           ))}
         </div>
 
-        {professionals.map((professional, index) => (
+        {professionals.map((professional) => (
           <div
             key={professional.id}
-            className={`relative border-l border-border ${mobileHidden(professional.id)}`}
+            className={`relative border-l border-border ${mobileHidden(professional.id)} ${desktopHidden(professional.id)}`}
             style={{ height: gridHeight }}
           >
             {slots.map((slot) => {
@@ -238,17 +258,44 @@ export function DayGrid({
                 );
               }
 
-              // Passou ou fechado: o clique explica por que não dá para agendar.
-              if (state !== "free") {
+              // Passou ou entre janelas: o clique explica que não dá para agendar.
+              if (state === "past" || state === "gap") {
                 return (
                   <button
                     key={slot}
                     type="button"
-                    onClick={() => onSlotBlocked?.(state)}
-                    aria-label={`${time} indisponível para ${professional.name}`}
+                    onClick={() =>
+                      state === "past" ? onSlotPast?.() : onSlotGap?.()
+                    }
+                    aria-label={
+                      state === "past"
+                        ? `${time} já passou para ${professional.name}`
+                        : `${time} sem atendimento para ${professional.name}`
+                    }
                     className={`block w-full cursor-not-allowed ${line}`}
                     style={{ height: SLOT_HEIGHT }}
                   />
+                );
+              }
+
+              // Fora do funcionamento: só encaixe. O botão fica acima do
+              // sombreado (z-[1]) para o destaque do mouse aparecer.
+              if (state === "closed") {
+                return (
+                  <button
+                    key={slot}
+                    type="button"
+                    onClick={() => onSlotOverbooking?.(professional.id, time)}
+                    aria-label={`Encaixar ${professional.name} às ${time}, fora do horário de funcionamento`}
+                    className={`relative z-[1] flex w-full cursor-pointer items-center justify-center text-xs text-transparent transition-colors hover:bg-muted hover:text-foreground focus-visible:bg-muted focus-visible:text-foreground ${line}`}
+                    style={{ height: SLOT_HEIGHT }}
+                  >
+                    <CalendarClock
+                      className="mr-1 size-3.5"
+                      aria-hidden="true"
+                    />
+                    Encaixar às {time}
+                  </button>
                 );
               }
 
@@ -280,6 +327,20 @@ export function DayGrid({
               />
             ))}
 
+            {/* Intervalo entre janelas (almoço): área cinza, sem agendamento. */}
+            {breaks.map((gap) => (
+              <div
+                key={gap.start}
+                className="pointer-events-none absolute inset-x-0 flex items-center justify-center border-y border-border bg-muted text-xs font-medium text-muted-foreground"
+                style={{
+                  top: toPixels(gap.start),
+                  height: toPixels(gap.end) - toPixels(gap.start),
+                }}
+              >
+                Intervalo
+              </div>
+            ))}
+
             {appointments
               .filter(
                 (appointment) => appointment.professionalId === professional.id,
@@ -305,7 +366,7 @@ export function DayGrid({
                 {/* Uma bolinha só: na primeira coluna; no celular, na visível. */}
                 <span
                   className={`absolute -top-1 -left-1 size-2 rounded-full bg-brand ${
-                    index === 0 ? "" : "md:hidden"
+                    professional.id === firstVisibleId ? "" : "md:hidden"
                   }`}
                 />
               </div>

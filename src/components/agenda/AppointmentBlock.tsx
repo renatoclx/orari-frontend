@@ -1,4 +1,4 @@
-import { Clock, StickyNote, UserRound } from "lucide-react";
+import { CalendarClock, Clock, StickyNote, UserRound } from "lucide-react";
 import { APPOINTMENT_STATUS } from "@/components/agenda/appointment-status";
 import { PersonAvatar } from "@/components/shared/PersonAvatar";
 import {
@@ -44,7 +44,7 @@ export function AppointmentBlock({
           onKeyDown={(event) => {
             if (event.key === "Enter") onSelect?.(appointment);
           }}
-          aria-label={`${appointment.clientName}, ${appointment.serviceName}, das ${appointment.start} às ${appointment.end}, com ${appointment.professionalName}. ${statusLabel}`}
+          aria-label={`${appointment.clientName}, ${appointment.serviceName}, das ${appointment.start} às ${appointment.end}, com ${appointment.professionalName}. ${statusLabel}${appointment.overbooking ? ". Encaixe fora do horário de funcionamento" : ""}`}
           className={`absolute inset-x-1 z-[1] cursor-pointer overflow-hidden rounded-control border-l-[3px] px-2 py-1 ${
             faded ? "opacity-55" : ""
           }`}
@@ -78,8 +78,11 @@ export function AppointmentBlock({
               aria-hidden="true"
             />
           </div>
-          <p className="truncate text-xs text-muted-foreground">
-            {appointment.serviceName}
+          <p className="flex items-center gap-1 truncate text-xs text-muted-foreground">
+            {appointment.overbooking && (
+              <CalendarClock className="size-3 shrink-0" aria-hidden="true" />
+            )}
+            <span className="truncate">{appointment.serviceName}</span>
           </p>
         </article>
       </HoverCardTrigger>
@@ -122,6 +125,12 @@ export function AppointmentBlock({
             <StatusIcon className="size-4 shrink-0" aria-hidden="true" />
             {statusLabel}
           </li>
+          {appointment.overbooking && (
+            <li className="flex items-center gap-2 font-medium text-foreground">
+              <CalendarClock className="size-4 shrink-0" aria-hidden="true" />
+              Encaixe fora do horário de funcionamento
+            </li>
+          )}
           {appointment.note && (
             <li className="flex items-start gap-2">
               <StickyNote

@@ -29,4 +29,9 @@ export type AgendaAppointment = {
   durationMinutes: number;
   note: string | null;
   status: AppointmentStatus;
+  /**
+   * Encaixe: agendamento fora do horário de funcionamento. Ainda não vem da
+   * API (o backend passa a guardar a flag depois); por ora é sempre falso.
+   */
+  overbooking: boolean;
 };

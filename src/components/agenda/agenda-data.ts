@@ -5,6 +5,9 @@ import { toTimeString } from "@/utils/time";
 // Serviço sem cor cadastrada: cinza neutro, para o bloco continuar legível.
 const DEFAULT_SERVICE_COLOR = "#64748b";
 
+/** Cor exclusiva do encaixe (agendamento fora do horário de funcionamento). */
+export const OVERBOOKING_COLOR = "#6b7280";
+
 /**
  * Agendamento da API → o que a grade desenha. Os horários vão para o fuso da
  * empresa; um atendimento que passa da meia-noite termina às 24:00 (a agenda
@@ -29,6 +32,8 @@ export function toAgendaAppointment(
     serviceColor: item.service.color ?? DEFAULT_SERVICE_COLOR,
     durationMinutes: item.service.duration,
     note: item.note,
+    // A API ainda não informa o encaixe.
+    overbooking: false,
     status: item.status,
   };
 }

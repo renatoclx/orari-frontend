@@ -1,3 +1,4 @@
+import { OVERBOOKING_COLOR } from "@/components/agenda/agenda-data";
 import {
   APPOINTMENT_STATUS,
   APPOINTMENT_STATUS_ORDER,
@@ -21,6 +22,14 @@ export function AgendaLegend() {
           </li>
         );
       })}
+      <li className="flex items-center gap-1.5">
+        <span
+          className="size-3 rounded-sm"
+          style={{ backgroundColor: OVERBOOKING_COLOR }}
+          aria-hidden="true"
+        />
+        Encaixe
+      </li>
     </ul>
   );
 }

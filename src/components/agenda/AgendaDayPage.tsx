@@ -3,10 +3,7 @@ import { AgendaLegend } from "@/components/agenda/AgendaLegend";
 import { AgendaToolbar } from "@/components/agenda/AgendaToolbar";
 import { AgendaDayView } from "@/components/agenda/AgendaDayView";
 import { toAgendaAppointment } from "@/components/agenda/agenda-data";
-import {
-  computeGridRange,
-  unavailableRanges,
-} from "@/components/agenda/agenda-range";
+import { computeGridRange, gridAreas } from "@/components/agenda/agenda-range";
 import { listAppointments } from "@/services/appointment.service";
 import { getCurrentUser } from "@/services/auth.service";
 import { listBusinessHours } from "@/services/business-hour.service";
@@ -69,7 +66,9 @@ export async function AgendaDayPage({ searchParams }: AgendaDayPageProps) {
     start: hours.openAt,
     end: hours.closeAt,
   }));
+
   const range = computeGridRange(windows, agendaAppointments);
+  const areas = gridAreas(windows, range);
 
   // Não se agenda no passado: dias passados inteiros, ou hoje até agora.
   const nowTime = toTimeString(new Date().toISOString(), timeZone);
@@ -101,7 +100,9 @@ export async function AgendaDayPage({ searchParams }: AgendaDayPageProps) {
           professionals={professionals}
           appointments={agendaAppointments}
           range={range}
-          unavailable={unavailableRanges(windows, range)}
+          unavailable={areas.outside}
+          breaks={areas.breaks}
+          businessHours={windows}
           now={date === today ? nowTime : null}
           pastMinutes={pastMinutes}
           services={services.items

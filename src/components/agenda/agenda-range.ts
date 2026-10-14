@@ -41,38 +41,85 @@ export function computeGridRange(
   return { start, end };
 }
 
+/** Áreas da grade que não são horário de atendimento. */
+export type GridAreas = {
+  /** Fora do expediente (antes da abertura e depois do fechamento): hachurado. */
+  outside: TimeRange[];
+  /** Intervalos entre janelas de atendimento (almoço, por exemplo): cinza. */
+  breaks: TimeRange[];
+};
+
 /**
- * Trechos da janela fora do horário de funcionamento. Sem horário no dia
- * (empresa fechada), a janela inteira é indisponível.
+ * Separa o que não é atendimento em "fora do expediente" e "intervalos".
+ * Sem horário no dia (empresa fechada), a janela inteira é "fora".
  */
-export function unavailableRanges(
+export function gridAreas(
   businessHours: TimeRange[],
   range: GridRange,
-): TimeRange[] {
-  const open = businessHours
+): GridAreas {
+  const windows = businessHours
     .map((hours) => ({
       start: timeToMinutes(hours.start),
       end: timeToMinutes(hours.end),
     }))
     .sort((a, b) => a.start - b.start);
 
-  const gaps: TimeRange[] = [];
-  let cursor = range.start;
+  const toRange = (start: number, end: number): TimeRange[] =>
+    end > start
+      ? [{ start: minutesToTime(start), end: minutesToTime(end) }]
+      : [];
 
-  for (const window of open) {
+  if (windows.length === 0) {
+    return { outside: toRange(range.start, range.end), breaks: [] };
+  }
+
+  const open = windows[0].start;
+  const close = Math.max(...windows.map((window) => window.end));
+
+  // Intervalos: o que sobra entre janelas, dentro do expediente.
+  const breaks: TimeRange[] = [];
+  let cursor = open;
+  for (const window of windows) {
     if (window.start > cursor) {
-      gaps.push({
-        start: minutesToTime(cursor),
-        end: minutesToTime(Math.min(window.start, range.end)),
-      });
+      breaks.push(...toRange(cursor, window.start));
     }
     cursor = Math.max(cursor, window.end);
   }
 
-  if (cursor < range.end) {
-    gaps.push({ start: minutesToTime(cursor), end: minutesToTime(range.end) });
-  }
-  return gaps.filter(
-    (gap) => timeToMinutes(gap.end) > timeToMinutes(gap.start),
-  );
+  return {
+    outside: [
+      ...toRange(range.start, Math.min(open, range.end)),
+      ...toRange(Math.max(close, range.start), range.end),
+    ],
+    breaks,
+  };
+}
+
+/**
+ * Expediente do dia: da abertura mais cedo ao fechamento mais tarde, em
+ * minutos. Intervalos entre janelas (almoço, por exemplo) fazem parte dele.
+ * Nulo quando a empresa não funciona no dia.
+ */
+export function expedientOf(
+  businessHours: TimeRange[],
+): { open: number; close: number } | null {
+  if (businessHours.length === 0) return null;
+  return {
+    open: Math.min(...businessHours.map((hours) => timeToMinutes(hours.start))),
+    close: Math.max(...businessHours.map((hours) => timeToMinutes(hours.end))),
+  };
+}
+
+/**
+ * Um trecho está fora do expediente (e só aceita encaixe) quando termina antes
+ * da abertura ou começa depois do fechamento. Sem expediente, o dia todo é
+ * "fora".
+ */
+export function isOutsideExpedient(
+  start: number,
+  end: number,
+  expedient: { open: number; close: number } | null,
+): boolean {
+  if (!expedient) return true;
+  return end <= expedient.open || start >= expedient.close;
 }

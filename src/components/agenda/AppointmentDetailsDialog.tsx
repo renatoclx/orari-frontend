@@ -1,6 +1,12 @@
 "use client";
 
-import { Clock, Pencil, StickyNote, UserRound } from "lucide-react";
+import {
+  CalendarClock,
+  Clock,
+  Pencil,
+  StickyNote,
+  UserRound,
+} from "lucide-react";
 import { toast } from "sonner";
 import { APPOINTMENT_STATUS } from "@/components/agenda/appointment-status";
 import { PersonAvatar } from "@/components/shared/PersonAvatar";
@@ -134,6 +140,15 @@ function Details({
           />
           {statusLabel}
         </li>
+        {appointment.overbooking && (
+          <li className="flex items-center gap-2 font-medium">
+            <CalendarClock
+              className="size-4 shrink-0 text-muted-foreground"
+              aria-hidden="true"
+            />
+            Encaixe fora do horário de funcionamento
+          </li>
+        )}
         {appointment.note && (
           <li className="flex items-start gap-2">
             <StickyNote

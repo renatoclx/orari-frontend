@@ -32,6 +32,14 @@ export function createService(input: ServiceInput): Promise<ServiceItem> {
   });
 }
 
+/**
+ * Exclusão lógica. A API recusa (409) quando o serviço tem agendamentos,
+ * recorrências ou planos vinculados; nesse caso o caminho é inativar.
+ */
+export async function deleteService(id: string): Promise<void> {
+  await apiFetch(`/services/${id}`, { method: "DELETE" });
+}
+
 /** Inativa ou ativa o serviço (campo `isActive`). */
 export function setServiceActive(
   id: string,

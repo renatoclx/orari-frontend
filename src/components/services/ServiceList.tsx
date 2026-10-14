@@ -10,7 +10,10 @@ import {
   Trash2,
 } from "lucide-react";
 import { toast } from "sonner";
-import { setServiceActiveAction } from "@/app/(admin)/service-actions";
+import {
+  deleteServiceAction,
+  setServiceActiveAction,
+} from "@/app/(admin)/service-actions";
 import { ServiceFormDialog } from "@/components/services/ServiceFormDialog";
 import {
   AlertDialog,
@@ -73,6 +76,7 @@ type RowHandlers = {
   onEdit: (service: ServiceItem) => void;
   onDeactivate: (service: ServiceItem) => void;
   onActivate: (service: ServiceItem) => void;
+  onDelete: (service: ServiceItem) => void;
   /** Há uma ativação em andamento. */
   busy: boolean;
 };
@@ -85,6 +89,7 @@ function ServiceActions({
   onEdit,
   onDeactivate,
   onActivate,
+  onDelete,
   busy,
 }: { service: ServiceItem } & RowHandlers) {
   return (
@@ -129,8 +134,7 @@ function ServiceActions({
               Ativar
             </DropdownMenuItem>
           )}
-          {/* Exclusão entra com a regra de relacionamentos do backend. */}
-          <DropdownMenuItem disabled>
+          <DropdownMenuItem onSelect={() => onDelete(service)}>
             <Trash2 aria-hidden="true" />
             Excluir
           </DropdownMenuItem>
@@ -198,7 +202,9 @@ export function ServiceList({ services, search, footer }: ServiceListProps) {
 
   const [viewing, setViewing] = useState<ServiceItem | null>(null);
   const [deactivating, setDeactivating] = useState<ServiceItem | null>(null);
+  const [deleting, setDeleting] = useState<ServiceItem | null>(null);
   const [pending, startTransition] = useTransition();
+  const [removing, startRemove] = useTransition();
   const [activating, startActivate] = useTransition();
 
   function confirmDeactivate() {
@@ -231,11 +237,32 @@ export function ServiceList({ services, search, footer }: ServiceListProps) {
     });
   }
 
+  function confirmDelete() {
+    if (!deleting) return;
+    const target = deleting;
+
+    startRemove(async () => {
+      const result = await deleteServiceAction(target.id);
+      if (result.ok) {
+        toast.success("Serviço excluído.", { description: target.name });
+        setDeleting(null);
+        return;
+      }
+
+      toast.error("Não foi possível excluir o serviço.", {
+        description: result.message,
+      });
+      // Com vínculos, repetir não adianta: o caminho é inativar.
+      if (result.conflict) setDeleting(null);
+    });
+  }
+
   const handlers: RowHandlers = {
     onView: setViewing,
     onEdit: edit,
     onDeactivate: setDeactivating,
     onActivate: activate,
+    onDelete: setDeleting,
     busy: activating,
   };
   const headerClass =
@@ -347,6 +374,36 @@ export function ServiceList({ services, search, footer }: ServiceListProps) {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      <AlertDialog
+        open={deleting !== null}
+        onOpenChange={(open) => !open && !removing && setDeleting(null)}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Excluir serviço?</AlertDialogTitle>
+            <AlertDialogDescription>
+              O serviço {deleting?.name} será excluído. Serviços com
+              agendamentos, recorrências ou planos vinculados não podem ser
+              excluídos; nesse caso, inative-o.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={removing}>Cancelar</AlertDialogCancel>
+            <AlertDialogAction
+              disabled={removing}
+              className="bg-destructive text-white hover:bg-destructive/90"
+              onClick={(event) => {
+                // Mantém o diálogo aberto enquanto exclui ("Excluindo…").
+                event.preventDefault();
+                confirmDelete();
+              }}
+            >
+              {removing ? "Excluindo…" : "Excluir"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
 
       <AlertDialog
         open={deactivating !== null}

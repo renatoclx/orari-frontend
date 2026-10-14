@@ -8,6 +8,7 @@ import {
 import { ApiError } from "@/services/api";
 import {
   createService,
+  deleteService,
   setServiceActive,
   updateService,
 } from "@/services/service.service";
@@ -22,6 +23,8 @@ export type ServiceActionResult =
       message: string;
       /** Campo do formulário a que o erro se refere, quando houver. */
       field?: ServiceField;
+      /** A exclusão foi recusada por haver vínculos (409). */
+      conflict?: boolean;
     };
 
 const HEX_COLOR = /^#([0-9a-fA-F]{3}|[0-9a-fA-F]{6})$/;
@@ -115,6 +118,26 @@ export async function setServiceActiveAction(
     await setServiceActive(id, isActive);
   } catch (error) {
     return failure(error);
+  }
+
+  revalidatePath("/servicos");
+  return { ok: true };
+}
+
+export async function deleteServiceAction(
+  id: string,
+): Promise<ServiceActionResult> {
+  try {
+    await deleteService(id);
+  } catch (error) {
+    if (error instanceof ApiError) {
+      return {
+        ok: false,
+        message: error.message,
+        conflict: error.status === 409,
+      };
+    }
+    throw error;
   }
 
   revalidatePath("/servicos");

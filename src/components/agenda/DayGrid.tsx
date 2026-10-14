@@ -1,3 +1,4 @@
+import { ChevronsUpDown } from "lucide-react";
 import { AppointmentBlock } from "@/components/agenda/AppointmentBlock";
 import type { GridRange } from "@/components/agenda/agenda-range";
 import type {
@@ -5,6 +6,14 @@ import type {
   AgendaProfessional,
   TimeRange,
 } from "@/types/agenda";
+import { Button } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuRadioGroup,
+  DropdownMenuRadioItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { minutesToTime, timeToMinutes } from "@/utils/time";
 
 // Altura de cada intervalo de 30 minutos.
@@ -26,6 +35,8 @@ type DayGridProps = {
    * ocultas por CSS). Sem isso, todas aparecem em qualquer tela.
    */
   mobileProfessionalId?: string;
+  /** Troca do profissional exibido no celular (menu ao lado do nome). */
+  onMobileProfessionalChange?: (professionalId: string) => void;
 };
 
 /** Grade do dia: uma coluna por profissional, com expediente e agendamentos. */
@@ -36,6 +47,7 @@ export function DayGrid({
   unavailable,
   now,
   mobileProfessionalId,
+  onMobileProfessionalChange,
 }: DayGridProps) {
   // Colunas dos outros profissionais somem no celular, quando há um escolhido.
   const mobileHidden = (professionalId: string) =>
@@ -85,10 +97,49 @@ export function DayGrid({
               key={professional.id}
               className={`sticky top-0 z-20 border-b border-l border-border bg-card px-3 py-2 ${mobileHidden(professional.id)}`}
             >
-              <p className="text-sm font-semibold">{professional.name}</p>
-              <p className="text-xs text-muted-foreground">
-                {count} {count === 1 ? "agendamento" : "agendamentos"}
-              </p>
+              <div className="flex items-center justify-between gap-2">
+                <div className="min-w-0">
+                  <p className="truncate text-sm font-semibold">
+                    {professional.name}
+                  </p>
+                  <p className="text-xs text-muted-foreground">
+                    {count} {count === 1 ? "agendamento" : "agendamentos"}
+                  </p>
+                </div>
+
+                {/* Só no celular, na coluna exibida: troca o profissional. */}
+                {onMobileProfessionalChange &&
+                  professional.id === mobileProfessionalId &&
+                  professionals.length > 1 && (
+                    <DropdownMenu modal={false}>
+                      <DropdownMenuTrigger asChild>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="shrink-0 md:hidden"
+                          aria-label="Trocar profissional"
+                        >
+                          <ChevronsUpDown aria-hidden="true" />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end">
+                        <DropdownMenuRadioGroup
+                          value={mobileProfessionalId}
+                          onValueChange={onMobileProfessionalChange}
+                        >
+                          {professionals.map((option) => (
+                            <DropdownMenuRadioItem
+                              key={option.id}
+                              value={option.id}
+                            >
+                              {option.name}
+                            </DropdownMenuRadioItem>
+                          ))}
+                        </DropdownMenuRadioGroup>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  )}
+              </div>
             </div>
           );
         })}

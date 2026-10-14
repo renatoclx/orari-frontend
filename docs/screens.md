@@ -369,6 +369,6 @@ No celular, somente o item calendário será exibido, os demais devem permanecer
 
 ### Celular
 
-- Exibe um profissional por vez, com seleção do profissional no topo.
+- Exibe um profissional por vez. A troca é feita por um ícone de seleção ao lado do nome do profissional, no cabeçalho da coluna.
 
 ---

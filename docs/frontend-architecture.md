@@ -112,7 +112,7 @@ As três telas são a mesma implementação, escolhida pelo tipo (`PeopleType`).
 - O dia fica na URL (`?date=aaaa-mm-dd`); anterior, próximo e hoje são links, e o calendário do atalho leva ao dia escolhido. Sem data (ou data inválida), exibe hoje.
 - Tudo é calculado no **fuso da empresa** (`company.timezone`): `dayBounds` converte o dia para o intervalo UTC que a API filtra; `toTimeString` converte os horários exibidos.
 - A faixa da grade (`agenda-range.ts`) vai da abertura mais cedo menos 2 h ao fechamento mais tarde mais 2 h, ampliada por agendamentos fora dela; fora do horário de funcionamento a grade é sombreada. Pausas por profissional não existem no backend.
-- No celular, um profissional por vez (`AgendaDayView`, com a seleção em estado local); no computador, uma coluna por profissional.
+- No celular, um profissional por vez, trocado por um menu ao lado do nome no cabeçalho da coluna (`AgendaDayView` guarda a seleção em estado local); no computador, uma coluna por profissional.
 - `getCurrentUser` usa `cache` do React: layout e página compartilham a chamada a `/auth/me` na mesma requisição.
 
 ## Sessão e rotas protegidas

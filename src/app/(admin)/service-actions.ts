@@ -6,6 +6,8 @@ import {
   type ServiceFormValues,
 } from "@/components/services/service-validation";
 import { ApiError } from "@/services/api";
+import { failureFrom, type ActionFailure } from "@/lib/action-result";
+import { formText } from "@/lib/form-data";
 import {
   createService,
   deleteService,
@@ -18,30 +20,21 @@ export type ServiceField = keyof ServiceFormValues;
 
 export type ServiceActionResult =
   | { ok: true }
-  | {
-      ok: false;
-      message: string;
-      /** Campo do formulário a que o erro se refere, quando houver. */
-      field?: ServiceField;
+  | (ActionFailure<ServiceField> & {
       /** A exclusão foi recusada por haver vínculos (409). */
       conflict?: boolean;
-    };
+    });
 
 const HEX_COLOR = /^#([0-9a-fA-F]{3}|[0-9a-fA-F]{6})$/;
-
-function text(data: FormData, key: string): string {
-  const value = data.get(key);
-  return typeof value === "string" ? value.trim() : "";
-}
 
 // Lê o formulário, valida de novo no servidor e monta o corpo da API.
 function parseForm(
   data: FormData,
 ): { input: ServiceInput } | { error: ServiceActionResult } {
   const values: ServiceFormValues = {
-    name: text(data, "name"),
-    duration: text(data, "duration"),
-    price: text(data, "price"),
+    name: formText(data, "name"),
+    duration: formText(data, "duration"),
+    price: formText(data, "price"),
   };
 
   const errors = validateServiceForm(values);
@@ -52,29 +45,17 @@ function parseForm(
     };
   }
 
-  const color = text(data, "color");
+  const color = formText(data, "color");
   return {
     input: {
       name: values.name,
-      description: text(data, "description") || null,
+      description: formText(data, "description") || null,
       // Centavos → reais, com até 2 casas decimais.
       price: values.price ? Number(values.price) / 100 : null,
       duration: Number(values.duration),
       color: HEX_COLOR.test(color) ? color : null,
     },
   };
-}
-
-function failure(error: unknown): ServiceActionResult {
-  if (error instanceof ApiError) {
-    // O 409 é nome duplicado: aparece no campo.
-    return {
-      ok: false,
-      message: error.message,
-      field: error.status === 409 ? "name" : undefined,
-    };
-  }
-  throw error;
 }
 
 export async function createServiceAction(
@@ -86,7 +67,8 @@ export async function createServiceAction(
   try {
     await createService(parsed.input);
   } catch (error) {
-    return failure(error);
+    // O 409 é nome duplicado: aparece no campo.
+    return failureFrom(error, "name" as const);
   }
 
   revalidatePath("/servicos");
@@ -103,7 +85,8 @@ export async function updateServiceAction(
   try {
     await updateService(id, parsed.input);
   } catch (error) {
-    return failure(error);
+    // O 409 é nome duplicado: aparece no campo.
+    return failureFrom(error, "name" as const);
   }
 
   revalidatePath("/servicos");
@@ -117,7 +100,7 @@ export async function setServiceActiveAction(
   try {
     await setServiceActive(id, isActive);
   } catch (error) {
-    return failure(error);
+    return failureFrom(error);
   }
 
   revalidatePath("/servicos");

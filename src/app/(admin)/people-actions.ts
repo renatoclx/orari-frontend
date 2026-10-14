@@ -7,6 +7,11 @@ import {
   type PersonFormValues,
 } from "@/components/people/person-validation";
 import { ApiError } from "@/services/api";
+import {
+  failureFrom,
+  type ActionFailure as BaseActionFailure,
+} from "@/lib/action-result";
+import { formText } from "@/lib/form-data";
 import { createAddress, deleteAddress } from "@/services/address.service";
 import {
   createContact,
@@ -32,12 +37,7 @@ import { onlyDigits } from "@/utils/masks";
 
 export type PersonField = keyof PersonFormValues;
 
-export type ActionFailure = {
-  ok: false;
-  message: string;
-  /** Campo do formulário a que o erro se refere, quando houver. */
-  field?: PersonField;
-};
+export type ActionFailure = BaseActionFailure<PersonField>;
 
 export type DeletePersonResult = { ok: true } | ActionFailure;
 export type ReactivatePersonResult = { ok: true } | ActionFailure;
@@ -46,16 +46,6 @@ export type CreatePersonResult =
 
 const CONTACT_TYPES: ContactType[] = ["MAIN", "MESSAGE", "BRANCH"];
 const ADDRESS_TYPES: AddressType[] = ["MAIN", "MESSAGE", "BRANCH"];
-
-function failure(error: ApiError): ActionFailure {
-  // Na criação, o 409 é CPF duplicado.
-  return { ok: false, message: error.message };
-}
-
-function text(data: FormData, key: string): string {
-  const value = data.get(key);
-  return typeof value === "string" ? value.trim() : "";
-}
 
 function parseList(raw: string): Record<string, unknown>[] {
   try {
@@ -94,10 +84,10 @@ export async function createPersonAction(
   if (!isPeopleType(type)) return INVALID_TYPE;
 
   const values: PersonFormValues = {
-    name: text(data, "name"),
-    phone: text(data, "phone"),
-    email: text(data, "email"),
-    document: text(data, "document"),
+    name: formText(data, "name"),
+    phone: formText(data, "phone"),
+    email: formText(data, "email"),
+    document: formText(data, "document"),
   };
 
   const errors = validatePersonForm(values);
@@ -108,7 +98,7 @@ export async function createPersonAction(
     return { ok: false, field: invalid, message: errors[invalid] ?? "" };
   }
 
-  const contactType = text(data, "contactType") as ContactType;
+  const contactType = formText(data, "contactType") as ContactType;
   const mainContact: NewContactInput = {
     type: CONTACT_TYPES.includes(contactType) ? contactType : "MAIN",
     phone: onlyDigits(values.phone),
@@ -117,7 +107,7 @@ export async function createPersonAction(
   };
 
   const extraContacts: NewContactInput[] = parseList(
-    text(data, "extraContacts"),
+    formText(data, "extraContacts"),
   ).map((item) => ({
     type: CONTACT_TYPES.includes(item.type as ContactType)
       ? (item.type as ContactType)
@@ -126,29 +116,29 @@ export async function createPersonAction(
     isPrincipal: false,
   }));
 
-  const addresses: NewAddressInput[] = parseList(text(data, "addresses")).map(
-    (item, index) => ({
-      type: ADDRESS_TYPES.includes(item.type as AddressType)
-        ? (item.type as AddressType)
-        : "MAIN",
-      cep: onlyDigits(asString(item.cep)),
-      street: asString(item.street),
-      number: asString(item.number),
-      ...(asString(item.neighborhood) && {
-        neighborhood: asString(item.neighborhood),
-      }),
-      ...(asString(item.complement) && {
-        complement: asString(item.complement),
-      }),
-      cityId: asString(item.cityId),
-      // O primeiro endereço é o principal (o exibido para a pessoa).
-      isPrincipal: index === 0,
+  const addresses: NewAddressInput[] = parseList(
+    formText(data, "addresses"),
+  ).map((item, index) => ({
+    type: ADDRESS_TYPES.includes(item.type as AddressType)
+      ? (item.type as AddressType)
+      : "MAIN",
+    cep: onlyDigits(asString(item.cep)),
+    street: asString(item.street),
+    number: asString(item.number),
+    ...(asString(item.neighborhood) && {
+      neighborhood: asString(item.neighborhood),
     }),
-  );
+    ...(asString(item.complement) && {
+      complement: asString(item.complement),
+    }),
+    cityId: asString(item.cityId),
+    // O primeiro endereço é o principal (o exibido para a pessoa).
+    isPrincipal: index === 0,
+  }));
 
-  const birthDate = text(data, "birthDate");
-  const profession = text(data, "profession");
-  const note = text(data, "note");
+  const birthDate = formText(data, "birthDate");
+  const profession = formText(data, "profession");
+  const note = formText(data, "note");
 
   let personId: string;
   try {
@@ -164,11 +154,7 @@ export async function createPersonAction(
     });
     personId = person.id;
   } catch (error) {
-    if (!(error instanceof ApiError)) throw error;
-    return {
-      ...failure(error),
-      ...(error.status === 409 && { field: "document" as const }),
-    };
+    return failureFrom(error, "document" as const);
   }
 
   // A pessoa já existe: uma falha na foto não desfaz o cadastro.
@@ -208,8 +194,7 @@ export async function quickCreateClientAction(
       phone: onlyDigits(phone),
     });
   } catch (error) {
-    if (!(error instanceof ApiError)) throw error;
-    return failure(error);
+    return failureFrom(error);
   }
 
   revalidatePath(PEOPLE_KINDS.CLIENT.path);
@@ -225,8 +210,7 @@ export async function deletePersonAction(
   try {
     await deletePerson(id);
   } catch (error) {
-    if (!(error instanceof ApiError)) throw error;
-    return failure(error);
+    return failureFrom(error);
   }
 
   // A listagem é renderizada no servidor: recarrega com a pessoa inativa.
@@ -243,8 +227,7 @@ export async function reactivatePersonAction(
   try {
     await restorePerson(id);
   } catch (error) {
-    if (!(error instanceof ApiError)) throw error;
-    return failure(error);
+    return failureFrom(error);
   }
 
   revalidatePath(PEOPLE_KINDS[type].path);
@@ -274,10 +257,10 @@ export async function updatePersonAction(
   if (!isPeopleType(type)) return INVALID_TYPE;
 
   const values: PersonFormValues = {
-    name: text(data, "name"),
-    phone: text(data, "phone"),
-    email: text(data, "email"),
-    document: text(data, "document"),
+    name: formText(data, "name"),
+    phone: formText(data, "phone"),
+    email: formText(data, "email"),
+    document: formText(data, "document"),
   };
 
   const errors = validatePersonForm(values);
@@ -293,25 +276,21 @@ export async function updatePersonAction(
     await updatePerson(id, {
       name: values.name,
       document: values.document ? onlyDigits(values.document) : null,
-      birthDate: text(data, "birthDate") || null,
-      profession: text(data, "profession") || null,
-      note: text(data, "note") || null,
+      birthDate: formText(data, "birthDate") || null,
+      profession: formText(data, "profession") || null,
+      note: formText(data, "note") || null,
     });
   } catch (error) {
-    if (!(error instanceof ApiError)) throw error;
-    return {
-      ...failure(error),
-      ...(error.status === 409 && { field: "document" as const }),
-    };
+    return failureFrom(error, "document" as const);
   }
 
   // A pessoa já foi salva: o que falhar daqui para a frente vira aviso, e
   // tentar de novo é seguro (as operações são repetíveis).
   const warnings: string[] = [];
 
-  const contactType = text(data, "contactType") as ContactType;
+  const contactType = formText(data, "contactType") as ContactType;
   const type_ = CONTACT_TYPES.includes(contactType) ? contactType : "MAIN";
-  const mainContactId = text(data, "mainContactId");
+  const mainContactId = formText(data, "mainContactId");
   try {
     if (mainContactId) {
       await updateContact(mainContactId, {
@@ -336,7 +315,7 @@ export async function updatePersonAction(
   try {
     if (photo instanceof File && photo.size > 0) {
       await uploadPersonPhoto(id, photo);
-    } else if (text(data, "removePhoto") === "1") {
+    } else if (formText(data, "removePhoto") === "1") {
       await removePersonPhoto(id);
     }
   } catch (error) {
@@ -364,8 +343,7 @@ export async function addContactAction(
       isPrincipal: false,
     });
   } catch (error) {
-    if (!(error instanceof ApiError)) throw error;
-    return failure(error);
+    return failureFrom(error);
   }
 
   revalidatePerson(type, personId);
@@ -382,8 +360,7 @@ export async function deleteContactAction(
   try {
     await deleteContact(contactId);
   } catch (error) {
-    if (!(error instanceof ApiError)) throw error;
-    return failure(error);
+    return failureFrom(error);
   }
 
   revalidatePerson(type, personId);
@@ -413,8 +390,7 @@ export async function addAddressAction(
       isPrincipal: address.isPrincipal ?? false,
     });
   } catch (error) {
-    if (!(error instanceof ApiError)) throw error;
-    return failure(error);
+    return failureFrom(error);
   }
 
   revalidatePerson(type, personId);
@@ -431,8 +407,7 @@ export async function deleteAddressAction(
   try {
     await deleteAddress(addressId);
   } catch (error) {
-    if (!(error instanceof ApiError)) throw error;
-    return failure(error);
+    return failureFrom(error);
   }
 
   revalidatePerson(type, personId);

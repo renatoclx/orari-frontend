@@ -1,7 +1,7 @@
 import "server-only";
 
 import { apiFetch } from "@/services/api";
-import type { Paginated } from "@/types/location";
+import type { Paginated } from "@/types/api";
 import type { ServiceInput, ServiceItem } from "@/types/service";
 
 type ListServicesParams = {

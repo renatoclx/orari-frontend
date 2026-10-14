@@ -265,7 +265,7 @@ function PersonTable({
           <th scope="col" className={headerClass}>
             Status
           </th>
-          <th scope="col" className={`${headerClass} text-right`}>
+          <th scope="col" className={`${headerClass}`}>
             Ações
           </th>
         </tr>
@@ -320,7 +320,7 @@ function PersonActions({
   const removed = person.deletedAt !== null;
 
   return (
-    <div className="flex shrink-0 items-center justify-end gap-1">
+    <div className="flex shrink-0 items-center justify-start gap-1">
       {removed ? (
         <Button
           variant="ghost"
@@ -402,8 +402,14 @@ function PersonDetails({
   return (
     <>
       <DialogHeader>
+        <div className="flex flex-1 justify-center">
+          <PersonAvatar
+            name={person.name}
+            photoUrl={person.photoUrl}
+            className="size-20 **:data-[slot=avatar-fallback]:text-3xl"
+          />
+        </div>
         <DialogTitle className="flex items-center gap-3">
-          <PersonAvatar name={person.name} photoUrl={person.photoUrl} />
           {person.name}
         </DialogTitle>
         <DialogDescription>Dados do {kind.singular}.</DialogDescription>

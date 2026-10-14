@@ -145,8 +145,8 @@ export function CameraCaptureDialog({
               playsInline
               muted
               onLoadedData={() => setReady(true)}
-              // Espelhada, como um espelho; a foto salva não é espelhada.
-              className="size-full -scale-x-100 object-cover"
+              // Sem espelhar: o que aparece aqui é exatamente a foto salva.
+              className="size-full object-cover"
             />
           )}
         </div>

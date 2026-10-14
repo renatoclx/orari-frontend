@@ -38,8 +38,10 @@ específica, prevalece a documentação da entidade.
 
 ## Tabelas
 
+- Titulos do cabeçalho sempre alinhados a esquerda.
 - Os itens exibidos em cada tabela serão descritos por entidade e
   deverão ser respeitados.
+- Quando não existir a informação, preencher com "--";
 - Todas as tabelas deverão contar com uma coluna chamada "Ações", situada
   sempre na última coluna.
 - Nesta coluna deverá ter os botões para interação com o item da tabela
@@ -114,6 +116,10 @@ Ao solicitar uma visualização:
 - Abrir dialog de visualização.
 - Exibirá as informações da entidade e do item selecionado.
 - Botão Fechar para encerrar a visualização.
+
+### Dialog de Pessoas (Clientes, Funcionários, Profissionais e usuários)
+
+- Colocar a foto logo acima das informações, centralizada, em um tamanho de 80px;
 
 ---
 

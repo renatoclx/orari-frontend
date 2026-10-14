@@ -6,6 +6,7 @@ import type {
   CreatePersonInput,
   PeopleType,
   PersonListItem,
+  UpdatePersonInput,
 } from "@/types/people";
 
 type ListPeopleParams = {
@@ -58,4 +59,23 @@ export async function uploadPersonPhoto(
   const body = new FormData();
   body.append("photo", photo, photo.name);
   await apiFetch(`/people/${id}/photo`, { method: "POST", body });
+}
+
+/** Detalhe de uma pessoa ativa (inativa responde 404). */
+export function getPerson(id: string): Promise<PersonListItem> {
+  return apiFetch<PersonListItem>(`/people/${id}`);
+}
+
+export async function updatePerson(
+  id: string,
+  input: UpdatePersonInput,
+): Promise<void> {
+  await apiFetch(`/people/${id}`, {
+    method: "PATCH",
+    body: JSON.stringify(input),
+  });
+}
+
+export async function removePersonPhoto(id: string): Promise<void> {
+  await apiFetch(`/people/${id}/photo`, { method: "DELETE" });
 }

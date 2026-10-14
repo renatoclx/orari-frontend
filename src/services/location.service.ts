@@ -24,3 +24,8 @@ export async function listCities(params: {
   const { items } = await apiFetch<Paginated<City>>(`/cities?${query}`);
   return items;
 }
+
+/** Uma cidade pelo código (os endereços cadastrados guardam só o código). */
+export function getCity(id: string): Promise<City> {
+  return apiFetch<City>(`/cities/${id}`);
+}

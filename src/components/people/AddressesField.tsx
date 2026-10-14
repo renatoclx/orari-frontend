@@ -1,14 +1,29 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useTransition } from "react";
 import { LoaderCircle, Plus, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import {
   lookupCepAction,
   searchCitiesAction,
 } from "@/app/(admin)/location-actions";
+import {
+  addAddressAction,
+  deleteAddressAction,
+} from "@/app/(admin)/people-actions";
+import type { PeopleKind } from "@/components/people/people-kinds";
 import { Combobox } from "@/components/shared/Combobox";
 import { MaskedInput } from "@/components/shared/MaskedInput";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -28,7 +43,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import type { City, State } from "@/types/location";
-import type { AddressType } from "@/types/people";
+import type { AddressRecord, AddressType } from "@/types/people";
 import { addressTypeLabels } from "@/utils/format";
 import { maskCep } from "@/utils/masks";
 import { normalizeText } from "@/utils/text";
@@ -67,8 +82,24 @@ const addressTypes = Object.keys(addressTypeLabels) as AddressType[];
 // A API aceita até 10 endereços por cadastro.
 const MAX_ADDRESSES = 10;
 
+/** Endereço já cadastrado, com a cidade resolvida para exibição. */
+export type PersistedAddress = AddressRecord & {
+  cityName: string;
+  stateAcronym: string;
+};
+
 type AddressesFieldProps = {
   states: State[];
+  /**
+   * Alteração: endereços já cadastrados da pessoa. Adicionar e excluir valem na
+   * hora (a API mantém endereços por rotas próprias). Sem isso, é o cadastro:
+   * a lista fica no formulário e vai junto com a pessoa.
+   */
+  persisted?: {
+    kind: PeopleKind;
+    personId: string;
+    addresses: PersistedAddress[];
+  };
 };
 
 function FieldBox({
@@ -93,8 +124,18 @@ function FieldBox({
 // "Endereços" (screens.md): o formulário aparece ao clicar em adicionar; o CEP
 // busca o logradouro; Estado habilita Cidade; os endereços adicionados vão
 // para uma tabela com a opção de excluir.
-export function AddressesField({ states }: AddressesFieldProps) {
-  const [addresses, setAddresses] = useState<ExtraAddress[]>([]);
+export function AddressesField({ states, persisted }: AddressesFieldProps) {
+  const [localAddresses, setLocalAddresses] = useState<ExtraAddress[]>([]);
+  const [deleting, setDeleting] = useState<ExtraAddress | null>(null);
+  const [pending, startTransition] = useTransition();
+
+  const addresses: ExtraAddress[] = persisted
+    ? persisted.addresses.map((address) => ({
+        ...address,
+        neighborhood: address.neighborhood ?? "",
+        complement: address.complement ?? "",
+      }))
+    : localAddresses;
   const [adding, setAdding] = useState(false);
   const [draft, setDraft] = useState<Draft>(emptyDraft);
   const [error, setError] = useState<string>();
@@ -236,22 +277,82 @@ export function AddressesField({ states }: AddressesFieldProps) {
       return;
     }
 
-    setAddresses((current) => [
-      ...current,
-      {
-        id: crypto.randomUUID(),
-        type: draft.type,
-        cep: draft.cep,
-        street: draft.street.trim(),
-        number: draft.number.trim(),
-        neighborhood: draft.neighborhood.trim(),
-        complement: draft.complement.trim(),
-        cityId: draft.cityId,
-        cityName: draft.cityName,
-        stateAcronym: state.acronym,
-      },
-    ]);
-    closeForm();
+    const fields = {
+      type: draft.type,
+      cep: draft.cep,
+      street: draft.street.trim(),
+      number: draft.number.trim(),
+      neighborhood: draft.neighborhood.trim(),
+      complement: draft.complement.trim(),
+      cityId: draft.cityId,
+    };
+
+    if (!persisted) {
+      setLocalAddresses((current) => [
+        ...current,
+        {
+          id: crypto.randomUUID(),
+          ...fields,
+          cityName: draft.cityName,
+          stateAcronym: state.acronym,
+        },
+      ]);
+      closeForm();
+      return;
+    }
+
+    startTransition(async () => {
+      const result = await addAddressAction(
+        persisted.kind.type,
+        persisted.personId,
+        {
+          ...fields,
+          // O primeiro endereço da pessoa é o principal.
+          isPrincipal: addresses.length === 0,
+        },
+      );
+      if (result.ok) {
+        toast.success("Endereço adicionado.");
+        closeForm();
+      } else {
+        setError(result.message);
+        toast.error("Não foi possível adicionar o endereço.", {
+          description: result.message,
+        });
+      }
+    });
+  }
+
+  function removeAddress(address: ExtraAddress) {
+    if (!persisted) {
+      setLocalAddresses((current) =>
+        current.filter((item) => item.id !== address.id),
+      );
+      return;
+    }
+    // Já cadastrado: pede confirmação (padrão de exclusão).
+    setDeleting(address);
+  }
+
+  function confirmRemove() {
+    if (!persisted || !deleting) return;
+    const target = deleting;
+
+    startTransition(async () => {
+      const result = await deleteAddressAction(
+        persisted.kind.type,
+        persisted.personId,
+        target.id,
+      );
+      if (result.ok) {
+        toast.success("Endereço excluído.");
+        setDeleting(null);
+      } else {
+        toast.error("Não foi possível excluir o endereço.", {
+          description: result.message,
+        });
+      }
+    });
   }
 
   const limitReached = addresses.length >= MAX_ADDRESSES;
@@ -272,32 +373,34 @@ export function AddressesField({ states }: AddressesFieldProps) {
 
   return (
     <div className="space-y-4">
-      {/* Vai no envio do formulário, junto com os demais campos. */}
-      <input
-        type="hidden"
-        name="addresses"
-        value={JSON.stringify(
-          addresses.map(
-            ({
-              type,
-              cep,
-              street,
-              number,
-              neighborhood,
-              complement,
-              cityId,
-            }) => ({
-              type,
-              cep,
-              street,
-              number,
-              neighborhood,
-              complement,
-              cityId,
-            }),
-          ),
-        )}
-      />
+      {/* Cadastro: vai no envio do formulário, junto com os demais campos. */}
+      {!persisted && (
+        <input
+          type="hidden"
+          name="addresses"
+          value={JSON.stringify(
+            addresses.map(
+              ({
+                type,
+                cep,
+                street,
+                number,
+                neighborhood,
+                complement,
+                cityId,
+              }) => ({
+                type,
+                cep,
+                street,
+                number,
+                neighborhood,
+                complement,
+                cityId,
+              }),
+            ),
+          )}
+        />
+      )}
       {adding ? (
         // Dentro do formulário principal: o Enter adiciona o endereço em vez
         // de enviar o cadastro inteiro.
@@ -455,8 +558,8 @@ export function AddressesField({ states }: AddressesFieldProps) {
             <Button type="button" variant="ghost" onClick={closeForm}>
               Cancelar
             </Button>
-            <Button type="button" onClick={addAddress}>
-              Adicionar
+            <Button type="button" disabled={pending} onClick={addAddress}>
+              {pending ? "Adicionando…" : "Adicionar"}
             </Button>
           </div>
         </div>
@@ -513,11 +616,7 @@ export function AddressesField({ states }: AddressesFieldProps) {
                     size="icon"
                     aria-label={`Excluir endereço ${address.street}, ${address.number}`}
                     className="text-destructive hover:bg-destructive/10 hover:text-destructive"
-                    onClick={() =>
-                      setAddresses((current) =>
-                        current.filter((item) => item.id !== address.id),
-                      )
-                    }
+                    onClick={() => removeAddress(address)}
                   >
                     <Trash2 aria-hidden="true" />
                   </Button>
@@ -527,6 +626,33 @@ export function AddressesField({ states }: AddressesFieldProps) {
           </TableBody>
         </Table>
       )}
+
+      <AlertDialog
+        open={deleting !== null}
+        onOpenChange={(open) => !open && !pending && setDeleting(null)}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Excluir endereço?</AlertDialogTitle>
+            <AlertDialogDescription>
+              O endereço {deleting?.street}, {deleting?.number} será excluído.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={pending}>Cancelar</AlertDialogCancel>
+            <AlertDialogAction
+              disabled={pending}
+              className="bg-destructive text-white hover:bg-destructive/90"
+              onClick={(event) => {
+                event.preventDefault();
+                confirmRemove();
+              }}
+            >
+              {pending ? "Excluindo…" : "Excluir"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

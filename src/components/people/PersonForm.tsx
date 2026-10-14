@@ -4,14 +4,20 @@ import { useRef, useState, useTransition } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import { createPersonAction } from "@/app/(admin)/people-actions";
+import {
+  createPersonAction,
+  updatePersonAction,
+} from "@/app/(admin)/people-actions";
 import type { PeopleKind } from "@/components/people/people-kinds";
 import {
   personFieldOrder,
   validatePersonForm,
   type PersonFormErrors,
 } from "@/components/people/person-validation";
-import { AddressesField } from "@/components/people/AddressesField";
+import {
+  AddressesField,
+  type PersistedAddress,
+} from "@/components/people/AddressesField";
 import { ContactsField } from "@/components/people/ContactsField";
 import { DatePicker } from "@/components/shared/DatePicker";
 import { FormFooter } from "@/components/shared/FormFooter";
@@ -40,7 +46,11 @@ import {
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import type { State } from "@/types/location";
-import type { ContactType } from "@/types/people";
+import type {
+  ContactRecord,
+  ContactType,
+  PersonListItem,
+} from "@/types/people";
 import { contactTypeLabels } from "@/utils/format";
 import { maskCpf, maskPhone } from "@/utils/masks";
 
@@ -76,14 +86,26 @@ function Field({ id, label, required, error, children }: FieldProps) {
   );
 }
 
+/** Dados da pessoa na alteração (vêm do servidor). */
+export type EditablePerson = {
+  person: PersonListItem;
+  /** Contato principal: o que os campos Contato, Tipo e E-mail mostram. */
+  mainContact: ContactRecord | null;
+  /** Demais contatos ("Outros contatos"). */
+  extraContacts: ContactRecord[];
+  addresses: PersistedAddress[];
+};
+
 type PersonFormProps = {
   kind: PeopleKind;
   states: State[];
+  /** Presente na alteração; sem isso, é o cadastro. */
+  editing?: EditablePerson;
 };
 
 // Duas colunas ocupando a largura do card (screens.md, "Layout do formulário"):
 // à esquerda os dados principais; à direita os opcionais, em seções recolhíveis.
-export function PersonForm({ kind, states }: PersonFormProps) {
+export function PersonForm({ kind, states, editing }: PersonFormProps) {
   const [errors, setErrors] = useState<PersonFormErrors>({});
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [personName, setPersonName] = useState("");
@@ -111,7 +133,47 @@ export function PersonForm({ kind, states }: PersonFormProps) {
     }
 
     setPersonName(values.name.trim());
+
+    if (editing) {
+      save(data, values.name.trim());
+      return;
+    }
     setConfirmOpen(true);
+  }
+
+  // Alteração: salva a pessoa, o contato principal e a foto.
+  function save(data: FormData, name: string) {
+    if (!editing) return;
+
+    startTransition(async () => {
+      const result = await updatePersonAction(
+        kind.type,
+        editing.person.id,
+        data,
+      );
+
+      if (result.ok) {
+        toast.success(`${kind.singularTitle} atualizado.`, {
+          description: name,
+        });
+        for (const warning of result.warnings) {
+          toast.warning("Parte da alteração não foi salva.", {
+            description: warning,
+          });
+        }
+        router.push(kind.path);
+        return;
+      }
+
+      if (result.field) {
+        const field = result.field;
+        setErrors({ [field]: result.message });
+        document.getElementById(field)?.focus();
+      }
+      toast.error(`Não foi possível atualizar o ${kind.singular}.`, {
+        description: result.message,
+      });
+    });
   }
 
   // Envia o formulário inteiro (inclusive as listas e a foto) ao servidor.
@@ -166,10 +228,17 @@ export function PersonForm({ kind, states }: PersonFormProps) {
         // Padrão de página: o card ocupa a largura toda e a altura que sobra.
         className="flex min-h-0 flex-1 flex-col rounded-card border border-border bg-card"
       >
+        {editing?.mainContact && (
+          <input
+            type="hidden"
+            name="mainContactId"
+            value={editing.mainContact.id}
+          />
+        )}
         <div className="min-h-0 flex-1 overflow-auto p-4 md:p-6">
           {/* Foto centralizada, acima das colunas (screens.md). */}
           <div className="mb-6 flex justify-center">
-            <PhotoUpload />
+            <PhotoUpload currentUrl={editing?.person.photoUrl} />
           </div>
 
           <div className="grid gap-x-12 gap-y-6 md:grid-cols-2">
@@ -184,6 +253,7 @@ export function PersonForm({ kind, states }: PersonFormProps) {
                   aria-invalid={errors.name ? true : undefined}
                   aria-describedby={errors.name ? "name-error" : undefined}
                   name="name"
+                  defaultValue={editing?.person.name}
                   autoComplete="name"
                   placeholder="Nome completo"
                 />
@@ -196,6 +266,7 @@ export function PersonForm({ kind, states }: PersonFormProps) {
                     aria-invalid={errors.phone ? true : undefined}
                     aria-describedby={errors.phone ? "phone-error" : undefined}
                     name="phone"
+                    initialValue={editing?.mainContact?.phone ?? ""}
                     mask={maskPhone}
                     type="tel"
                     inputMode="tel"
@@ -205,7 +276,10 @@ export function PersonForm({ kind, states }: PersonFormProps) {
                 </Field>
 
                 <Field id="contactType" label="Tipo do contato">
-                  <Select name="contactType" defaultValue="MAIN">
+                  <Select
+                    name="contactType"
+                    defaultValue={editing?.mainContact?.type ?? "MAIN"}
+                  >
                     <SelectTrigger id="contactType" className="w-full">
                       <SelectValue />
                     </SelectTrigger>
@@ -228,6 +302,7 @@ export function PersonForm({ kind, states }: PersonFormProps) {
                   aria-invalid={errors.email ? true : undefined}
                   aria-describedby={errors.email ? "email-error" : undefined}
                   name="email"
+                  defaultValue={editing?.mainContact?.email ?? ""}
                   type="email"
                   inputMode="email"
                   autoComplete="email"
@@ -239,6 +314,7 @@ export function PersonForm({ kind, states }: PersonFormProps) {
                 <Textarea
                   id="note"
                   name="note"
+                  defaultValue={editing?.person.note ?? ""}
                   rows={4}
                   maxLength={1000}
                   // Pelo menos 4 linhas (screens.md); cresce com o conteúdo.
@@ -269,6 +345,7 @@ export function PersonForm({ kind, states }: PersonFormProps) {
                             errors.document ? "document-error" : undefined
                           }
                           name="document"
+                          initialValue={editing?.person.document ?? ""}
                           mask={maskCpf}
                           inputMode="numeric"
                           placeholder="000.000.000-00"
@@ -279,13 +356,18 @@ export function PersonForm({ kind, states }: PersonFormProps) {
                         <DatePicker
                           id="birthDate"
                           name="birthDate"
+                          initialValue={editing?.person.birthDate}
                           maxDate={new Date()}
                         />
                       </Field>
                     </div>
 
                     <Field id="profession" label="Profissão">
-                      <Input id="profession" name="profession" />
+                      <Input
+                        id="profession"
+                        name="profession"
+                        defaultValue={editing?.person.profession ?? ""}
+                      />
                     </Field>
                   </div>
                 </FormSection>
@@ -294,14 +376,31 @@ export function PersonForm({ kind, states }: PersonFormProps) {
                   title="Outros contatos"
                   description="Telefones adicionais"
                 >
-                  <ContactsField />
+                  <ContactsField
+                    persisted={
+                      editing && {
+                        kind,
+                        personId: editing.person.id,
+                        contacts: editing.extraContacts,
+                      }
+                    }
+                  />
                 </FormSection>
 
                 <FormSection
                   title="Endereços"
                   description={`Onde o ${kind.singular} pode ser encontrado`}
                 >
-                  <AddressesField states={states} />
+                  <AddressesField
+                    states={states}
+                    persisted={
+                      editing && {
+                        kind,
+                        personId: editing.person.id,
+                        addresses: editing.addresses,
+                      }
+                    }
+                  />
                 </FormSection>
               </div>
             </section>
@@ -318,36 +417,40 @@ export function PersonForm({ kind, states }: PersonFormProps) {
           <Button variant="outline" asChild>
             <Link href={kind.path}>Cancelar</Link>
           </Button>
-          <Button type="submit">Salvar</Button>
+          <Button type="submit" disabled={pending}>
+            {editing ? (pending ? "Salvando…" : "Salvar alterações") : "Salvar"}
+          </Button>
         </FormFooter>
       </form>
 
-      <AlertDialog
-        open={confirmOpen}
-        onOpenChange={(open) => !pending && setConfirmOpen(open)}
-      >
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Cadastrar {kind.singular}?</AlertDialogTitle>
-            <AlertDialogDescription>
-              O cadastro de {personName} será criado com os dados informados.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel disabled={pending}>Cancelar</AlertDialogCancel>
-            <AlertDialogAction
-              disabled={pending}
-              onClick={(event) => {
-                // Mantém o diálogo aberto enquanto cadastra ("Cadastrando…").
-                event.preventDefault();
-                confirmCreate();
-              }}
-            >
-              {pending ? "Cadastrando…" : "Cadastrar"}
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+      {!editing && (
+        <AlertDialog
+          open={confirmOpen}
+          onOpenChange={(open) => !pending && setConfirmOpen(open)}
+        >
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Cadastrar {kind.singular}?</AlertDialogTitle>
+              <AlertDialogDescription>
+                O cadastro de {personName} será criado com os dados informados.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel disabled={pending}>Cancelar</AlertDialogCancel>
+              <AlertDialogAction
+                disabled={pending}
+                onClick={(event) => {
+                  // Mantém o diálogo aberto enquanto cadastra ("Cadastrando…").
+                  event.preventDefault();
+                  confirmCreate();
+                }}
+              >
+                {pending ? "Cadastrando…" : "Cadastrar"}
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
+      )}
     </>
   );
 }

@@ -14,6 +14,8 @@ type MaskedInputProps = Omit<
   name?: string;
   /** Valor controlado, sem máscara. */
   value?: string;
+  /** Valor inicial (sem máscara) quando não controlado. */
+  initialValue?: string;
   onValueChange?: (digits: string) => void;
 };
 
@@ -22,10 +24,11 @@ export function MaskedInput({
   mask,
   name,
   value,
+  initialValue = "",
   onValueChange,
   ...props
 }: MaskedInputProps) {
-  const [internal, setInternal] = useState("");
+  const [internal, setInternal] = useState(onlyDigits(initialValue));
   const digits = value ?? internal;
 
   return (

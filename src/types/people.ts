@@ -70,3 +70,34 @@ export type CreatePersonInput = {
   contacts?: NewContactInput[];
   addresses?: NewAddressInput[];
 };
+
+/** Contato cadastrado (GET /contacts). */
+export type ContactRecord = {
+  id: string;
+  type: ContactType;
+  phone: string | null;
+  email: string | null;
+  isPrincipal: boolean;
+};
+
+/** Endereço cadastrado (GET /addresses); a cidade vem só como código. */
+export type AddressRecord = {
+  id: string;
+  type: AddressType;
+  cep: string;
+  street: string;
+  number: string;
+  neighborhood: string | null;
+  complement: string | null;
+  cityId: string;
+  isPrincipal: boolean;
+};
+
+/** Corpo de PATCH /people/:id. `null` limpa um campo opcional. */
+export type UpdatePersonInput = {
+  name: string;
+  document: string | null;
+  birthDate: string | null;
+  profession: string | null;
+  note: string | null;
+};

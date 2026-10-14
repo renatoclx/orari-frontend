@@ -17,7 +17,16 @@ type DatePickerProps = {
   placeholder?: string;
   /** Datas depois deste limite ficam desabilitadas (ex.: nascimento → hoje). */
   maxDate?: Date;
+  /** Valor inicial, "aaaa-mm-dd" (ou ISO completo; só a data conta). */
+  initialValue?: string | null;
 };
+
+// "1990-03-15" (ou "1990-03-15T00:00:00.000Z") → data local, sem passar por UTC.
+function parseIsoDate(value: string | null | undefined): Date | undefined {
+  const match = value?.match(/^(\d{4})-(\d{2})-(\d{2})/);
+  if (!match) return undefined;
+  return new Date(Number(match[1]), Number(match[2]) - 1, Number(match[3]));
+}
 
 // Data local como "aaaa-mm-dd", sem passar por UTC (que poderia mudar o dia).
 function toIsoDate(date: Date): string {
@@ -34,8 +43,11 @@ export function DatePicker({
   name,
   placeholder = "dd/mm/aaaa",
   maxDate,
+  initialValue,
 }: DatePickerProps) {
-  const [date, setDate] = useState<Date | undefined>();
+  const [date, setDate] = useState<Date | undefined>(() =>
+    parseIsoDate(initialValue),
+  );
   const [open, setOpen] = useState(false);
 
   return (

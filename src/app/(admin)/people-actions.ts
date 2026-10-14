@@ -7,10 +7,18 @@ import {
   type PersonFormValues,
 } from "@/components/people/person-validation";
 import { ApiError } from "@/services/api";
+import { createAddress, deleteAddress } from "@/services/address.service";
+import {
+  createContact,
+  deleteContact,
+  updateContact,
+} from "@/services/contact.service";
 import {
   createPerson,
   deletePerson,
+  removePersonPhoto,
   restorePerson,
+  updatePerson,
   uploadPersonPhoto,
 } from "@/services/people.service";
 import type {
@@ -240,5 +248,193 @@ export async function reactivatePersonAction(
   }
 
   revalidatePath(PEOPLE_KINDS[type].path);
+  return { ok: true };
+}
+
+export type UpdatePersonResult =
+  { ok: true; warnings: string[] } | ActionFailure;
+
+/** Atualiza a lista e a tela de alteração da pessoa. */
+function revalidatePerson(type: PeopleType, id: string) {
+  const { path } = PEOPLE_KINDS[type];
+  revalidatePath(path);
+  revalidatePath(`${path}/${id}/editar`);
+}
+
+/**
+ * Alteração: salva os dados da pessoa, o contato principal e a foto. Contatos
+ * e endereços adicionais têm ações próprias (aplicadas na hora), porque a API
+ * os mantém por rotas separadas.
+ */
+export async function updatePersonAction(
+  type: PeopleType,
+  id: string,
+  data: FormData,
+): Promise<UpdatePersonResult> {
+  if (!isPeopleType(type)) return INVALID_TYPE;
+
+  const values: PersonFormValues = {
+    name: text(data, "name"),
+    phone: text(data, "phone"),
+    email: text(data, "email"),
+    document: text(data, "document"),
+  };
+
+  const errors = validatePersonForm(values);
+  const invalid = (Object.keys(errors) as PersonField[]).find(
+    (field) => errors[field],
+  );
+  if (invalid) {
+    return { ok: false, field: invalid, message: errors[invalid] ?? "" };
+  }
+
+  // Campo vazio vira null: é assim que a API limpa um valor opcional.
+  try {
+    await updatePerson(id, {
+      name: values.name,
+      document: values.document ? onlyDigits(values.document) : null,
+      birthDate: text(data, "birthDate") || null,
+      profession: text(data, "profession") || null,
+      note: text(data, "note") || null,
+    });
+  } catch (error) {
+    if (!(error instanceof ApiError)) throw error;
+    return {
+      ...failure(error),
+      ...(error.status === 409 && { field: "document" as const }),
+    };
+  }
+
+  // A pessoa já foi salva: o que falhar daqui para a frente vira aviso, e
+  // tentar de novo é seguro (as operações são repetíveis).
+  const warnings: string[] = [];
+
+  const contactType = text(data, "contactType") as ContactType;
+  const type_ = CONTACT_TYPES.includes(contactType) ? contactType : "MAIN";
+  const mainContactId = text(data, "mainContactId");
+  try {
+    if (mainContactId) {
+      await updateContact(mainContactId, {
+        type: type_,
+        phone: onlyDigits(values.phone),
+        email: values.email || null,
+      });
+    } else {
+      await createContact(id, {
+        type: type_,
+        phone: onlyDigits(values.phone),
+        ...(values.email && { email: values.email }),
+        isPrincipal: true,
+      });
+    }
+  } catch (error) {
+    if (!(error instanceof ApiError)) throw error;
+    warnings.push(`Contato principal: ${error.message}`);
+  }
+
+  const photo = data.get("photo");
+  try {
+    if (photo instanceof File && photo.size > 0) {
+      await uploadPersonPhoto(id, photo);
+    } else if (text(data, "removePhoto") === "1") {
+      await removePersonPhoto(id);
+    }
+  } catch (error) {
+    if (!(error instanceof ApiError)) throw error;
+    warnings.push(`Foto: ${error.message}`);
+  }
+
+  revalidatePerson(type, id);
+  return { ok: true, warnings };
+}
+
+export type SimpleResult = { ok: true } | ActionFailure;
+
+export async function addContactAction(
+  type: PeopleType,
+  personId: string,
+  contact: { phone: string; type: ContactType },
+): Promise<SimpleResult> {
+  if (!isPeopleType(type)) return INVALID_TYPE;
+
+  try {
+    await createContact(personId, {
+      type: CONTACT_TYPES.includes(contact.type) ? contact.type : "MAIN",
+      phone: onlyDigits(contact.phone),
+      isPrincipal: false,
+    });
+  } catch (error) {
+    if (!(error instanceof ApiError)) throw error;
+    return failure(error);
+  }
+
+  revalidatePerson(type, personId);
+  return { ok: true };
+}
+
+export async function deleteContactAction(
+  type: PeopleType,
+  personId: string,
+  contactId: string,
+): Promise<SimpleResult> {
+  if (!isPeopleType(type)) return INVALID_TYPE;
+
+  try {
+    await deleteContact(contactId);
+  } catch (error) {
+    if (!(error instanceof ApiError)) throw error;
+    return failure(error);
+  }
+
+  revalidatePerson(type, personId);
+  return { ok: true };
+}
+
+export async function addAddressAction(
+  type: PeopleType,
+  personId: string,
+  address: NewAddressInput,
+): Promise<SimpleResult> {
+  if (!isPeopleType(type)) return INVALID_TYPE;
+
+  try {
+    await createAddress(personId, {
+      type: ADDRESS_TYPES.includes(address.type) ? address.type : "MAIN",
+      cep: onlyDigits(address.cep),
+      street: address.street.trim(),
+      number: address.number.trim(),
+      ...(address.neighborhood?.trim() && {
+        neighborhood: address.neighborhood.trim(),
+      }),
+      ...(address.complement?.trim() && {
+        complement: address.complement.trim(),
+      }),
+      cityId: address.cityId,
+      isPrincipal: address.isPrincipal ?? false,
+    });
+  } catch (error) {
+    if (!(error instanceof ApiError)) throw error;
+    return failure(error);
+  }
+
+  revalidatePerson(type, personId);
+  return { ok: true };
+}
+
+export async function deleteAddressAction(
+  type: PeopleType,
+  personId: string,
+  addressId: string,
+): Promise<SimpleResult> {
+  if (!isPeopleType(type)) return INVALID_TYPE;
+
+  try {
+    await deleteAddress(addressId);
+  } catch (error) {
+    if (!(error instanceof ApiError)) throw error;
+    return failure(error);
+  }
+
+  revalidatePerson(type, personId);
   return { ok: true };
 }

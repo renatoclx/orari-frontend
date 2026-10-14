@@ -13,16 +13,26 @@ const MAX_BYTES = 2 * 1024 * 1024;
 type PhotoUploadProps = {
   /** Nome do campo de arquivo no formulário. */
   name?: string;
+  /** Foto já cadastrada (alteração), ex.: "/uploads/people/x.png". */
+  currentUrl?: string | null;
 };
 
 // Foto da pessoa: uma div circular que mostra a imagem escolhida ou tirada na
 // câmera do dispositivo. Opcional. O envio é feito depois do cadastro (a API
 // recebe a foto numa rota própria).
-export function PhotoUpload({ name = "photo" }: PhotoUploadProps) {
+export function PhotoUpload({
+  name = "photo",
+  currentUrl = null,
+}: PhotoUploadProps) {
   const inputRef = useRef<HTMLInputElement>(null);
   const [preview, setPreview] = useState<string>();
   const [error, setError] = useState<string>();
   const [cameraOpen, setCameraOpen] = useState(false);
+  // Alteração: a foto cadastrada foi retirada (será removida ao salvar).
+  const [currentRemoved, setCurrentRemoved] = useState(false);
+
+  const shownUrl =
+    preview ?? (currentRemoved ? undefined : (currentUrl ?? undefined));
 
   // Libera a URL temporária da imagem anterior ao trocar ou sair da tela.
   useEffect(() => {
@@ -31,9 +41,16 @@ export function PhotoUpload({ name = "photo" }: PhotoUploadProps) {
     };
   }, [preview]);
 
+  // Descarta a foto escolhida; a cadastrada, se houver, volta a valer.
   function clear() {
     if (inputRef.current) inputRef.current.value = "";
     setPreview(undefined);
+  }
+
+  // Botão "Remover": tira a foto escolhida e, na alteração, a cadastrada.
+  function remove() {
+    clear();
+    if (currentUrl) setCurrentRemoved(true);
   }
 
   // Valida o arquivo (escolhido ou tirado na câmera) e mostra a prévia.
@@ -50,6 +67,7 @@ export function PhotoUpload({ name = "photo" }: PhotoUploadProps) {
     }
 
     setError(undefined);
+    setCurrentRemoved(false);
     setPreview(URL.createObjectURL(file));
   }
 
@@ -72,11 +90,11 @@ export function PhotoUpload({ name = "photo" }: PhotoUploadProps) {
       <button
         type="button"
         onClick={() => inputRef.current?.click()}
-        aria-label={preview ? "Trocar foto" : "Selecionar foto"}
+        aria-label={shownUrl ? "Trocar foto" : "Selecionar foto"}
         className="rounded-full"
       >
         <Avatar className="size-24 border border-border">
-          {preview && <AvatarImage src={preview} alt="Foto selecionada" />}
+          {shownUrl && <AvatarImage src={shownUrl} alt="Foto da pessoa" />}
           <AvatarFallback>
             <Camera
               className="size-8 text-muted-foreground"
@@ -95,6 +113,8 @@ export function PhotoUpload({ name = "photo" }: PhotoUploadProps) {
         className="hidden"
       />
 
+      {currentRemoved && <input type="hidden" name="removePhoto" value="1" />}
+
       <div className="flex flex-wrap justify-center gap-2">
         <Button
           type="button"
@@ -102,7 +122,7 @@ export function PhotoUpload({ name = "photo" }: PhotoUploadProps) {
           onClick={() => inputRef.current?.click()}
         >
           <Upload aria-hidden="true" />
-          {preview ? "Trocar foto" : "Selecionar foto"}
+          {shownUrl ? "Trocar foto" : "Selecionar foto"}
         </Button>
         <Button
           type="button"
@@ -112,8 +132,8 @@ export function PhotoUpload({ name = "photo" }: PhotoUploadProps) {
           <Camera aria-hidden="true" />
           Tirar foto
         </Button>
-        {preview && (
-          <Button type="button" variant="ghost" onClick={clear}>
+        {shownUrl && (
+          <Button type="button" variant="ghost" onClick={remove}>
             Remover
           </Button>
         )}

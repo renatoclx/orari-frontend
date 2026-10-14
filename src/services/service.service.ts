@@ -32,6 +32,17 @@ export function createService(input: ServiceInput): Promise<ServiceItem> {
   });
 }
 
+/** Inativa ou ativa o serviço (campo `isActive`). */
+export function setServiceActive(
+  id: string,
+  isActive: boolean,
+): Promise<ServiceItem> {
+  return apiFetch<ServiceItem>(`/services/${id}`, {
+    method: "PATCH",
+    body: JSON.stringify({ isActive }),
+  });
+}
+
 export function updateService(
   id: string,
   input: ServiceInput,

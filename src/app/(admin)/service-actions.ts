@@ -6,7 +6,11 @@ import {
   type ServiceFormValues,
 } from "@/components/services/service-validation";
 import { ApiError } from "@/services/api";
-import { createService, updateService } from "@/services/service.service";
+import {
+  createService,
+  setServiceActive,
+  updateService,
+} from "@/services/service.service";
 import type { ServiceInput } from "@/types/service";
 
 export type ServiceField = keyof ServiceFormValues;
@@ -95,6 +99,20 @@ export async function updateServiceAction(
 
   try {
     await updateService(id, parsed.input);
+  } catch (error) {
+    return failure(error);
+  }
+
+  revalidatePath("/servicos");
+  return { ok: true };
+}
+
+export async function setServiceActiveAction(
+  id: string,
+  isActive: boolean,
+): Promise<ServiceActionResult> {
+  try {
+    await setServiceActive(id, isActive);
   } catch (error) {
     return failure(error);
   }

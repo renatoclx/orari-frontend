@@ -9,8 +9,12 @@ Pontos conhecidos e aceitos por enquanto. Revisar quando o contexto mudar.
 
 ## Telas
 
-- **Dados de exemplo.** Agendamentos usa `components/agenda/mock-data.ts`; os tipos em `types/agenda.ts` são provisórios e devem ser conferidos com o backend ao ligar a tela. Clientes, Funcionários e Profissionais já usam a API.
-- **Calendário da barra de ações** marca sempre o dia de hoje; será ligado à data selecionada da agenda.
+- **Agenda somente leitura.** O botão "Novo Agendamento" e os blocos ainda não têm ação (cadastro, remarcação, cancelamento e mudança de status serão especificados em etapas futuras).
+- **Profissionais da agenda.** A grade carrega até 100 profissionais (uma página). Acima disso, os demais não aparecem.
+- **Pausas por profissional.** O backend só tem o horário de funcionamento da empresa; a agenda não desenha pausas (previsto: o administrador poderá lançá-las).
+- **Posição inicial da grade.** No celular a grade abre no início da faixa (2 h antes do expediente); falta rolar até o primeiro agendamento ou até o horário atual.
+- **Calendário do atalho** usa o relógio do navegador para marcar "hoje"; se o fuso do navegador diferir do da empresa, o marcador pode divergir da agenda (que usa o fuso da empresa).
+- **Nomes de profissional fora da lista.** Agendamentos de profissionais inativos não aparecem (a agenda deles será remanejada, fora do MVP).
 
 ## Pessoas
 

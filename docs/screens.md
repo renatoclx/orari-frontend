@@ -176,6 +176,7 @@ deverão ser respeitados.
   - Excluir, que deve ser um ícone de lixeira vermelho.
 
 - Não deve ser permitido adicionar um contato vazio.
+- A tabela deve ser posicionada abaixo dos campos cadastrais e do botão Adicionar.
 
 ### Endereços
 
@@ -202,5 +203,6 @@ deverão ser respeitados.
   - Excluir, que deve ser um ícone de lixeira vermelho.
 
 - Não deve ser permitido adicionar um endereço vazio.
+- A tabela deve ser posicionada abaixo dos campos cadastrais e do botão Adicionar.
 
 ---

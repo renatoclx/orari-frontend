@@ -63,44 +63,6 @@ export function ContactsField() {
 
   return (
     <div className="space-y-4">
-      {contacts.length > 0 && (
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Contato</TableHead>
-              <TableHead>Tipo</TableHead>
-              <TableHead className="w-16 text-right">Excluir</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {contacts.map((contact) => (
-              <TableRow key={contact.id}>
-                <TableCell className="tabular-nums">
-                  {maskPhone(contact.phone)}
-                </TableCell>
-                <TableCell>{contactTypeLabels[contact.type]}</TableCell>
-                <TableCell className="text-right">
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="icon"
-                    aria-label={`Excluir contato ${maskPhone(contact.phone)}`}
-                    className="text-destructive hover:bg-destructive/10 hover:text-destructive"
-                    onClick={() =>
-                      setContacts((current) =>
-                        current.filter((item) => item.id !== contact.id),
-                      )
-                    }
-                  >
-                    <Trash2 aria-hidden="true" />
-                  </Button>
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      )}
-
       {adding ? (
         // Dentro do formulário principal: o Enter adiciona o contato em vez de
         // enviar o cadastro inteiro.
@@ -184,6 +146,44 @@ export function ContactsField() {
             Adicionar contato
           </Button>
         </div>
+      )}
+
+      {contacts.length > 0 && (
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Contato</TableHead>
+              <TableHead>Tipo</TableHead>
+              <TableHead className="w-16 text-right">Excluir</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {contacts.map((contact) => (
+              <TableRow key={contact.id}>
+                <TableCell className="tabular-nums">
+                  {maskPhone(contact.phone)}
+                </TableCell>
+                <TableCell>{contactTypeLabels[contact.type]}</TableCell>
+                <TableCell className="text-right">
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="icon"
+                    aria-label={`Excluir contato ${maskPhone(contact.phone)}`}
+                    className="text-destructive hover:bg-destructive/10 hover:text-destructive"
+                    onClick={() =>
+                      setContacts((current) =>
+                        current.filter((item) => item.id !== contact.id),
+                      )
+                    }
+                  >
+                    <Trash2 aria-hidden="true" />
+                  </Button>
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
       )}
     </div>
   );

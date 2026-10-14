@@ -267,50 +267,6 @@ export function AddressesField({ states }: AddressesFieldProps) {
 
   return (
     <div className="space-y-4">
-      {addresses.length > 0 && (
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Logradouro</TableHead>
-              <TableHead>Tipo</TableHead>
-              <TableHead className="w-16 text-right">Excluir</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {addresses.map((address) => (
-              <TableRow key={address.id}>
-                <TableCell className="whitespace-normal">
-                  <span className="block font-medium">
-                    {address.street}, {address.number}
-                  </span>
-                  <span className="block text-sm text-muted-foreground">
-                    {address.neighborhood && `${address.neighborhood}, `}
-                    {address.cityName}/{address.stateAcronym}
-                  </span>
-                </TableCell>
-                <TableCell>{addressTypeLabels[address.type]}</TableCell>
-                <TableCell className="text-right">
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="icon"
-                    aria-label={`Excluir endereço ${address.street}, ${address.number}`}
-                    className="text-destructive hover:bg-destructive/10 hover:text-destructive"
-                    onClick={() =>
-                      setAddresses((current) =>
-                        current.filter((item) => item.id !== address.id),
-                      )
-                    }
-                  >
-                    <Trash2 aria-hidden="true" />
-                  </Button>
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      )}
-
       {adding ? (
         // Dentro do formulário principal: o Enter adiciona o endereço em vez
         // de enviar o cadastro inteiro.
@@ -489,6 +445,50 @@ export function AddressesField({ states }: AddressesFieldProps) {
             Adicionar endereço
           </Button>
         </div>
+      )}
+
+      {addresses.length > 0 && (
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Logradouro</TableHead>
+              <TableHead>Tipo</TableHead>
+              <TableHead className="w-16 text-right">Excluir</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {addresses.map((address) => (
+              <TableRow key={address.id}>
+                <TableCell className="whitespace-normal">
+                  <span className="block font-medium">
+                    {address.street}, {address.number}
+                  </span>
+                  <span className="block text-sm text-muted-foreground">
+                    {address.neighborhood && `${address.neighborhood}, `}
+                    {address.cityName}/{address.stateAcronym}
+                  </span>
+                </TableCell>
+                <TableCell>{addressTypeLabels[address.type]}</TableCell>
+                <TableCell className="text-right">
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="icon"
+                    aria-label={`Excluir endereço ${address.street}, ${address.number}`}
+                    className="text-destructive hover:bg-destructive/10 hover:text-destructive"
+                    onClick={() =>
+                      setAddresses((current) =>
+                        current.filter((item) => item.id !== address.id),
+                      )
+                    }
+                  >
+                    <Trash2 aria-hidden="true" />
+                  </Button>
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
       )}
     </div>
   );

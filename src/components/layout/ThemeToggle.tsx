@@ -1,5 +1,6 @@
 "use client";
 
+import { Hint } from "@/components/shared/Hint";
 import { useSyncExternalStore } from "react";
 import { Moon, Sun } from "lucide-react";
 import { useTheme } from "next-themes";
@@ -22,11 +23,13 @@ export function ThemeToggle() {
     <div className="flex items-center gap-2 text-muted-foreground">
       <Sun className="size-4" aria-hidden="true" />
       {mounted ? (
-        <Switch
-          checked={resolvedTheme === "dark"}
-          onCheckedChange={(checked) => setTheme(checked ? "dark" : "light")}
-          aria-label="Tema escuro"
-        />
+        <Hint label="Alternar entre tema claro e escuro">
+          <Switch
+            checked={resolvedTheme === "dark"}
+            onCheckedChange={(checked) => setTheme(checked ? "dark" : "light")}
+            aria-label="Tema escuro"
+          />
+        </Hint>
       ) : (
         <span className="h-[18.4px] w-8 rounded-full bg-input" />
       )}

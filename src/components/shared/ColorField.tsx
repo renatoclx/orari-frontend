@@ -1,5 +1,6 @@
 "use client";
 
+import { Hint } from "@/components/shared/Hint";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 
@@ -18,14 +19,16 @@ export function ColorField({ id, name, initialValue }: ColorFieldProps) {
 
   return (
     <div className="flex items-center gap-3">
-      <input
-        id={id}
-        type="color"
-        value={color || "#cccccc"}
-        onChange={(event) => setColor(event.target.value)}
-        aria-label="Escolher cor"
-        className="h-9 w-14 cursor-pointer rounded-lg border border-input bg-transparent p-1"
-      />
+      <Hint label="Clique para escolher a cor">
+        <input
+          id={id}
+          type="color"
+          value={color || "#cccccc"}
+          onChange={(event) => setColor(event.target.value)}
+          aria-label="Escolher cor"
+          className="h-9 w-14 cursor-pointer rounded-lg border border-input bg-transparent p-1"
+        />
+      </Hint>
       <input type="hidden" name={name} value={color} />
 
       {color ? (

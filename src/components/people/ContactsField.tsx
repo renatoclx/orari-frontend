@@ -1,5 +1,6 @@
 "use client";
 
+import { Hint } from "@/components/shared/Hint";
 import { useState, useTransition } from "react";
 import { Plus, Trash2 } from "lucide-react";
 import { toast } from "sonner";
@@ -273,16 +274,20 @@ export function ContactsField({ persisted }: ContactsFieldProps) {
                 </TableCell>
                 <TableCell>{contactTypeLabels[contact.type]}</TableCell>
                 <TableCell className="text-right">
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="icon"
-                    aria-label={`Excluir contato ${contact.phone ? maskPhone(contact.phone) : contact.email}`}
-                    className="text-destructive hover:bg-destructive/10 hover:text-destructive"
-                    onClick={() => removeContact(contact)}
+                  <Hint
+                    label={`Excluir contato ${contact.phone ? maskPhone(contact.phone) : contact.email}`}
                   >
-                    <Trash2 aria-hidden="true" />
-                  </Button>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="icon"
+                      aria-label={`Excluir contato ${contact.phone ? maskPhone(contact.phone) : contact.email}`}
+                      className="text-destructive hover:bg-destructive/10 hover:text-destructive"
+                      onClick={() => removeContact(contact)}
+                    >
+                      <Trash2 aria-hidden="true" />
+                    </Button>
+                  </Hint>
                 </TableCell>
               </TableRow>
             ))}

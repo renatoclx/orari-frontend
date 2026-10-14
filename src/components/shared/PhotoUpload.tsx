@@ -1,5 +1,6 @@
 "use client";
 
+import { Hint } from "@/components/shared/Hint";
 import { useEffect, useRef, useState } from "react";
 import { Camera, Upload } from "lucide-react";
 import { CameraCaptureDialog } from "@/components/shared/CameraCaptureDialog";
@@ -88,22 +89,30 @@ export function PhotoUpload({
 
   return (
     <div className="flex flex-col items-center gap-3">
-      <button
-        type="button"
-        onClick={() => inputRef.current?.click()}
-        aria-label={shownUrl ? "Trocar foto" : "Selecionar foto"}
-        className="rounded-full"
+      <Hint
+        label={
+          shownUrl
+            ? "Clique para trocar a foto"
+            : "Clique para escolher uma foto"
+        }
       >
-        <Avatar className="size-24 border border-border">
-          {shownUrl && <AvatarImage src={shownUrl} alt="Foto da pessoa" />}
-          <AvatarFallback>
-            <Camera
-              className="size-8 text-muted-foreground"
-              aria-hidden="true"
-            />
-          </AvatarFallback>
-        </Avatar>
-      </button>
+        <button
+          type="button"
+          onClick={() => inputRef.current?.click()}
+          aria-label={shownUrl ? "Trocar foto" : "Selecionar foto"}
+          className="rounded-full"
+        >
+          <Avatar className="size-24 border border-border">
+            {shownUrl && <AvatarImage src={shownUrl} alt="Foto da pessoa" />}
+            <AvatarFallback>
+              <Camera
+                className="size-8 text-muted-foreground"
+                aria-hidden="true"
+              />
+            </AvatarFallback>
+          </Avatar>
+        </button>
+      </Hint>
 
       <input
         ref={inputRef}

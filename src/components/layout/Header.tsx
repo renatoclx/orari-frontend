@@ -1,5 +1,6 @@
 import { Menu } from "lucide-react";
 import { CalendarShortcut } from "@/components/layout/CalendarShortcut";
+import { Hint } from "@/components/shared/Hint";
 import { Logo } from "@/components/layout/Logo";
 import { ThemeToggle } from "@/components/layout/ThemeToggle";
 import { UserMenu } from "@/components/layout/UserMenu";
@@ -15,14 +16,16 @@ type HeaderProps = {
 export function Header({ user, onOpenMobile }: HeaderProps) {
   return (
     <header className="flex h-16 shrink-0 items-center gap-2 border-b border-border bg-card px-4 md:px-8">
-      <button
-        type="button"
-        onClick={onOpenMobile}
-        aria-label="Abrir menu"
-        className="rounded-control p-2 text-muted-foreground hover:text-foreground md:hidden"
-      >
-        <Menu className="size-5" aria-hidden="true" />
-      </button>
+      <Hint label="Abrir o menu de navegação" side="bottom">
+        <button
+          type="button"
+          onClick={onOpenMobile}
+          aria-label="Abrir menu"
+          className="rounded-control p-2 text-muted-foreground hover:text-foreground md:hidden"
+        >
+          <Menu className="size-5" aria-hidden="true" />
+        </button>
+      </Hint>
       <div className="md:hidden">
         <Logo variant="icon" />
       </div>

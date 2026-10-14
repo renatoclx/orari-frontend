@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { CalendarDays } from "lucide-react";
 import { ptBR } from "react-day-picker/locale";
+import { Hint } from "@/components/shared/Hint";
 import { Calendar } from "@/components/ui/calendar";
 import {
   Popover,
@@ -44,12 +45,19 @@ export function CalendarShortcut({ placement }: CalendarShortcutProps) {
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
-      <PopoverTrigger
-        aria-label="Abrir calendário"
-        title="Calendário"
-        className="rounded-control p-2 text-muted-foreground hover:bg-background hover:text-foreground"
-      >
-        <CalendarDays className="size-5" aria-hidden="true" />
+      <PopoverTrigger asChild>
+        <Hint
+          label="Calendário: escolher o dia da agenda"
+          side={inBar ? "left" : "bottom"}
+        >
+          <button
+            type="button"
+            aria-label="Abrir calendário"
+            className="rounded-control p-2 text-muted-foreground hover:bg-background hover:text-foreground"
+          >
+            <CalendarDays className="size-5" aria-hidden="true" />
+          </button>
+        </Hint>
       </PopoverTrigger>
       <PopoverContent
         side={inBar ? "left" : "bottom"}

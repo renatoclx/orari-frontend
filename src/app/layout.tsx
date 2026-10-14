@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Plus_Jakarta_Sans } from "next/font/google";
 import { ThemeProvider } from "next-themes";
+import { TooltipProvider } from "@/components/ui/tooltip";
 import { AppToaster } from "@/components/layout/AppToaster";
 import "./globals.css";
 
@@ -21,10 +22,13 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
           antes da hidratação. */}
       <body suppressHydrationWarning>
         <ThemeProvider attribute="class" disableTransitionOnChange>
-          {/* Antes do conteúdo: o Toaster precisa estar ativo quando a página
-              disparar um toast logo ao abrir (ex.: despedida do logout). */}
-          <AppToaster />
-          {children}
+          {/* Dicas (tooltips) de toda a aplicação, inclusive do login. */}
+          <TooltipProvider delayDuration={300}>
+            {/* Antes do conteúdo: o Toaster precisa estar ativo quando a página
+                disparar um toast logo ao abrir (ex.: despedida do logout). */}
+            <AppToaster />
+            {children}
+          </TooltipProvider>
         </ThemeProvider>
       </body>
     </html>

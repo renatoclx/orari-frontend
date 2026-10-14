@@ -18,6 +18,7 @@ import { ServiceFormDialog } from "@/components/services/ServiceFormDialog";
 import { EmptyValue } from "@/components/shared/EmptyValue";
 import { StatusBadge } from "@/components/shared/StatusBadge";
 import { ConfirmDialog } from "@/components/shared/ConfirmDialog";
+import { Hint } from "@/components/shared/Hint";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -47,12 +48,14 @@ type ServiceListProps = {
 // Círculo de 16 px, sem borda, com a cor do serviço (screens.md).
 function ColorDot({ color }: { color: string | null }) {
   return color ? (
-    <span
-      className="block size-4 rounded-full"
-      style={{ backgroundColor: color }}
-      role="img"
-      aria-label={`Cor ${color}`}
-    />
+    <Hint label={`Cor do serviço: ${color.toUpperCase()}`}>
+      <span
+        className="block size-4 rounded-full"
+        style={{ backgroundColor: color }}
+        role="img"
+        aria-label={`Cor ${color}`}
+      />
+    </Hint>
   ) : (
     <EmptyValue />
   );
@@ -81,26 +84,29 @@ function ServiceActions({
 }: { service: ServiceItem } & RowHandlers) {
   return (
     <div className="flex shrink-0 items-center justify-start gap-1">
-      <Button
-        variant="ghost"
-        size="icon"
-        aria-label={`Alterar ${service.name}`}
-        title="Alterar"
-        onClick={() => onEdit(service)}
-      >
-        <Pencil aria-hidden="true" />
-      </Button>
+      <Hint label={`Alterar ${service.name}`}>
+        <Button
+          variant="ghost"
+          size="icon"
+          aria-label={`Alterar ${service.name}`}
+          onClick={() => onEdit(service)}
+        >
+          <Pencil aria-hidden="true" />
+        </Button>
+      </Hint>
 
       {/* modal={false}: o menu fecha antes do diálogo abrir, sem travar a página. */}
       <DropdownMenu modal={false}>
         <DropdownMenuTrigger asChild>
-          <Button
-            variant="ghost"
-            size="icon"
-            aria-label={`Mais ações para ${service.name}`}
-          >
-            <EllipsisVertical aria-hidden="true" />
-          </Button>
+          <Hint label={`Mais ações para ${service.name}`}>
+            <Button
+              variant="ghost"
+              size="icon"
+              aria-label={`Mais ações para ${service.name}`}
+            >
+              <EllipsisVertical aria-hidden="true" />
+            </Button>
+          </Hint>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
           <DropdownMenuItem onSelect={() => onView(service)}>

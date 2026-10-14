@@ -13,6 +13,7 @@ import { PersonAvatar } from "@/components/shared/PersonAvatar";
 import { EmptyValue } from "@/components/shared/EmptyValue";
 import { StatusBadge } from "@/components/shared/StatusBadge";
 import { ConfirmDialog } from "@/components/shared/ConfirmDialog";
+import { Hint } from "@/components/shared/Hint";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -281,36 +282,44 @@ function PersonActions({
   return (
     <div className="flex shrink-0 items-center justify-start gap-1">
       {removed ? (
-        <Button
-          variant="ghost"
-          size="icon"
-          disabled
-          aria-label={`Alterar ${person.name}`}
-        >
-          <Pencil aria-hidden="true" />
-        </Button>
+        // Desabilitado não recebe o mouse: a dica fica no invólucro.
+        <Hint label={`Registro inativo: ${person.name} não pode ser alterado`}>
+          <span className="inline-flex" tabIndex={0}>
+            <Button
+              variant="ghost"
+              size="icon"
+              disabled
+              aria-label={`Alterar ${person.name}`}
+            >
+              <Pencil aria-hidden="true" />
+            </Button>
+          </span>
+        </Hint>
       ) : (
-        <Button variant="ghost" size="icon" asChild>
-          <Link
-            href={`${basePath}/${person.id}/editar`}
-            aria-label={`Alterar ${person.name}`}
-            title="Alterar"
-          >
-            <Pencil aria-hidden="true" />
-          </Link>
-        </Button>
+        <Hint label={`Alterar ${person.name}`}>
+          <Button variant="ghost" size="icon" asChild>
+            <Link
+              href={`${basePath}/${person.id}/editar`}
+              aria-label={`Alterar ${person.name}`}
+            >
+              <Pencil aria-hidden="true" />
+            </Link>
+          </Button>
+        </Hint>
       )}
 
       {/* modal={false}: o menu fecha antes do diálogo abrir, sem travar a página. */}
       <DropdownMenu modal={false}>
         <DropdownMenuTrigger asChild>
-          <Button
-            variant="ghost"
-            size="icon"
-            aria-label={`Mais ações para ${person.name}`}
-          >
-            <EllipsisVertical aria-hidden="true" />
-          </Button>
+          <Hint label={`Mais ações para ${person.name}`}>
+            <Button
+              variant="ghost"
+              size="icon"
+              aria-label={`Mais ações para ${person.name}`}
+            >
+              <EllipsisVertical aria-hidden="true" />
+            </Button>
+          </Hint>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
           <DropdownMenuItem onSelect={() => onView(person)}>

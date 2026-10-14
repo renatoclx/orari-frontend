@@ -1,5 +1,6 @@
 "use client";
 
+import { Hint } from "@/components/shared/Hint";
 import { useState, useTransition } from "react";
 import { LogOut } from "lucide-react";
 import { logout } from "@/app/(admin)/actions";
@@ -42,11 +43,16 @@ export function UserMenu({ user }: UserMenuProps) {
     <>
       {/* modal={false}: o menu fecha antes do diálogo abrir, sem travar a página. */}
       <DropdownMenu modal={false}>
-        <DropdownMenuTrigger
-          aria-label="Menu do usuário"
-          className="rounded-full"
-        >
-          <PersonAvatar name={user.name} size="lg" />
+        <DropdownMenuTrigger asChild>
+          <Hint label={`Minha conta: ${user.name}`} side="bottom">
+            <button
+              type="button"
+              aria-label="Menu do usuário"
+              className="rounded-full"
+            >
+              <PersonAvatar name={user.name} size="lg" />
+            </button>
+          </Hint>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end" className="w-64 p-1.5">
           <DropdownMenuLabel className="space-y-0.5 px-3 py-2.5 font-normal">

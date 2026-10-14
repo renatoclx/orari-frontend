@@ -131,6 +131,7 @@ function ServiceActions({
   );
 }
 
+// Conteúdo do dialog de visualização.
 function ServiceDetails({ service }: { service: ServiceItem }) {
   const rows: [string, React.ReactNode][] = [
     ["Descrição", service.description],
@@ -176,6 +177,7 @@ function ServiceDetails({ service }: { service: ServiceItem }) {
   );
 }
 
+/** Card da listagem: tabela (computador) ou lista empilhada (celular), com as ações de cada serviço. */
 export function ServiceList({ services, search, footer }: ServiceListProps) {
   // O serviço fica guardado ao fechar, para o dialog não trocar de título
   // durante a animação de saída.

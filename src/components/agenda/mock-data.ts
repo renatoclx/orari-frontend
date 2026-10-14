@@ -6,6 +6,7 @@ export const mockDate = new Date("2026-10-12T12:00:00-03:00");
 // Horário fixo do "agora" para o protótipo ficar previsível.
 export const mockNow = "10:40";
 
+// Dados de exemplo da agenda, até a tela ser ligada à API.
 export const mockProfessionals: Professional[] = [
   {
     id: "carla",

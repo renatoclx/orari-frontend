@@ -16,6 +16,7 @@ import {
 } from "@/services/service.service";
 import type { ServiceInput } from "@/types/service";
 
+/** Campos do formulário de serviço a que um erro pode se referir. */
 export type ServiceField = keyof ServiceFormValues;
 
 export type ServiceActionResult =
@@ -25,6 +26,7 @@ export type ServiceActionResult =
       conflict?: boolean;
     });
 
+// Mesma regra do backend: #RGB ou #RRGGBB.
 const HEX_COLOR = /^#([0-9a-fA-F]{3}|[0-9a-fA-F]{6})$/;
 
 // Lê o formulário, valida de novo no servidor e monta o corpo da API.
@@ -58,6 +60,7 @@ function parseForm(
   };
 }
 
+/** Cadastro: o serviço nasce sempre ativo (padrão da API). */
 export async function createServiceAction(
   data: FormData,
 ): Promise<ServiceActionResult> {
@@ -75,6 +78,7 @@ export async function createServiceAction(
   return { ok: true };
 }
 
+/** Alteração: campos opcionais vazios vão como `null`, que é como a API os limpa. */
 export async function updateServiceAction(
   id: string,
   data: FormData,
@@ -93,6 +97,7 @@ export async function updateServiceAction(
   return { ok: true };
 }
 
+/** Inativa ou ativa o serviço (campo `isActive`). */
 export async function setServiceActiveAction(
   id: string,
   isActive: boolean,
@@ -107,6 +112,7 @@ export async function setServiceActiveAction(
   return { ok: true };
 }
 
+/** Exclusão: a API recusa (409) quando há agendamentos, recorrências ou planos vinculados. */
 export async function deleteServiceAction(
   id: string,
 ): Promise<ServiceActionResult> {

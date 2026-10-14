@@ -1,3 +1,4 @@
+/** Campos validados no cliente e de novo no servidor (preço em centavos). */
 export type ServiceFormValues = {
   name: string;
   /** Minutos, só dígitos. */

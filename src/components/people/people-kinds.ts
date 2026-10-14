@@ -14,6 +14,7 @@ export type PeopleKind = {
   singularTitle: string;
 };
 
+/** Configuração de cada tipo de pessoa: as três telas são a mesma implementação, escolhida por aqui. */
 export const PEOPLE_KINDS: Record<PeopleType, PeopleKind> = {
   CLIENT: {
     type: "CLIENT",

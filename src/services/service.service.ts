@@ -4,6 +4,7 @@ import { apiFetch } from "@/services/api";
 import type { Paginated } from "@/types/api";
 import type { ServiceInput, ServiceItem } from "@/types/service";
 
+// Traz serviços ativos e inativos: o status vem de `isActive`.
 type ListServicesParams = {
   /** Busca parcial pelo nome, sem diferenciar acentos nem maiúsculas. */
   name?: string;
@@ -25,6 +26,7 @@ export function listServices(
   return apiFetch<Paginated<ServiceItem>>(`/services?${query}`);
 }
 
+/** Cadastra o serviço; a duração é obrigatória e o preço, opcional. */
 export function createService(input: ServiceInput): Promise<ServiceItem> {
   return apiFetch<ServiceItem>("/services", {
     method: "POST",
@@ -51,6 +53,7 @@ export function setServiceActive(
   });
 }
 
+/** Alteração; `null` limpa descrição, preço ou cor. */
 export function updateService(
   id: string,
   input: ServiceInput,

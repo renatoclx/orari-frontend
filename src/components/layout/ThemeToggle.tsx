@@ -5,6 +5,7 @@ import { Moon, Sun } from "lucide-react";
 import { useTheme } from "next-themes";
 import { Switch } from "@/components/ui/switch";
 
+// Sem assinatura: o valor só muda ao montar no navegador.
 const subscribe = () => () => {};
 
 export function ThemeToggle() {

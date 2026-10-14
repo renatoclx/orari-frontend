@@ -7,6 +7,7 @@ export type State = {
   acronym: string;
 };
 
+/** Cidade (GET /cities); o endereço guarda só o código dela. */
 export type City = {
   id: string;
   name: string;

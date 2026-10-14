@@ -38,6 +38,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 
+// Itens do menu: link simples ou grupo com subitens.
 type NavLink = { href: string; label: string; icon: LucideIcon };
 type NavGroup = {
   label: string;
@@ -64,6 +65,7 @@ const navItems: (NavLink | NavGroup)[] = [
   { href: "/financeiro", label: "Financeiro", icon: Wallet },
 ];
 
+// Botões de ícone da sidebar (recolher, fechar no celular).
 const iconButtonClass =
   "rounded-control p-1.5 text-sidebar-muted hover:bg-sidebar-accent hover:text-sidebar-foreground";
 
@@ -74,6 +76,7 @@ type SidebarProps = {
   onCloseMobile: () => void;
 };
 
+/** Menu lateral: fixo e recolhível no computador, gaveta no celular. */
 export function Sidebar({
   collapsed,
   onToggleCollapsed,
@@ -158,6 +161,7 @@ function isActivePath(pathname: string, href: string): boolean {
   return pathname === href || (href !== "/" && pathname.startsWith(`${href}/`));
 }
 
+// Estilo comum dos itens do menu, com destaque para o ativo.
 const itemClass = (active: boolean) =>
   `flex w-full items-center gap-3 rounded-control px-3 py-2 text-sm ${
     active

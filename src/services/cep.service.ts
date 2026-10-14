@@ -1,5 +1,6 @@
 import "server-only";
 
+/** Endereço devolvido pela consulta de CEP (só o que o formulário preenche). */
 export type CepAddress = {
   street: string;
   complement: string;
@@ -9,6 +10,7 @@ export type CepAddress = {
   stateAcronym: string;
 };
 
+/** Resultado da consulta: `unavailable` é falha do serviço, diferente de CEP inexistente. */
 export type CepLookup =
   | { status: "found"; address: CepAddress }
   | { status: "not-found" }
@@ -17,6 +19,7 @@ export type CepLookup =
 // ViaCEP: API pública e gratuita de consulta de CEP, sem chave.
 const VIACEP_URL = "https://viacep.com.br/ws";
 
+// Formato da resposta do ViaCEP (campos em português).
 type ViaCepResponse = {
   logradouro?: string;
   complemento?: string;

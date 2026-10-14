@@ -11,6 +11,7 @@ import type { City } from "@/types/location";
 export type SearchCitiesResult =
   { ok: true; cities: City[] } | { ok: false; message: string };
 
+/** Cidades de um estado, filtradas pelo nome; o formulário de endereço busca conforme o usuário digita. */
 export async function searchCitiesAction(
   stateId: string,
   name: string,
@@ -23,6 +24,7 @@ export async function searchCitiesAction(
   }
 }
 
+/** Consulta o CEP no servidor, para o navegador não falar com o serviço externo. */
 export async function lookupCepAction(cep: string): Promise<CepLookup> {
   return lookupCep(cep);
 }

@@ -1,5 +1,6 @@
 import { onlyDigits } from "@/utils/masks";
 
+/** Campos validados no cliente e de novo no servidor. */
 export type PersonFormValues = {
   name: string;
   /** Contato principal; aceita com ou sem máscara. */
@@ -19,6 +20,7 @@ export const personFieldOrder: (keyof PersonFormValues)[] = [
   "document",
 ];
 
+// Formato mínimo; a API confere o e-mail de verdade.
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 /**

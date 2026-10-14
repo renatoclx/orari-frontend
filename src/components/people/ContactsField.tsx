@@ -31,6 +31,7 @@ import type { ContactRecord, ContactType } from "@/types/people";
 import { contactTypeLabels } from "@/utils/format";
 import { maskPhone } from "@/utils/masks";
 
+// Contato como a lista o exibe: o já cadastrado (com id da API) ou o local, ainda não enviado.
 type ExtraContact = {
   id: string;
   phone: string;
@@ -51,6 +52,7 @@ type ContactsFieldProps = {
   };
 };
 
+// Tipos de contato em ordem de exibição.
 const contactTypes = Object.keys(contactTypeLabels) as ContactType[];
 
 // A API aceita até 10 contatos por cadastro; um deles é o contato principal.

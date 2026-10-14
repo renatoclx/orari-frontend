@@ -14,6 +14,7 @@ export async function listAddresses(
   return items;
 }
 
+/** Cria um endereço de uma pessoa já cadastrada. */
 export async function createAddress(
   peopleId: string,
   input: NewAddressInput,
@@ -24,6 +25,7 @@ export async function createAddress(
   });
 }
 
+/** Exclusão lógica do endereço. */
 export async function deleteAddress(id: string): Promise<void> {
   await apiFetch(`/addresses/${id}`, { method: "DELETE" });
 }

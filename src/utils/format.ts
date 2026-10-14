@@ -31,6 +31,7 @@ export function getInitials(name: string): string {
   return (first + last).toUpperCase();
 }
 
+// Rótulos em pt-BR dos tipos de usuário do backend.
 const userTypeLabels: Record<UserType, string> = {
   SUPER_ADMIN: "Super administrador",
   ADMIN: "Administrador",

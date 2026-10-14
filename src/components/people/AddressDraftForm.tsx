@@ -40,6 +40,7 @@ export type NewAddressFields = {
 
 type Draft = Omit<NewAddressFields, "stateAcronym"> & { stateId: string };
 
+// Estado inicial do rascunho; o tipo padrão é "Pessoal" (MAIN).
 const emptyDraft: Draft = {
   type: "MAIN",
   cep: "",
@@ -64,6 +65,7 @@ type AddressDraftFormProps = {
   onCancel: () => void;
 };
 
+// Rótulo + campo na grade de 6 colunas do formulário de endereço.
 function FieldBox({
   id,
   label,

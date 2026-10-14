@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 
 // Regras do backend (business-rules.md): JPEG ou PNG, até 2 MB.
 const ACCEPTED_TYPES = ["image/jpeg", "image/png"];
+// Limite do backend para a foto.
 const MAX_BYTES = 2 * 1024 * 1024;
 
 type PhotoUploadProps = {

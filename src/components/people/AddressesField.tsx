@@ -26,6 +26,7 @@ import type { State } from "@/types/location";
 import type { AddressRecord, AddressType } from "@/types/people";
 import { addressTypeLabels } from "@/utils/format";
 
+// Endereço como a lista o exibe: o já cadastrado (com id da API) ou o local, ainda não enviado.
 type ExtraAddress = {
   id: string;
   type: AddressType;

@@ -15,10 +15,12 @@ export async function getAccessToken(): Promise<string | undefined> {
   return (await cookies()).get(ACCESS_TOKEN_COOKIE)?.value;
 }
 
+/** Refresh token da sessão, usado para renovar o acesso. */
 export async function getRefreshToken(): Promise<string | undefined> {
   return (await cookies()).get(REFRESH_TOKEN_COOKIE)?.value;
 }
 
+/** Grava os cookies da sessão (só em Server Actions e Route Handlers). */
 export async function setSession(tokens: AuthTokens): Promise<void> {
   const cookieStore = await cookies();
   for (const cookie of buildSessionCookies(tokens)) {
@@ -26,6 +28,7 @@ export async function setSession(tokens: AuthTokens): Promise<void> {
   }
 }
 
+/** Encerra a sessão apagando os cookies (só em Server Actions e Route Handlers). */
 export async function clearSession(): Promise<void> {
   const cookieStore = await cookies();
   cookieStore.delete(ACCESS_TOKEN_COOKIE);

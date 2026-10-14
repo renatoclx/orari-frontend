@@ -23,6 +23,7 @@ export function logout(refreshToken: string): Promise<void> {
   });
 }
 
+/** Usuário da sessão e a empresa dele; a API recusa (401) se a sessão acabou. */
 export function getCurrentUser(): Promise<CurrentUser> {
   return apiFetch<CurrentUser>("/auth/me");
 }

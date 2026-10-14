@@ -1,15 +1,8 @@
-import { CircleCheck } from "lucide-react";
-import type { AgendaAppointment, AppointmentStatus } from "@/types/agenda";
+import { APPOINTMENT_STATUS } from "@/components/agenda/appointment-status";
+import type { AgendaAppointment } from "@/types/agenda";
 
-// Rótulos em pt-BR dos status de agendamento do backend.
-const statusLabels: Record<AppointmentStatus, string> = {
-  SCHEDULED: "Agendado",
-  CONFIRMED: "Confirmado",
-  IN_PROGRESS: "Em andamento",
-  COMPLETED: "Concluído",
-  CANCELLED: "Cancelado",
-  NO_SHOW: "Não compareceu",
-};
+// Concluído, cancelado e não compareceu ficam esmaecidos: já não pedem ação.
+const FADED_STATUSES = ["COMPLETED", "CANCELLED", "NO_SHOW"];
 
 type AppointmentBlockProps = {
   appointment: AgendaAppointment;
@@ -24,8 +17,8 @@ export function AppointmentBlock({
   height,
 }: AppointmentBlockProps) {
   const { status, serviceColor } = appointment;
-  const statusLabel = statusLabels[status];
-  const faded = status === "COMPLETED" || status === "CANCELLED";
+  const { label: statusLabel, icon: StatusIcon } = APPOINTMENT_STATUS[status];
+  const faded = FADED_STATUSES.includes(status);
 
   return (
     <article
@@ -53,19 +46,13 @@ export function AppointmentBlock({
           {appointment.clientName}
         </h3>
 
-        {status === "CONFIRMED" && (
-          <CircleCheck
-            className="ml-auto size-3.5 shrink-0 text-foreground"
-            aria-hidden="true"
-          />
-        )}
-        {status === "IN_PROGRESS" && (
-          <span
-            className="ml-auto size-2 shrink-0 rounded-full motion-safe:animate-pulse"
-            style={{ backgroundColor: serviceColor }}
-            aria-hidden="true"
-          />
-        )}
+        <StatusIcon
+          className={`ml-auto size-3.5 shrink-0 ${
+            status === "IN_PROGRESS" ? "motion-safe:animate-pulse" : ""
+          }`}
+          style={status === "IN_PROGRESS" ? { color: serviceColor } : undefined}
+          aria-hidden="true"
+        />
         <span className="sr-only">{statusLabel}</span>
       </div>
       <p className="truncate text-xs text-muted-foreground">

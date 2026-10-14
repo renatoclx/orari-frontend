@@ -26,7 +26,7 @@ export function AgendaToolbar({ dateLabel }: AgendaToolbarProps) {
 
       <Button className="ml-auto">
         <Plus aria-hidden="true" />
-        Agendar
+        Novo Agendamento
       </Button>
     </div>
   );

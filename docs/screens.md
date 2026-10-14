@@ -337,19 +337,20 @@ No celular, somente o item calendário será exibido, os demais devem permanecer
   - Coluna de horários fixa à esquerda, em intervalos de 30 minutos.
   - Linha do horário atual, somente quando o dia exibido é hoje.
   - Áreas fora do horário de funcionamento da empresa sombreadas.
+- Legenda dos ícones de status no rodapé da página, alinhada à direita.
 
 ### Bloco de agendamento
 
 - Posicionado pelo horário de início e pela duração do serviço.
 - Cor do serviço na borda esquerda e como fundo suave.
 - Exibe horário de início, nome do cliente e nome do serviço.
-- Por status:
-  - Agendado: padrão.
-  - Confirmado: ícone de check.
-  - Em andamento: ponto pulsante na cor do serviço.
-  - Concluído: esmaecido.
-  - Cancelado: esmaecido e nome do cliente riscado.
-  - Não compareceu: esmaecido, com ícone de ausência.
+- Cada status tem um ícone no canto do bloco:
+  - Agendado: relógio.
+  - Confirmado: check em círculo.
+  - Em andamento: play em círculo, pulsando, na cor do serviço.
+  - Concluído: duplo check. Bloco esmaecido.
+  - Cancelado: X em círculo. Bloco esmaecido e nome do cliente riscado.
+  - Não compareceu: usuário com X. Bloco esmaecido.
 - Ao passar o mouse, exibe "Cliente, Serviço (Status)".
 
 ### Regras específicas

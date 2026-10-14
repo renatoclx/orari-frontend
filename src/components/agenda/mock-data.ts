@@ -81,7 +81,7 @@ export const mockAppointments: AgendaAppointment[] = [
     end: "09:00",
     clientName: "Marcos Oliveira",
     ...services.pilates,
-    status: "COMPLETED",
+    status: "NO_SHOW",
   },
   {
     id: "6",

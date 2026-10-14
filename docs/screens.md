@@ -316,3 +316,58 @@ No celular, somente o item calendário será exibido, os demais devem permanecer
   - Executar ações conforme padrão do cadastro.
 
 ---
+
+---
+
+# Agendamentos
+
+> Primeira entrega: **somente leitura**. Cadastro, remarcação, cancelamento e alteração de status serão especificados nas próximas etapas.
+
+## Visualização do dia
+
+### Estrutura da tela
+
+- Título: "Agendamentos".
+- Barra superior:
+  - Botões "Dia anterior", "Próximo dia" e "Hoje".
+  - Data por extenso do dia exibido.
+  - Botão "Novo Agendamento", sempre visível (a ação será implementada em etapa futura).
+- Grade do dia, que ocupa a largura e a altura da página, com rolagem própria:
+  - Uma coluna por profissional ativo, com o nome e a quantidade de agendamentos do dia (cancelados não contam).
+  - Coluna de horários fixa à esquerda, em intervalos de 30 minutos.
+  - Linha do horário atual, somente quando o dia exibido é hoje.
+  - Áreas fora do horário de funcionamento da empresa sombreadas.
+
+### Bloco de agendamento
+
+- Posicionado pelo horário de início e pela duração do serviço.
+- Cor do serviço na borda esquerda e como fundo suave.
+- Exibe horário de início, nome do cliente e nome do serviço.
+- Por status:
+  - Agendado: padrão.
+  - Confirmado: ícone de check.
+  - Em andamento: ponto pulsante na cor do serviço.
+  - Concluído: esmaecido.
+  - Cancelado: esmaecido e nome do cliente riscado.
+  - Não compareceu: esmaecido, com ícone de ausência.
+- Ao passar o mouse, exibe "Cliente, Serviço (Status)".
+
+### Regras específicas
+
+- O dia é calculado no fuso da empresa (a API trabalha em UTC).
+- Apenas profissionais ativos são exibidos. A agenda de um profissional inativo será remanejada (fora do MVP).
+- Agendamentos cancelados permanecem na grade, esmaecidos.
+- O intervalo exibido vai da abertura mais cedo do dia, menos 2 horas, ao fechamento mais tarde, mais 2 horas. Agendamentos fora desse intervalo ampliam a grade. Sem horário de funcionamento no dia, a grade exibe das 07:00 às 20:00.
+- Não há pausas por profissional nesta versão (previsão futura: o administrador poderá lançar pausas).
+- Dia sem agendamentos: grade vazia. Sem profissionais cadastrados: mensagem orientando o cadastro.
+
+### Navegação
+
+- O dia exibido fica na URL (`?date=aaaa-mm-dd`); sem ele, exibe hoje.
+- O calendário do atalho da barra lateral leva ao dia escolhido.
+
+### Celular
+
+- Exibe um profissional por vez, com seleção do profissional no topo.
+
+---

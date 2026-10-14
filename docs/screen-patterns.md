@@ -50,6 +50,7 @@ específica, prevalece a documentação da entidade.
   telas.
 - A ordem dos botões deverá permanecer consistente em todas as
   entidades.
+- Quando não existir a informação de uma coluna, preencher com "--".
 
 ---
 
@@ -132,6 +133,18 @@ Ao solicitar uma exclusão:
 - Exibir mensagem de exclusão com o nome da entidade.
 - Permitir cancelar.
 - Executar a operação somente após confirmação.
+
+---
+
+## Dialog de Formulário
+
+Ao solicitar uma exclusão:
+
+- Abrir dialog de formulário.
+- Exibir as informações que serão cadastradas conforme `screens.md`.
+- Permitir cancelar.
+- Os botões que persistem as cadastros, alterações, etc., devem estar no rodapé da div que contém o formulário,
+  separados por uma borda no topo e alinhados a direita.
 
 ---
 

@@ -1,7 +1,7 @@
 import "server-only";
 
 import { apiFetch } from "@/services/api";
-import type { Paginated } from "@/types/location";
+import type { Paginated } from "@/types/api";
 import type { AddressRecord, NewAddressInput } from "@/types/people";
 
 /** Todos os endereços de uma pessoa (a API limita a 100 por página). */

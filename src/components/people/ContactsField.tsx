@@ -9,16 +9,7 @@ import {
 } from "@/app/(admin)/people-actions";
 import type { PeopleKind } from "@/components/people/people-kinds";
 import { MaskedInput } from "@/components/shared/MaskedInput";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
+import { ConfirmDialog } from "@/components/shared/ConfirmDialog";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import {
@@ -297,34 +288,17 @@ export function ContactsField({ persisted }: ContactsFieldProps) {
         </Table>
       )}
 
-      <AlertDialog
+      <ConfirmDialog
         open={deleting !== null}
-        onOpenChange={(open) => !open && !pending && setDeleting(null)}
-      >
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Excluir contato?</AlertDialogTitle>
-            <AlertDialogDescription>
-              O contato{" "}
-              {deleting?.phone ? maskPhone(deleting.phone) : deleting?.email}{" "}
-              será excluído.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel disabled={pending}>Cancelar</AlertDialogCancel>
-            <AlertDialogAction
-              disabled={pending}
-              className="bg-destructive text-white hover:bg-destructive/90"
-              onClick={(event) => {
-                event.preventDefault();
-                confirmRemove();
-              }}
-            >
-              {pending ? "Excluindo…" : "Excluir"}
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+        onOpenChange={(open) => !open && setDeleting(null)}
+        title="Excluir contato?"
+        description={`O contato ${deleting?.phone ? maskPhone(deleting.phone) : (deleting?.email ?? "")} será excluído.`}
+        confirmLabel="Excluir"
+        pendingLabel="Excluindo…"
+        pending={pending}
+        destructive
+        onConfirm={confirmRemove}
+      />
     </div>
   );
 }

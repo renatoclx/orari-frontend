@@ -1,7 +1,7 @@
 import "server-only";
 
 import { apiFetch } from "@/services/api";
-import type { Paginated } from "@/types/location";
+import type { Paginated } from "@/types/api";
 import type { ContactRecord, ContactType } from "@/types/people";
 
 /** Todos os contatos de uma pessoa (a API limita a 100 por página). */

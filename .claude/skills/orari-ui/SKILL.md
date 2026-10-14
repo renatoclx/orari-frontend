@@ -63,6 +63,7 @@ Use `Button` de `@/components/ui/button`:
 
 Padrão do sistema (`docs/screen-patterns.md`): cor correspondente à informação e texto pesado em caixa alta (o `Badge` já aplica `font-bold uppercase`; escreva o texto normalmente).
 
+- Status ativo/inativo: use `StatusBadge` (`@/components/shared/StatusBadge`, `active={...}`); não recrie a badge nas telas.
 - `variant="success"` (verde, token `success`): ativo e informações positivas.
 - `variant="destructive"` (vermelho): inativo e informações negativas.
 - Outros significados ainda sem cor definida: pergunte antes de escolher.
@@ -75,12 +76,13 @@ Fonte das regras: `docs/screen-patterns.md` e `docs/screens.md`. Modelo: `src/co
 - Cada tipo tem rotas finas: `app/(admin)/<caminho>/{page,loading}.tsx` e `novo/page.tsx`, que só escolhem o `kind` e delegam a `PeopleListPage`, `PeopleListLoading` e `NewPersonPage`. Para outro tipo, acrescente a entrada em `PEOPLE_KINDS` e as três rotas.
 - Server Actions de pessoas (`app/(admin)/people-actions.ts`) recebem o tipo do navegador e o conferem com `isPeopleType` antes de usar. Usuários são outra entidade (`UserType`): não usam estas telas.
 
-- A página é um Server Component que lê `searchParams` (`q`, `page`) e busca pelo service; o card (`ClientList`) ocupa a largura e a altura que sobram, com a tabela rolando por dentro e o rodapé de paginação fixo (`TablePagination`).
-- Busca durante a digitação: o campo (Client Component) espera ~350 ms e troca `?q=` na URL com `router.replace`; a página é renderizada de novo no servidor, na primeira página.
+- **Componentes compartilhados das listagens e diálogos** (`@/components/shared/`), usados por Pessoas e Serviços: `ListSearch` (busca durante a digitação), `StatusBadge`, `EmptyValue` (mostra "--") e `ConfirmDialog` (confirmação com texto de andamento; `destructive` para o botão vermelho). Antes de escrever um diálogo de confirmação ou uma busca, use estes.
+- A página é um Server Component que lê `searchParams` (`q`, `page`) e busca pelo service; o card (`PersonList`/`ServiceList`) ocupa a largura e a altura que sobram, com a tabela rolando por dentro e o rodapé de paginação fixo (`TablePagination`).
+- Busca durante a digitação: o `ListSearch` espera ~350 ms e troca `?q=` na URL com `router.replace`; a página é renderizada de novo no servidor, na primeira página.
 - Botão "Novo <entidade>" leva à tela de cadastro. Vazios aparecem como "--".
 - Status (ativo/inativo, derivado de `deletedAt`) com `Badge` (`success` / `destructive`).
 - Coluna Ações: "Alterar" em destaque (ícone) e as demais ações num menu de três pontos (`DropdownMenu modal={false}`), na ordem Visualizar, Excluir. Estilo neutro. Alterar e Excluir ficam desabilitados para registros excluídos.
-- Visualizar abre `Dialog` com Fechar; Excluir abre `AlertDialog` com o nome do registro, botão vermelho e "Excluindo…" enquanto executa.
+- Visualizar abre `Dialog` com Fechar; Excluir abre o `ConfirmDialog` com o nome do registro, botão vermelho e "Excluindo…" enquanto executa.
 - Carregamento: `loading.tsx` com `Skeleton`. No celular, a tabela vira lista empilhada.
 
 ## Formulários
@@ -100,6 +102,8 @@ Fonte das regras: `docs/screen-patterns.md` (padrões) e `docs/screens.md` (camp
 - `FormSection` mantém o conteúdo montado quando recolhida (`forceMount`), para não perder o que foi digitado.
 - Textos longos: `Textarea` com `min-h-28` (4 linhas).
 - **Salvar:** o formulário inteiro vai por `FormData` a uma Server Action (`createClientAction`); listas (contatos e endereços adicionais) vão em campos ocultos com JSON e a foto no campo de arquivo. O botão do diálogo de confirmação mostra "Cadastrando…" e a ação valida de novo no servidor. Erro de um campo (ex.: CPF duplicado, 409) aparece no campo; os demais, em aviso. Sucesso: aviso e volta para a listagem.
+- **Dialog de formulário** (ex.: serviços, `ServiceFormDialog`): cadastro e alteração no mesmo dialog (`sm:max-w-lg`), com `DialogFooter` (borda no topo, botões à direita: Cancelar e a ação principal, com "Cadastrando…"/"Salvando…"). Sem diálogo de confirmação sobre o dialog. O conteúdo só existe com o dialog aberto (campos limpos a cada abertura); ao fechar, guarde o item em estado para o título não mudar durante a animação. Rótulo e erro por `FormField` (`@/components/shared/FormField`).
+- Preço: `MaskedInput` com `maskCurrency` (guarda centavos, envia dígitos; a action divide por 100). Cor opcional: `ColorField` (`@/components/shared/ColorField`, seletor nativo com "Remover").
 - **Alteração:** mesma tela do cadastro (`PersonForm` com a prop `editing`; página `EditPersonPage`, rota `/<tipo>/[id]/editar`). Sem diálogo de confirmação; botão "Salvar alterações" ("Salvando…"). Salvar envia a pessoa (`PATCH`), o contato principal (`mainContactId`) e a foto (trocar, tirar ou "Remover"). Contatos e endereços adicionais valem **na hora** (a API os mantém em rotas próprias): adicionar mostra aviso; excluir pede confirmação. Falha depois de salvar a pessoa vira aviso, não erro. Pessoa inativa ou inexistente: `notFound()`.
 - Foto exibida vem de `/uploads/...`: o `next.config.ts` reescreve para a API (e o proxy não intercepta `uploads/`). Server Actions aceitam corpo de até 3 MB por causa da foto.
 - Contato principal do cadastro completo vai em `contacts` com `isPrincipal: true` (assim leva o tipo escolhido e o e-mail); o campo `phone` da API é só para o cadastro rápido (tipo fixo, sem e-mail). Limites da API: 10 contatos, 10 endereços, observação até 1000 caracteres.
@@ -141,7 +145,7 @@ Toda página da área administrativa segue o modelo da tela de Agendamentos (`sr
 ## Barra de ações lateral
 
 - Componente único `@/components/layout/ActionBar`, renderizado pelo `AdminShell`: aparece em **todas** as telas administrativas a partir do tablet (`md`). Não adicione barras por página.
-- **No celular, a barra some** e os mesmos atalhos aparecem como ícones no header, para não cobrir o conteúdo. Cada atalho é um componente reutilizado nos dois lugares (ex.: `CalendarShortcut` com `placement="bar"` ou `"header"`). Atalhos atuais: calendário (`CalendarShortcut`) e cadastro rápido de cliente (`QuickClientShortcut`, diálogo só com nome e telefone).
+- **No celular, a barra some** e só o calendário aparece, como ícone no header (`CalendarShortcut` com `placement="header"`); os demais atalhos (cliente, serviço) ficam ocultos (screens.md). Atalhos atuais: calendário (`CalendarShortcut`), cadastro rápido de cliente (`QuickClientShortcut`, diálogo só com nome e telefone) e cadastro de serviço (`QuickServiceShortcut`, abre o `ServiceFormDialog` de qualquer tela).
 - Fixa na borda direita da tela, centralizada na vertical, com cantos arredondados só à esquerda (`rounded-l-overlay`), sombra e sem borda à direita.
 - Guarda atalhos secundários (hoje: calendário). Novos atalhos entram nela como botões de ícone com `aria-label` e `title`.
 - Painéis abertos por ela usam o `Popover` do shadcn com `side="left"` e `sideOffset={0}`, colados à barra e flutuando sobre o conteúdo.

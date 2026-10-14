@@ -1,7 +1,8 @@
 import "server-only";
 
 import { apiFetch } from "@/services/api";
-import type { City, Paginated, State } from "@/types/location";
+import type { Paginated } from "@/types/api";
+import type { City, State } from "@/types/location";
 
 /** Os 27 estados, em ordem alfabética (cabem em uma página). */
 export async function listStates(): Promise<State[]> {

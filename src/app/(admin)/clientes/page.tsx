@@ -1,13 +1,15 @@
-import { ClientList } from "@/components/clients/ClientList";
-import { ClientsToolbar } from "@/components/clients/ClientsToolbar";
-import { mockClients } from "@/components/clients/mock-data";
+import type { Metadata } from "next";
+import { PeopleListPage } from "@/components/people/PeopleListPage";
+import { PEOPLE_KINDS } from "@/components/people/people-kinds";
 
-export default function ClientsPage() {
-  return (
-    <div className="flex min-h-0 flex-1 flex-col gap-4">
-      <h1 className="text-2xl font-semibold">Clientes</h1>
-      <ClientsToolbar />
-      <ClientList clients={mockClients} />
-    </div>
-  );
+const kind = PEOPLE_KINDS.CLIENT;
+
+export const metadata: Metadata = {
+  title: `${kind.plural} | Orari`,
+};
+
+export default async function ClientsPage({
+  searchParams,
+}: PageProps<"/clientes">) {
+  return <PeopleListPage kind={kind} searchParams={await searchParams} />;
 }

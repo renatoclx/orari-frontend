@@ -17,7 +17,9 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html lang="pt-BR" className={jakarta.variable} suppressHydrationWarning>
-      <body>
+      {/* Extensões do navegador (ex.: ColorZilla) injetam atributos no body
+          antes da hidratação. */}
+      <body suppressHydrationWarning>
         <ThemeProvider attribute="class" disableTransitionOnChange>
           {/* Antes do conteúdo: o Toaster precisa estar ativo quando a página
               disparar um toast logo ao abrir (ex.: despedida do logout). */}

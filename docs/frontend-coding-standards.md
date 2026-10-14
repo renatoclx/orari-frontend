@@ -9,15 +9,15 @@ Complementa o `coding-standards.md` do backend com regras pontuais do frontend.
 
 # Exemplos
 
-- Componentes em PascalCase: `ClientCard.tsx`
+- Componentes em PascalCase: `PersonForm.tsx`
   - Exceção: `src/components/ui/` mantém os nomes em minúsculas gerados pelo shadcn/ui (`button.tsx`), para que `npx shadcn add` continue atualizando os arquivos.
 - Hooks iniciados com `use`: `useAppointments.ts`
-- Services com sufixo `.service.ts`: `client.service.ts`
-- Tipos em `src/types/`: `client.ts`
+- Services com sufixo `.service.ts`: `people.service.ts`
+- Tipos em `src/types/`: `people.ts`
 
 ## Imports
 
-- Utilizar sempre o alias `@/` (ex.: `@/components/ClientCard`).
+- Utilizar sempre o alias `@/` (ex.: `@/components/people/PersonForm`).
 - Evitar caminhos relativos como `../../`.
 
 ## Tipagem

@@ -38,7 +38,7 @@ A sidebar é escura nos dois temas e tem tokens próprios: `sidebar` (fundo), `s
 - `primary` (blue-600) é a ação principal. Uma por tela.
 - Foco de teclado é global (`globals.css`): contorno de 1 px no token `ring`, que surge com uma transição curta. **Não adicione classes de foco (`focus-visible:ring-*`, `outline-none`) nos componentes** — ao adicionar um componente do shadcn, remova as dele.
 - Não usar valores soltos (`bg-[#...]`) nem cores da paleta do Tailwind para a interface base. Se faltar uma cor, ela vira um token novo no `globals.css`.
-- Cores de status e de agendamentos ainda não foram definidas: pergunte antes de inventar.
+- Cores dos status da **agenda** (agendado, confirmado…) ainda não foram definidas: pergunte antes de inventar. Os status de cadastro (ativo/inativo) seguem o padrão de badges.
 
 ## Componentes (shadcn/ui)
 
@@ -59,11 +59,56 @@ Use `Button` de `@/components/ui/button`:
 - `size="icon"` para botões só com ícone (sempre com `aria-label`).
 - Login: botão e campos com `h-14 text-base` (56 px, texto 16 px), só nessa tela.
 
+## Badges
+
+Padrão do sistema (`docs/screen-patterns.md`): cor correspondente à informação e texto pesado em caixa alta (o `Badge` já aplica `font-bold uppercase`; escreva o texto normalmente).
+
+- `variant="success"` (verde, token `success`): ativo e informações positivas.
+- `variant="destructive"` (vermelho): inativo e informações negativas.
+- Outros significados ainda sem cor definida: pergunte antes de escolher.
+
+## Listagens
+
+Fonte das regras: `docs/screen-patterns.md` e `docs/screens.md`. Modelo: `src/components/people/` (`PeopleListPage`, `PersonList`, `PeopleToolbar`).
+
+- **Pessoas (cliente, funcionário, profissional) compartilham as mesmas telas.** A diferença está só em `PEOPLE_KINDS` (`@/components/people/people-kinds`): tipo, caminho, singular e plural. Textos usam `kind.singular` / `kind.plural`; nunca escreva "cliente" direto em componente de `people/`.
+- Cada tipo tem rotas finas: `app/(admin)/<caminho>/{page,loading}.tsx` e `novo/page.tsx`, que só escolhem o `kind` e delegam a `PeopleListPage`, `PeopleListLoading` e `NewPersonPage`. Para outro tipo, acrescente a entrada em `PEOPLE_KINDS` e as três rotas.
+- Server Actions de pessoas (`app/(admin)/people-actions.ts`) recebem o tipo do navegador e o conferem com `isPeopleType` antes de usar. Usuários são outra entidade (`UserType`): não usam estas telas.
+
+- A página é um Server Component que lê `searchParams` (`q`, `page`) e busca pelo service; o card (`ClientList`) ocupa a largura e a altura que sobram, com a tabela rolando por dentro e o rodapé de paginação fixo (`TablePagination`).
+- Busca durante a digitação: o campo (Client Component) espera ~350 ms e troca `?q=` na URL com `router.replace`; a página é renderizada de novo no servidor, na primeira página.
+- Botão "Novo <entidade>" leva à tela de cadastro. Vazios aparecem como "--".
+- Status (ativo/inativo, derivado de `deletedAt`) com `Badge` (`success` / `destructive`).
+- Coluna Ações: "Alterar" em destaque (ícone) e as demais ações num menu de três pontos (`DropdownMenu modal={false}`), na ordem Visualizar, Excluir. Estilo neutro. Alterar e Excluir ficam desabilitados para registros excluídos.
+- Visualizar abre `Dialog` com Fechar; Excluir abre `AlertDialog` com o nome do registro, botão vermelho e "Excluindo…" enquanto executa.
+- Carregamento: `loading.tsx` com `Skeleton`. No celular, a tabela vira lista empilhada.
+
+## Formulários
+
+Fonte das regras: `docs/screen-patterns.md` (padrões) e `docs/screens.md` (campos e layout de cada entidade). Consulte os dois antes de criar uma tela de cadastro ou alteração.
+
+- **Segue o padrão de página:** o card do formulário é o componente principal — ocupa a **largura toda e a altura que sobra** (`flex min-h-0 flex-1 flex-col rounded-card border bg-card`). Nunca limite a largura do card nem o faça acompanhar a altura do conteúdo. Raiz da página: `flex min-h-0 flex-1 flex-col gap-4`, com título e subtítulo acima.
+- Estrutura do card: área de campos (`min-h-0 flex-1 overflow-auto p-4 md:p-6`) + `FormFooter` (`@/components/shared/FormFooter`) fixo no fim, com borda no topo e botões à direita (Cancelar, depois a ação principal). Os botões ficam **dentro** do `<form>`. A legenda "Campos obrigatórios" vai na prop `note` do rodapé.
+- Duas colunas que ocupam a **largura toda do card** (`gap-x-12 gap-y-6 md:grid-cols-2`, sem `max-w`): dados principais à esquerda; opcionais à direita, em `FormSection` (recolhíveis, com `border-t`). No celular, uma coluna.
+- Equilibre a altura das colunas (a seção opcional mais usada pode iniciar aberta: `defaultOpen`) e mantenha espaçamentos moderados.
+- Obrigatórios com `*` em `text-destructive`. Dentro do `Label`, rótulo e asterisco num único `<span>` (o `Label` espaça os filhos).
+- Foto da pessoa: `PhotoUpload` (`@/components/shared/PhotoUpload`), círculo centralizado **acima das colunas**; opcional; escolhida do dispositivo ("Selecionar foto") ou tirada na câmera ("Tirar foto", `CameraCaptureDialog`, recorte quadrado em JPEG); JPEG ou PNG até 2 MB (regras do backend); o envio é feito depois do cadastro, por rota própria.
+- Data: `DatePicker` (`@/components/shared/DatePicker`), com calendário; envia "aaaa-mm-dd".
+- Campos com máscara (celular, CPF, CEP): `MaskedInput` com as máscaras de `@/utils/masks`; exibe formatado e envia só os dígitos.
+- Seleção com busca (estado, cidade): `Combobox` (`@/components/shared/Combobox`). Listas grandes buscam no servidor por `onSearchChange`.
+- Itens repetíveis (contatos, endereços de pessoas): `ContactsField` e `AddressesField` (`@/components/people/`): o formulário aparece ao clicar em adicionar, os itens vão para uma tabela com lixeira. Dentro do `<form>`, o Enter nesses sub-formulários adiciona o item (não envia o cadastro).
+- `FormSection` mantém o conteúdo montado quando recolhida (`forceMount`), para não perder o que foi digitado.
+- Textos longos: `Textarea` com `min-h-28` (4 linhas).
+- **Salvar:** o formulário inteiro vai por `FormData` a uma Server Action (`createClientAction`); listas (contatos e endereços adicionais) vão em campos ocultos com JSON e a foto no campo de arquivo. O botão do diálogo de confirmação mostra "Cadastrando…" e a ação valida de novo no servidor. Erro de um campo (ex.: CPF duplicado, 409) aparece no campo; os demais, em aviso. Sucesso: aviso e volta para a listagem.
+- **Alteração:** mesma tela do cadastro (`PersonForm` com a prop `editing`; página `EditPersonPage`, rota `/<tipo>/[id]/editar`). Sem diálogo de confirmação; botão "Salvar alterações" ("Salvando…"). Salvar envia a pessoa (`PATCH`), o contato principal (`mainContactId`) e a foto (trocar, tirar ou "Remover"). Contatos e endereços adicionais valem **na hora** (a API os mantém em rotas próprias): adicionar mostra aviso; excluir pede confirmação. Falha depois de salvar a pessoa vira aviso, não erro. Pessoa inativa ou inexistente: `notFound()`.
+- Foto exibida vem de `/uploads/...`: o `next.config.ts` reescreve para a API (e o proxy não intercepta `uploads/`). Server Actions aceitam corpo de até 3 MB por causa da foto.
+- Contato principal do cadastro completo vai em `contacts` com `isPrincipal: true` (assim leva o tipo escolhido e o e-mail); o campo `phone` da API é só para o cadastro rápido (tipo fixo, sem e-mail). Limites da API: 10 contatos, 10 endereços, observação até 1000 caracteres.
+
 ## Tipografia
 
 - Fonte única: Plus Jakarta Sans (já é a fonte padrão da página; não precisa de classe).
 - Horários, datas e valores usam `tabular-nums`, para alinharem em coluna.
-- Nada de rótulos em CAIXA ALTA.
+- Nada de rótulos em CAIXA ALTA — exceto as badges (ver "Badges").
 
 ## Forma
 
@@ -76,6 +121,7 @@ Use `Button` de `@/components/ui/button`:
 
 ## Layout da área administrativa
 
+- Itens de menu podem ser grupos (ex.: "Pessoas", com Clientes, Funcionários e Profissionais): expandida, a seção abre; recolhida, vira um menu ao lado do ícone.
 - Sidebar escura com a logo colorida no topo (`/logo/logo-full-color.svg` aberta, `/logo/logo-icon-color.svg` recolhida). O botão de recolher é um ícone pequeno ao lado da logo; recolhida, a logo vira o botão de expandir ao passar o mouse.
 - Header com atalhos, toggle (switch) de tema claro/escuro e usuário logado.
 - Componentes da estrutura ficam em `src/components/layout/`; o estado da sidebar recolhida fica em cookie, lido no servidor.
@@ -95,7 +141,7 @@ Toda página da área administrativa segue o modelo da tela de Agendamentos (`sr
 ## Barra de ações lateral
 
 - Componente único `@/components/layout/ActionBar`, renderizado pelo `AdminShell`: aparece em **todas** as telas administrativas a partir do tablet (`md`). Não adicione barras por página.
-- **No celular, a barra some** e os mesmos atalhos aparecem como ícones no header, para não cobrir o conteúdo. Cada atalho é um componente reutilizado nos dois lugares (ex.: `CalendarShortcut` com `placement="bar"` ou `"header"`).
+- **No celular, a barra some** e os mesmos atalhos aparecem como ícones no header, para não cobrir o conteúdo. Cada atalho é um componente reutilizado nos dois lugares (ex.: `CalendarShortcut` com `placement="bar"` ou `"header"`). Atalhos atuais: calendário (`CalendarShortcut`) e cadastro rápido de cliente (`QuickClientShortcut`, diálogo só com nome e telefone).
 - Fixa na borda direita da tela, centralizada na vertical, com cantos arredondados só à esquerda (`rounded-l-overlay`), sombra e sem borda à direita.
 - Guarda atalhos secundários (hoje: calendário). Novos atalhos entram nela como botões de ícone com `aria-label` e `title`.
 - Painéis abertos por ela usam o `Popover` do shadcn com `side="left"` e `sideOffset={0}`, colados à barra e flutuando sobre o conteúdo.

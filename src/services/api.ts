@@ -65,7 +65,10 @@ export async function apiFetch<T>(
     response = await fetch(`${baseUrl}${path}`, {
       ...options,
       headers: {
-        "Content-Type": "application/json",
+        // Em multipart (arquivo), o fetch define o Content-Type com o limite.
+        ...(!(options.body instanceof FormData) && {
+          "Content-Type": "application/json",
+        }),
         ...(token && { Authorization: `Bearer ${token}` }),
         ...options.headers,
       },

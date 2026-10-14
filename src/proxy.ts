@@ -131,7 +131,7 @@ function endSession(request: NextRequest, isLoginPage: boolean) {
   return response;
 }
 
-// Arquivos estáticos (logo, ícones, imagens) não passam pelo proxy.
+// Arquivos estáticos (logo, ícones, fotos em /uploads) não passam pelo proxy.
 export const config = {
-  matcher: ["/((?!_next/static|_next/image|favicon.ico|logo/).*)"],
+  matcher: ["/((?!_next/static|_next/image|favicon.ico|logo/|uploads/).*)"],
 };

@@ -4,14 +4,28 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
   CalendarDays,
+  ChevronDown,
   ClipboardList,
   PanelLeftClose,
   PanelLeftOpen,
   Users,
   Wallet,
   X,
+  type LucideIcon,
 } from "lucide-react";
 import { Logo } from "@/components/layout/Logo";
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@/components/ui/collapsible";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import {
   Sheet,
   SheetClose,
@@ -24,10 +38,28 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 
-// Menu provisório: as rotas ainda não existem.
-const navItems = [
+type NavLink = { href: string; label: string; icon: LucideIcon };
+type NavGroup = {
+  label: string;
+  icon: LucideIcon;
+  children: { href: string; label: string }[];
+};
+
+// Menu provisório: várias rotas ainda não existem. "Pessoas" agrupa os tipos de
+// pessoa (cada um referencia um PeopleType no backend); "Usuários" é outra
+// entidade (UserType), listada junto por facilidade de acesso.
+const navItems: (NavLink | NavGroup)[] = [
   { href: "/", label: "Agendamentos", icon: CalendarDays },
-  { href: "/clientes", label: "Clientes", icon: Users },
+  {
+    label: "Pessoas",
+    icon: Users,
+    children: [
+      { href: "/clientes", label: "Clientes" },
+      { href: "/funcionarios", label: "Funcionários" },
+      { href: "/profissionais", label: "Profissionais" },
+      { href: "/usuarios", label: "Usuários" },
+    ],
+  },
   { href: "/servicos", label: "Serviços", icon: ClipboardList },
   { href: "/financeiro", label: "Financeiro", icon: Wallet },
 ];
@@ -121,48 +153,181 @@ type SidebarNavProps = {
   onNavigate?: () => void;
 };
 
+// Subpáginas (ex.: /clientes/novo) mantêm o item do menu ativo.
+function isActivePath(pathname: string, href: string): boolean {
+  return pathname === href || (href !== "/" && pathname.startsWith(`${href}/`));
+}
+
+const itemClass = (active: boolean) =>
+  `flex w-full items-center gap-3 rounded-control px-3 py-2 text-sm ${
+    active
+      ? "bg-sidebar-accent font-medium text-sidebar-foreground"
+      : "text-sidebar-muted hover:bg-sidebar-accent hover:text-sidebar-foreground"
+  }`;
+
 function SidebarNav({ collapsed, onNavigate }: SidebarNavProps) {
   const pathname = usePathname();
 
   return (
     <nav aria-label="Menu principal" className="flex-1 p-2">
       <ul className="space-y-1">
-        {navItems.map(({ href, label, icon: Icon }) => {
-          const active = pathname === href;
-          const link = (
-            <Link
-              href={href}
-              onClick={onNavigate}
-              aria-current={active ? "page" : undefined}
-              className={`flex items-center gap-3 rounded-control px-3 py-2 text-sm ${
-                active
-                  ? "bg-sidebar-accent font-medium text-sidebar-foreground"
-                  : "text-sidebar-muted hover:bg-sidebar-accent hover:text-sidebar-foreground"
-              }`}
-            >
-              <Icon
-                className={`size-5 shrink-0 ${active ? "text-brand" : ""}`}
-                aria-hidden="true"
+        {navItems.map((entry) =>
+          "children" in entry ? (
+            <li key={entry.label}>
+              <SidebarGroup
+                group={entry}
+                collapsed={collapsed}
+                pathname={pathname}
+                onNavigate={onNavigate}
               />
-              <span className={collapsed ? "sr-only" : undefined}>{label}</span>
-            </Link>
-          );
-
-          return (
-            <li key={href}>
-              {collapsed ? (
-                // Recolhida, o nome aparece numa dica ao lado do ícone.
-                <Tooltip>
-                  <TooltipTrigger asChild>{link}</TooltipTrigger>
-                  <TooltipContent side="right">{label}</TooltipContent>
-                </Tooltip>
-              ) : (
-                link
-              )}
             </li>
-          );
-        })}
+          ) : (
+            <li key={entry.href}>
+              <SidebarLink
+                link={entry}
+                collapsed={collapsed}
+                active={isActivePath(pathname, entry.href)}
+                onNavigate={onNavigate}
+              />
+            </li>
+          ),
+        )}
       </ul>
     </nav>
+  );
+}
+
+type SidebarLinkProps = {
+  link: NavLink;
+  collapsed: boolean;
+  active: boolean;
+  onNavigate?: () => void;
+};
+
+function SidebarLink({
+  link,
+  collapsed,
+  active,
+  onNavigate,
+}: SidebarLinkProps) {
+  const { href, label, icon: Icon } = link;
+  const anchor = (
+    <Link
+      href={href}
+      onClick={onNavigate}
+      aria-current={active ? "page" : undefined}
+      className={itemClass(active)}
+    >
+      <Icon
+        className={`size-5 shrink-0 ${active ? "text-brand" : ""}`}
+        aria-hidden="true"
+      />
+      <span className={collapsed ? "sr-only" : undefined}>{label}</span>
+    </Link>
+  );
+
+  if (!collapsed) return anchor;
+
+  // Recolhida, o nome aparece numa dica ao lado do ícone.
+  return (
+    <Tooltip>
+      <TooltipTrigger asChild>{anchor}</TooltipTrigger>
+      <TooltipContent side="right">{label}</TooltipContent>
+    </Tooltip>
+  );
+}
+
+type SidebarGroupProps = {
+  group: NavGroup;
+  collapsed: boolean;
+  pathname: string;
+  onNavigate?: () => void;
+};
+
+// Grupo com subitens: aberto, é uma seção que expande; recolhida a sidebar,
+// vira um menu que abre ao lado do ícone.
+function SidebarGroup({
+  group,
+  collapsed,
+  pathname,
+  onNavigate,
+}: SidebarGroupProps) {
+  const { label, icon: Icon, children } = group;
+  const active = children.some((child) => isActivePath(pathname, child.href));
+  const icon = (
+    <Icon
+      className={`size-5 shrink-0 ${active ? "text-brand" : ""}`}
+      aria-hidden="true"
+    />
+  );
+
+  if (collapsed) {
+    return (
+      <DropdownMenu>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <DropdownMenuTrigger
+              aria-label={label}
+              className={itemClass(active)}
+            >
+              {icon}
+              <span className="sr-only">{label}</span>
+            </DropdownMenuTrigger>
+          </TooltipTrigger>
+          <TooltipContent side="right">{label}</TooltipContent>
+        </Tooltip>
+        <DropdownMenuContent side="right" align="start" className="w-48">
+          <DropdownMenuLabel>{label}</DropdownMenuLabel>
+          {children.map((child) => (
+            <DropdownMenuItem key={child.href} asChild>
+              <Link
+                href={child.href}
+                aria-current={
+                  isActivePath(pathname, child.href) ? "page" : undefined
+                }
+              >
+                {child.label}
+              </Link>
+            </DropdownMenuItem>
+          ))}
+        </DropdownMenuContent>
+      </DropdownMenu>
+    );
+  }
+
+  return (
+    <Collapsible defaultOpen={active}>
+      <CollapsibleTrigger className={`group ${itemClass(active)}`}>
+        {icon}
+        <span>{label}</span>
+        <ChevronDown
+          className="ml-auto size-4 shrink-0 group-data-[state=open]:rotate-180 motion-safe:transition-transform"
+          aria-hidden="true"
+        />
+      </CollapsibleTrigger>
+      <CollapsibleContent>
+        <ul className="mt-1 space-y-1 pl-5">
+          {children.map((child) => {
+            const childActive = isActivePath(pathname, child.href);
+            return (
+              <li key={child.href}>
+                <Link
+                  href={child.href}
+                  onClick={onNavigate}
+                  aria-current={childActive ? "page" : undefined}
+                  className={`block rounded-control px-3 py-2 text-sm ${
+                    childActive
+                      ? "bg-sidebar-accent font-medium text-sidebar-foreground"
+                      : "text-sidebar-muted hover:bg-sidebar-accent hover:text-sidebar-foreground"
+                  }`}
+                >
+                  {child.label}
+                </Link>
+              </li>
+            );
+          })}
+        </ul>
+      </CollapsibleContent>
+    </Collapsible>
   );
 }

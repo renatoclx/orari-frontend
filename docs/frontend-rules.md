@@ -8,3 +8,4 @@
 - Chamadas à API somente pelos services (que usam o `apiFetch`); nunca do navegador.
 - Componentes de interface vêm do shadcn/ui (`src/components/ui/`); verificar antes de criar um novo.
 - Cookies só são gravados ou apagados em Server Actions, Route Handlers e no proxy.
+- A aplicação se encontra em fase MVP, tendo apenas o usuário Administrador nesta fase.

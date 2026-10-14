@@ -1,4 +1,5 @@
 import type { UserType } from "@/types/auth";
+import type { AddressType, ContactType } from "@/types/people";
 
 /** "12345678909" → "123.456.789-09" */
 export function formatCpf(cpf: string): string {
@@ -40,3 +41,17 @@ const userTypeLabels: Record<UserType, string> = {
 export function formatUserType(type: UserType): string {
   return userTypeLabels[type];
 }
+
+/** Rótulos dos tipos de contato, na ordem em que aparecem nos selects. */
+export const contactTypeLabels: Record<ContactType, string> = {
+  MAIN: "Pessoal",
+  MESSAGE: "Recados",
+  BRANCH: "Filial",
+};
+
+/** Rótulos dos tipos de endereço (mesmos valores dos contatos). */
+export const addressTypeLabels: Record<AddressType, string> = {
+  MAIN: "Pessoal",
+  MESSAGE: "Recados",
+  BRANCH: "Filial",
+};

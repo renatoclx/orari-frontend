@@ -101,7 +101,7 @@ As três telas são a mesma implementação, escolhida pelo tipo (`PeopleType`).
 
 ## Serviços
 
-- Listagem em página (`/servicos`), com busca e paginação pela URL; cadastro e alteração em **dialog** (`ServiceFormDialog`), como o `screens.md` especifica.
+- Listagem em página (`/servicos`), com busca e paginação pela URL; cadastro e alteração em **dialog** (`ServiceFormDialog`), como `screens/servicos.md` especifica.
 - Ativar e inativar usam `PATCH /services/:id` (`isActive`); a exclusão é recusada pela API (409) quando há agendamentos, recorrências ou planos vinculados, e a tela orienta a inativar.
 - O preço chega da API como texto (`Decimal`) e é enviado como número; a máscara BRL guarda centavos no formulário.
 - O atalho de cadastro de serviço da barra lateral abre o mesmo dialog de qualquer tela.

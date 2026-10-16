@@ -59,7 +59,7 @@ const contactTypes = Object.keys(contactTypeLabels) as ContactType[];
 // A API aceita até 10 contatos por cadastro; um deles é o contato principal.
 const MAX_EXTRA_CONTACTS = 9;
 
-// "Outros contatos" (screens.md): o formulário aparece ao clicar em adicionar;
+// "Outros contatos" (screens/pessoas.md): o formulário aparece ao clicar em adicionar;
 // os contatos adicionados aparecem numa tabela com a opção de excluir.
 export function ContactsField({ persisted }: ContactsFieldProps) {
   const [localContacts, setLocalContacts] = useState<ExtraContact[]>([]);

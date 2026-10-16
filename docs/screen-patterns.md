@@ -141,7 +141,7 @@ Ao solicitar uma exclusão:
 Ao solicitar uma exclusão:
 
 - Abrir dialog de formulário.
-- Exibir as informações que serão cadastradas conforme `screens.md`.
+- Exibir as informações que serão cadastradas conforme o arquivo da tela em `screens/`.
 - Permitir cancelar.
 - Os botões que persistem as cadastros, alterações, etc., devem estar no rodapé da div que contém o formulário,
   separados por uma borda no topo e alinhados a direita.
@@ -152,7 +152,7 @@ Ao solicitar uma exclusão:
 
 Ao abrir um formulário de cadastro:
 
-- Verificar se a tela em `screens.md` possui algum diferencial
+- Verificar se a tela em `screens/` possui algum diferencial
 - Os botões que persistem as cadastros, alterações, etc., devem estar no rodapé da div que contém o formulário,
   separados por uma borda no topo e alinhados a direita.
 - Os campos de data serão sempre do tipo Date com calendário.

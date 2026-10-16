@@ -24,7 +24,7 @@ export const personFieldOrder: (keyof PersonFormValues)[] = [
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 /**
- * Obrigatórios (screens.md): nome e um contato (celular). Os opcionais só são
+ * Obrigatórios (screens/pessoas.md): nome e um contato (celular). Os opcionais só são
  * conferidos quando preenchidos, para não falharem depois, no cadastro.
  */
 export function validatePersonForm(values: PersonFormValues): PersonFormErrors {

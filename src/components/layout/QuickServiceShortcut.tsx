@@ -5,7 +5,7 @@ import { useState } from "react";
 import { ClipboardPlus } from "lucide-react";
 import { ServiceFormDialog } from "@/components/services/ServiceFormDialog";
 
-// Atalho de cadastro rápido de serviço (screens.md, "Barra de ações lateral"):
+// Atalho de cadastro rápido de serviço (screens/layout.md, "Barra de ações lateral"):
 // abre o mesmo dialog de cadastro da tela de Serviços, de qualquer tela. Usado
 // na barra lateral e no header do celular.
 export function QuickServiceShortcut() {

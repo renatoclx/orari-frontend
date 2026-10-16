@@ -64,7 +64,7 @@ type AddressesFieldProps = {
   };
 };
 
-// "Endereços" (screens.md): o formulário aparece ao clicar em adicionar e os
+// "Endereços" (screens/pessoas.md): o formulário aparece ao clicar em adicionar e os
 // endereços adicionados vão para uma tabela com a opção de excluir.
 export function AddressesField({ states, persisted }: AddressesFieldProps) {
   const [localAddresses, setLocalAddresses] = useState<ExtraAddress[]>([]);

@@ -71,7 +71,7 @@ Padrão do sistema (`docs/screen-patterns.md`): cor correspondente à informaç�
 
 ## Listagens
 
-Fonte das regras: `docs/screen-patterns.md` e `docs/screens.md`. Modelo: `src/components/people/` (`PeopleListPage`, `PersonList`, `PeopleToolbar`).
+Fonte das regras: `docs/screen-patterns.md` e `docs/screens/pessoas.md`. Modelo: `src/components/people/` (`PeopleListPage`, `PersonList`, `PeopleToolbar`).
 
 - **Pessoas (cliente, funcionário, profissional) compartilham as mesmas telas.** A diferença está só em `PEOPLE_KINDS` (`@/components/people/people-kinds`): tipo, caminho, singular e plural. Textos usam `kind.singular` / `kind.plural`; nunca escreva "cliente" direto em componente de `people/`.
 - Cada tipo tem rotas finas: `app/(admin)/<caminho>/{page,loading}.tsx` e `novo/page.tsx`, que só escolhem o `kind` e delegam a `PeopleListPage`, `PeopleListLoading` e `NewPersonPage`. Para outro tipo, acrescente a entrada em `PEOPLE_KINDS` e as três rotas.
@@ -88,7 +88,7 @@ Fonte das regras: `docs/screen-patterns.md` e `docs/screens.md`. Modelo: `src/co
 
 ## Formulários
 
-Fonte das regras: `docs/screen-patterns.md` (padrões) e `docs/screens.md` (campos e layout de cada entidade). Consulte os dois antes de criar uma tela de cadastro ou alteração.
+Fonte das regras: `docs/screen-patterns.md` (padrões) e `docs/screens/` (campos e layout de cada tela, um arquivo por tela: `pessoas.md`, `servicos.md`, `agendamentos.md`...). Consulte os dois antes de criar uma tela de cadastro ou alteração.
 
 - **Segue o padrão de página:** o card do formulário é o componente principal — ocupa a **largura toda e a altura que sobra** (`flex min-h-0 flex-1 flex-col rounded-card border bg-card`). Nunca limite a largura do card nem o faça acompanhar a altura do conteúdo. Raiz da página: `flex min-h-0 flex-1 flex-col gap-4`, com título e subtítulo acima.
 - Estrutura do card: área de campos (`min-h-0 flex-1 overflow-auto p-4 md:p-6`) + `FormFooter` (`@/components/shared/FormFooter`) fixo no fim, com borda no topo e botões à direita (Cancelar, depois a ação principal). Os botões ficam **dentro** do `<form>`. A legenda "Campos obrigatórios" vai na prop `note` do rodapé.
@@ -145,7 +145,7 @@ Toda página da área administrativa segue o modelo da tela de Agendamentos (`sr
 
 ## Agenda
 
-Fonte: `docs/screens.md` (seção Agendamentos). Modelo: `src/components/agenda/`.
+Fonte: `docs/screens/agendamentos.md`. Modelo: `src/components/agenda/`.
 
 - O dia exibido (`?date=`) e o filtro de profissional (`?professional=`) ficam na URL; anterior, próximo, hoje e o calendário do atalho levam os dois. O filtro é aplicado na tela e vai para a URL com `history.replaceState` (sem buscar os dados de novo). Padrão: todos os profissionais ativos; "Mostrar Todos" sempre visível.
 - Datas e horários sempre no fuso da empresa (`utils/time.ts`: `dayBounds`, `toTimeString`); a API trabalha em UTC.
@@ -159,7 +159,7 @@ Fonte: `docs/screens.md` (seção Agendamentos). Modelo: `src/components/agenda/
 ## Barra de ações lateral
 
 - Componente único `@/components/layout/ActionBar`, renderizado pelo `AdminShell`: aparece em **todas** as telas administrativas a partir do tablet (`md`). Não adicione barras por página.
-- **No celular, a barra some** e só o calendário aparece, como ícone no header (`CalendarShortcut` com `placement="header"`); os demais atalhos (cliente, serviço) ficam ocultos (screens.md). Atalhos atuais: calendário (`CalendarShortcut`), cadastro rápido de cliente (`QuickClientShortcut`, diálogo só com nome e telefone) e cadastro de serviço (`QuickServiceShortcut`, abre o `ServiceFormDialog` de qualquer tela).
+- **No celular, a barra some** e só o calendário aparece, como ícone no header (`CalendarShortcut` com `placement="header"`); os demais atalhos (cliente, serviço) ficam ocultos (`docs/screens/layout.md`). Atalhos atuais: calendário (`CalendarShortcut`), cadastro rápido de cliente (`QuickClientShortcut`, diálogo só com nome e telefone) e cadastro de serviço (`QuickServiceShortcut`, abre o `ServiceFormDialog` de qualquer tela).
 - Fixa na borda direita da tela, centralizada na vertical, com cantos arredondados só à esquerda (`rounded-l-overlay`), sombra e sem borda à direita.
 - Guarda atalhos secundários (hoje: calendário). Novos atalhos entram nela como botões de ícone com `aria-label` e `title`.
 - Painéis abertos por ela usam o `Popover` do shadcn com `side="left"` e `sideOffset={0}`, colados à barra e flutuando sobre o conteúdo.

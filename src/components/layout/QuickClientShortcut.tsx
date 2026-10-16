@@ -24,7 +24,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { maskPhone } from "@/utils/masks";
 
-// Atalho de cadastro rápido de cliente (screens.md, "Barra de ações lateral"):
+// Atalho de cadastro rápido de cliente (screens/layout.md, "Barra de ações lateral"):
 // um diálogo só com nome e telefone; o restante é completado depois. Usado na
 // barra lateral e no header do celular. O telefone vira o contato principal.
 export function QuickClientShortcut() {

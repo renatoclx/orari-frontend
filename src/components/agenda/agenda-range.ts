@@ -94,32 +94,3 @@ export function gridAreas(
     breaks,
   };
 }
-
-/**
- * Expediente do dia: da abertura mais cedo ao fechamento mais tarde, em
- * minutos. Intervalos entre janelas (almoço, por exemplo) fazem parte dele.
- * Nulo quando a empresa não funciona no dia.
- */
-export function expedientOf(
-  businessHours: TimeRange[],
-): { open: number; close: number } | null {
-  if (businessHours.length === 0) return null;
-  return {
-    open: Math.min(...businessHours.map((hours) => timeToMinutes(hours.start))),
-    close: Math.max(...businessHours.map((hours) => timeToMinutes(hours.end))),
-  };
-}
-
-/**
- * Um trecho está fora do expediente (e só aceita encaixe) quando termina antes
- * da abertura ou começa depois do fechamento. Sem expediente, o dia todo é
- * "fora".
- */
-export function isOutsideExpedient(
-  start: number,
-  end: number,
-  expedient: { open: number; close: number } | null,
-): boolean {
-  if (!expedient) return true;
-  return end <= expedient.open || start >= expedient.close;
-}

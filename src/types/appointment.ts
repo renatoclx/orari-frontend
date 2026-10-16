@@ -34,6 +34,8 @@ export type AppointmentItem = {
   startAt: string;
   endAt: string;
   status: AppointmentStatus;
+  /** Encaixe: marcado fora do horário de funcionamento (retrato do momento). */
+  overBooking: boolean;
   note: string | null;
   client: AppointmentPerson;
   professional: AppointmentPerson;

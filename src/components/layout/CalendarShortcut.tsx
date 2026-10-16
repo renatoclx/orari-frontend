@@ -40,7 +40,10 @@ export function CalendarShortcut({ placement }: CalendarShortcutProps) {
   const inBar = placement === "bar";
 
   // Dia exibido na agenda (?date=); sem ele, hoje.
-  const param = useSearchParams().get("date");
+  const searchParams = useSearchParams();
+  const param = searchParams.get("date");
+  // O filtro de profissional da agenda acompanha a troca de dia.
+  const professional = searchParams.get("professional");
   const selected = param && isDateString(param) ? parseDay(param) : new Date();
 
   return (
@@ -78,7 +81,9 @@ export function CalendarShortcut({ placement }: CalendarShortcutProps) {
             // Clicar no dia já selecionado limpa a seleção: nada a fazer.
             if (!day) return;
             setOpen(false);
-            router.push(`/?date=${formatDay(day)}`);
+            const query = new URLSearchParams({ date: formatDay(day) });
+            if (professional) query.set("professional", professional);
+            router.push(`/?${query}`);
           }}
         />
       </PopoverContent>

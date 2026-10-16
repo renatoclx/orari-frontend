@@ -58,6 +58,14 @@ export async function AgendaDayPage({ searchParams }: AgendaDayPageProps) {
     .sort((a, b) => a.name.localeCompare(b.name, "pt-BR"));
   const visible = new Set(professionals.map((person) => person.id));
 
+  // Filtro vindo da URL; ignora um profissional que não é ativo.
+  const requestedProfessional = searchParams.professional;
+  const initialFilterId =
+    typeof requestedProfessional === "string" &&
+    visible.has(requestedProfessional)
+      ? requestedProfessional
+      : null;
+
   const agendaAppointments = appointments
     .filter((item) => visible.has(item.professionalId))
     .map((item) => toAgendaAppointment(item, timeZone, bounds.to));
@@ -97,6 +105,7 @@ export async function AgendaDayPage({ searchParams }: AgendaDayPageProps) {
         <AgendaDayView
           date={date}
           dateLabel={dateLabel}
+          initialFilterId={initialFilterId}
           professionals={professionals}
           appointments={agendaAppointments}
           range={range}

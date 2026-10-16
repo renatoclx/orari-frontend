@@ -34,9 +34,16 @@ type AgendaToolbarProps = {
   onShowAll?: () => void;
 };
 
-// O dia fica na URL (?date=): os botões são links, então a navegação funciona
-// sem estado no navegador e o dia pode ser compartilhado ou recarregado.
-const dayHref = (date: string) => `/?date=${date}`;
+// O dia (?date=) e o filtro de profissional (?professional=) ficam na URL: os
+// botões são links, então a navegação funciona sem estado no navegador, o
+// filtro acompanha a troca de dia e a tela pode ser compartilhada ou recarregada.
+function agendaHref(date: string | null, professionalId: string | null) {
+  const params = new URLSearchParams();
+  if (date) params.set("date", date);
+  if (professionalId) params.set("professional", professionalId);
+  const query = params.toString();
+  return query ? `/?${query}` : "/";
+}
 
 // "terça-feira, 13 de outubro": diz para onde o botão leva.
 const dayName = (date: string) =>
@@ -59,7 +66,7 @@ export function AgendaToolbar({
         <Hint label={`Ir para ${dayName(shiftDateString(date, -1))}`}>
           <Button variant="outline" size="icon" asChild>
             <Link
-              href={dayHref(shiftDateString(date, -1))}
+              href={agendaHref(shiftDateString(date, -1), filterId)}
               aria-label="Dia anterior"
             >
               <ChevronLeft aria-hidden="true" />
@@ -69,7 +76,7 @@ export function AgendaToolbar({
         <Hint label={`Ir para ${dayName(shiftDateString(date, 1))}`}>
           <Button variant="outline" size="icon" asChild>
             <Link
-              href={dayHref(shiftDateString(date, 1))}
+              href={agendaHref(shiftDateString(date, 1), filterId)}
               aria-label="Próximo dia"
             >
               <ChevronRight aria-hidden="true" />
@@ -78,7 +85,7 @@ export function AgendaToolbar({
         </Hint>
         <Hint label="Voltar para a agenda de hoje">
           <Button variant="outline" asChild>
-            <Link href="/">Hoje</Link>
+            <Link href={agendaHref(null, filterId)}>Hoje</Link>
           </Button>
         </Hint>
       </div>
@@ -109,14 +116,28 @@ export function AgendaToolbar({
               </SelectContent>
             </Select>
 
-            {filterId !== null && (
-              <Hint label="Voltar à exibição padrão: todos os profissionais com agendamentos">
-                <Button variant="ghost" onClick={onShowAll}>
+            {/* Sempre visível; sem filtro, não há o que desfazer. */}
+            <Hint
+              label={
+                filterId === null
+                  ? "Já exibindo todos os profissionais"
+                  : "Voltar a exibir todos os profissionais"
+              }
+            >
+              <span
+                className="inline-flex"
+                tabIndex={filterId === null ? 0 : -1}
+              >
+                <Button
+                  variant="ghost"
+                  onClick={onShowAll}
+                  disabled={filterId === null}
+                >
                   <RotateCcw aria-hidden="true" />
                   Mostrar Todos
                 </Button>
-              </Hint>
-            )}
+              </span>
+            </Hint>
           </div>
         )}
 

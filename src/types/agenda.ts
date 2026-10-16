@@ -30,8 +30,8 @@ export type AgendaAppointment = {
   note: string | null;
   status: AppointmentStatus;
   /**
-   * Encaixe: agendamento fora do horário de funcionamento. Ainda não vem da
-   * API (o backend passa a guardar a flag depois); por ora é sempre falso.
+   * Encaixe: agendamento marcado fora do horário de funcionamento (campo
+   * `overBooking` da API).
    */
   overbooking: boolean;
 };

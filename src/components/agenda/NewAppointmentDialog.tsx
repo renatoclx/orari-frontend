@@ -30,10 +30,6 @@ import type {
   TimeRange,
 } from "@/types/agenda";
 import { formatDuration } from "@/utils/format";
-import {
-  expedientOf,
-  isOutsideExpedient,
-} from "@/components/agenda/agenda-range";
 import { minutesToTime, timeToMinutes } from "@/utils/time";
 
 /** Serviço como o formulário o oferece. */
@@ -75,7 +71,7 @@ const DAY_MINUTES = 24 * 60;
 
 /**
  * Horários de início possíveis para um encaixe: de 30 em 30 minutos, fora do
- * expediente (antes da abertura ou depois do fechamento), que ainda não passaram e que não sobrepõem um agendamento do
+ * expediente (fora de qualquer janela de atendimento), que ainda não passaram e que não sobrepõem um agendamento do
  * profissional. Considera a duração do serviço escolhido (30 min sem serviço).
  */
 function overbookingTimes({
@@ -93,7 +89,10 @@ function overbookingTimes({
 }): string[] {
   if (!professionalId) return [];
 
-  const expedient = expedientOf(businessHours);
+  const windows = businessHours.map((window) => ({
+    start: timeToMinutes(window.start),
+    end: timeToMinutes(window.end),
+  }));
   const busy = appointments
     .filter(
       (appointment) =>
@@ -116,7 +115,9 @@ function overbookingTimes({
       range.start < end && range.end > start;
 
     if (start < pastMinutes) continue;
-    if (!isOutsideExpedient(start, end, expedient)) continue;
+    // Precisa ficar inteiro fora de qualquer janela (inclui o intervalo entre
+    // janelas).
+    if (windows.some(overlaps)) continue;
     if (busy.some(overlaps)) continue;
     times.push(minutesToTime(start));
   }

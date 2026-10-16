@@ -22,9 +22,9 @@ const SLOT_MINUTES = 30;
 const SLOT_HEIGHT = 48;
 const PX_PER_MINUTE = SLOT_HEIGHT / SLOT_MINUTES;
 
-// "closed": fora do expediente (aceita encaixe). "gap": dentro do expediente,
-// entre duas janelas de atendimento (não aceita agendamento nem encaixe).
-type SlotState = "free" | "past" | "closed" | "gap" | "occupied";
+// "closed": fora das janelas de atendimento (inclui o intervalo entre janelas):
+// só aceita encaixe.
+type SlotState = "free" | "past" | "closed" | "occupied";
 
 type DayGridProps = {
   professionals: AgendaProfessional[];
@@ -58,8 +58,6 @@ type DayGridProps = {
   onSlotSelect?: (professionalId: string, time: string) => void;
   /** Clique em um intervalo que já passou: não aceita agendamento. */
   onSlotPast?: () => void;
-  /** Clique em um intervalo dentro do expediente, entre janelas de atendimento. */
-  onSlotGap?: () => void;
   /** Clique em um intervalo fora do funcionamento: abre o encaixe. */
   onSlotOverbooking?: (professionalId: string, time: string) => void;
   /** Clique em um agendamento. */
@@ -80,7 +78,6 @@ export function DayGrid({
   desktopVisibleIds,
   onSlotSelect,
   onSlotPast,
-  onSlotGap,
   onSlotOverbooking,
   onAppointmentSelect,
 }: DayGridProps) {
@@ -110,9 +107,8 @@ export function DayGrid({
     if (slot < pastMinutes) return "past";
     const overlaps = (gap: TimeRange) =>
       timeToMinutes(gap.start) < end && timeToMinutes(gap.end) > slot;
-    // Fora do expediente aceita encaixe; entre janelas, nada.
-    if (unavailable.some(overlaps)) return "closed";
-    if (breaks.some(overlaps)) return "gap";
+    // Fora de qualquer janela (inclusive o intervalo entre janelas): encaixe.
+    if (unavailable.some(overlaps) || breaks.some(overlaps)) return "closed";
     const occupied = appointments.some(
       (appointment) =>
         appointment.professionalId === professionalId &&
@@ -258,20 +254,14 @@ export function DayGrid({
                 );
               }
 
-              // Passou ou entre janelas: o clique explica que não dá para agendar.
-              if (state === "past" || state === "gap") {
+              // Passou: o clique explica que não dá para agendar.
+              if (state === "past") {
                 return (
                   <button
                     key={slot}
                     type="button"
-                    onClick={() =>
-                      state === "past" ? onSlotPast?.() : onSlotGap?.()
-                    }
-                    aria-label={
-                      state === "past"
-                        ? `${time} já passou para ${professional.name}`
-                        : `${time} sem atendimento para ${professional.name}`
-                    }
+                    onClick={() => onSlotPast?.()}
+                    aria-label={`${time} já passou para ${professional.name}`}
                     className={`block w-full cursor-not-allowed ${line}`}
                     style={{ height: SLOT_HEIGHT }}
                   />

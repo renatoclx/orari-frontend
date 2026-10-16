@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { AppointmentDetailsDialog } from "@/components/agenda/AppointmentDetailsDialog";
 import { AgendaToolbar } from "@/components/agenda/AgendaToolbar";
@@ -21,6 +21,8 @@ type AgendaDayViewProps = {
   /** Dia exibido, "aaaa-mm-dd", e o texto dele por extenso. */
   date: string;
   dateLabel: string;
+  /** Profissional filtrado, vindo da URL (?professional=); nulo = padrão. */
+  initialFilterId: string | null;
   /** Todos os profissionais ativos (a exibição padrão filtra daqui). */
   professionals: AgendaProfessional[];
   appointments: AgendaAppointment[];
@@ -46,8 +48,8 @@ type CreatingState = {
 };
 
 /**
- * Barra, grade e diálogos do dia. No computador a grade mostra, por padrão, os
- * profissionais que têm agendamentos (o filtro mostra só um); no celular, um
+ * Barra, grade e diálogos do dia. No computador a grade mostra, por padrão, todos
+ * os profissionais ativos (o filtro mostra só um); no celular, um
  * profissional por vez, trocado por um menu ao lado do nome. A seleção e os
  * diálogos abertos ficam aqui porque são só estado de tela.
  */
@@ -58,50 +60,62 @@ export function AgendaDayView({
   services,
   clients,
   businessHours,
+  initialFilterId,
   ...grid
 }: AgendaDayViewProps) {
   const [selectedId, setSelectedId] = useState<string>();
-  const [filterId, setFilterId] = useState<string | null>(null);
+  const [filterId, setFilterId] = useState<string | null>(initialFilterId);
   const [creating, setCreating] = useState<CreatingState | null>(null);
   const [viewing, setViewing] = useState<AgendaAppointment | null>(null);
 
-  // Padrão: quem tem agendamento no dia (cancelados não contam). Sem nenhum,
-  // mostra todos, para a grade não ficar sem colunas.
-  const withAppointments = new Set(
-    grid.appointments
-      .filter((appointment) => appointment.status !== "CANCELLED")
-      .map((appointment) => appointment.professionalId),
-  );
-  const defaultIds = professionals
-    .filter((professional) => withAppointments.has(professional.id))
-    .map((professional) => professional.id);
+  // Padrão: todos os profissionais ativos; o filtro mostra só um.
   const visibleIds = filterId
     ? [filterId]
-    : defaultIds.length > 0
-      ? defaultIds
-      : professionals.map((professional) => professional.id);
+    : professionals.map((professional) => professional.id);
 
   // Se o escolhido não existe mais (outro dia, outra lista), volta ao primeiro.
   const activeId = professionals.some((item) => item.id === selectedId)
     ? selectedId
     : professionals[0]?.id;
 
-  function handleFilterChange(professionalId: string) {
-    setFilterId(professionalId);
-
-    // Sem nenhum agendamento (de qualquer status): a coluna aparece vazia e
-    // o usuário é avisado.
+  // Sem nenhum agendamento (de qualquer status): a coluna aparece vazia e o
+  // usuário é avisado.
+  function warnIfEmpty(professionalId: string) {
     const hasAny = grid.appointments.some(
       (appointment) => appointment.professionalId === professionalId,
     );
-    if (!hasAny) {
-      const name = professionals.find(
-        (item) => item.id === professionalId,
-      )?.name;
-      toast.info(
-        `${name ?? "O profissional"} não possui agendamentos neste dia.`,
-      );
+    if (hasAny) return;
+
+    const name = professionals.find((item) => item.id === professionalId)?.name;
+    toast.info(
+      `${name ?? "O profissional"} não possui agendamentos neste dia.`,
+    );
+  }
+
+  // Chegou à tela já filtrado (pela URL, ao trocar de dia): avisa uma vez.
+  useEffect(() => {
+    if (initialFilterId) warnIfEmpty(initialFilterId);
+    // Só na chegada à tela.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // O filtro vai para a URL sem recarregar os dados: a troca de dia e o
+  // calendário o levam junto, e a tela pode ser recarregada ou compartilhada.
+  function applyFilter(professionalId: string | null) {
+    setFilterId(professionalId);
+
+    const url = new URL(window.location.href);
+    if (professionalId) {
+      url.searchParams.set("professional", professionalId);
+    } else {
+      url.searchParams.delete("professional");
     }
+    window.history.replaceState(null, "", url);
+  }
+
+  function handleFilterChange(professionalId: string) {
+    applyFilter(professionalId);
+    warnIfEmpty(professionalId);
   }
 
   return (
@@ -112,7 +126,7 @@ export function AgendaDayView({
         professionals={professionals}
         filterId={filterId}
         onFilterChange={handleFilterChange}
-        onShowAll={() => setFilterId(null)}
+        onShowAll={() => applyFilter(null)}
         onNewAppointment={() =>
           setCreating({
             professionalId: filterId ?? activeId ?? null,
@@ -139,11 +153,6 @@ export function AgendaDayView({
         }
         onSlotPast={() =>
           toast.info("Não é possível agendar em horário que já passou.")
-        }
-        onSlotGap={() =>
-          toast.info(
-            "Intervalo dentro do expediente, sem atendimento. Não é possível agendar neste horário.",
-          )
         }
         onSlotOverbooking={(professionalId, time) =>
           setCreating({ professionalId, time, overbooking: true })

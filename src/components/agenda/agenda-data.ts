@@ -29,11 +29,13 @@ export function toAgendaAppointment(
     clientPhotoUrl: item.client.photoUrl,
     professionalName: item.professional.name,
     serviceName: item.service.name,
-    serviceColor: item.service.color ?? DEFAULT_SERVICE_COLOR,
+    // O encaixe tem a sua cor exclusiva, no lugar da cor do serviço.
+    serviceColor: item.overBooking
+      ? OVERBOOKING_COLOR
+      : (item.service.color ?? DEFAULT_SERVICE_COLOR),
     durationMinutes: item.service.duration,
     note: item.note,
-    // A API ainda não informa o encaixe.
-    overbooking: false,
+    overbooking: item.overBooking,
     status: item.status,
   };
 }

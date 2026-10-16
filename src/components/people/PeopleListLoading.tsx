@@ -7,8 +7,8 @@ export function PeopleListLoading({ kind }: { kind: PeopleKind }) {
     <div className="flex min-h-0 flex-1 flex-col gap-4">
       <h1 className="text-2xl font-semibold">{kind.plural}</h1>
       <div className="flex items-center justify-between gap-3">
-        <Skeleton className="h-9 w-72" />
-        <Skeleton className="h-9 w-32" />
+        <Skeleton className="h-10 w-72" />
+        <Skeleton className="h-10 w-32" />
       </div>
       <div className="min-h-0 flex-1 space-y-1 rounded-card border border-border bg-card p-4">
         {Array.from({ length: 8 }, (_, index) => (

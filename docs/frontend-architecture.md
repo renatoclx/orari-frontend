@@ -20,8 +20,12 @@ src/
       actions.ts             Server Actions da área (ex.: logout)
       people-actions.ts      Server Actions de pessoas (cadastro, alteração,
                              exclusão, reativação, contatos, endereços)
+      service-actions.ts     Server Actions de serviços (cadastro, alteração,
+                             inativação, exclusão)
       location-actions.ts    busca de cidades e consulta de CEP
-      page.tsx               Agendamentos ("/")
+      page.tsx               Agendamentos ("/"): agenda do dia (?date=)
+      servicos/              Serviços: page e loading (cadastro e alteração
+                             em dialog)
       clientes/              Clientes: page, loading, novo/, [id]/editar/
       funcionarios/          Funcionários (mesma estrutura)
       profissionais/         Profissionais (mesma estrutura)
@@ -36,11 +40,14 @@ src/
     shared/                  componentes do Orari usados em várias telas
     people/                  telas de Clientes, Funcionários e Profissionais
                              (uma implementação, parametrizada por tipo)
-    <tela>/                  componentes de cada tela (agenda/, auth/)
+    services/                tela de Serviços (listagem e dialog de formulário)
+    agenda/                  agenda do dia (grade, blocos, legenda, faixa)
+    <tela>/                  componentes das demais telas (auth/)
   services/                  comunicação com a API e sessão (somente servidor)
   types/                     tipos do domínio, espelhando o backend
   utils/                     funções puras (datas, formatação, máscaras)
-  lib/utils.ts               cn() do shadcn
+  lib/                       cn() do shadcn e helpers das Server Actions
+                             (action-result.ts, form-data.ts)
   proxy.ts                   proteção das rotas (antigo middleware)
 next.config.ts               limite das Server Actions e rewrite de /uploads
 ```
@@ -91,6 +98,22 @@ As três telas são a mesma implementação, escolhida pelo tipo (`PeopleType`).
 - O `next.config.ts` reescreve `/uploads/:path*` para `${API_URL}/uploads/:path*`, e o proxy não intercepta esse caminho. O navegador nunca conhece o endereço da API.
 - O envio passa por Server Action (multipart). O limite do corpo das Server Actions foi elevado de 1 MB para 3 MB, porque a foto pode ter até 2 MB.
 - Regras da foto (backend): JPEG ou PNG, até 2 MB, opcional.
+
+## Serviços
+
+- Listagem em página (`/servicos`), com busca e paginação pela URL; cadastro e alteração em **dialog** (`ServiceFormDialog`), como o `screens.md` especifica.
+- Ativar e inativar usam `PATCH /services/:id` (`isActive`); a exclusão é recusada pela API (409) quando há agendamentos, recorrências ou planos vinculados, e a tela orienta a inativar.
+- O preço chega da API como texto (`Decimal`) e é enviado como número; a máscara BRL guarda centavos no formulário.
+- O atalho de cadastro de serviço da barra lateral abre o mesmo dialog de qualquer tela.
+
+## Agenda
+
+- Somente leitura. `AgendaDayPage` (Server Component) busca, em paralelo, os profissionais ativos, os agendamentos do dia e o horário de funcionamento da empresa no dia da semana.
+- O dia fica na URL (`?date=aaaa-mm-dd`); anterior, próximo e hoje são links, e o calendário do atalho leva ao dia escolhido. Sem data (ou data inválida), exibe hoje.
+- Tudo é calculado no **fuso da empresa** (`company.timezone`): `dayBounds` converte o dia para o intervalo UTC que a API filtra; `toTimeString` converte os horários exibidos.
+- A faixa da grade (`agenda-range.ts`) vai da abertura mais cedo menos 2 h ao fechamento mais tarde mais 2 h, ampliada por agendamentos fora dela; fora do horário de funcionamento a grade é sombreada. Pausas por profissional não existem no backend.
+- No celular, um profissional por vez, trocado por um menu ao lado do nome no cabeçalho da coluna (`AgendaDayView` guarda a seleção em estado local); no computador, uma coluna por profissional.
+- `getCurrentUser` usa `cache` do React: layout e página compartilham a chamada a `/auth/me` na mesma requisição.
 
 ## Sessão e rotas protegidas
 

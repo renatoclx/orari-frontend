@@ -10,6 +10,7 @@ import {
 } from "@/components/people/person-validation";
 import { FormField } from "@/components/shared/FormField";
 import { MaskedInput } from "@/components/shared/MaskedInput";
+import { Hint } from "@/components/shared/Hint";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -76,12 +77,19 @@ export function QuickClientShortcut() {
 
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
-      <DialogTrigger
-        aria-label="Cadastrar cliente rapidamente"
-        title="Cadastro rápido de cliente"
-        className="rounded-control p-2 text-muted-foreground hover:bg-background hover:text-foreground"
-      >
-        <UserPlus className="size-5" aria-hidden="true" />
+      <DialogTrigger asChild>
+        <Hint
+          label="Cadastrar um cliente rapidamente (nome e telefone)"
+          side="left"
+        >
+          <button
+            type="button"
+            aria-label="Cadastrar cliente rapidamente"
+            className="rounded-control p-2 text-muted-foreground hover:bg-background hover:text-foreground"
+          >
+            <UserPlus className="size-5" aria-hidden="true" />
+          </button>
+        </Hint>
       </DialogTrigger>
 
       <DialogContent>

@@ -1,23 +1,21 @@
-import { AgendaToolbar } from "@/components/agenda/AgendaToolbar";
-import { DayGrid } from "@/components/agenda/DayGrid";
-import {
-  mockAppointments,
-  mockDate,
-  mockNow,
-  mockProfessionals,
-} from "@/components/agenda/mock-data";
-import { formatLongDate } from "@/utils/time";
+import type { Metadata } from "next";
+import { Suspense } from "react";
+import { AgendaDayPage } from "@/components/agenda/AgendaDayPage";
+import { AgendaLoading } from "@/components/agenda/AgendaLoading";
 
-export default function AgendaPage() {
+export const metadata: Metadata = {
+  title: "Agendamentos | Orari",
+};
+
+export default async function AgendaPage({ searchParams }: PageProps<"/">) {
+  const params = await searchParams;
+  const date = typeof params.date === "string" ? params.date : "";
+
+  // A chave troca com o dia: ao navegar, o esqueleto aparece enquanto o novo
+  // dia carrega (um loading.tsx na raiz valeria para todas as telas da área).
   return (
-    <div className="flex min-h-0 flex-1 flex-col gap-4">
-      <h1 className="text-2xl font-semibold">Agendamentos</h1>
-      <AgendaToolbar dateLabel={formatLongDate(mockDate)} />
-      <DayGrid
-        professionals={mockProfessionals}
-        appointments={mockAppointments}
-        now={mockNow}
-      />
-    </div>
+    <Suspense key={date} fallback={<AgendaLoading />}>
+      <AgendaDayPage searchParams={params} />
+    </Suspense>
   );
 }

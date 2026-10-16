@@ -1,5 +1,6 @@
 "use client";
 
+import { Hint } from "@/components/shared/Hint";
 import { useActionState, useState } from "react";
 import { CircleAlert, Eye, EyeOff, LockKeyhole, Mail } from "lucide-react";
 import { login } from "@/app/(auth)/login/actions";
@@ -72,20 +73,27 @@ export function LoginForm() {
             aria-describedby={passwordError ? "password-error" : undefined}
             className={`${inputClass} pr-12 pl-11`}
           />
-          <button
-            type="button"
-            onClick={() => setShowPassword((visible) => !visible)}
-            aria-label="Mostrar senha"
-            aria-pressed={showPassword}
-            title={showPassword ? "Ocultar senha" : "Mostrar senha"}
-            className="absolute inset-y-0 right-0 flex items-center rounded-r-control px-3 text-muted-foreground hover:text-foreground"
+          <Hint
+            label={
+              showPassword
+                ? "Ocultar a senha digitada"
+                : "Mostrar a senha digitada"
+            }
           >
-            {showPassword ? (
-              <EyeOff className="size-5" aria-hidden="true" />
-            ) : (
-              <Eye className="size-5" aria-hidden="true" />
-            )}
-          </button>
+            <button
+              type="button"
+              onClick={() => setShowPassword((visible) => !visible)}
+              aria-label="Mostrar senha"
+              aria-pressed={showPassword}
+              className="absolute inset-y-0 right-0 flex items-center rounded-r-control px-3 text-muted-foreground hover:text-foreground"
+            >
+              {showPassword ? (
+                <EyeOff className="size-5" aria-hidden="true" />
+              ) : (
+                <Eye className="size-5" aria-hidden="true" />
+              )}
+            </button>
+          </Hint>
         </div>
         {passwordError && (
           <p id="password-error" className="text-sm text-destructive">

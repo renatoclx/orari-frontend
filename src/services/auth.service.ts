@@ -1,5 +1,6 @@
 import "server-only";
 
+import { cache } from "react";
 import { apiFetch } from "@/services/api";
 import type { AuthTokens, CurrentUser } from "@/types/auth";
 
@@ -23,7 +24,9 @@ export function logout(refreshToken: string): Promise<void> {
   });
 }
 
-/** Usuário da sessão e a empresa dele; a API recusa (401) se a sessão acabou. */
-export function getCurrentUser(): Promise<CurrentUser> {
-  return apiFetch<CurrentUser>("/auth/me");
-}
+/**
+ * Usuário da sessão e a empresa dele; a API recusa (401) se a sessão acabou.
+ * O `cache` evita repetir a chamada quando o layout e a página precisam do
+ * usuário na mesma requisição.
+ */
+export const getCurrentUser = cache(() => apiFetch<CurrentUser>("/auth/me"));

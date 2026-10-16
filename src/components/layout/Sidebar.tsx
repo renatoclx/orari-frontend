@@ -14,6 +14,7 @@ import {
   type LucideIcon,
 } from "lucide-react";
 import { Logo } from "@/components/layout/Logo";
+import { Hint } from "@/components/shared/Hint";
 import {
   Collapsible,
   CollapsibleContent,
@@ -93,34 +94,36 @@ export function Sidebar({
         {collapsed ? (
           <div className="flex h-16 items-center justify-center">
             {/* Recolhida, a logo vira o botão de expandir ao passar o mouse. */}
-            <button
-              type="button"
-              onClick={onToggleCollapsed}
-              aria-label="Expandir menu"
-              title="Expandir menu"
-              className="group grid size-9 place-items-center rounded-control hover:bg-sidebar-accent"
-            >
-              <span className="col-start-1 row-start-1 group-hover:invisible group-focus-visible:invisible">
-                <Logo variant="icon" />
-              </span>
-              <PanelLeftOpen
-                className="invisible col-start-1 row-start-1 size-5 text-sidebar-foreground group-hover:visible group-focus-visible:visible"
-                aria-hidden="true"
-              />
-            </button>
+            <Hint label="Expandir o menu lateral" side="right">
+              <button
+                type="button"
+                onClick={onToggleCollapsed}
+                aria-label="Expandir menu"
+                className="group grid size-9 place-items-center rounded-control hover:bg-sidebar-accent"
+              >
+                <span className="col-start-1 row-start-1 group-hover:invisible group-focus-visible:invisible">
+                  <Logo variant="icon" />
+                </span>
+                <PanelLeftOpen
+                  className="invisible col-start-1 row-start-1 size-5 text-sidebar-foreground group-hover:visible group-focus-visible:visible"
+                  aria-hidden="true"
+                />
+              </button>
+            </Hint>
           </div>
         ) : (
           <div className="flex h-16 items-center justify-between px-4">
             <Logo variant="full" />
-            <button
-              type="button"
-              onClick={onToggleCollapsed}
-              aria-label="Recolher menu"
-              title="Recolher menu"
-              className={iconButtonClass}
-            >
-              <PanelLeftClose className="size-5" aria-hidden="true" />
-            </button>
+            <Hint label="Recolher o menu lateral" side="bottom">
+              <button
+                type="button"
+                onClick={onToggleCollapsed}
+                aria-label="Recolher menu"
+                className={iconButtonClass}
+              >
+                <PanelLeftClose className="size-5" aria-hidden="true" />
+              </button>
+            </Hint>
           </div>
         )}
 
@@ -140,9 +143,11 @@ export function Sidebar({
           <SheetTitle className="sr-only">Menu</SheetTitle>
           <div className="flex h-16 items-center justify-between px-4">
             <Logo variant="full" />
-            <SheetClose aria-label="Fechar menu" className={iconButtonClass}>
-              <X className="size-5" aria-hidden="true" />
-            </SheetClose>
+            <Hint label="Fechar o menu" side="bottom">
+              <SheetClose aria-label="Fechar menu" className={iconButtonClass}>
+                <X className="size-5" aria-hidden="true" />
+              </SheetClose>
+            </Hint>
           </div>
           <SidebarNav collapsed={false} onNavigate={onCloseMobile} />
         </SheetContent>

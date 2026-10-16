@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { ChevronLeft, ChevronRight } from "lucide-react";
+import { Hint } from "@/components/shared/Hint";
 import { Button } from "@/components/ui/button";
 
 type TablePaginationProps = {
@@ -46,36 +47,49 @@ export function TablePagination({
           Página {Math.min(page, totalPages)} de {totalPages}
         </span>
         {page > 1 ? (
-          <Button variant="outline" size="icon" asChild>
-            <Link href={hrefFor(page - 1)} aria-label="Página anterior">
-              <ChevronLeft aria-hidden="true" />
-            </Link>
-          </Button>
+          <Hint label={`Ir para a página ${page - 1}`}>
+            <Button variant="outline" size="icon" asChild>
+              <Link href={hrefFor(page - 1)} aria-label="Página anterior">
+                <ChevronLeft aria-hidden="true" />
+              </Link>
+            </Button>
+          </Hint>
         ) : (
-          <Button
-            variant="outline"
-            size="icon"
-            disabled
-            aria-label="Página anterior"
-          >
-            <ChevronLeft aria-hidden="true" />
-          </Button>
+          // Desabilitado não recebe o mouse: a dica fica no invólucro.
+          <Hint label="Você está na primeira página">
+            <span className="inline-flex" tabIndex={0}>
+              <Button
+                variant="outline"
+                size="icon"
+                disabled
+                aria-label="Página anterior"
+              >
+                <ChevronLeft aria-hidden="true" />
+              </Button>
+            </span>
+          </Hint>
         )}
         {page < totalPages ? (
-          <Button variant="outline" size="icon" asChild>
-            <Link href={hrefFor(page + 1)} aria-label="Próxima página">
-              <ChevronRight aria-hidden="true" />
-            </Link>
-          </Button>
+          <Hint label={`Ir para a página ${page + 1}`}>
+            <Button variant="outline" size="icon" asChild>
+              <Link href={hrefFor(page + 1)} aria-label="Próxima página">
+                <ChevronRight aria-hidden="true" />
+              </Link>
+            </Button>
+          </Hint>
         ) : (
-          <Button
-            variant="outline"
-            size="icon"
-            disabled
-            aria-label="Próxima página"
-          >
-            <ChevronRight aria-hidden="true" />
-          </Button>
+          <Hint label="Você está na última página">
+            <span className="inline-flex" tabIndex={0}>
+              <Button
+                variant="outline"
+                size="icon"
+                disabled
+                aria-label="Próxima página"
+              >
+                <ChevronRight aria-hidden="true" />
+              </Button>
+            </span>
+          </Hint>
         )}
       </div>
     </div>

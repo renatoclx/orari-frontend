@@ -316,3 +316,92 @@ No celular, somente o item calendário será exibido, os demais devem permanecer
   - Executar ações conforme padrão do cadastro.
 
 ---
+
+---
+
+# Agendamentos
+
+> Esta entrega cobre a visualização do dia. O cadastro, a alteração e a mudança de status de agendamentos serão especificados nas próximas etapas (os dialogs existem como rascunho visual e ainda não gravam).
+
+## Visualização do dia
+
+### Estrutura da tela
+
+- Título: "Agendamentos".
+- Barra superior:
+  - Botões "Dia anterior", "Próximo dia" e "Hoje".
+  - Data por extenso do dia exibido.
+  - Filtro "Filtrar por profissional" (apenas no computador) e, quando há filtro, o botão "Mostrar Todos".
+  - Botão "Encaixar horário", neutro, para agendar fora do horário de funcionamento (ver "Encaixe").
+  - Botão "Novo Agendamento", sempre visível.
+- Grade do dia, que ocupa a largura e a altura da página, com rolagem própria:
+  - Uma coluna por profissional exibido (ver "Profissionais exibidos"), com o nome e a quantidade de agendamentos do dia (cancelados não contam).
+  - Coluna de horários fixa à esquerda, em intervalos de 30 minutos.
+  - Linha do horário atual, somente quando o dia exibido é hoje.
+  - Áreas fora das janelas de atendimento (antes da abertura e depois do fechamento) sombreadas, com hachura.
+  - O intervalo entre duas janelas de atendimento (almoço, por exemplo) em cinza, com a indicação "Intervalo". É apenas indicação visual: não tem regra própria.
+- Legenda dos ícones de status e do encaixe no rodapé da página, alinhada à direita.
+
+### Profissionais exibidos
+
+- Ao carregar, a grade exibe todos os profissionais ativos cadastrados, com ou sem agendamentos no dia.
+- Filtro por profissional: exibe somente o profissional escolhido. O filtro fica na URL (`?professional=`) e acompanha a troca de dia e o calendário.
+  - Um profissional sem agendamentos aparece com a coluna vazia, e o usuário é notificado de que ele não possui agendamentos no dia.
+  - Um profissional que só tem agendamentos cancelados exibe a sua grade normalmente.
+- Botão "Mostrar Todos": sempre visível; volta a exibir todos os profissionais ativos (desabilitado quando já estão todos).
+- Profissional inativo permanece fora da grade (a agenda dele será remanejada, fora do MVP).
+
+### Encaixe (agendamento fora do horário de funcionamento)
+
+- Acionado de duas formas: pelo botão "Encaixar horário" ou clicando em uma área sombreada (fora das janelas de atendimento, inclusive o intervalo entre janelas) da grade.
+- Abre o dialog de novo agendamento com um aviso fixo de que o agendamento é fora do horário de funcionamento.
+- O expediente do dia são as janelas de atendimento cadastradas. Fora do expediente é tudo que não está dentro de uma janela: antes da abertura, depois do fechamento, dias sem janela e o intervalo entre duas janelas.
+- O seletor de horário do dialog oferece apenas horários inteiros fora de qualquer janela de atendimento (inclusive os do intervalo entre janelas), que ainda não passaram e que não sobrepõem outro agendamento do profissional.
+- A duração do serviço escolhido é considerada: o atendimento inteiro precisa ficar fora das janelas.
+- Pela API, um atendimento que começa dentro de uma janela e termina fora (ex.: 17:30 às 18:30, com fechamento às 18:00) também é aceito como encaixe, quando autorizado; a tela, porém, só oferece horários inteiros fora das janelas.
+- Ao clicar em uma área sombreada, o profissional e o horário clicados já vêm preenchidos.
+- Não há recorrência de encaixe; apenas agendamentos básicos.
+- O encaixe é exibido com uma cor cinza exclusiva e identificado como encaixe.
+- Horário que já passou, na área livre ou sombreada, não aceita agendamento: o clique exibe um aviso.
+
+### Bloco de agendamento
+
+- Posicionado pelo horário de início e pela duração do serviço.
+- Cor do serviço na borda esquerda e como fundo suave. O encaixe usa o cinza exclusivo.
+- Exibe horário de início, nome do cliente e nome do serviço.
+- Cada status tem um ícone no canto do bloco:
+  - Agendado: relógio.
+  - Confirmado: check em círculo.
+  - Em andamento: play em círculo, pulsando, na cor do serviço.
+  - Concluído: duplo check. Bloco esmaecido.
+  - Cancelado: X em círculo. Bloco esmaecido e nome do cliente riscado.
+  - Não compareceu: usuário com X. Bloco esmaecido.
+- Ao passar o mouse, um cartão exibe: foto e nome do cliente, serviço com cor e duração, horário, profissional, status, observação (quando houver) e a indicação de encaixe.
+- Ao clicar, abre o dialog de detalhes do agendamento (rascunho visual, sem gravação).
+
+### Regras específicas
+
+- O dia é calculado no fuso da empresa (a API trabalha em UTC).
+- Agendamentos cancelados permanecem na grade, esmaecidos, para os profissionais exibidos.
+- O intervalo exibido vai da abertura mais cedo do dia, menos 2 horas, ao fechamento mais tarde, mais 2 horas. Agendamentos fora desse intervalo ampliam a grade. Sem horário de funcionamento no dia, a grade exibe das 07:00 às 20:00.
+- Não há pausas por profissional nesta versão (previsão futura: o administrador poderá lançar pausas).
+- Sem profissionais cadastrados: mensagem orientando o cadastro.
+- Horários livres dentro do expediente abrem o novo agendamento com profissional e horário preenchidos. Horários ocupados abrem os detalhes do agendamento.
+
+### Navegação
+
+- O dia exibido fica na URL (`?date=aaaa-mm-dd`); sem ele, exibe hoje.
+- O calendário do atalho da barra lateral leva ao dia escolhido.
+
+### Celular
+
+- Exibe um profissional por vez. A troca é feita por um ícone de seleção ao lado do nome do profissional, no cabeçalho da coluna.
+- O filtro por profissional e o botão "Mostrar Todos" não existem no celular.
+
+### Pendências (previstas)
+
+- Backend: aceitar agendamento fora do horário de funcionamento e guardá-lo como overbooking (flag opcional) para diferenciá-lo dos demais. Previsto para sexta-feira.
+- Cadastro, alteração, confirmação e cancelamento de agendamentos.
+- Regras das transições de status.
+
+---

@@ -1,5 +1,6 @@
 "use client";
 
+import { Hint } from "@/components/shared/Hint";
 import { useState, useTransition } from "react";
 import { Plus, Trash2 } from "lucide-react";
 import { toast } from "sonner";
@@ -238,16 +239,20 @@ export function AddressesField({ states, persisted }: AddressesFieldProps) {
                 </TableCell>
                 <TableCell>{addressTypeLabels[address.type]}</TableCell>
                 <TableCell className="text-right">
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="icon"
-                    aria-label={`Excluir endereço ${address.street}, ${address.number}`}
-                    className="text-destructive hover:bg-destructive/10 hover:text-destructive"
-                    onClick={() => removeAddress(address)}
+                  <Hint
+                    label={`Excluir endereço ${address.street}, ${address.number}`}
                   >
-                    <Trash2 aria-hidden="true" />
-                  </Button>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="icon"
+                      aria-label={`Excluir endereço ${address.street}, ${address.number}`}
+                      className="text-destructive hover:bg-destructive/10 hover:text-destructive"
+                      onClick={() => removeAddress(address)}
+                    >
+                      <Trash2 aria-hidden="true" />
+                    </Button>
+                  </Hint>
                 </TableCell>
               </TableRow>
             ))}

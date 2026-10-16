@@ -108,11 +108,14 @@ As três telas são a mesma implementação, escolhida pelo tipo (`PeopleType`).
 
 ## Agenda
 
-- Somente leitura. `AgendaDayPage` (Server Component) busca, em paralelo, os profissionais ativos, os agendamentos do dia e o horário de funcionamento da empresa no dia da semana.
-- O dia fica na URL (`?date=aaaa-mm-dd`); anterior, próximo e hoje são links, e o calendário do atalho leva ao dia escolhido. Sem data (ou data inválida), exibe hoje.
+- `AgendaDayPage` (Server Component) busca, em paralelo, os profissionais ativos, os agendamentos do dia, o horário de funcionamento do dia da semana e as opções do formulário (clientes e serviços). A tela é montada por `AgendaDayView` (Client Component): barra, grade e diálogos.
+- O dia fica na URL (`?date=aaaa-mm-dd`) e o filtro de profissional também (`?professional=`); os botões de dia e o calendário do atalho levam os dois. Sem data (ou data inválida), exibe hoje.
 - Tudo é calculado no **fuso da empresa** (`company.timezone`): `dayBounds` converte o dia para o intervalo UTC que a API filtra; `toTimeString` converte os horários exibidos.
-- A faixa da grade (`agenda-range.ts`) vai da abertura mais cedo menos 2 h ao fechamento mais tarde mais 2 h, ampliada por agendamentos fora dela; fora do horário de funcionamento a grade é sombreada. Pausas por profissional não existem no backend.
-- No celular, um profissional por vez, trocado por um menu ao lado do nome no cabeçalho da coluna (`AgendaDayView` guarda a seleção em estado local); no computador, uma coluna por profissional.
+- **Relógio vivo** (`useAgendaClock`): o "agora" avança sem recarregar a página (linha do horário atual, horários passados, possibilidade de cancelar), e os dados são buscados de novo a cada minuto e ao voltar para a aba (`router.refresh`). Com a aba escondida, nada roda.
+- A faixa da grade (`agenda-range.ts`) vai da abertura mais cedo menos 2 h ao fechamento mais tarde mais 2 h, ampliada por agendamentos fora dela. Fora das janelas, a grade é hachurada; o intervalo entre janelas é cinza. Pausas por profissional não existem no backend.
+- **Novo agendamento e encaixe:** mesmo dialog (`NewAppointmentDialog`). Os horários são calculados no navegador (`agenda-availability.ts`) a partir das janelas e dos agendamentos do profissional na data, buscados pela Server Action `getAvailabilityAction`. O comum exige caber inteiro em uma janela; o encaixe, ficar inteiro fora delas (sem atravessar a meia-noite) e grava com `overBooking: true`. As Server Actions ficam em `appointment-actions.ts` (disponibilidade, busca de clientes, criar e cancelar).
+- **Cancelar:** única ação de status no dialog de detalhes, só antes de o agendamento iniciar. A regra de não cancelar o que já iniciou ainda é só da tela.
+- No celular, um profissional por vez, trocado por um menu ao lado do nome no cabeçalho da coluna; no computador, uma coluna por profissional (padrão: todos os ativos; o filtro mostra só um).
 - `getCurrentUser` usa `cache` do React: layout e página compartilham a chamada a `/auth/me` na mesma requisição.
 
 ## Sessão e rotas protegidas

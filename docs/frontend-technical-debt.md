@@ -9,11 +9,16 @@ Pontos conhecidos e aceitos por enquanto. Revisar quando o contexto mudar.
 
 ## Telas
 
-- **Agenda somente leitura.** O botão "Novo Agendamento" e os blocos ainda não têm ação (cadastro, remarcação, cancelamento e mudança de status serão especificados em etapas futuras).
+- **Alterar agendamento.** O botão "Alterar" do dialog de detalhes é rascunho (remarcar e editar serão especificados).
+- **Cancelar o que já iniciou.** A tela só oferece o cancelamento antes do início; o backend ainda permite cancelar depois (regra a ser criada lá).
+- **Empresa sem nenhuma janela cadastrada.** A API não restringe horários nem há encaixe; a agenda trata o dia sem janela como "somente encaixe" (o agendamento comum fica sem horários).
+- **Conflito do cliente.** Os horários oferecidos só consideram os agendamentos do profissional; se o cliente já tiver agendamento no horário, o servidor recusa (409) e a tela informa.
+- **Disponibilidade calculada no frontend.** As regras de horário (janela, conflito, passado) são repetidas na tela; a API é quem decide ao salvar. Se divergirem, o servidor vence. Uma rota de disponibilidade no backend centralizaria as regras.
+- **Busca de clientes e serviços.** Clientes: busca no servidor (20 por vez). Serviços: até 100 ativos, filtrados na tela.
 - **Profissionais da agenda.** A grade carrega até 100 profissionais (uma página). Acima disso, os demais não aparecem.
 - **Pausas por profissional.** O backend só tem o horário de funcionamento da empresa; a agenda não desenha pausas (previsto: o administrador poderá lançá-las).
+- **Horário de funcionamento sem tela.** As janelas (e o almoço como duas janelas) só são cadastradas pela API.
 - **Posição inicial da grade.** No celular a grade abre no início da faixa (2 h antes do expediente); falta rolar até o primeiro agendamento ou até o horário atual.
-- **Calendário do atalho** usa o relógio do navegador para marcar "hoje"; se o fuso do navegador diferir do da empresa, o marcador pode divergir da agenda (que usa o fuso da empresa).
 - **Nomes de profissional fora da lista.** Agendamentos de profissionais inativos não aparecem (a agenda deles será remanejada, fora do MVP).
 
 ## Pessoas

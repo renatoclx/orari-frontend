@@ -22,6 +22,8 @@ type ConfirmDialogProps = {
   pending: boolean;
   /** Ações que apagam algo usam o botão vermelho. */
   destructive?: boolean;
+  /** Texto do botão que desiste da ação ("Cancelar" por padrão). */
+  cancelLabel?: string;
   onConfirm: () => void;
 };
 
@@ -37,6 +39,7 @@ export function ConfirmDialog({
   pendingLabel,
   pending,
   destructive = false,
+  cancelLabel = "Cancelar",
   onConfirm,
 }: ConfirmDialogProps) {
   return (
@@ -50,7 +53,9 @@ export function ConfirmDialog({
           <AlertDialogDescription>{description}</AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel disabled={pending}>Cancelar</AlertDialogCancel>
+          <AlertDialogCancel disabled={pending}>
+            {cancelLabel}
+          </AlertDialogCancel>
           <AlertDialogAction
             disabled={pending}
             className={

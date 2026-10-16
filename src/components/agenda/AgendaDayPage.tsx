@@ -15,8 +15,6 @@ import {
   formatLongDate,
   isDateString,
   toDateString,
-  timeToMinutes,
-  toTimeString,
   weekDayOf,
 } from "@/utils/time";
 
@@ -30,7 +28,9 @@ type AgendaDayPageProps = {
 export async function AgendaDayPage({ searchParams }: AgendaDayPageProps) {
   const { company } = await getCurrentUser();
   const timeZone = company.timezone;
-  const today = toDateString(new Date(), timeZone);
+  // Instante em que a página foi montada: o relógio da tela começa nele.
+  const renderedAt = new Date();
+  const today = toDateString(renderedAt, timeZone);
 
   // Sem data (ou data inválida) na URL, exibe hoje.
   const requested = searchParams.date;
@@ -78,11 +78,6 @@ export async function AgendaDayPage({ searchParams }: AgendaDayPageProps) {
   const range = computeGridRange(windows, agendaAppointments);
   const areas = gridAreas(windows, range);
 
-  // Não se agenda no passado: dias passados inteiros, ou hoje até agora.
-  const nowTime = toTimeString(new Date().toISOString(), timeZone);
-  const pastMinutes =
-    date < today ? 24 * 60 : date === today ? timeToMinutes(nowTime) : 0;
-
   const dateLabel = formatLongDate(new Date(`${date}T12:00:00Z`));
 
   return (
@@ -111,9 +106,8 @@ export async function AgendaDayPage({ searchParams }: AgendaDayPageProps) {
           range={range}
           unavailable={areas.outside}
           breaks={areas.breaks}
-          businessHours={windows}
-          now={date === today ? nowTime : null}
-          pastMinutes={pastMinutes}
+          timeZone={timeZone}
+          serverNow={renderedAt.getTime()}
           services={services.items
             .filter((service) => service.isActive)
             .map((service) => ({

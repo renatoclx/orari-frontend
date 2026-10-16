@@ -57,6 +57,7 @@ Use `Button` de `@/components/ui/button`:
 - `ghost`: ações discretas ("Ver detalhes").
 - `destructive`: ações destrutivas ("Excluir").
 - `size="icon"` para botões só com ícone (sempre com `aria-label`).
+- **Tamanhos: botões e campos têm 40 px** (`h-10`; ícones `size-10`). Valem para `Button`, `Input`, `Select` (gatilho), `DatePicker`, `Combobox` e o campo de busca dentro das caixas de seleção. Variações: `sm` 36 px, `lg` 44 px, `icon-sm` 32 px. Não use `h-8` ou `h-9` à mão; ajuste o componente em `components/ui/` se precisar mudar.
 - Login: botão e campos com `h-14 text-base` (56 px, texto 16 px), só nessa tela.
 
 ## Badges
@@ -97,7 +98,7 @@ Fonte das regras: `docs/screen-patterns.md` (padrões) e `docs/screens.md` (camp
 - Foto da pessoa: `PhotoUpload` (`@/components/shared/PhotoUpload`), círculo centralizado **acima das colunas**; opcional; escolhida do dispositivo ("Selecionar foto") ou tirada na câmera ("Tirar foto", `CameraCaptureDialog`, recorte quadrado em JPEG); JPEG ou PNG até 2 MB (regras do backend); o envio é feito depois do cadastro, por rota própria.
 - Data: `DatePicker` (`@/components/shared/DatePicker`), com calendário; envia "aaaa-mm-dd".
 - Campos com máscara (celular, CPF, CEP): `MaskedInput` com as máscaras de `@/utils/masks`; exibe formatado e envia só os dígitos.
-- Seleção com busca (estado, cidade): `Combobox` (`@/components/shared/Combobox`). Listas grandes buscam no servidor por `onSearchChange`.
+- Seleção com busca (estado, cidade, cliente): `Combobox` (`@/components/shared/Combobox`). Listas grandes buscam no servidor por `onSearchChange`. Nas caixas de seleção com campo de busca dentro, o campo tem `margin-top` de 0.5rem (`mt-2` no `CommandInput`), para não colar na borda da caixa.
 - Itens repetíveis (contatos, endereços de pessoas): `ContactsField` e `AddressesField` (`@/components/people/`): o formulário aparece ao clicar em adicionar, os itens vão para uma tabela com lixeira. Dentro do `<form>`, o Enter nesses sub-formulários adiciona o item (não envia o cadastro).
 - `FormSection` mantém o conteúdo montado quando recolhida (`forceMount`), para não perder o que foi digitado.
 - Textos longos: `Textarea` com `min-h-28` (4 linhas).
@@ -146,10 +147,13 @@ Toda página da área administrativa segue o modelo da tela de Agendamentos (`sr
 
 Fonte: `docs/screens.md` (seção Agendamentos). Modelo: `src/components/agenda/`.
 
-- O dia exibido fica na URL (`/?date=aaaa-mm-dd`); anterior, próximo e hoje são links, e o calendário do atalho (`CalendarShortcut`) leva ao dia escolhido. Sem estado do dia no navegador.
+- O dia exibido (`?date=`) e o filtro de profissional (`?professional=`) ficam na URL; anterior, próximo, hoje e o calendário do atalho levam os dois. O filtro é aplicado na tela e vai para a URL com `history.replaceState` (sem buscar os dados de novo). Padrão: todos os profissionais ativos; "Mostrar Todos" sempre visível.
 - Datas e horários sempre no fuso da empresa (`utils/time.ts`: `dayBounds`, `toTimeString`); a API trabalha em UTC.
-- Rótulo e ícone de cada status vêm de `appointment-status.ts` (bloco e legenda usam a mesma fonte). Concluído, cancelado e não compareceu ficam esmaecidos; a legenda fica no rodapé da página, à direita.
-- A faixa da grade é calculada em `agenda-range.ts` (expediente ± 2 h, ampliada por agendamentos fora dela). Cor do serviço vem do cadastro; sem cor, cinza neutro.
+- **Relógio vivo** (`useAgendaClock`): o "agora" anda sem recarregar (linha do horário atual, horários passados, botão de cancelar) e os dados são buscados de novo a cada minuto e ao voltar para a aba (`router.refresh`). Nunca calcule "agora" no servidor para a tela.
+- Rótulo e ícone de cada status vêm de `appointment-status.ts` (bloco e legenda usam a mesma fonte). Concluído, cancelado e não compareceu ficam esmaecidos; o encaixe é cinza exclusivo (`OVERBOOKING_COLOR`, campo `overBooking` da API).
+- A faixa da grade é calculada em `agenda-range.ts` (expediente ± 2 h, ampliada por agendamentos fora dela). Fora das janelas: hachurado e clicável para encaixe; entre janelas: cinza "Intervalo" (só visual, também encaixe). Cancelado só aparece se não ficar sobreposto a nada.
+- **Novo agendamento e encaixe** (`NewAppointmentDialog`, mesmo dialog): cliente com busca no servidor, serviço com busca, profissional, data (sem passado), horários em `AvailableTimes` (caixa de período Manhã/Tarde/Noite, só os com horário, e botões). Os horários vêm de `agenda-availability.ts` (grade de 15 min mais o fim de cada agendamento): comum = cabe em uma janela; encaixe = inteiro fora das janelas e até a meia-noite. A busca de disponibilidade (janelas e agendamentos do profissional na data) é a Server Action `getAvailabilityAction`. Encaixe grava com `overBooking: true` e mostra aviso fixo.
+- **Detalhes do agendamento:** só a ação "Cancelar agendamento" (botão vermelho centralizado, com confirmação), enquanto não iniciou. Início e fim são automáticos (job do backend).
 - O carregamento usa `Suspense` com `key` no dia, no `page.tsx` (um `loading.tsx` na raiz de `(admin)` valeria para todas as telas).
 
 ## Barra de ações lateral

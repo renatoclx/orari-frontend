@@ -6,9 +6,9 @@ export function AgendaLoading() {
     <div className="flex min-h-0 flex-1 flex-col gap-4">
       <h1 className="text-2xl font-semibold">Agendamentos</h1>
       <div className="flex items-center gap-3">
-        <Skeleton className="h-9 w-28" />
+        <Skeleton className="h-10 w-28" />
         <Skeleton className="h-6 w-48" />
-        <Skeleton className="ml-auto h-9 w-44" />
+        <Skeleton className="ml-auto h-10 w-44" />
       </div>
       <div className="grid min-h-0 flex-1 grid-cols-3 gap-px overflow-hidden rounded-card border border-border bg-card">
         {Array.from({ length: 3 }, (_, column) => (

@@ -23,6 +23,8 @@ export function toAgendaAppointment(
   return {
     id: item.id,
     professionalId: item.professionalId,
+    clientId: item.clientId,
+    serviceId: item.serviceId,
     start: toTimeString(item.startAt, timeZone),
     end: endsAfterDay ? "24:00" : toTimeString(item.endAt, timeZone),
     clientName: item.client.name,

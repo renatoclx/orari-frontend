@@ -22,6 +22,7 @@ diferente. Em caso de conflito, prevalece o arquivo da tela.
 | [pessoas.md](pessoas.md)           | Clientes, funcionários e profissionais                  |
 | [servicos.md](servicos.md)         | Serviços                                                |
 | [agendamentos.md](agendamentos.md) | Agenda, novo agendamento, encaixe, detalhes e alteração |
+| [recorrencias.md](recorrencias.md) | Recorrências (rascunho)                                 |
 
 ## Convenções
 

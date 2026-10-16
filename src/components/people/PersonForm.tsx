@@ -62,7 +62,7 @@ type PersonFormProps = {
   editing?: EditablePerson;
 };
 
-// Duas colunas ocupando a largura do card (screens.md, "Layout do formulário"):
+// Duas colunas ocupando a largura do card (screens/pessoas.md, "Layout do formulário"):
 // à esquerda os dados principais; à direita os opcionais, em seções recolhíveis.
 export function PersonForm({ kind, states, editing }: PersonFormProps) {
   const [errors, setErrors] = useState<PersonFormErrors>({});
@@ -195,7 +195,7 @@ export function PersonForm({ kind, states, editing }: PersonFormProps) {
           />
         )}
         <div className="min-h-0 flex-1 overflow-auto p-4 md:p-6">
-          {/* Foto centralizada, acima das colunas (screens.md). */}
+          {/* Foto centralizada, acima das colunas (screens/pessoas.md). */}
           <div className="mb-6 flex justify-center">
             <PhotoUpload currentUrl={editing?.person.photoUrl} />
           </div>
@@ -281,7 +281,7 @@ export function PersonForm({ kind, states, editing }: PersonFormProps) {
                   defaultValue={editing?.person.note ?? ""}
                   rows={4}
                   maxLength={1000}
-                  // Pelo menos 4 linhas (screens.md); cresce com o conteúdo.
+                  // Pelo menos 4 linhas (screens/pessoas.md); cresce com o conteúdo.
                   className="min-h-28"
                   placeholder="Preferências, cuidados, informações úteis para o atendimento"
                 />

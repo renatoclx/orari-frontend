@@ -71,7 +71,7 @@ Padrão do sistema (`docs/screen-patterns.md`): cor correspondente à informaç�
 
 ## Listagens
 
-Fonte das regras: `docs/screen-patterns.md` e `docs/screens.md`. Modelo: `src/components/people/` (`PeopleListPage`, `PersonList`, `PeopleToolbar`).
+Fonte das regras: `docs/screen-patterns.md` e `docs/screens/pessoas.md`. Modelo: `src/components/people/` (`PeopleListPage`, `PersonList`, `PeopleToolbar`).
 
 - **Pessoas (cliente, funcionário, profissional) compartilham as mesmas telas.** A diferença está só em `PEOPLE_KINDS` (`@/components/people/people-kinds`): tipo, caminho, singular e plural. Textos usam `kind.singular` / `kind.plural`; nunca escreva "cliente" direto em componente de `people/`.
 - Cada tipo tem rotas finas: `app/(admin)/<caminho>/{page,loading}.tsx` e `novo/page.tsx`, que só escolhem o `kind` e delegam a `PeopleListPage`, `PeopleListLoading` e `NewPersonPage`. Para outro tipo, acrescente a entrada em `PEOPLE_KINDS` e as três rotas.
@@ -88,7 +88,7 @@ Fonte das regras: `docs/screen-patterns.md` e `docs/screens.md`. Modelo: `src/co
 
 ## Formulários
 
-Fonte das regras: `docs/screen-patterns.md` (padrões) e `docs/screens.md` (campos e layout de cada entidade). Consulte os dois antes de criar uma tela de cadastro ou alteração.
+Fonte das regras: `docs/screen-patterns.md` (padrões) e `docs/screens/` (campos e layout de cada tela, um arquivo por tela: `pessoas.md`, `servicos.md`, `agendamentos.md`...). Consulte os dois antes de criar uma tela de cadastro ou alteração.
 
 - **Segue o padrão de página:** o card do formulário é o componente principal — ocupa a **largura toda e a altura que sobra** (`flex min-h-0 flex-1 flex-col rounded-card border bg-card`). Nunca limite a largura do card nem o faça acompanhar a altura do conteúdo. Raiz da página: `flex min-h-0 flex-1 flex-col gap-4`, com título e subtítulo acima.
 - Estrutura do card: área de campos (`min-h-0 flex-1 overflow-auto p-4 md:p-6`) + `FormFooter` (`@/components/shared/FormFooter`) fixo no fim, com borda no topo e botões à direita (Cancelar, depois a ação principal). Os botões ficam **dentro** do `<form>`. A legenda "Campos obrigatórios" vai na prop `note` do rodapé.
@@ -145,7 +145,7 @@ Toda página da área administrativa segue o modelo da tela de Agendamentos (`sr
 
 ## Agenda
 
-Fonte: `docs/screens.md` (seção Agendamentos). Modelo: `src/components/agenda/`.
+Fonte: `docs/screens/agendamentos.md`. Modelo: `src/components/agenda/`.
 
 - O dia exibido (`?date=`) e o filtro de profissional (`?professional=`) ficam na URL; anterior, próximo, hoje e o calendário do atalho levam os dois. O filtro é aplicado na tela e vai para a URL com `history.replaceState` (sem buscar os dados de novo). Padrão: todos os profissionais ativos; "Mostrar Todos" sempre visível.
 - Datas e horários sempre no fuso da empresa (`utils/time.ts`: `dayBounds`, `toTimeString`); a API trabalha em UTC.
@@ -153,13 +153,14 @@ Fonte: `docs/screens.md` (seção Agendamentos). Modelo: `src/components/agenda/
 - Rótulo e ícone de cada status vêm de `appointment-status.ts` (bloco e legenda usam a mesma fonte). Concluído, cancelado e não compareceu ficam esmaecidos; o encaixe é cinza exclusivo (`OVERBOOKING_COLOR`, campo `overBooking` da API).
 - A faixa da grade é calculada em `agenda-range.ts` (expediente ± 2 h, ampliada por agendamentos fora dela). Fora das janelas: hachurado e clicável para encaixe; entre janelas: cinza "Intervalo" (só visual, também encaixe). Cancelado só aparece se não ficar sobreposto a nada.
 - **Novo agendamento e encaixe** (`NewAppointmentDialog`, mesmo dialog): cliente com busca no servidor, serviço com busca, profissional, data (sem passado), horários em `AvailableTimes` (caixa de período Manhã/Tarde/Noite, só os com horário, e botões). Os horários vêm de `agenda-availability.ts` (grade de 15 min mais o fim de cada agendamento): comum = cabe em uma janela; encaixe = inteiro fora das janelas e até a meia-noite. A busca de disponibilidade (janelas e agendamentos do profissional na data) é a Server Action `getAvailabilityAction`. Encaixe grava com `overBooking: true` e mostra aviso fixo.
-- **Detalhes do agendamento:** só a ação "Cancelar agendamento" (botão vermelho centralizado, com confirmação), enquanto não iniciou. Início e fim são automáticos (job do backend).
+- **Detalhes do agendamento:** só a ação "Cancelar agendamento" (botão vermelho centralizado, com confirmação), enquanto não iniciou. Início e fim são automáticos (job do backend). **Nada no passado é alterado:** "Cancelar" e "Alterar" só aparecem antes do início.
+- **Alterar agendamento:** o mesmo `NewAppointmentDialog` em modo de alteração (prop `editing`), preenchido, com "Salvar alterações" habilitado só se algo mudou; envia só os campos alterados (`updateAppointmentAction`). Mantém o tipo: comum só dentro do expediente; encaixe só fora, reenviando `overBooking: true`. O próprio horário conta como livre (`ignoreAppointmentId` na busca de disponibilidade).
 - O carregamento usa `Suspense` com `key` no dia, no `page.tsx` (um `loading.tsx` na raiz de `(admin)` valeria para todas as telas).
 
 ## Barra de ações lateral
 
 - Componente único `@/components/layout/ActionBar`, renderizado pelo `AdminShell`: aparece em **todas** as telas administrativas a partir do tablet (`md`). Não adicione barras por página.
-- **No celular, a barra some** e só o calendário aparece, como ícone no header (`CalendarShortcut` com `placement="header"`); os demais atalhos (cliente, serviço) ficam ocultos (screens.md). Atalhos atuais: calendário (`CalendarShortcut`), cadastro rápido de cliente (`QuickClientShortcut`, diálogo só com nome e telefone) e cadastro de serviço (`QuickServiceShortcut`, abre o `ServiceFormDialog` de qualquer tela).
+- **No celular, a barra some** e só o calendário aparece, como ícone no header (`CalendarShortcut` com `placement="header"`); os demais atalhos (cliente, serviço) ficam ocultos (`docs/screens/layout.md`). Atalhos atuais: calendário (`CalendarShortcut`), cadastro rápido de cliente (`QuickClientShortcut`, diálogo só com nome e telefone) e cadastro de serviço (`QuickServiceShortcut`, abre o `ServiceFormDialog` de qualquer tela).
 - Fixa na borda direita da tela, centralizada na vertical, com cantos arredondados só à esquerda (`rounded-l-overlay`), sombra e sem borda à direita.
 - Guarda atalhos secundários (hoje: calendário). Novos atalhos entram nela como botões de ícone com `aria-label` e `title`.
 - Painéis abertos por ela usam o `Popover` do shadcn com `side="left"` e `sideOffset={0}`, colados à barra e flutuando sobre o conteúdo.

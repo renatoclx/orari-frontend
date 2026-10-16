@@ -22,6 +22,8 @@ src/
                              exclusão, reativação, contatos, endereços)
       service-actions.ts     Server Actions de serviços (cadastro, alteração,
                              inativação, exclusão)
+      appointment-actions.ts Server Actions da agenda (disponibilidade, busca
+                             de clientes, criar, alterar e cancelar)
       location-actions.ts    busca de cidades e consulta de CEP
       page.tsx               Agendamentos ("/"): agenda do dia (?date=)
       servicos/              Serviços: page e loading (cadastro e alteração
@@ -48,12 +50,13 @@ src/
   utils/                     funções puras (datas, formatação, máscaras)
   lib/                       cn() do shadcn e helpers das Server Actions
                              (action-result.ts, form-data.ts)
+docs/                        documentação; screens/ tem um arquivo por tela
   proxy.ts                   proteção das rotas (antigo middleware)
 next.config.ts               limite das Server Actions e rewrite de /uploads
 ```
 
 - Pastas entre parênteses (`(admin)`, `(auth)`) são **grupos de rotas**: organizam layouts sem mudar a URL.
-- `hooks/` será criada quando existir o primeiro hook próprio.
+- Hooks próprios ficam junto da tela que os usa (ex.: `components/agenda/useAgendaClock.ts`). Uma pasta `hooks/` só será criada quando um hook for usado por mais de uma tela.
 
 ## Organização
 
@@ -70,7 +73,7 @@ Layout ──────────────────┘
 ```
 
 - **`apiFetch`** (`services/api.ts`) é o ponto único de chamada à API: monta a URL com `API_URL`, envia JSON sem cache, anexa o token da sessão e transforma erros em `ApiError` (status + mensagem). Status `0` = API fora do ar. Um 401 em chamada autenticada leva ao login (`/session-expired`).
-- **Services por assunto** (`auth.service.ts`, `people.service.ts`, `contact.service.ts`, `address.service.ts`, `location.service.ts`, `cep.service.ts`) conhecem os caminhos da API e são chamados pelas telas, layouts e Server Actions — nunca o `apiFetch` direto.
+- **Services por assunto** (`auth.service.ts`, `people.service.ts`, `contact.service.ts`, `address.service.ts`, `location.service.ts`, `cep.service.ts`, `service.service.ts`, `appointment.service.ts`, `business-hour.service.ts`) conhecem os caminhos da API e são chamados pelas telas, layouts e Server Actions — nunca o `apiFetch` direto.
 - Os services importam `server-only`: rodam só no servidor. O navegador nunca fala com a API diretamente.
 - Server Actions tratam `ApiError` (viram mensagem na tela) e deixam estourar erros inesperados — inclusive o `redirect()` do Next, que também é lançado como erro.
 
@@ -101,7 +104,7 @@ As três telas são a mesma implementação, escolhida pelo tipo (`PeopleType`).
 
 ## Serviços
 
-- Listagem em página (`/servicos`), com busca e paginação pela URL; cadastro e alteração em **dialog** (`ServiceFormDialog`), como o `screens.md` especifica.
+- Listagem em página (`/servicos`), com busca e paginação pela URL; cadastro e alteração em **dialog** (`ServiceFormDialog`), como `screens/servicos.md` especifica.
 - Ativar e inativar usam `PATCH /services/:id` (`isActive`); a exclusão é recusada pela API (409) quando há agendamentos, recorrências ou planos vinculados, e a tela orienta a inativar.
 - O preço chega da API como texto (`Decimal`) e é enviado como número; a máscara BRL guarda centavos no formulário.
 - O atalho de cadastro de serviço da barra lateral abre o mesmo dialog de qualquer tela.
@@ -114,7 +117,7 @@ As três telas são a mesma implementação, escolhida pelo tipo (`PeopleType`).
 - **Relógio vivo** (`useAgendaClock`): o "agora" avança sem recarregar a página (linha do horário atual, horários passados, possibilidade de cancelar), e os dados são buscados de novo a cada minuto e ao voltar para a aba (`router.refresh`). Com a aba escondida, nada roda.
 - A faixa da grade (`agenda-range.ts`) vai da abertura mais cedo menos 2 h ao fechamento mais tarde mais 2 h, ampliada por agendamentos fora dela. Fora das janelas, a grade é hachurada; o intervalo entre janelas é cinza. Pausas por profissional não existem no backend.
 - **Novo agendamento e encaixe:** mesmo dialog (`NewAppointmentDialog`). Os horários são calculados no navegador (`agenda-availability.ts`) a partir das janelas e dos agendamentos do profissional na data, buscados pela Server Action `getAvailabilityAction`. O comum exige caber inteiro em uma janela; o encaixe, ficar inteiro fora delas (sem atravessar a meia-noite) e grava com `overBooking: true`. As Server Actions ficam em `appointment-actions.ts` (disponibilidade, busca de clientes, criar e cancelar).
-- **Cancelar:** única ação de status no dialog de detalhes, só antes de o agendamento iniciar. A regra de não cancelar o que já iniciou ainda é só da tela.
+- **Cancelar:** única ação de status no dialog de detalhes, só antes de o agendamento iniciar. A regra também é imposta pelo backend (400 ao cancelar o que já iniciou); a tela só esconde o botão e mostra a mensagem do servidor se ele recusar.
 - No celular, um profissional por vez, trocado por um menu ao lado do nome no cabeçalho da coluna; no computador, uma coluna por profissional (padrão: todos os ativos; o filtro mostra só um).
 - `getCurrentUser` usa `cache` do React: layout e página compartilham a chamada a `/auth/me` na mesma requisição.
 

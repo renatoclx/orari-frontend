@@ -4,7 +4,7 @@ import { QuickServiceShortcut } from "@/components/layout/QuickServiceShortcut";
 
 // Barra de atalhos fixa na borda direita, presente em todas as telas
 // administrativas a partir do tablet. No celular ela some e só o calendário
-// aparece, no header (screens.md).
+// aparece, no header (screens/layout.md).
 export function ActionBar() {
   return (
     <div className="fixed top-1/2 right-0 z-30 hidden -translate-y-1/2 md:block">

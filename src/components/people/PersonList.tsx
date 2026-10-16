@@ -276,7 +276,7 @@ function PersonActions({
   busy,
   basePath,
 }: { person: PersonListItem } & RowHandlers) {
-  // Excluído: Alterar e Excluir ficam desabilitados (screens.md).
+  // Excluído: Alterar e Excluir ficam desabilitados (screens/pessoas.md).
   const removed = person.deletedAt !== null;
 
   return (

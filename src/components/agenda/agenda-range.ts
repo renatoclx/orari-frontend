@@ -4,7 +4,7 @@ import { minutesToTime, timeToMinutes } from "@/utils/time";
 const SLOT_MINUTES = 30;
 const DAY_MINUTES = 24 * 60;
 
-// Folga exibida antes da abertura e depois do fechamento (screens.md).
+// Folga exibida antes da abertura e depois do fechamento (screens/agendamentos.md).
 const MARGIN_MINUTES = 2 * 60;
 
 // Janela padrão para o dia sem horário de funcionamento e sem agendamentos.

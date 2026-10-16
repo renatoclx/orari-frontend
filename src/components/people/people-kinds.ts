@@ -1,6 +1,6 @@
 import type { PeopleType } from "@/types/people";
 
-// Tipos de pessoa que compartilham as mesmas telas (screens.md): cada um
+// Tipos de pessoa que compartilham as mesmas telas (screens/pessoas.md): cada um
 // referencia um PeopleType do backend. Usuários são outra entidade (UserType).
 export type PeopleKind = {
   type: PeopleType;

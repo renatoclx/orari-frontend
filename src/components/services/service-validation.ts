@@ -21,7 +21,7 @@ export const serviceFieldOrder: (keyof ServiceFormValues)[] = [
 // Decimal(10,2) do banco: até 99.999.999,99, ou 9.999.999.999 centavos.
 const MAX_PRICE_CENTS = 9_999_999_999;
 
-/** Obrigatórios (screens.md): nome e duração. O preço é opcional. */
+/** Obrigatórios (screens/servicos.md): nome e duração. O preço é opcional. */
 export function validateServiceForm(
   values: ServiceFormValues,
 ): ServiceFormErrors {

@@ -31,7 +31,7 @@ export function Header({ user, onOpenMobile }: HeaderProps) {
       </div>
 
       <div className="ml-auto flex items-center gap-3">
-        {/* No celular só o calendário aparece (screens.md); os demais atalhos
+        {/* No celular só o calendário aparece (screens/layout.md); os demais atalhos
             ficam na barra lateral, do tablet em diante. */}
         <div className="flex items-center md:hidden">
           <CalendarShortcut placement="header" />

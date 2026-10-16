@@ -45,7 +45,7 @@ type ServiceListProps = {
   footer: React.ReactNode;
 };
 
-// Círculo de 16 px, sem borda, com a cor do serviço (screens.md).
+// Círculo de 16 px, sem borda, com a cor do serviço (screens/servicos.md).
 function ColorDot({ color }: { color: string | null }) {
   return color ? (
     <Hint label={`Cor do serviço: ${color.toUpperCase()}`}>

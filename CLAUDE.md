@@ -18,6 +18,7 @@ frontend-rules.md
 frontend-coding-standards.md
 frontend-auth.md
 frontend-technical-debt.md
+decisions.md
 stack-tecnologico.md
 screens/ (README.md e um arquivo por tela)
 screen-patterns.md

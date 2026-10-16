@@ -9,8 +9,6 @@ Pontos conhecidos e aceitos por enquanto. Revisar quando o contexto mudar.
 
 ## Telas
 
-- **Alterar agendamento.** O botão "Alterar" do dialog de detalhes é rascunho (remarcar e editar serão especificados).
-- **Cancelar o que já iniciou.** A tela só oferece "Cancelar agendamento" (e "Alterar") antes do início, com o relógio vivo; o backend ainda aceita cancelar um agendamento avulso em qualquer status e horário, inclusive já iniciado ou concluído. A regra precisa existir no `PATCH /appointments/:id` (ver a dívida "Cancelamento de agendamento que já iniciou" em `../backend/docs/technical-debt.md`). Enquanto isso, só a tela impede.
 - **Empresa sem nenhuma janela cadastrada.** A API não restringe horários nem há encaixe; a agenda trata o dia sem janela como "somente encaixe" (o agendamento comum fica sem horários).
 - **Conflito do cliente.** Os horários oferecidos só consideram os agendamentos do profissional; se o cliente já tiver agendamento no horário, o servidor recusa (409) e a tela informa.
 - **Disponibilidade calculada no frontend.** As regras de horário (janela, conflito, passado) são repetidas na tela; a API é quem decide ao salvar. Se divergirem, o servidor vence. Uma rota de disponibilidade no backend centralizaria as regras.

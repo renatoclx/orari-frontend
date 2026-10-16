@@ -76,7 +76,6 @@
 
 - Confirmação do agendamento pelo cliente (status Confirmado).
 - Empresa sem nenhuma janela de atendimento cadastrada: a API não restringe horários nem há encaixe; a agenda ainda trata o dia sem janela como "somente encaixe".
-- Regra no backend para não cancelar agendamento que já iniciou (hoje só a tela impede).
 
 ---
 
@@ -87,6 +86,7 @@
   - Botão vermelho, centralizado, exibido apenas enquanto o agendamento ainda não iniciou (status Agendado ou Confirmado, com o horário de início no futuro).
   - Pede confirmação em dialog ("Cancelar agendamento?", com "Voltar" e "Cancelar agendamento"). Ao confirmar, o status passa a Cancelado, o horário fica livre e um aviso informa o cancelamento.
   - Agendamento gerado por recorrência é cancelado pela própria recorrência; se a API recusar, o motivo é exibido.
+  - A regra também é imposta pelo backend: a API recusa (400) o cancelamento de agendamento que já iniciou, concluído, com "Não compareceu" ou já cancelado, e a tela exibe a mensagem do servidor. Cancelado é um estado final (não pode ser reaberto).
 - Não há ação manual para os demais status: o início e a conclusão do atendimento são automáticos, pelo horário (o backend atualiza o status), e a confirmação (status Confirmado) será feita pelo cliente em uma funcionalidade futura. "Não compareceu" ainda não tem regra no backend.
 - O botão "Alterar" abre o dialog de alteração (ver "Alterar agendamento"). Aparece apenas enquanto o agendamento ainda não iniciou, como o cancelamento: nada no passado é alterado.
 

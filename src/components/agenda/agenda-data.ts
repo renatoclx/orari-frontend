@@ -39,5 +39,6 @@ export function toAgendaAppointment(
     note: item.note,
     overbooking: item.overBooking,
     status: item.status,
+    recurrence: item.recurringAppointment,
   };
 }

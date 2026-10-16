@@ -1,5 +1,6 @@
 import { CalendarShortcut } from "@/components/layout/CalendarShortcut";
 import { QuickClientShortcut } from "@/components/layout/QuickClientShortcut";
+import { QuickRecurrenceShortcut } from "@/components/layout/QuickRecurrenceShortcut";
 import { QuickServiceShortcut } from "@/components/layout/QuickServiceShortcut";
 
 // Barra de atalhos fixa na borda direita, presente em todas as telas
@@ -12,6 +13,7 @@ export function ActionBar() {
         <CalendarShortcut placement="bar" />
         <QuickClientShortcut />
         <QuickServiceShortcut />
+        <QuickRecurrenceShortcut />
       </div>
     </div>
   );

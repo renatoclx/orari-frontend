@@ -6,8 +6,10 @@ import {
   CalendarDays,
   ChevronDown,
   ClipboardList,
+  Package,
   PanelLeftClose,
   PanelLeftOpen,
+  Repeat,
   Users,
   Wallet,
   X,
@@ -63,6 +65,15 @@ const navItems: (NavLink | NavGroup)[] = [
     ],
   },
   { href: "/servicos", label: "Serviços", icon: ClipboardList },
+  { href: "/recorrencias", label: "Recorrências", icon: Repeat },
+  {
+    label: "Pacotes",
+    icon: Package,
+    children: [
+      { href: "/pacotes/planos", label: "Planos" },
+      { href: "/pacotes/contratacoes", label: "Contratações" },
+    ],
+  },
   { href: "/financeiro", label: "Financeiro", icon: Wallet },
 ];
 

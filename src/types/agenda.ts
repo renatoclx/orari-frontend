@@ -36,4 +36,6 @@ export type AgendaAppointment = {
    * `overBooking` da API).
    */
   overbooking: boolean;
+  /** Recorrência de origem (nulo no agendamento avulso). */
+  recurrence: { id: string; clientPlanId: string | null } | null;
 };

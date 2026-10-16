@@ -1,16 +1,20 @@
 "use client";
 
+import Link from "next/link";
 import {
   CalendarClock,
   Clock,
   Pencil,
+  Repeat,
   StickyNote,
   UserRound,
 } from "lucide-react";
 import { useState, useTransition } from "react";
 import { toast } from "sonner";
 import { cancelAppointmentAction } from "@/app/(admin)/appointment-actions";
+import { cancelRecurrenceSessionAction } from "@/app/(admin)/recurrence-actions";
 import { APPOINTMENT_STATUS } from "@/components/agenda/appointment-status";
+import { recurrenceLabel } from "@/components/agenda/recurrence-label";
 import { ConfirmDialog } from "@/components/shared/ConfirmDialog";
 import { PersonAvatar } from "@/components/shared/PersonAvatar";
 import { Button } from "@/components/ui/button";
@@ -78,7 +82,13 @@ function Details({
 
   function cancel() {
     startTransition(async () => {
-      const result = await cancelAppointmentAction(appointment.id);
+      // Agendamento de recorrência só é cancelado pela rota da recorrência.
+      const result = appointment.recurrence
+        ? await cancelRecurrenceSessionAction(
+            appointment.recurrence.id,
+            appointment.id,
+          )
+        : await cancelAppointmentAction(appointment.id);
       if (result.ok) {
         toast.success("Agendamento cancelado.", {
           description: `${appointment.clientName}, ${appointment.start} às ${appointment.end}`,
@@ -152,6 +162,15 @@ function Details({
             Encaixe fora do horário de funcionamento
           </li>
         )}
+        {appointment.recurrence && (
+          <li className="flex items-center gap-2">
+            <Repeat
+              className="size-4 shrink-0 text-muted-foreground"
+              aria-hidden="true"
+            />
+            {recurrenceLabel(appointment.recurrence)}
+          </li>
+        )}
         {appointment.note && (
           <li className="flex items-start gap-2">
             <StickyNote
@@ -193,11 +212,21 @@ function Details({
           Fechar
         </Button>
         {/* Nada no passado é alterado: mesma condição do cancelamento. */}
-        {cancellable && (
-          <Button type="button" onClick={onEdit}>
-            <Pencil aria-hidden="true" />
-            Alterar
+        {/* Sessão de recorrência não é alterada aqui: remaneja-se na recorrência. */}
+        {appointment.recurrence ? (
+          <Button asChild>
+            <Link href={`/recorrencias/${appointment.recurrence.id}`}>
+              <Repeat aria-hidden="true" />
+              Ver recorrência
+            </Link>
           </Button>
+        ) : (
+          cancellable && (
+            <Button type="button" onClick={onEdit}>
+              <Pencil aria-hidden="true" />
+              Alterar
+            </Button>
+          )
         )}
       </DialogFooter>
     </>

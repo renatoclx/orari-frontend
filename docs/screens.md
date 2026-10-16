@@ -395,7 +395,6 @@ No celular, somente o item calendário será exibido, os demais devem permanecer
 
 ### Pendências (previstas)
 
-- Alteração (remarcar e editar) de agendamentos.
 - Confirmação do agendamento pelo cliente (status Confirmado).
 - Empresa sem nenhuma janela de atendimento cadastrada: a API não restringe horários nem há encaixe; a agenda ainda trata o dia sem janela como "somente encaixe".
 - Regra no backend para não cancelar agendamento que já iniciou (hoje só a tela impede).
@@ -410,7 +409,7 @@ No celular, somente o item calendário será exibido, os demais devem permanecer
   - Pede confirmação em dialog ("Cancelar agendamento?", com "Voltar" e "Cancelar agendamento"). Ao confirmar, o status passa a Cancelado, o horário fica livre e um aviso informa o cancelamento.
   - Agendamento gerado por recorrência é cancelado pela própria recorrência; se a API recusar, o motivo é exibido.
 - Não há ação manual para os demais status: o início e a conclusão do atendimento são automáticos, pelo horário (o backend atualiza o status), e a confirmação (status Confirmado) será feita pelo cliente em uma funcionalidade futura. "Não compareceu" ainda não tem regra no backend.
-- O botão "Alterar" (remarcar e editar) é rascunho; será especificado depois.
+- O botão "Alterar" abre o dialog de alteração (ver "Alterar agendamento"). Aparece apenas enquanto o agendamento ainda não iniciou, como o cancelamento: nada no passado é alterado.
 
 ---
 
@@ -469,5 +468,37 @@ Segue a mesma estrutura de um novo agendamento.
 - O horário clicado em uma área sombreada da agenda vem como "desejado", como no novo agendamento.
 - Ao salvar, o agendamento é gravado como encaixe (`overBooking`). Conflito de horário do profissional ou do cliente é recusado pelo servidor e informado no dialog. Não há dialog de confirmação.
 - Após salvar, um aviso informa o dia e o horário do encaixe, e a agenda permanece no dia em que estava.
+
+---
+
+## Alterar agendamento
+
+### Estrutura do dialog
+
+- Reaproveita o dialog de novo agendamento em modo de alteração, com o título "Alterar agendamento" e o botão "Salvar alterações".
+- Todos os campos vêm preenchidos com os dados do agendamento: Cliente, Serviço, Profissional, Data, Horário (o horário atual já vem marcado) e Observações.
+- Aberto pelo botão "Alterar" do dialog de detalhes do agendamento.
+
+### O que pode ser alterado
+
+- Agendamento ainda não iniciado (status Agendado ou Confirmado, com o horário de início no futuro): pode alterar cliente, serviço, profissional, data, horário e observações.
+- Nada no passado é alterado: agendamento já iniciado, concluído, cancelado ou com status "Não compareceu" não pode ser alterado, nem as observações. O botão "Alterar" não é exibido.
+- A restrição é da tela: o endpoint do backend continua aceitando mais formas de alteração (outras funcionalidades o usam), então a regra não é imposta lá.
+
+### Regras específicas
+
+- Seguem as regras do novo agendamento: a data não pode ser anterior a hoje, os horários são calculados pela disponibilidade do profissional na data para a duração do serviço (grade de 15 em 15 minutos mais o horário logo após o fim de cada agendamento), agrupados em períodos na caixa de seleção.
+- O próprio horário do agendamento conta como livre para ele mesmo: pode permanecer no mesmo horário ou escolher outro.
+- Mudando o profissional, a data ou o serviço, o horário escolhido é limpo, a menos que continue disponível.
+- O tipo do agendamento é mantido:
+  - Agendamento comum só pode ser remarcado para horários dentro do expediente (inteiro dentro de uma janela de atendimento).
+  - Encaixe só pode ser remarcado para horários fora do expediente, com as regras do encaixe (inteiro fora das janelas, sem atravessar a meia-noite). A alteração do encaixe reenvia a autorização do encaixe (`overBooking`). O dialog exibe o aviso fixo de encaixe.
+  - Para transformar um agendamento comum em encaixe, ou o contrário, cancela-se o agendamento e cria-se outro.
+- Não pode ser remarcado para o passado.
+- Limpar o campo Observações remove a observação.
+- O botão "Salvar alterações" só fica habilitado quando algo foi alterado. Não há dialog de confirmação.
+- Se o profissional ou o cliente já tiverem agendamento no novo horário, o servidor recusa (conflito), e o dialog informa e atualiza os horários.
+- Agendamentos gerados por recorrência (funcionalidade futura) têm restrições na API (cliente, profissional, serviço e horário não mudam pela alteração comum); se a API recusar, o motivo é exibido no aviso de erro.
+- Após salvar, um aviso informa o novo dia e horário (ex.: "Quinta-feira, 22 de outubro, das 10:00 às 11:00"). A agenda permanece no dia em que estava; se o agendamento foi para outro dia, o bloco deixa de aparecer nela e o aviso informa para onde foi.
 
 ---

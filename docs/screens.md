@@ -338,27 +338,27 @@ No celular, somente o item calendário será exibido, os demais devem permanecer
   - Uma coluna por profissional exibido (ver "Profissionais exibidos"), com o nome e a quantidade de agendamentos do dia (cancelados não contam).
   - Coluna de horários fixa à esquerda, em intervalos de 30 minutos.
   - Linha do horário atual, somente quando o dia exibido é hoje.
-  - Áreas fora do expediente (antes da abertura e depois do fechamento) sombreadas, com hachura.
-  - O intervalo entre janelas de atendimento (horário de almoço, por exemplo) em cinza, com a indicação "Intervalo".
+  - Áreas fora das janelas de atendimento (antes da abertura e depois do fechamento) sombreadas, com hachura.
+  - O intervalo entre duas janelas de atendimento (almoço, por exemplo) em cinza, com a indicação "Intervalo". É apenas indicação visual: não tem regra própria.
 - Legenda dos ícones de status e do encaixe no rodapé da página, alinhada à direita.
 
 ### Profissionais exibidos
 
-- Ao carregar, a grade exibe os profissionais ativos que têm agendamentos no dia. Agendamentos cancelados não contam.
-- Dia sem nenhum agendamento: exibe todos os profissionais ativos.
-- Filtro por profissional: exibe somente o profissional escolhido.
+- Ao carregar, a grade exibe todos os profissionais ativos cadastrados, com ou sem agendamentos no dia.
+- Filtro por profissional: exibe somente o profissional escolhido. O filtro fica na URL (`?professional=`) e acompanha a troca de dia e o calendário.
   - Um profissional sem agendamentos aparece com a coluna vazia, e o usuário é notificado de que ele não possui agendamentos no dia.
-  - Um profissional que só tem agendamentos cancelados também pode ser filtrado e exibe a sua grade.
-- Botão "Mostrar Todos": volta à exibição padrão (profissionais com agendamentos).
+  - Um profissional que só tem agendamentos cancelados exibe a sua grade normalmente.
+- Botão "Mostrar Todos": sempre visível; volta a exibir todos os profissionais ativos (desabilitado quando já estão todos).
 - Profissional inativo permanece fora da grade (a agenda dele será remanejada, fora do MVP).
 
 ### Encaixe (agendamento fora do horário de funcionamento)
 
-- Acionado de duas formas: pelo botão "Encaixar horário" ou clicando em uma área sombreada fora do expediente (antes da abertura ou depois do fechamento) da grade.
+- Acionado de duas formas: pelo botão "Encaixar horário" ou clicando em uma área sombreada (fora das janelas de atendimento, inclusive o intervalo entre janelas) da grade.
 - Abre o dialog de novo agendamento com um aviso fixo de que o agendamento é fora do horário de funcionamento.
-- O expediente do dia vai da abertura mais cedo ao fechamento mais tarde. Intervalos entre janelas de atendimento (almoço, por exemplo) fazem parte do expediente: não aceitam agendamento nem encaixe, e o clique exibe um aviso.
-- O seletor de horário do dialog oferece apenas horários que estão de fato fora do expediente (antes da abertura ou depois do fechamento), que ainda não passaram e que não sobrepõem outro agendamento do profissional. Horários do intervalo entre janelas e dentro do expediente não aparecem.
-- A duração do serviço escolhido é considerada: o atendimento inteiro precisa caber fora do expediente.
+- O expediente do dia são as janelas de atendimento cadastradas. Fora do expediente é tudo que não está dentro de uma janela: antes da abertura, depois do fechamento, dias sem janela e o intervalo entre duas janelas.
+- O seletor de horário do dialog oferece apenas horários inteiros fora de qualquer janela de atendimento (inclusive os do intervalo entre janelas), que ainda não passaram e que não sobrepõem outro agendamento do profissional.
+- A duração do serviço escolhido é considerada: o atendimento inteiro precisa ficar fora das janelas.
+- Pela API, um atendimento que começa dentro de uma janela e termina fora (ex.: 17:30 às 18:30, com fechamento às 18:00) também é aceito como encaixe, quando autorizado; a tela, porém, só oferece horários inteiros fora das janelas.
 - Ao clicar em uma área sombreada, o profissional e o horário clicados já vêm preenchidos.
 - Não há recorrência de encaixe; apenas agendamentos básicos.
 - O encaixe é exibido com uma cor cinza exclusiva e identificado como encaixe.

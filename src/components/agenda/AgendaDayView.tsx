@@ -73,6 +73,9 @@ export function AgendaDayView({
   const [filterId, setFilterId] = useState<string | null>(initialFilterId);
   const [creating, setCreating] = useState<CreatingState | null>(null);
   const [viewing, setViewing] = useState<AgendaAppointment | null>(null);
+  // Agendamento em alteração (o dialog de novo agendamento em modo de edição).
+  const [editing, setEditing] = useState<AgendaAppointment | null>(null);
+  const [editOpen, setEditOpen] = useState(false);
 
   // Padrão: todos os profissionais ativos; o filtro mostra só um.
   const visibleIds = filterId
@@ -198,9 +201,28 @@ export function AgendaDayView({
         }
       />
 
+      {/* Alteração: o mesmo dialog, preenchido com o agendamento. */}
+      <NewAppointmentDialog
+        key={editing?.id ?? "editing"}
+        open={editOpen}
+        onOpenChange={setEditOpen}
+        professionals={professionals}
+        services={services}
+        clients={clients}
+        date={date}
+        today={today}
+        initial={{ professionalId: null, time: null, overbooking: false }}
+        editing={editing ?? undefined}
+      />
+
       <AppointmentDetailsDialog
         appointment={viewing}
         canCancel={canCancel}
+        onEdit={(appointment) => {
+          setViewing(null);
+          setEditing(appointment);
+          setEditOpen(true);
+        }}
         onOpenChange={(open) => !open && setViewing(null)}
       />
     </>

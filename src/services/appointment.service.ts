@@ -76,3 +76,30 @@ export function cancelAppointment(id: string): Promise<AppointmentItem> {
     body: JSON.stringify({ status: "CANCELLED" }),
   });
 }
+
+/** Campos que a alteração pode mudar; só o que for informado é enviado. */
+export type UpdateAppointmentInput = {
+  clientId?: string;
+  professionalId?: string;
+  serviceId?: string;
+  /** Novo início em UTC (ISO 8601). */
+  startAt?: string;
+  /** `null` remove a observação. */
+  note?: string | null;
+  /**
+   * Reautoriza o encaixe: ao mudar horário ou serviço, a API reavalia o
+   * agendamento e exige a autorização de novo se ele ficar fora do expediente.
+   */
+  overBooking?: boolean;
+};
+
+/** Altera o agendamento (remarcar, trocar serviço, cliente, profissional ou observação). */
+export function updateAppointment(
+  id: string,
+  input: UpdateAppointmentInput,
+): Promise<AppointmentItem> {
+  return apiFetch<AppointmentItem>(`/appointments/${id}`, {
+    method: "PATCH",
+    body: JSON.stringify(input),
+  });
+}

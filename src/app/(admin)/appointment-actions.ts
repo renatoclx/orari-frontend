@@ -6,6 +6,7 @@ import {
   cancelAppointment,
   createAppointment,
   listAppointments,
+  updateAppointment,
 } from "@/services/appointment.service";
 import { getCurrentUser } from "@/services/auth.service";
 import { listBusinessHours } from "@/services/business-hour.service";
@@ -41,6 +42,8 @@ export type AvailabilityResult =
 export async function getAvailabilityAction(
   professionalId: string,
   date: string,
+  /** Na alteração, o próprio agendamento não ocupa horário para ele mesmo. */
+  ignoreAppointmentId?: string,
 ): Promise<AvailabilityResult> {
   if (!professionalId || !isDateString(date)) {
     return { ok: false, message: "Informe o profissional e a data." };
@@ -74,7 +77,10 @@ export async function getAvailabilityAction(
           end: item.closeAt,
         })),
         busy: appointments
-          .filter((item) => item.status !== "CANCELLED")
+          .filter(
+            (item) =>
+              item.status !== "CANCELLED" && item.id !== ignoreAppointmentId,
+          )
           .map((item) => ({
             start: toTimeString(item.startAt, timeZone),
             // Atendimento que passa da meia-noite termina às 24:00.
@@ -200,4 +206,68 @@ export async function cancelAppointmentAction(
 
   revalidatePath("/");
   return { ok: true };
+}
+
+export type UpdateAppointmentActionInput = {
+  id: string;
+  clientId?: string;
+  professionalId?: string;
+  serviceId?: string;
+  /** Novo dia e horário (juntos), no fuso da empresa. */
+  date?: string;
+  time?: string;
+  /** Texto vazio remove a observação. */
+  note?: string;
+  overBooking?: boolean;
+};
+
+export type UpdateAppointmentResult =
+  | { ok: true; dateLabel: string; start: string; end: string }
+  | ActionFailure<"time">;
+
+/** Altera o agendamento: só os campos informados são enviados à API. */
+export async function updateAppointmentAction(
+  input: UpdateAppointmentActionInput,
+): Promise<UpdateAppointmentResult> {
+  const moves = input.date !== undefined || input.time !== undefined;
+  if (
+    moves &&
+    (!input.date ||
+      !isDateString(input.date) ||
+      !input.time ||
+      !/^\d{2}:\d{2}$/.test(input.time))
+  ) {
+    return { ok: false, message: "Informe a data e o horário." };
+  }
+
+  try {
+    const { company } = await getCurrentUser();
+    const timeZone = company.timezone;
+
+    const updated = await updateAppointment(input.id, {
+      ...(input.clientId && { clientId: input.clientId }),
+      ...(input.professionalId && { professionalId: input.professionalId }),
+      ...(input.serviceId && { serviceId: input.serviceId }),
+      ...(moves && {
+        // Meia-noite do dia no fuso da empresa + o horário escolhido.
+        startAt: new Date(
+          dayBounds(input.date as string, timeZone).from.getTime() +
+            timeToMinutes(input.time as string) * 60_000,
+        ).toISOString(),
+      }),
+      ...(input.note !== undefined && { note: input.note.trim() || null }),
+      ...(input.overBooking && { overBooking: true }),
+    });
+
+    revalidatePath("/");
+    return {
+      ok: true,
+      dateLabel: formatLongDate(new Date(updated.startAt)),
+      start: toTimeString(updated.startAt, timeZone),
+      end: toTimeString(updated.endAt, timeZone),
+    };
+  } catch (error) {
+    // O 409 é conflito de horário (do profissional ou do cliente).
+    return failureFrom(error, "time" as const);
+  }
 }

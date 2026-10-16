@@ -5,6 +5,7 @@ import { TriangleAlert } from "lucide-react";
 import { toast } from "sonner";
 import {
   createAppointmentAction,
+  updateAppointmentAction,
   getAvailabilityAction,
   searchClientsAction,
   type Availability,
@@ -35,7 +36,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import type { AgendaProfessional } from "@/types/agenda";
+import type { AgendaAppointment, AgendaProfessional } from "@/types/agenda";
 import { formatDuration } from "@/utils/format";
 import { minutesToTime, timeToMinutes } from "@/utils/time";
 
@@ -67,10 +68,13 @@ type NewAppointmentDialogProps = {
     /** Encaixe: agendamento fora do horário de funcionamento. */
     overbooking: boolean;
   };
+  /** Alteração: o agendamento a alterar (o dialog abre preenchido com ele). */
+  editing?: AgendaAppointment;
 };
 
-// Novo agendamento e encaixe (agendamento fora do expediente): mesmo dialog e
-// mesmos campos; muda só quais horários são oferecidos e o envio do `overBooking`.
+// Novo agendamento, encaixe (fora do expediente) e alteração: mesmo dialog e
+// mesmos campos. O encaixe muda só quais horários são oferecidos e o envio do
+// `overBooking`; a alteração abre preenchida e envia apenas o que mudou.
 export function NewAppointmentDialog(props: NewAppointmentDialogProps) {
   return (
     <Dialog open={props.open} onOpenChange={props.onOpenChange}>
@@ -89,20 +93,24 @@ function NewAppointmentForm({
   date,
   today,
   initial,
+  editing,
 }: NewAppointmentDialogProps) {
-  const overbooking = initial.overbooking;
+  // Na alteração, o tipo (comum ou encaixe) é o do próprio agendamento.
+  const overbooking = editing ? editing.overbooking : initial.overbooking;
+  // Horário "desejado": o do agendamento (alteração) ou o clicado na agenda.
+  const desiredTime = editing ? editing.start : initial.time;
 
-  const [clientId, setClientId] = useState("");
-  const [serviceId, setServiceId] = useState("");
+  const [clientId, setClientId] = useState(editing?.clientId ?? "");
+  const [serviceId, setServiceId] = useState(editing?.serviceId ?? "");
   const [professionalId, setProfessionalId] = useState(
-    initial.professionalId ?? "",
+    editing?.professionalId ?? initial.professionalId ?? "",
   );
   // Não se agenda antes de hoje: a agenda aberta num dia passado começa em hoje.
   const [day, setDay] = useState(date < today ? today : date);
   const [time, setTime] = useState("");
   // O usuário já escolheu um horário (o clicado na agenda deixa de valer).
   const [touched, setTouched] = useState(false);
-  const [note, setNote] = useState("");
+  const [note, setNote] = useState(editing?.note ?? "");
   const [errors, setErrors] = useState<{
     client?: string;
     service?: string;
@@ -111,12 +119,26 @@ function NewAppointmentForm({
   }>({});
   const [pending, startTransition] = useTransition();
 
-  const service = services.find((item) => item.id === serviceId);
+  // O serviço do agendamento continua na lista mesmo que tenha sido inativado.
+  const serviceOptions = [...services];
+  if (
+    editing &&
+    !serviceOptions.some((item) => item.id === editing.serviceId)
+  ) {
+    serviceOptions.push({
+      id: editing.serviceId,
+      name: editing.serviceName,
+      duration: editing.durationMinutes,
+    });
+  }
+  const service = serviceOptions.find((item) => item.id === serviceId);
 
   // --- Busca de clientes no servidor (a lista inicial traz os primeiros). ---
   const [clientOptions, setClientOptions] = useState<ClientOption[]>(clients);
   const [clientsLoading, setClientsLoading] = useState(false);
-  const [pickedClient, setPickedClient] = useState<ClientOption>();
+  const [pickedClient, setPickedClient] = useState<ClientOption | undefined>(
+    editing && { id: editing.clientId, name: editing.clientName },
+  );
   const clientRequest = useRef(0);
   const clientDebounce = useRef<ReturnType<typeof setTimeout> | undefined>(
     undefined,
@@ -161,7 +183,7 @@ function NewAppointmentForm({
     if (!professionalId) return;
 
     let cancelled = false;
-    getAvailabilityAction(professionalId, day).then((result) => {
+    getAvailabilityAction(professionalId, day, editing?.id).then((result) => {
       if (cancelled) return;
       if (!result.ok) {
         toast.error("Não foi possível buscar os horários.", {
@@ -176,7 +198,7 @@ function NewAppointmentForm({
     return () => {
       cancelled = true;
     };
-  }, [professionalId, day, reload, availabilityKey]);
+  }, [professionalId, day, reload, availabilityKey, editing?.id]);
 
   const availabilityLoading = loaded?.key !== availabilityKey;
   const availability = availabilityLoading ? undefined : loaded?.availability;
@@ -196,7 +218,7 @@ function NewAppointmentForm({
   // Horário: o que o usuário escolheu; antes disso, o clicado na agenda (se
   // ainda estiver disponível para o serviço). Some se deixar de estar disponível
   // (outro serviço, profissional ou data).
-  const wanted = touched ? time : (initial.time ?? "");
+  const wanted = touched ? time : (desiredTime ?? "");
   const currentTime =
     wanted && starts.includes(timeToMinutes(wanted)) ? wanted : "";
 
@@ -207,6 +229,20 @@ function NewAppointmentForm({
           Math.min(24 * 60, timeToMinutes(currentTime) + service.duration),
         )
       : null;
+
+  // Alteração: só salva se algo mudou.
+  const serviceChanged = editing ? serviceId !== editing.serviceId : false;
+  const moved = editing
+    ? day !== date || (currentTime !== "" && currentTime !== editing.start)
+    : false;
+  const noteChanged = editing ? note.trim() !== (editing.note ?? "") : false;
+  const changed = editing
+    ? clientId !== editing.clientId ||
+      professionalId !== editing.professionalId ||
+      serviceChanged ||
+      moved ||
+      noteChanged
+    : true;
 
   function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -232,6 +268,37 @@ function NewAppointmentForm({
     }
 
     startTransition(async () => {
+      // Alteração: envia só o que mudou (o encaixe reenvia a autorização).
+      if (editing) {
+        const updated = await updateAppointmentAction({
+          id: editing.id,
+          ...(clientId !== editing.clientId && { clientId }),
+          ...(professionalId !== editing.professionalId && { professionalId }),
+          ...(serviceChanged && { serviceId }),
+          ...((moved || professionalId !== editing.professionalId) && {
+            date: day,
+            time: currentTime,
+          }),
+          ...(noteChanged && { note }),
+          ...(overbooking && { overBooking: true }),
+        });
+
+        if (updated.ok) {
+          toast.success("Agendamento alterado.", {
+            description: `${updated.dateLabel}, das ${updated.start} às ${updated.end}`,
+          });
+          onOpenChange(false);
+          return;
+        }
+
+        if (updated.field) setErrors({ time: updated.message });
+        toast.error("Não foi possível alterar o agendamento.", {
+          description: updated.message,
+        });
+        setReload((version) => version + 1);
+        return;
+      }
+
       const result = await createAppointmentAction({
         clientId,
         professionalId,
@@ -286,10 +353,16 @@ function NewAppointmentForm({
     <form noValidate onSubmit={handleSubmit} className="space-y-4">
       <DialogHeader>
         <DialogTitle>
-          {overbooking ? "Encaixar horário" : "Novo agendamento"}
+          {editing
+            ? "Alterar agendamento"
+            : overbooking
+              ? "Encaixar horário"
+              : "Novo agendamento"}
         </DialogTitle>
         <DialogDescription>
-          Escolha o cliente, o serviço e o horário do atendimento.
+          {editing
+            ? "Altere os dados do agendamento."
+            : "Escolha o cliente, o serviço e o horário do atendimento."}
         </DialogDescription>
       </DialogHeader>
 
@@ -303,7 +376,7 @@ function NewAppointmentForm({
             aria-hidden="true"
           />
           <p>
-            Você está agendando{" "}
+            {editing ? "Este agendamento é um encaixe" : "Você está agendando"}{" "}
             <strong>fora do horário de funcionamento</strong>. Só aparecem
             horários livres, inteiros fora do expediente, que ainda não
             passaram.
@@ -345,7 +418,7 @@ function NewAppointmentForm({
       >
         <Combobox
           id="appointment-service"
-          options={services.map((item) => ({
+          options={serviceOptions.map((item) => ({
             value: item.id,
             label: `${item.name} · ${formatDuration(item.duration)}`,
           }))}
@@ -447,8 +520,14 @@ function NewAppointmentForm({
         >
           Cancelar
         </Button>
-        <Button type="submit" disabled={pending}>
-          {pending ? "Agendando…" : "Agendar"}
+        <Button type="submit" disabled={pending || !changed}>
+          {editing
+            ? pending
+              ? "Salvando…"
+              : "Salvar alterações"
+            : pending
+              ? "Agendando…"
+              : "Agendar"}
         </Button>
       </DialogFooter>
     </form>

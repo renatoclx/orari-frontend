@@ -16,6 +16,8 @@ export type AgendaProfessional = {
 export type AgendaAppointment = {
   id: string;
   professionalId: string;
+  clientId: string;
+  serviceId: string;
   /** "HH:mm" */
   start: string;
   /** "HH:mm"; "24:00" quando o atendimento vai até o fim do dia. */

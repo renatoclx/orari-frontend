@@ -27,17 +27,20 @@ import { formatDuration } from "@/utils/format";
 
 type AppointmentDetailsDialogProps = {
   appointment: AgendaAppointment | null;
-  /** O agendamento pode ser cancelado: ainda não começou e não está encerrado. */
+  /** Pode ser cancelado ou alterado: ainda não começou e não está encerrado. */
   canCancel: (appointment: AgendaAppointment) => boolean;
+  /** Abre o dialog de alteração do agendamento. */
+  onEdit: (appointment: AgendaAppointment) => void;
   onOpenChange: (open: boolean) => void;
 };
 
 // Detalhes do agendamento. A única ação de status é cancelar: início e fim são
 // automáticos (o backend muda o status pelo horário) e a confirmação virá do
-// cliente. "Alterar" ainda é rascunho.
+// cliente. "Alterar" abre o dialog de alteração, só antes de o agendamento iniciar.
 export function AppointmentDetailsDialog({
   appointment,
   canCancel,
+  onEdit,
   onOpenChange,
 }: AppointmentDetailsDialogProps) {
   return (
@@ -47,6 +50,7 @@ export function AppointmentDetailsDialog({
           <Details
             appointment={appointment}
             cancellable={canCancel(appointment)}
+            onEdit={() => onEdit(appointment)}
             onClose={() => onOpenChange(false)}
           />
         )}
@@ -58,10 +62,12 @@ export function AppointmentDetailsDialog({
 function Details({
   appointment,
   cancellable,
+  onEdit,
   onClose,
 }: {
   appointment: AgendaAppointment;
   cancellable: boolean;
+  onEdit: () => void;
   onClose: () => void;
 }) {
   const [confirmOpen, setConfirmOpen] = useState(false);
@@ -69,11 +75,6 @@ function Details({
 
   const { label: statusLabel, icon: StatusIcon } =
     APPOINTMENT_STATUS[appointment.status];
-
-  function draft(action: string) {
-    toast.info(`Rascunho de tela: "${action}" ainda não grava.`);
-    onClose();
-  }
 
   function cancel() {
     startTransition(async () => {
@@ -191,10 +192,13 @@ function Details({
         <Button type="button" variant="outline" onClick={onClose}>
           Fechar
         </Button>
-        <Button type="button" onClick={() => draft("Alterar agendamento")}>
-          <Pencil aria-hidden="true" />
-          Alterar
-        </Button>
+        {/* Nada no passado é alterado: mesma condição do cancelamento. */}
+        {cancellable && (
+          <Button type="button" onClick={onEdit}>
+            <Pencil aria-hidden="true" />
+            Alterar
+          </Button>
+        )}
       </DialogFooter>
     </>
   );

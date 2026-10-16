@@ -17,6 +17,10 @@ type DatePickerProps = {
   placeholder?: string;
   /** Datas depois deste limite ficam desabilitadas (ex.: nascimento → hoje). */
   maxDate?: Date;
+  /** Datas antes deste limite ficam desabilitadas (ex.: agendamento → hoje). */
+  minDate?: Date;
+  /** Chamado ao escolher a data, com "aaaa-mm-dd". */
+  onValueChange?: (value: string) => void;
   /** Valor inicial, "aaaa-mm-dd" (ou ISO completo; só a data conta). */
   initialValue?: string | null;
 };
@@ -43,6 +47,8 @@ export function DatePicker({
   name,
   placeholder = "dd/mm/aaaa",
   maxDate,
+  minDate,
+  onValueChange,
   initialValue,
 }: DatePickerProps) {
   const [date, setDate] = useState<Date | undefined>(() =>
@@ -79,14 +85,26 @@ export function DatePicker({
             onSelect={(selected) => {
               setDate(selected);
               setOpen(false);
+              onValueChange?.(selected ? toIsoDate(selected) : "");
             }}
             locale={ptBR}
-            // Mês e ano em listas: datas de nascimento ficam longe de hoje.
-            captionLayout="dropdown"
-            startMonth={new Date(1900, 0)}
-            endMonth={maxDate ?? new Date()}
-            defaultMonth={date ?? maxDate}
-            disabled={maxDate ? { after: maxDate } : undefined}
+            // Datas futuras (agendamento): navega mês a mês, a partir de hoje.
+            // Passadas (nascimento): mês e ano em listas, pois ficam longe de hoje.
+            captionLayout={minDate ? "label" : "dropdown"}
+            startMonth={minDate ?? new Date(1900, 0)}
+            endMonth={
+              minDate
+                ? new Date(minDate.getFullYear() + 2, minDate.getMonth())
+                : (maxDate ?? new Date())
+            }
+            defaultMonth={date ?? minDate ?? maxDate}
+            disabled={
+              minDate
+                ? { before: minDate }
+                : maxDate
+                  ? { after: maxDate }
+                  : undefined
+            }
           />
         </PopoverContent>
       </Popover>

@@ -119,6 +119,31 @@ export function DayGrid({
     return occupied ? "occupied" : "free";
   }
 
+  // Agendamentos de um profissional que aparecem na grade. Os ativos sempre
+  // aparecem. Um cancelado só aparece (esmaecido) se não ficar sobreposto a nada:
+  // nem a um agendamento ativo que ocupou o horário liberado, nem a outro
+  // cancelado já exibido (o horário pode ser liberado e reaproveitado várias vezes).
+  function visibleAppointments(professionalId: string): AgendaAppointment[] {
+    const mine = appointments
+      .filter((appointment) => appointment.professionalId === professionalId)
+      .sort((a, b) => timeToMinutes(a.start) - timeToMinutes(b.start));
+
+    const overlaps = (a: AgendaAppointment, b: AgendaAppointment) =>
+      timeToMinutes(a.start) < timeToMinutes(b.end) &&
+      timeToMinutes(a.end) > timeToMinutes(b.start);
+
+    const shown = mine.filter(
+      (appointment) => appointment.status !== "CANCELLED",
+    );
+    for (const appointment of mine) {
+      if (appointment.status !== "CANCELLED") continue;
+      if (!shown.some((other) => overlaps(other, appointment))) {
+        shown.push(appointment);
+      }
+    }
+    return shown;
+  }
+
   // Posição vertical de um horário na grade.
   function toPixels(time: string): number {
     return (timeToMinutes(time) - range.start) * PX_PER_MINUTE;
@@ -331,21 +356,15 @@ export function DayGrid({
               </div>
             ))}
 
-            {appointments
-              .filter(
-                (appointment) => appointment.professionalId === professional.id,
-              )
-              .map((appointment) => (
-                <AppointmentBlock
-                  key={appointment.id}
-                  appointment={appointment}
-                  onSelect={onAppointmentSelect}
-                  top={toPixels(appointment.start)}
-                  height={
-                    toPixels(appointment.end) - toPixels(appointment.start)
-                  }
-                />
-              ))}
+            {visibleAppointments(professional.id).map((appointment) => (
+              <AppointmentBlock
+                key={appointment.id}
+                appointment={appointment}
+                onSelect={onAppointmentSelect}
+                top={toPixels(appointment.start)}
+                height={toPixels(appointment.end) - toPixels(appointment.start)}
+              />
+            ))}
 
             {showNow && (
               <div

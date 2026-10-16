@@ -2,6 +2,8 @@
 
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
+import { useAgendaClock } from "@/components/agenda/useAgendaClock";
+import { timeToMinutes } from "@/utils/time";
 import { AppointmentDetailsDialog } from "@/components/agenda/AppointmentDetailsDialog";
 import { AgendaToolbar } from "@/components/agenda/AgendaToolbar";
 import { DayGrid } from "@/components/agenda/DayGrid";
@@ -31,10 +33,9 @@ type AgendaDayViewProps = {
   unavailable: TimeRange[];
   /** Intervalos entre janelas de atendimento (almoço), em cinza. */
   breaks: TimeRange[];
-  /** Janelas de funcionamento do dia. */
-  businessHours: TimeRange[];
-  now: string | null;
-  pastMinutes: number;
+  /** Fuso da empresa e o instante (ms) em que o servidor montou a página. */
+  timeZone: string;
+  serverNow: number;
   services: AgendaServiceOption[];
   clients: AgendaClientOption[];
 };
@@ -59,10 +60,15 @@ export function AgendaDayView({
   professionals,
   services,
   clients,
-  businessHours,
   initialFilterId,
+  timeZone,
+  serverNow,
   ...grid
 }: AgendaDayViewProps) {
+  // Relógio vivo: o que depende de "agora" acompanha o tempo sem recarregar.
+  const { today, nowTime, nowMinutes } = useAgendaClock(timeZone, serverNow);
+  // Não se agenda no passado: dias passados inteiros, ou hoje até agora.
+  const pastMinutes = date < today ? 24 * 60 : date === today ? nowMinutes : 0;
   const [selectedId, setSelectedId] = useState<string>();
   const [filterId, setFilterId] = useState<string | null>(initialFilterId);
   const [creating, setCreating] = useState<CreatingState | null>(null);
@@ -118,6 +124,20 @@ export function AgendaDayView({
     warnIfEmpty(professionalId);
   }
 
+  // Cancelar só vale para agendamento ainda não iniciado e não encerrado: o
+  // horário de início ainda não chegou (dia futuro, ou hoje depois de agora).
+  function canCancel(appointment: AgendaAppointment): boolean {
+    if (
+      appointment.status !== "SCHEDULED" &&
+      appointment.status !== "CONFIRMED"
+    ) {
+      return false;
+    }
+    if (date < today) return false;
+    if (date > today) return true;
+    return timeToMinutes(appointment.start) > nowMinutes;
+  }
+
   return (
     <>
       <AgendaToolbar
@@ -158,6 +178,8 @@ export function AgendaDayView({
           setCreating({ professionalId, time, overbooking: true })
         }
         onAppointmentSelect={setViewing}
+        now={date === today ? nowTime : null}
+        pastMinutes={pastMinutes}
         {...grid}
       />
 
@@ -170,16 +192,15 @@ export function AgendaDayView({
         services={services}
         clients={clients}
         date={date}
+        today={today}
         initial={
           creating ?? { professionalId: null, time: null, overbooking: false }
         }
-        businessHours={businessHours}
-        appointments={grid.appointments}
-        pastMinutes={grid.pastMinutes}
       />
 
       <AppointmentDetailsDialog
         appointment={viewing}
+        canCancel={canCancel}
         onOpenChange={(open) => !open && setViewing(null)}
       />
     </>

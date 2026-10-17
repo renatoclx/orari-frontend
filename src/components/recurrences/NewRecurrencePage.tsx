@@ -19,7 +19,7 @@ export async function NewRecurrencePage() {
   return (
     <div className="flex min-h-0 flex-1 flex-col gap-4">
       <div className="space-y-1">
-        <h1 className="text-2xl font-semibold">Nova recorrência</h1>
+        <h1 className="text-2xl font-semibold">Nova Recorrência</h1>
         <p className="text-sm text-muted-foreground">
           Reserve horários fixos na semana para um cliente, por um período.
         </p>

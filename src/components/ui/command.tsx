@@ -68,7 +68,7 @@ function CommandInput({
 }: React.ComponentProps<typeof CommandPrimitive.Input>) {
   return (
     // Margem de 0.5rem acima do campo de busca, para ele não colar na borda da caixa.
-    <div data-slot="command-input-wrapper" className="mt-2 p-1 pb-0">
+    <div data-slot="command-input-wrapper" className="mt-2 mb-2 p-1 pb-0">
       <InputGroup className="h-10! rounded-lg! border-input/30 bg-input/30 shadow-none! *:data-[slot=input-group-addon]:pl-2!">
         <CommandPrimitive.Input
           data-slot="command-input"

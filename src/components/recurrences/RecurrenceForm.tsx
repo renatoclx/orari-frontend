@@ -74,7 +74,7 @@ export function RecurrenceForm({
   const [clientId, setClientId] = useState("");
   const [serviceId, setServiceId] = useState("");
   const [professionalId, setProfessionalId] = useState("");
-  const [startDate, setStartDate] = useState(today);
+  const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
   const [dayTimes, setDayTimes] = useState<DayTimes>({});
   const [note, setNote] = useState("");
@@ -106,6 +106,14 @@ export function RecurrenceForm({
     startDate && endDate
       ? occurrences(startDate, endDate, days, today, nowMinutes)
       : [];
+
+  // Profissional, serviço e data inicial mudam os horários livres: os horários
+  // já escolhidos deixam de valer (os dias marcados continuam).
+  function resetTimes() {
+    setDayTimes((current) =>
+      Object.fromEntries(Object.keys(current).map((day) => [day, ""])),
+    );
+  }
 
   function clear(field: keyof Errors) {
     setErrors((current) => ({ ...current, [field]: undefined }));
@@ -202,7 +210,7 @@ export function RecurrenceForm({
                 clientSearch.pick(next);
                 clear("client");
               }}
-              placeholder="Selecione o cliente"
+              placeholder="Selecione o cliente..."
               searchPlaceholder="Buscar cliente…"
               emptyMessage="Nenhum cliente encontrado."
               loading={clientSearch.loading}
@@ -225,9 +233,10 @@ export function RecurrenceForm({
               value={serviceId}
               onValueChange={(next) => {
                 setServiceId(next);
+                resetTimes();
                 clear("service");
               }}
-              placeholder="Selecione o serviço"
+              placeholder="Selecione o serviço..."
               searchPlaceholder="Buscar serviço…"
               emptyMessage="Nenhum serviço encontrado."
             />
@@ -243,11 +252,12 @@ export function RecurrenceForm({
               value={professionalId || undefined}
               onValueChange={(next) => {
                 setProfessionalId(next);
+                resetTimes();
                 clear("professional");
               }}
             >
               <SelectTrigger id="recurrence-professional" className="w-full">
-                <SelectValue placeholder="Selecione o profissional" />
+                <SelectValue placeholder="Selecione o profissional..." />
               </SelectTrigger>
               <SelectContent>
                 {professionals.map((item) => (
@@ -269,10 +279,11 @@ export function RecurrenceForm({
               <DatePicker
                 id="recurrence-start"
                 name="startDate"
-                initialValue={startDate}
+                initialValue={undefined}
                 minDate={parseDay(today)}
                 onValueChange={(next) => {
                   setStartDate(next);
+                  resetTimes();
                   clear("start");
                 }}
               />
@@ -311,6 +322,9 @@ export function RecurrenceForm({
               clear("days");
             }}
             invalid={Boolean(errors.days)}
+            professionalId={professionalId}
+            duration={service?.duration ?? 0}
+            startDate={startDate}
           />
         </FormField>
 
@@ -324,10 +338,10 @@ export function RecurrenceForm({
         <FormField id="recurrence-note" label="Observações">
           <Textarea
             id="recurrence-note"
-            rows={3}
+            rows={4}
             value={note}
             onChange={(event) => setNote(event.target.value)}
-            placeholder="Preferências, cuidados, informações úteis para os atendimentos"
+            placeholder="Preferências, cuidados, informações úteis para os atendimentos..."
           />
         </FormField>
       </div>

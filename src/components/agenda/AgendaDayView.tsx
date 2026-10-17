@@ -1,9 +1,10 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { toast } from "sonner";
 import { useAgendaClock } from "@/components/agenda/useAgendaClock";
 import { timeToMinutes } from "@/utils/time";
+import { RescheduleAppointmentDialog } from "@/components/agenda/RescheduleAppointmentDialog";
 import { AppointmentDetailsDialog } from "@/components/agenda/AppointmentDetailsDialog";
 import { AgendaToolbar } from "@/components/agenda/AgendaToolbar";
 import { DayGrid } from "@/components/agenda/DayGrid";
@@ -75,6 +76,12 @@ export function AgendaDayView({
   const [viewing, setViewing] = useState<AgendaAppointment | null>(null);
   // Agendamento em alteração (o dialog de novo agendamento em modo de edição).
   const [editing, setEditing] = useState<AgendaAppointment | null>(null);
+  // Sessão de recorrência em remanejamento.
+  const [rescheduling, setRescheduling] = useState<AgendaAppointment | null>(
+    null,
+  );
+  // Estável: o diálogo de remanejar o usa como dependência de um efeito.
+  const closeReschedule = useCallback(() => setRescheduling(null), []);
   const [editOpen, setEditOpen] = useState(false);
 
   // Padrão: todos os profissionais ativos; o filtro mostra só um.
@@ -223,7 +230,18 @@ export function AgendaDayView({
           setEditing(appointment);
           setEditOpen(true);
         }}
+        onReschedule={(appointment) => {
+          setViewing(null);
+          setRescheduling(appointment);
+        }}
         onOpenChange={(open) => !open && setViewing(null)}
+      />
+
+      <RescheduleAppointmentDialog
+        appointment={rescheduling}
+        date={date}
+        today={today}
+        onClose={closeReschedule}
       />
     </>
   );

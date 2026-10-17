@@ -11,10 +11,11 @@ import {
   cancelRecurrence,
   cancelRecurrenceSession,
   createRecurrence,
+  getRecurrence,
   rescheduleRecurrenceSession,
   updateRecurrenceNote,
 } from "@/services/recurrence.service";
-import type { NewRecurrenceInput } from "@/types/recurrence";
+import type { NewRecurrenceInput, RecurrenceItem } from "@/types/recurrence";
 import {
   dayBounds,
   isDateString,
@@ -23,6 +24,20 @@ import {
 } from "@/utils/time";
 
 export type RecurrenceActionResult = { ok: true } | ActionFailure;
+
+export type GetRecurrenceResult =
+  { ok: true; recurrence: RecurrenceItem } | ActionFailure;
+
+/** Dados da recorrência (período, serviço, profissional), para remanejar pela agenda. */
+export async function getRecurrenceAction(
+  id: string,
+): Promise<GetRecurrenceResult> {
+  try {
+    return { ok: true, recurrence: await getRecurrence(id) };
+  } catch (error) {
+    return failureFrom(error);
+  }
+}
 
 export type CreateRecurrenceResult = { ok: true; id: string } | ActionFailure;
 

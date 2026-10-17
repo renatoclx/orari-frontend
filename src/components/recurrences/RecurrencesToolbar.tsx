@@ -77,7 +77,7 @@ export function RecurrencesToolbar({
       <Button asChild className="w-full sm:ml-auto sm:w-auto">
         <Link href="/recorrencias/nova">
           <Plus aria-hidden="true" />
-          Nova recorrência
+          Nova Recorrência
         </Link>
       </Button>
     </div>

@@ -6,7 +6,6 @@ import {
   getAvailabilityAction,
   type Availability,
 } from "@/app/(admin)/appointment-actions";
-import { rescheduleRecurrenceSessionAction } from "@/app/(admin)/recurrence-actions";
 import { availableStarts } from "@/components/agenda/agenda-availability";
 import { AvailableTimes } from "@/components/agenda/AvailableTimes";
 import { DatePicker } from "@/components/shared/DatePicker";
@@ -20,15 +19,32 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import type { RecurrenceItem, RecurrenceSession } from "@/types/recurrence";
-import { timeToMinutes, toDateString, toTimeString } from "@/utils/time";
+import { timeToMinutes } from "@/utils/time";
+
+/** O que o diálogo precisa saber da sessão: o id e quando ela está marcada. */
+export type ReschedulableSession = {
+  id: string;
+  /** "aaaa-mm-dd" */
+  date: string;
+  /** "HH:mm" */
+  time: string;
+};
 
 type RescheduleSessionDialogProps = {
-  recurrence: RecurrenceItem;
-  /** Sessão a remanejar; nula = dialog fechado. */
-  session: RecurrenceSession | null;
-  timeZone: string;
+  /** Agendamento ou sessão a remanejar, com dia e horário no fuso da empresa; nulo = dialog fechado. */
+  session: ReschedulableSession | null;
+  professional: { id: string; name: string };
+  clientName: string;
+  /** Duração do serviço, em minutos. */
+  duration: number;
+  /** Sessão de recorrência: só se remaneja dentro do período ("aaaa-mm-dd"). */
+  period?: { start: string; end: string };
   today: string;
+  /** Grava o novo dia e horário (a recorrência e o agendamento comum usam rotas diferentes). */
+  onSubmit: (
+    date: string,
+    time: string,
+  ) => Promise<{ ok: true } | { ok: false; message: string }>;
   onOpenChange: (open: boolean) => void;
 };
 
@@ -38,7 +54,7 @@ const parseDay = (value: string) => {
 };
 
 /**
- * Remanejamento de uma sessão: nova data (dentro do período da recorrência) e
+ * Remanejamento de um agendamento (comum ou sessão de recorrência): nova data e
  * horário livre do profissional; o fim é o início mais a duração do serviço.
  */
 export function RescheduleSessionDialog(props: RescheduleSessionDialogProps) {
@@ -52,13 +68,16 @@ export function RescheduleSessionDialog(props: RescheduleSessionDialogProps) {
 }
 
 function RescheduleForm({
-  recurrence,
   session,
-  timeZone,
+  professional,
+  clientName,
+  duration,
+  period,
   today,
+  onSubmit,
   onOpenChange,
-}: RescheduleSessionDialogProps & { session: RecurrenceSession }) {
-  const original = toDateString(new Date(session.startAt), timeZone);
+}: RescheduleSessionDialogProps & { session: ReschedulableSession }) {
+  const original = session.date;
   const [day, setDay] = useState(original < today ? today : original);
   const [time, setTime] = useState("");
   const [error, setError] = useState<string>();
@@ -66,7 +85,7 @@ function RescheduleForm({
 
   // Disponibilidade do profissional no dia; o resultado guarda a chave a que se
   // refere, e outra chave significa que ainda está carregando.
-  const key = `${recurrence.professional.id}|${day}`;
+  const key = `${professional.id}|${day}`;
   const [loaded, setLoaded] = useState<{
     key: string;
     availability?: Availability;
@@ -74,7 +93,8 @@ function RescheduleForm({
 
   useEffect(() => {
     let cancelled = false;
-    getAvailabilityAction(recurrence.professional.id, day).then((result) => {
+    // O próprio agendamento não ocupa horário para ele mesmo.
+    getAvailabilityAction(professional.id, day, session.id).then((result) => {
       if (cancelled) return;
       if (!result.ok) {
         toast.error("Não foi possível buscar os horários.", {
@@ -89,7 +109,7 @@ function RescheduleForm({
     return () => {
       cancelled = true;
     };
-  }, [recurrence.professional.id, day, key]);
+  }, [professional.id, session.id, day, key]);
 
   const loading = loaded?.key !== key;
   const availability = loading ? undefined : loaded?.availability;
@@ -97,14 +117,13 @@ function RescheduleForm({
     ? availableStarts({
         windows: availability.windows,
         busy: availability.busy,
-        duration: recurrence.service.duration,
+        duration,
         notBefore: availability.notBefore,
       })
     : [];
   const currentTime = time && starts.includes(timeToMinutes(time)) ? time : "";
 
-  const currentStart = toTimeString(session.startAt, timeZone);
-  const unchanged = day === original && currentTime === currentStart;
+  const unchanged = day === original && currentTime === session.time;
 
   function submit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -115,19 +134,16 @@ function RescheduleForm({
     }
 
     startTransition(async () => {
-      const result = await rescheduleRecurrenceSessionAction(
-        recurrence.id,
-        session.id,
-        day,
-        currentTime,
-      );
+      const result = await onSubmit(day, currentTime);
       if (result.ok) {
-        toast.success("Sessão remanejada.");
+        toast.success(
+          period ? "Sessão remanejada." : "Agendamento remanejado.",
+        );
         onOpenChange(false);
         return;
       }
       setError(result.message);
-      toast.error("Não foi possível remanejar a sessão.", {
+      toast.error("Não foi possível remanejar.", {
         description: result.message,
       });
     });
@@ -142,10 +158,13 @@ function RescheduleForm({
   return (
     <form noValidate onSubmit={submit} className="space-y-4">
       <DialogHeader>
-        <DialogTitle>Remanejar sessão</DialogTitle>
+        <DialogTitle>
+          {period ? "Remanejar sessão" : "Remanejar agendamento"}
+        </DialogTitle>
         <DialogDescription>
-          Escolha a nova data e o horário de {recurrence.client.name} com{" "}
-          {recurrence.professional.name}, dentro do período da recorrência.
+          Escolha a nova data e o horário de {clientName} com{" "}
+          {professional.name}
+          {period ? ", dentro do período da recorrência." : "."}
         </DialogDescription>
       </DialogHeader>
 
@@ -155,9 +174,9 @@ function RescheduleForm({
           name="date"
           initialValue={day}
           minDate={parseDay(
-            recurrence.startDate > today ? recurrence.startDate : today,
+            period && period.start > today ? period.start : today,
           )}
-          maxDate={parseDay(recurrence.endDate)}
+          maxDate={period ? parseDay(period.end) : undefined}
           onValueChange={(next) => {
             setDay(next);
             setError(undefined);

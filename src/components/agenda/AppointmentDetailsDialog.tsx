@@ -3,6 +3,7 @@
 import Link from "next/link";
 import {
   CalendarClock,
+  CalendarSync,
   Clock,
   Pencil,
   Repeat,
@@ -35,6 +36,8 @@ type AppointmentDetailsDialogProps = {
   canCancel: (appointment: AgendaAppointment) => boolean;
   /** Abre o dialog de alteração do agendamento. */
   onEdit: (appointment: AgendaAppointment) => void;
+  /** Abre o remanejamento (agendamento comum ou sessão de recorrência). */
+  onReschedule: (appointment: AgendaAppointment) => void;
   onOpenChange: (open: boolean) => void;
 };
 
@@ -45,6 +48,7 @@ export function AppointmentDetailsDialog({
   appointment,
   canCancel,
   onEdit,
+  onReschedule,
   onOpenChange,
 }: AppointmentDetailsDialogProps) {
   return (
@@ -55,6 +59,7 @@ export function AppointmentDetailsDialog({
             appointment={appointment}
             cancellable={canCancel(appointment)}
             onEdit={() => onEdit(appointment)}
+            onReschedule={() => onReschedule(appointment)}
             onClose={() => onOpenChange(false)}
           />
         )}
@@ -67,11 +72,13 @@ function Details({
   appointment,
   cancellable,
   onEdit,
+  onReschedule,
   onClose,
 }: {
   appointment: AgendaAppointment;
   cancellable: boolean;
   onEdit: () => void;
+  onReschedule: () => void;
   onClose: () => void;
 }) {
   const [confirmOpen, setConfirmOpen] = useState(false);
@@ -183,14 +190,22 @@ function Details({
       </ul>
 
       {cancellable && (
-        <div className="flex justify-center border-t border-border pt-4">
+        <div className="flex justify-center gap-2 border-t border-border pt-4">
           <Button
             type="button"
             variant="destructive"
             onClick={() => setConfirmOpen(true)}
           >
-            Cancelar agendamento
+            Cancelar
           </Button>
+          {/* O cliente pode pedir outro dia em vez de cancelar. O encaixe tem
+              regras próprias de horário: é remanejado pelo "Alterar". */}
+          {!appointment.overbooking && (
+            <Button type="button" onClick={onReschedule}>
+              <CalendarSync aria-hidden="true" />
+              Remanejar
+            </Button>
+          )}
         </div>
       )}
 
@@ -212,9 +227,8 @@ function Details({
           Fechar
         </Button>
         {/* Nada no passado é alterado: mesma condição do cancelamento. */}
-        {/* Sessão de recorrência não é alterada aqui: remaneja-se na recorrência. */}
         {appointment.recurrence ? (
-          <Button asChild>
+          <Button asChild variant="outline">
             <Link href={`/recorrencias/${appointment.recurrence.id}`}>
               <Repeat aria-hidden="true" />
               Ver recorrência

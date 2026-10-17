@@ -6,6 +6,7 @@ import { toast } from "sonner";
 import {
   cancelRecurrenceAction,
   cancelRecurrenceSessionAction,
+  rescheduleRecurrenceSessionAction,
   updateRecurrenceNoteAction,
 } from "@/app/(admin)/recurrence-actions";
 import { APPOINTMENT_STATUS } from "@/components/agenda/appointment-status";
@@ -264,9 +265,25 @@ export function RecurrenceDetails({
       </section>
 
       <RescheduleSessionDialog
-        recurrence={recurrence}
-        session={rescheduling}
-        timeZone={timeZone}
+        professional={recurrence.professional}
+        clientName={recurrence.client.name}
+        duration={recurrence.service.duration}
+        period={{ start: recurrence.startDate, end: recurrence.endDate }}
+        onSubmit={(date, time) =>
+          rescheduleRecurrenceSessionAction(
+            recurrence.id,
+            rescheduling?.id ?? "",
+            date,
+            time,
+          )
+        }
+        session={
+          rescheduling && {
+            id: rescheduling.id,
+            date: dateOf(rescheduling),
+            time: timeOf(rescheduling.startAt),
+          }
+        }
         today={today}
         onOpenChange={(open) => !open && setRescheduling(null)}
       />

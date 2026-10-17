@@ -1,5 +1,6 @@
 "use client";
 
+import { Plus, X } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
@@ -354,9 +355,13 @@ export function RecurrenceForm({
         }
       >
         <Button asChild variant="outline" disabled={pending}>
-          <Link href="/recorrencias">Cancelar</Link>
+          <Link href="/recorrencias">
+            <X aria-hidden="true" />
+            Cancelar
+          </Link>
         </Button>
         <Button type="submit" disabled={pending}>
+          <Plus aria-hidden="true" />
           {pending ? "Cadastrando…" : "Cadastrar"}
         </Button>
       </FormFooter>

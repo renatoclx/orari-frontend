@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import { Ban, CalendarClock, Pencil } from "lucide-react";
+import { Ban, CalendarClock, Pencil, Save, X } from "lucide-react";
 import { toast } from "sonner";
 import {
   cancelRecurrenceAction,
@@ -294,6 +294,7 @@ export function RecurrenceDetails({
         title="Cancelar recorrência?"
         description="As sessões futuras que ainda não começaram serão canceladas e os horários ficarão livres. O que já aconteceu permanece."
         confirmLabel="Cancelar recorrência"
+        icon={Ban}
         pendingLabel="Cancelando…"
         cancelLabel="Voltar"
         pending={pending}
@@ -311,6 +312,7 @@ export function RecurrenceDetails({
             : ""
         }
         confirmLabel="Cancelar sessão"
+        icon={Ban}
         pendingLabel="Cancelando…"
         cancelLabel="Voltar"
         pending={pending}
@@ -342,9 +344,11 @@ export function RecurrenceDetails({
                 disabled={pending}
                 onClick={() => setEditingNote(false)}
               >
+                <X aria-hidden="true" />
                 Cancelar
               </Button>
               <Button type="submit" disabled={pending}>
+                <Save aria-hidden="true" />
                 {pending ? "Salvando…" : "Salvar"}
               </Button>
             </DialogFooter>

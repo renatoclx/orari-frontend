@@ -182,6 +182,7 @@ export function RecurrenceList({
         title="Cancelar recorrência?"
         description={`A recorrência de ${cancelling?.client.name ?? ""} será cancelada e as sessões futuras que ainda não começaram serão canceladas, liberando os horários. O que já aconteceu permanece.`}
         confirmLabel="Cancelar recorrência"
+        icon={Ban}
         pendingLabel="Cancelando…"
         cancelLabel="Voltar"
         pending={pending}

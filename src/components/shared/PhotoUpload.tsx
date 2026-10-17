@@ -2,7 +2,7 @@
 
 import { Hint } from "@/components/shared/Hint";
 import { useEffect, useRef, useState } from "react";
-import { Camera, Upload } from "lucide-react";
+import { Camera, Upload, Trash2 } from "lucide-react";
 import { CameraCaptureDialog } from "@/components/shared/CameraCaptureDialog";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -144,6 +144,7 @@ export function PhotoUpload({
         </Button>
         {shownUrl && (
           <Button type="button" variant="ghost" onClick={remove}>
+            <Trash2 aria-hidden="true" />
             Remover
           </Button>
         )}

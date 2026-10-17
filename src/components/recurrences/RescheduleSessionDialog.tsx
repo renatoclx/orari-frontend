@@ -1,5 +1,6 @@
 "use client";
 
+import { CalendarSync, X } from "lucide-react";
 import { useEffect, useState, useTransition } from "react";
 import { toast } from "sonner";
 import {
@@ -210,9 +211,11 @@ function RescheduleForm({
           disabled={pending}
           onClick={() => onOpenChange(false)}
         >
+          <X aria-hidden="true" />
           Cancelar
         </Button>
         <Button type="submit" disabled={pending || unchanged}>
+          <CalendarSync aria-hidden="true" />
           {pending ? "Salvando…" : "Remanejar"}
         </Button>
       </DialogFooter>

@@ -9,6 +9,8 @@ import {
   Repeat,
   StickyNote,
   UserRound,
+  X,
+  Ban,
 } from "lucide-react";
 import { useState, useTransition } from "react";
 import { toast } from "sonner";
@@ -196,6 +198,7 @@ function Details({
             variant="destructive"
             onClick={() => setConfirmOpen(true)}
           >
+            <Ban aria-hidden="true" />
             Cancelar
           </Button>
           {/* O cliente pode pedir outro dia em vez de cancelar. O encaixe tem
@@ -215,6 +218,7 @@ function Details({
         title="Cancelar agendamento?"
         description={`O agendamento de ${appointment.clientName}, das ${appointment.start} às ${appointment.end}, será cancelado e o horário ficará livre.`}
         confirmLabel="Cancelar agendamento"
+        icon={Ban}
         pendingLabel="Cancelando…"
         cancelLabel="Voltar"
         pending={pending}
@@ -224,6 +228,7 @@ function Details({
 
       <DialogFooter>
         <Button type="button" variant="outline" onClick={onClose}>
+          <X aria-hidden="true" />
           Fechar
         </Button>
         {/* Nada no passado é alterado: mesma condição do cancelamento. */}

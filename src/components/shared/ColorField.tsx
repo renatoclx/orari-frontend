@@ -1,5 +1,6 @@
 "use client";
 
+import { Trash2 } from "lucide-react";
 import { Hint } from "@/components/shared/Hint";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
@@ -37,6 +38,7 @@ export function ColorField({ id, name, initialValue }: ColorFieldProps) {
             {color}
           </span>
           <Button type="button" variant="ghost" onClick={() => setColor("")}>
+            <Trash2 aria-hidden="true" />
             Remover
           </Button>
         </>

@@ -2,7 +2,7 @@
 
 import { Hint } from "@/components/shared/Hint";
 import { useState, useTransition } from "react";
-import { Plus, Trash2 } from "lucide-react";
+import { Plus, Trash2, X } from "lucide-react";
 import { toast } from "sonner";
 import {
   addContactAction,
@@ -226,9 +226,11 @@ export function ContactsField({ persisted }: ContactsFieldProps) {
 
           <div className="flex justify-end gap-2">
             <Button type="button" variant="ghost" onClick={closeForm}>
+              <X aria-hidden="true" />
               Cancelar
             </Button>
             <Button type="button" disabled={pending} onClick={addContact}>
+              <Plus aria-hidden="true" />
               {pending ? "Adicionando…" : "Adicionar"}
             </Button>
           </div>
@@ -301,6 +303,7 @@ export function ContactsField({ persisted }: ContactsFieldProps) {
         title="Excluir contato?"
         description={`O contato ${deleting?.phone ? maskPhone(deleting.phone) : (deleting?.email ?? "")} será excluído.`}
         confirmLabel="Excluir"
+        icon={Trash2}
         pendingLabel="Excluindo…"
         pending={pending}
         destructive

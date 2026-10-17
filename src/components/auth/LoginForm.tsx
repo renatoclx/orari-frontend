@@ -2,7 +2,14 @@
 
 import { Hint } from "@/components/shared/Hint";
 import { useActionState, useState } from "react";
-import { CircleAlert, Eye, EyeOff, LockKeyhole, Mail } from "lucide-react";
+import {
+  CircleAlert,
+  Eye,
+  EyeOff,
+  LockKeyhole,
+  Mail,
+  LogIn,
+} from "lucide-react";
 import { login } from "@/app/(auth)/login/actions";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -107,6 +114,7 @@ export function LoginForm() {
         disabled={pending}
         className="mt-2 h-14 w-full text-base"
       >
+        <LogIn aria-hidden="true" />
         {pending ? "Entrando…" : "Entrar"}
       </Button>
     </form>

@@ -5,6 +5,7 @@ import {
   ChevronRight,
   Plus,
   RotateCcw,
+  CalendarCheck,
 } from "lucide-react";
 import { Hint } from "@/components/shared/Hint";
 import { Button } from "@/components/ui/button";
@@ -85,7 +86,10 @@ export function AgendaToolbar({
         </Hint>
         <Hint label="Voltar para a agenda de hoje">
           <Button variant="outline" asChild>
-            <Link href={agendaHref(null, filterId)}>Hoje</Link>
+            <Link href={agendaHref(null, filterId)}>
+              <CalendarCheck aria-hidden="true" />
+              Hoje
+            </Link>
           </Button>
         </Hint>
       </div>

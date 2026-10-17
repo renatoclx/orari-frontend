@@ -2,7 +2,14 @@
 
 import { useState, useTransition } from "react";
 import Link from "next/link";
-import { EllipsisVertical, Eye, Pencil, RotateCcw, Trash2 } from "lucide-react";
+import {
+  EllipsisVertical,
+  Eye,
+  Pencil,
+  RotateCcw,
+  Trash2,
+  X,
+} from "lucide-react";
 import { toast } from "sonner";
 import {
   deletePersonAction,
@@ -163,6 +170,7 @@ export function PersonList({ kind, people, search, footer }: PersonListProps) {
           {viewing && <PersonDetails person={viewing} kind={kind} />}
           <DialogFooter>
             <Button variant="outline" onClick={() => setViewing(null)}>
+              <X aria-hidden="true" />
               Fechar
             </Button>
           </DialogFooter>
@@ -175,6 +183,7 @@ export function PersonList({ kind, people, search, footer }: PersonListProps) {
         title={`Excluir ${kind.singular}?`}
         description={`O ${kind.singular} ${deleting?.name ?? ""} será inativado e continuará na lista com o status Inativo.`}
         confirmLabel="Excluir"
+        icon={Trash2}
         pendingLabel="Excluindo…"
         pending={pending}
         destructive

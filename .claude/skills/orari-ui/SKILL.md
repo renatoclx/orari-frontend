@@ -57,6 +57,8 @@ Use `Button` de `@/components/ui/button`:
 - `ghost`: ações discretas ("Ver detalhes").
 - `destructive`: ações destrutivas ("Excluir").
 - `size="icon"` para botões só com ícone (sempre com `aria-label`).
+- **Todo botão com texto tem ícone à esquerda** (lucide, `<Icon aria-hidden="true" />` antes do texto; o `Button` já dá o espaço). O ícone indica a ação e é sempre o mesmo para ela, também quando o texto muda durante o envio ("Salvando…"). Exceções: botões de escolha de dado (horários da agenda) e o item de lista/seleção. Mapa: Salvar → `Save`; Cadastrar/Adicionar/Novo → `Plus`; Cancelar e Fechar (desistir) → `X`; Voltar → `ArrowLeft`; Cancelar um registro (agendamento, sessão, recorrência) e Inativar → `Ban`; Excluir e Remover → `Trash2`; Alterar → `Pencil`; Remanejar → `CalendarSync`; Agendar → `CalendarPlus`; Hoje → `CalendarCheck`; Entrar → `LogIn`; Ver recorrência → `Repeat`. Ação nova usa o ícone mais evidente do lucide e entra neste mapa.
+- O `ConfirmDialog` recebe o ícone do botão de confirmação (`icon`); o botão de desistir usa `X` (ou `ArrowLeft` quando o texto é "Voltar").
 - **Tamanhos: botões e campos têm 40 px** (`h-10`; ícones `size-10`). Valem para `Button`, `Input`, `Select` (gatilho), `DatePicker`, `Combobox` e o campo de busca dentro das caixas de seleção. Variações: `sm` 36 px, `lg` 44 px, `icon-sm` 32 px. Não use `h-8` ou `h-9` à mão; ajuste o componente em `components/ui/` se precisar mudar.
 - Login: botão e campos com `h-14 text-base` (56 px, texto 16 px), só nessa tela.
 

@@ -54,6 +54,7 @@ type NavGroup = {
 // entidade (UserType), listada junto por facilidade de acesso.
 const navItems: (NavLink | NavGroup)[] = [
   { href: "/", label: "Agendamentos", icon: CalendarDays },
+  { href: "/recorrencias", label: "Recorrências", icon: Repeat },
   {
     label: "Pessoas",
     icon: Users,
@@ -65,7 +66,6 @@ const navItems: (NavLink | NavGroup)[] = [
     ],
   },
   { href: "/servicos", label: "Serviços", icon: ClipboardList },
-  { href: "/recorrencias", label: "Recorrências", icon: Repeat },
   {
     label: "Pacotes",
     icon: Package,
@@ -74,7 +74,17 @@ const navItems: (NavLink | NavGroup)[] = [
       { href: "/pacotes/contratacoes", label: "Contratações" },
     ],
   },
-  { href: "/financeiro", label: "Financeiro", icon: Wallet },
+  {
+    label: "Financeiro",
+    icon: Wallet,
+    children: [
+      { href: "/financeiro", label: "Pagamentos" },
+      {
+        href: "/financeiro/metodos-de-pagamento",
+        label: "Métodos de pagamento",
+      },
+    ],
+  },
 ];
 
 // Botões de ícone da sidebar (recolher, fechar no celular).
@@ -177,6 +187,17 @@ function isActivePath(pathname: string, href: string): boolean {
   return pathname === href || (href !== "/" && pathname.startsWith(`${href}/`));
 }
 
+// Subitem ativo de um grupo: o de caminho mais específico (em
+// /financeiro/metodos-de-pagamento, "Métodos de pagamento", não "Pagamentos").
+function activeChildHref(
+  pathname: string,
+  children: { href: string }[],
+): string | undefined {
+  return children
+    .filter((child) => isActivePath(pathname, child.href))
+    .sort((a, b) => b.href.length - a.href.length)[0]?.href;
+}
+
 // Estilo comum dos itens do menu, com destaque para o ativo.
 const itemClass = (active: boolean) =>
   `flex w-full items-center gap-3 rounded-control px-3 py-2 text-sm ${
@@ -273,7 +294,8 @@ function SidebarGroup({
   onNavigate,
 }: SidebarGroupProps) {
   const { label, icon: Icon, children } = group;
-  const active = children.some((child) => isActivePath(pathname, child.href));
+  const current = activeChildHref(pathname, children);
+  const active = current !== undefined;
   const icon = (
     <Icon
       className={`size-5 shrink-0 ${active ? "text-brand" : ""}`}
@@ -302,9 +324,7 @@ function SidebarGroup({
             <DropdownMenuItem key={child.href} asChild>
               <Link
                 href={child.href}
-                aria-current={
-                  isActivePath(pathname, child.href) ? "page" : undefined
-                }
+                aria-current={child.href === current ? "page" : undefined}
               >
                 {child.label}
               </Link>
@@ -328,7 +348,7 @@ function SidebarGroup({
       <CollapsibleContent>
         <ul className="mt-1 space-y-1 pl-5">
           {children.map((child) => {
-            const childActive = isActivePath(pathname, child.href);
+            const childActive = child.href === current;
             return (
               <li key={child.href}>
                 <Link

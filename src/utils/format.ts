@@ -69,3 +69,11 @@ export function formatPrice(price: string | number): string {
 export function formatDuration(minutes: number): string {
   return `${minutes} ${minutes === 1 ? "minuto" : "minutos"}`;
 }
+
+/** "12345678000190" → "12.345.678/0001-90" */
+export function formatCnpj(cnpj: string): string {
+  return cnpj.replace(
+    /^(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})$/,
+    "$1.$2.$3/$4-$5",
+  );
+}

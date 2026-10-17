@@ -1,3 +1,4 @@
+import { ArrowLeft, X, type LucideIcon } from "lucide-react";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -24,6 +25,8 @@ type ConfirmDialogProps = {
   destructive?: boolean;
   /** Texto do botão que desiste da ação ("Cancelar" por padrão). */
   cancelLabel?: string;
+  /** Ícone do botão de confirmação (ex.: lixeira para "Excluir"). */
+  icon: LucideIcon;
   onConfirm: () => void;
 };
 
@@ -40,6 +43,7 @@ export function ConfirmDialog({
   pending,
   destructive = false,
   cancelLabel = "Cancelar",
+  icon: Icon,
   onConfirm,
 }: ConfirmDialogProps) {
   return (
@@ -54,6 +58,11 @@ export function ConfirmDialog({
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel disabled={pending}>
+            {cancelLabel === "Voltar" ? (
+              <ArrowLeft aria-hidden="true" />
+            ) : (
+              <X aria-hidden="true" />
+            )}
             {cancelLabel}
           </AlertDialogCancel>
           <AlertDialogAction
@@ -70,6 +79,7 @@ export function ConfirmDialog({
               onConfirm();
             }}
           >
+            <Icon aria-hidden="true" />
             {pending ? pendingLabel : confirmLabel}
           </AlertDialogAction>
         </AlertDialogFooter>

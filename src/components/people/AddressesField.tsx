@@ -266,6 +266,7 @@ export function AddressesField({ states, persisted }: AddressesFieldProps) {
         title="Excluir endereço?"
         description={`O endereço ${deleting?.street ?? ""}, ${deleting?.number ?? ""} será excluído.`}
         confirmLabel="Excluir"
+        icon={Trash2}
         pendingLabel="Excluindo…"
         pending={pending}
         destructive

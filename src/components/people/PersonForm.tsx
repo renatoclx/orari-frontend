@@ -1,5 +1,6 @@
 "use client";
 
+import { Save, X, Plus } from "lucide-react";
 import { useRef, useState, useTransition } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -383,9 +384,13 @@ export function PersonForm({ kind, states, editing }: PersonFormProps) {
           }
         >
           <Button variant="outline" asChild>
-            <Link href={kind.path}>Cancelar</Link>
+            <Link href={kind.path}>
+              <X aria-hidden="true" />
+              Cancelar
+            </Link>
           </Button>
           <Button type="submit" disabled={pending}>
+            <Save aria-hidden="true" />
             {editing ? (pending ? "Salvando…" : "Salvar alterações") : "Salvar"}
           </Button>
         </FormFooter>
@@ -398,6 +403,7 @@ export function PersonForm({ kind, states, editing }: PersonFormProps) {
           title={`Cadastrar ${kind.singular}?`}
           description={`O cadastro de ${personName} será criado com os dados informados.`}
           confirmLabel="Cadastrar"
+          icon={Plus}
           pendingLabel="Cadastrando…"
           pending={pending}
           onConfirm={confirmCreate}

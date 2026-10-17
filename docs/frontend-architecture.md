@@ -24,10 +24,13 @@ src/
                              inativação, exclusão)
       appointment-actions.ts Server Actions da agenda (disponibilidade, busca
                              de clientes, criar, alterar e cancelar)
+      recurrence-actions.ts  Server Actions de recorrências (criar, consultar,
+                             cancelar, cancelar e remanejar sessão, observação)
       location-actions.ts    busca de cidades e consulta de CEP
       page.tsx               Agendamentos ("/"): agenda do dia (?date=)
       servicos/              Serviços: page e loading (cadastro e alteração
                              em dialog)
+      recorrencias/          Recorrências: page, nova/, [id]/
       clientes/              Clientes: page, loading, novo/, [id]/editar/
       funcionarios/          Funcionários (mesma estrutura)
       profissionais/         Profissionais (mesma estrutura)
@@ -44,6 +47,7 @@ src/
                              (uma implementação, parametrizada por tipo)
     services/                tela de Serviços (listagem e dialog de formulário)
     agenda/                  agenda do dia (grade, blocos, legenda, faixa)
+    recurrences/             recorrências (lista, cadastro, detalhes, remanejar)
     <tela>/                  componentes das demais telas (auth/)
   services/                  comunicação com a API e sessão (somente servidor)
   types/                     tipos do domínio, espelhando o backend
@@ -73,7 +77,7 @@ Layout ──────────────────┘
 ```
 
 - **`apiFetch`** (`services/api.ts`) é o ponto único de chamada à API: monta a URL com `API_URL`, envia JSON sem cache, anexa o token da sessão e transforma erros em `ApiError` (status + mensagem). Status `0` = API fora do ar. Um 401 em chamada autenticada leva ao login (`/session-expired`).
-- **Services por assunto** (`auth.service.ts`, `people.service.ts`, `contact.service.ts`, `address.service.ts`, `location.service.ts`, `cep.service.ts`, `service.service.ts`, `appointment.service.ts`, `business-hour.service.ts`) conhecem os caminhos da API e são chamados pelas telas, layouts e Server Actions — nunca o `apiFetch` direto.
+- **Services por assunto** (`auth.service.ts`, `people.service.ts`, `contact.service.ts`, `address.service.ts`, `location.service.ts`, `cep.service.ts`, `service.service.ts`, `appointment.service.ts`, `recurrence.service.ts`, `business-hour.service.ts`) conhecem os caminhos da API e são chamados pelas telas, layouts e Server Actions — nunca o `apiFetch` direto.
 - Os services importam `server-only`: rodam só no servidor. O navegador nunca fala com a API diretamente.
 - Server Actions tratam `ApiError` (viram mensagem na tela) e deixam estourar erros inesperados — inclusive o `redirect()` do Next, que também é lançado como erro.
 
@@ -119,7 +123,17 @@ As três telas são a mesma implementação, escolhida pelo tipo (`PeopleType`).
 - **Novo agendamento e encaixe:** mesmo dialog (`NewAppointmentDialog`). Os horários são calculados no navegador (`agenda-availability.ts`) a partir das janelas e dos agendamentos do profissional na data, buscados pela Server Action `getAvailabilityAction`. O comum exige caber inteiro em uma janela; o encaixe, ficar inteiro fora delas (sem atravessar a meia-noite) e grava com `overBooking: true`. As Server Actions ficam em `appointment-actions.ts` (disponibilidade, busca de clientes, criar e cancelar).
 - **Cancelar:** única ação de status no dialog de detalhes, só antes de o agendamento iniciar. A regra também é imposta pelo backend (400 ao cancelar o que já iniciou); a tela só esconde o botão e mostra a mensagem do servidor se ele recusar.
 - No celular, um profissional por vez, trocado por um menu ao lado do nome no cabeçalho da coluna; no computador, uma coluna por profissional (padrão: todos os ativos; o filtro mostra só um).
+- **Remanejar** (`RescheduleAppointmentDialog` → `RescheduleSessionDialog`): só data e horário. O agendamento comum grava por `updateAppointmentAction`; a sessão de recorrência, por `rescheduleRecurrenceSessionAction`, e o período da recorrência é buscado ao abrir (`getRecurrenceAction`), porque a agenda não o conhece. O encaixe não tem remanejar.
+- Sessões de recorrência vêm marcadas pela API (`recurringAppointment: { id, clientPlanId }`); o cancelamento delas vai pela rota da recorrência.
 - `getCurrentUser` usa `cache` do React: layout e página compartilham a chamada a `/auth/me` na mesma requisição.
+
+## Recorrências
+
+- Listagem (`/recorrencias`) com filtros de profissional e status na URL; detalhes (`/recorrencias/[id]`) com as sessões, que vêm de `GET /appointments?recurringAppointmentId=` (todas as páginas); cadastro em página (`/recorrencias/nova`).
+- `recurrence.service.ts` converte as datas de calendário da API (instante à meia-noite UTC) para `aaaa-mm-dd`.
+- Cadastro: `RecurrenceDaysField` mostra, na linha de cada dia marcado, os horários livres da primeira ocorrência (`getAvailabilityAction` + `availableStarts` + `AvailableTimes`); `recurrence-schedule.ts` calcula as ocorrências do resumo e o limite de 12 meses (`addMonths`). O servidor valida de novo as datas e confere todas as sessões (tudo ou nada).
+- A busca de clientes do cadastro está em `useClientSearch` (a do dialog de novo agendamento ainda tem a mesma lógica própria).
+- O dialog de remanejar (`RescheduleSessionDialog`) é o mesmo da agenda: recebe o profissional, a duração, o período (opcional) e a função que grava.
 
 ## Sessão e rotas protegidas
 

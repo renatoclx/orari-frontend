@@ -1,5 +1,6 @@
 "use client";
 
+import { Camera, X } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
@@ -158,6 +159,7 @@ export function CameraCaptureDialog({
             variant="outline"
             onClick={() => onOpenChange(false)}
           >
+            <X aria-hidden="true" />
             Cancelar
           </Button>
           <Button
@@ -165,6 +167,7 @@ export function CameraCaptureDialog({
             onClick={capture}
             disabled={!ready || !!message}
           >
+            <Camera aria-hidden="true" />
             Capturar
           </Button>
         </DialogFooter>

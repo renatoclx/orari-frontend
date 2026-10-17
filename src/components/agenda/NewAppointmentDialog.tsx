@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState, useTransition } from "react";
-import { TriangleAlert } from "lucide-react";
+import { CalendarPlus, Save, TriangleAlert, X } from "lucide-react";
 import { toast } from "sonner";
 import {
   createAppointmentAction,
@@ -518,9 +518,15 @@ function NewAppointmentForm({
           disabled={pending}
           onClick={() => onOpenChange(false)}
         >
+          <X aria-hidden="true" />
           Cancelar
         </Button>
         <Button type="submit" disabled={pending || !changed}>
+          {editing ? (
+            <Save aria-hidden="true" />
+          ) : (
+            <CalendarPlus aria-hidden="true" />
+          )}
           {editing
             ? pending
               ? "Salvando…"

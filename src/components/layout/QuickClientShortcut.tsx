@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import { UserPlus } from "lucide-react";
+import { UserPlus, Plus, X } from "lucide-react";
 import { toast } from "sonner";
 import { quickCreateClientAction } from "@/app/(admin)/people-actions";
 import {
@@ -147,9 +147,11 @@ export function QuickClientShortcut() {
               disabled={pending}
               onClick={() => handleOpenChange(false)}
             >
+              <X aria-hidden="true" />
               Cancelar
             </Button>
             <Button type="submit" disabled={pending}>
+              <Plus aria-hidden="true" />
               {pending ? "Cadastrando…" : "Cadastrar"}
             </Button>
           </DialogFooter>

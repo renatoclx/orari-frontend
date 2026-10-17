@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { LoaderCircle } from "lucide-react";
+import { LoaderCircle, Plus, X } from "lucide-react";
 import { toast } from "sonner";
 import {
   lookupCepAction,
@@ -397,9 +397,11 @@ export function AddressDraftForm({
 
       <div className="flex justify-end gap-2">
         <Button type="button" variant="ghost" onClick={onCancel}>
+          <X aria-hidden="true" />
           Cancelar
         </Button>
         <Button type="button" disabled={pending} onClick={submit}>
+          <Plus aria-hidden="true" />
           {pending ? "Adicionando…" : "Adicionar"}
         </Button>
       </div>

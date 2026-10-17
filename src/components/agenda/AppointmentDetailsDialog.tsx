@@ -1,16 +1,23 @@
 "use client";
 
+import Link from "next/link";
 import {
   CalendarClock,
+  CalendarSync,
   Clock,
   Pencil,
+  Repeat,
   StickyNote,
   UserRound,
+  X,
+  Ban,
 } from "lucide-react";
 import { useState, useTransition } from "react";
 import { toast } from "sonner";
 import { cancelAppointmentAction } from "@/app/(admin)/appointment-actions";
+import { cancelRecurrenceSessionAction } from "@/app/(admin)/recurrence-actions";
 import { APPOINTMENT_STATUS } from "@/components/agenda/appointment-status";
+import { recurrenceLabel } from "@/components/agenda/recurrence-label";
 import { ConfirmDialog } from "@/components/shared/ConfirmDialog";
 import { PersonAvatar } from "@/components/shared/PersonAvatar";
 import { Button } from "@/components/ui/button";
@@ -31,6 +38,8 @@ type AppointmentDetailsDialogProps = {
   canCancel: (appointment: AgendaAppointment) => boolean;
   /** Abre o dialog de alteração do agendamento. */
   onEdit: (appointment: AgendaAppointment) => void;
+  /** Abre o remanejamento (agendamento comum ou sessão de recorrência). */
+  onReschedule: (appointment: AgendaAppointment) => void;
   onOpenChange: (open: boolean) => void;
 };
 
@@ -41,6 +50,7 @@ export function AppointmentDetailsDialog({
   appointment,
   canCancel,
   onEdit,
+  onReschedule,
   onOpenChange,
 }: AppointmentDetailsDialogProps) {
   return (
@@ -51,6 +61,7 @@ export function AppointmentDetailsDialog({
             appointment={appointment}
             cancellable={canCancel(appointment)}
             onEdit={() => onEdit(appointment)}
+            onReschedule={() => onReschedule(appointment)}
             onClose={() => onOpenChange(false)}
           />
         )}
@@ -63,11 +74,13 @@ function Details({
   appointment,
   cancellable,
   onEdit,
+  onReschedule,
   onClose,
 }: {
   appointment: AgendaAppointment;
   cancellable: boolean;
   onEdit: () => void;
+  onReschedule: () => void;
   onClose: () => void;
 }) {
   const [confirmOpen, setConfirmOpen] = useState(false);
@@ -78,7 +91,13 @@ function Details({
 
   function cancel() {
     startTransition(async () => {
-      const result = await cancelAppointmentAction(appointment.id);
+      // Agendamento de recorrência só é cancelado pela rota da recorrência.
+      const result = appointment.recurrence
+        ? await cancelRecurrenceSessionAction(
+            appointment.recurrence.id,
+            appointment.id,
+          )
+        : await cancelAppointmentAction(appointment.id);
       if (result.ok) {
         toast.success("Agendamento cancelado.", {
           description: `${appointment.clientName}, ${appointment.start} às ${appointment.end}`,
@@ -152,6 +171,15 @@ function Details({
             Encaixe fora do horário de funcionamento
           </li>
         )}
+        {appointment.recurrence && (
+          <li className="flex items-center gap-2">
+            <Repeat
+              className="size-4 shrink-0 text-muted-foreground"
+              aria-hidden="true"
+            />
+            {recurrenceLabel(appointment.recurrence)}
+          </li>
+        )}
         {appointment.note && (
           <li className="flex items-start gap-2">
             <StickyNote
@@ -164,14 +192,23 @@ function Details({
       </ul>
 
       {cancellable && (
-        <div className="flex justify-center border-t border-border pt-4">
+        <div className="flex justify-center gap-2 border-t border-border pt-4">
           <Button
             type="button"
             variant="destructive"
             onClick={() => setConfirmOpen(true)}
           >
-            Cancelar agendamento
+            <Ban aria-hidden="true" />
+            Cancelar
           </Button>
+          {/* O cliente pode pedir outro dia em vez de cancelar. O encaixe tem
+              regras próprias de horário: é remanejado pelo "Alterar". */}
+          {!appointment.overbooking && (
+            <Button type="button" onClick={onReschedule}>
+              <CalendarSync aria-hidden="true" />
+              Remanejar
+            </Button>
+          )}
         </div>
       )}
 
@@ -181,6 +218,7 @@ function Details({
         title="Cancelar agendamento?"
         description={`O agendamento de ${appointment.clientName}, das ${appointment.start} às ${appointment.end}, será cancelado e o horário ficará livre.`}
         confirmLabel="Cancelar agendamento"
+        icon={Ban}
         pendingLabel="Cancelando…"
         cancelLabel="Voltar"
         pending={pending}
@@ -190,14 +228,24 @@ function Details({
 
       <DialogFooter>
         <Button type="button" variant="outline" onClick={onClose}>
+          <X aria-hidden="true" />
           Fechar
         </Button>
         {/* Nada no passado é alterado: mesma condição do cancelamento. */}
-        {cancellable && (
-          <Button type="button" onClick={onEdit}>
-            <Pencil aria-hidden="true" />
-            Alterar
+        {appointment.recurrence ? (
+          <Button asChild variant="outline">
+            <Link href={`/recorrencias/${appointment.recurrence.id}`}>
+              <Repeat aria-hidden="true" />
+              Ver recorrência
+            </Link>
           </Button>
+        ) : (
+          cancellable && (
+            <Button type="button" onClick={onEdit}>
+              <Pencil aria-hidden="true" />
+              Alterar
+            </Button>
+          )
         )}
       </DialogFooter>
     </>

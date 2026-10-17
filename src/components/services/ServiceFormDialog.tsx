@@ -1,5 +1,6 @@
 "use client";
 
+import { Plus, Save, X } from "lucide-react";
 import { useState, useTransition } from "react";
 import { toast } from "sonner";
 import {
@@ -225,9 +226,11 @@ function ServiceForm({
           disabled={pending}
           onClick={onClose}
         >
+          <X aria-hidden="true" />
           Cancelar
         </Button>
         <Button type="submit" disabled={pending}>
+          {editing ? <Save aria-hidden="true" /> : <Plus aria-hidden="true" />}
           {editing
             ? pending
               ? "Salvando…"

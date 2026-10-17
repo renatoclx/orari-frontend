@@ -8,6 +8,7 @@ import {
   Eye,
   Pencil,
   Trash2,
+  X,
 } from "lucide-react";
 import { toast } from "sonner";
 import {
@@ -374,6 +375,7 @@ export function ServiceList({ services, search, footer }: ServiceListProps) {
           {viewing && <ServiceDetails service={viewing} />}
           <DialogFooter>
             <Button variant="outline" onClick={() => setViewing(null)}>
+              <X aria-hidden="true" />
               Fechar
             </Button>
           </DialogFooter>
@@ -386,6 +388,7 @@ export function ServiceList({ services, search, footer }: ServiceListProps) {
         title="Excluir serviço?"
         description={`O serviço ${deleting?.name ?? ""} será excluído. Serviços com agendamentos, recorrências ou planos vinculados não podem ser excluídos; nesse caso, inative-o.`}
         confirmLabel="Excluir"
+        icon={Trash2}
         pendingLabel="Excluindo…"
         pending={removing}
         destructive
@@ -398,6 +401,7 @@ export function ServiceList({ services, search, footer }: ServiceListProps) {
         title="Inativar serviço?"
         description={`O serviço ${deactivating?.name ?? ""} ficará inativo e não poderá ser usado em novos agendamentos. Você poderá ativá-lo novamente.`}
         confirmLabel="Inativar"
+        icon={Ban}
         pendingLabel="Inativando…"
         pending={pending}
         onConfirm={confirmDeactivate}

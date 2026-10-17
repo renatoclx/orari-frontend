@@ -40,4 +40,6 @@ export type AppointmentItem = {
   client: AppointmentPerson;
   professional: AppointmentPerson;
   service: AppointmentService;
+  /** Recorrência de origem (nulo no agendamento avulso); `clientPlanId` se for de pacote. */
+  recurringAppointment: { id: string; clientPlanId: string | null } | null;
 };

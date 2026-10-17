@@ -1,3 +1,4 @@
+import { Repeat } from "lucide-react";
 import { OVERBOOKING_COLOR } from "@/components/agenda/agenda-data";
 import {
   APPOINTMENT_STATUS,
@@ -29,6 +30,11 @@ export function AgendaLegend() {
           aria-hidden="true"
         />
         Encaixe
+      </li>
+      {/* Mesmo ícone do bloco: sessão de recorrência ou de pacote. */}
+      <li className="flex items-center gap-1.5">
+        <Repeat className="size-3.5" aria-hidden="true" />
+        Recorrente
       </li>
     </ul>
   );

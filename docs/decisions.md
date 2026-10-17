@@ -26,6 +26,26 @@ regras de cada tela, em `docs/screens/`.
 - **2026-10-16 — Cancelados na grade** aparecem esmaecidos; se outro agendamento ocupa o horário, ou há vários cancelados iguais, aparece só um. _Por quê:_ evitar blocos sobrepostos.
 - **2026-10-16 — Relógio vivo:** o "agora" da agenda anda sozinho e os dados são buscados de novo a cada minuto e ao voltar para a aba. _Por quê:_ sem isso, o botão de cancelar continuava aparecendo depois do início.
 
+- **2026-10-17 — Remanejar** (agendamento comum e sessão de recorrência, exceto encaixe): botão ao lado de "Cancelar" no detalhe, dialog só com data e horário. O mesmo agendamento muda de data (não é recriado). _Por quê:_ o cliente costuma pedir outro dia em vez de cancelar, e cancelado é estado final.
+
+## Recorrências
+
+- **2026-10-16 — Tela própria (`/recorrencias`), com cadastro em página.** _Por quê:_ controle das recorrências separado da agenda; dias da semana e resumo das sessões não cabem num dialog.
+- **2026-10-16 — Período máximo de 12 meses, definido no frontend** (constante `MAX_RECURRENCE_MONTHS`). O backend deixou de limitar a 60 dias.
+- **2026-10-16 — Recorrência não é alterada:** só a observação muda; cancelar a recorrência cancela as sessões futuras. Sessões são canceladas ou remanejadas uma a uma, pela rota da recorrência.
+- **2026-10-16 — Recorrências de pacote aparecem na lista, sem "Cancelar".** _Por quê:_ a API não filtra por pacote (filtrar na tela quebraria a paginação) e recusa o cancelamento (a contratação encerra a agenda).
+- **2026-10-17 — Horários livres por dia da semana pela primeira ocorrência.** _Por quê:_ conferir todas as datas exigiria uma rota nova; o servidor confere tudo ao salvar (tudo ou nada, com a data do conflito na mensagem).
+- **2026-10-16 — Origem na agenda:** sessões de recorrência têm o ícone de repetir ("Recorrente" ou "Sessão de pacote"), vindo de `recurringAppointment` na resposta do agendamento.
+
+## Interface
+
+- **2026-10-17 — Todo botão com texto tem ícone à esquerda,** sempre o mesmo para a mesma ação (mapa na skill `orari-ui`). _Por quê:_ reconhecimento mais rápido da ação; antes era parcial.
+
+## Menu e próximos módulos
+
+- **2026-10-17 — Financeiro vira dropdown** com Pagamentos e Métodos de pagamento (métodos de pagamento: implementação do responsável pelo projeto).
+- **2026-10-17 — Configurações da empresa:** área própria para logo (futuramente exibida no menu), nome fantasia e horários de funcionamento; CNPJ, razão social e demais dados cadastrais só para leitura.
+
 ## Processo
 
 - **2026-10-14 — Comentários:** todo código novo leva comentário curto explicando o porquê (regra herdada do backend).
@@ -34,6 +54,6 @@ regras de cada tela, em `docs/screens/`.
 
 ## Em aberto
 
-- Almoço como duas janelas cadastradas pela API; tela de horário de funcionamento e pausas lançadas pelo administrador são futuras.
+- Almoço como duas janelas; a tela de horário de funcionamento entra em Configurações da empresa. Pausas lançadas pelo administrador são futuras.
 - Empresa sem nenhuma janela cadastrada: a API não restringe horários; falta definir o comportamento da agenda.
-- Alterar agendamento de recorrência (a API tem regra própria).
+- Ponto de acesso às Configurações da empresa (sidebar ou menu do usuário).

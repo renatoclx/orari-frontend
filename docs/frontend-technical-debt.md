@@ -15,9 +15,17 @@ Pontos conhecidos e aceitos por enquanto. Revisar quando o contexto mudar.
 - **Busca de clientes e serviços.** Clientes: busca no servidor (20 por vez). Serviços: até 100 ativos, filtrados na tela.
 - **Profissionais da agenda.** A grade carrega até 100 profissionais (uma página). Acima disso, os demais não aparecem.
 - **Pausas por profissional.** O backend só tem o horário de funcionamento da empresa; a agenda não desenha pausas (previsto: o administrador poderá lançá-las).
-- **Horário de funcionamento sem tela.** As janelas (e o almoço como duas janelas) só são cadastradas pela API.
+- **Horário de funcionamento sem tela.** As janelas (e o almoço como duas janelas) só são cadastradas pela API; a tela entra em Configurações da empresa.
 - **Posição inicial da grade.** No celular a grade abre no início da faixa (2 h antes do expediente); falta rolar até o primeiro agendamento ou até o horário atual.
 - **Nomes de profissional fora da lista.** Agendamentos de profissionais inativos não aparecem (a agenda deles será remanejada, fora do MVP).
+
+## Recorrências
+
+- **Horários do cadastro pela primeira ocorrência.** Cada dia da semana mostra os horários livres só da primeira data; as demais são conferidas ao salvar (tudo ou nada, com a data do conflito). Uma simulação no backend (dry-run) mostraria todos os conflitos antes.
+- **Recorrências de pacote na lista.** A API não filtra por pacote; elas aparecem, sem a ação de cancelar.
+- **Ordem da lista.** A API ordena pela data inicial crescente: as mais novas ficam nas últimas páginas.
+- **Busca de clientes duplicada.** `useClientSearch` (recorrência) e o dialog de novo agendamento têm a mesma lógica; unificar quando o dialog for revisto.
+- **Remanejar pela agenda busca a recorrência ao abrir** (a resposta do agendamento não traz o período). O dialog aparece depois dessa busca.
 
 ## Pessoas
 

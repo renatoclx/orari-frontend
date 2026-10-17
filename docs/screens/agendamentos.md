@@ -19,7 +19,7 @@
   - Linha do horário atual, somente quando o dia exibido é hoje.
   - Áreas fora das janelas de atendimento (antes da abertura e depois do fechamento) sombreadas, com hachura.
   - O intervalo entre duas janelas de atendimento (almoço, por exemplo) em cinza, com a indicação "Intervalo". É apenas indicação visual: não tem regra própria.
-- Legenda dos ícones de status e do encaixe no rodapé da página, alinhada à direita.
+- Legenda dos ícones de status, do encaixe e da recorrência no rodapé da página, alinhada à direita.
 
 ### Profissionais exibidos
 
@@ -81,14 +81,26 @@
 
 ## Detalhes do agendamento
 
-- Exibe foto e nome do cliente, serviço com cor e duração, horário, profissional, status, indicação de encaixe e observação.
-- A única ação de status é **Cancelar agendamento**:
+- Exibe foto e nome do cliente, serviço com cor e duração, horário, profissional, status, indicação de encaixe, indicação de recorrência ("Recorrente" ou "Sessão de pacote") e observação.
+- Ações, lado a lado, exibidas apenas enquanto o agendamento ainda não iniciou: **Cancelar** e **Remanejar** (ver "Remanejar agendamento").
+- A única ação de status é **Cancelar**:
   - Botão vermelho, centralizado, exibido apenas enquanto o agendamento ainda não iniciou (status Agendado ou Confirmado, com o horário de início no futuro).
   - Pede confirmação em dialog ("Cancelar agendamento?", com "Voltar" e "Cancelar agendamento"). Ao confirmar, o status passa a Cancelado, o horário fica livre e um aviso informa o cancelamento.
-  - Agendamento gerado por recorrência é cancelado pela própria recorrência; se a API recusar, o motivo é exibido.
+  - Agendamento gerado por recorrência é cancelado pela rota da recorrência; se a API recusar, o motivo é exibido.
   - A regra também é imposta pelo backend: a API recusa (400) o cancelamento de agendamento que já iniciou, concluído, com "Não compareceu" ou já cancelado, e a tela exibe a mensagem do servidor. Cancelado é um estado final (não pode ser reaberto).
 - Não há ação manual para os demais status: o início e a conclusão do atendimento são automáticos, pelo horário (o backend atualiza o status), e a confirmação (status Confirmado) será feita pelo cliente em uma funcionalidade futura. "Não compareceu" ainda não tem regra no backend.
 - O botão "Alterar" abre o dialog de alteração (ver "Alterar agendamento"). Aparece apenas enquanto o agendamento ainda não iniciou, como o cancelamento: nada no passado é alterado.
+- Em sessão de recorrência, o "Alterar" dá lugar a **Ver recorrência**, que abre os detalhes da recorrência.
+
+---
+
+## Remanejar agendamento
+
+- O cliente pode pedir outro dia em vez de cancelar. O botão "Remanejar" abre um dialog só com Data e Horário (mesmo seletor de períodos e horários do novo agendamento); cliente, serviço e profissional não mudam.
+- O mesmo agendamento muda de data e horário (não é cancelado nem recriado): some do dia antigo e aparece no novo.
+- Agendamento comum: grava pela alteração (`PATCH /appointments/:id`). Sessão de recorrência: grava pela rota da recorrência e só aceita datas dentro do período dela.
+- O próprio horário conta como livre para ele mesmo. Não pode ser remarcado para o passado.
+- O encaixe não tem "Remanejar": tem regras próprias de horário e é remarcado pelo "Alterar".
 
 ---
 
@@ -177,5 +189,5 @@ Segue a mesma estrutura de um novo agendamento.
 - Limpar o campo Observações remove a observação.
 - O botão "Salvar alterações" só fica habilitado quando algo foi alterado. Não há dialog de confirmação.
 - Se o profissional ou o cliente já tiverem agendamento no novo horário, o servidor recusa (conflito), e o dialog informa e atualiza os horários.
-- Agendamentos gerados por recorrência (funcionalidade futura) têm restrições na API (cliente, profissional, serviço e horário não mudam pela alteração comum); se a API recusar, o motivo é exibido no aviso de erro.
+- Agendamentos gerados por recorrência não são alterados por este dialog (a API recusa): o detalhe oferece Remanejar e Ver recorrência.
 - Após salvar, um aviso informa o novo dia e horário (ex.: "Quinta-feira, 22 de outubro, das 10:00 às 11:00"). A agenda permanece no dia em que estava; se o agendamento foi para outro dia, o bloco deixa de aparecer nela e o aviso informa para onde foi.

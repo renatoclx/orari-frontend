@@ -7,7 +7,8 @@
   - Clientes / Funcionários / Profissionais / Usuários
 - Cada tipo de Pessoa irá referenciar um PeopleType no backend.
 - Usuário é uma entidade separada, que possui referência diferente (UserType)
-- Itens do menu, em ordem: Agendamentos, Recorrências, Pessoas (dropdown), Serviços, Pacotes (dropdown com Planos e Contratações) e Financeiro.
+- Itens do menu, em ordem: Agendamentos, Recorrências, Pessoas (dropdown), Serviços, Pacotes (dropdown com Planos e Contratações) e Financeiro (dropdown com Pagamentos e Métodos de pagamento).
+- Configurações da empresa: área própria (logo, nome fantasia, horários de funcionamento e dados cadastrais só para leitura). O ponto de acesso ainda será definido.
 
 ---
 
@@ -18,6 +19,6 @@
   - Calendário (irá ter ação com a tela de Agendamentos);
   - Cliente (ícone para cadastro rápido de um cliente);
   - Serviços (ícone para cadastro rápido de um serviço);
-  - Recorrência (ícone para cadastro rápido de uma recorrência);
+  - Recorrência (ícone que abre o cadastro de uma nova recorrência);
 
 No celular, somente o item calendário será exibido, os demais devem permanecer ocultos.

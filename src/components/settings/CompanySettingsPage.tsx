@@ -1,13 +1,12 @@
-import { BusinessHoursForm } from "@/components/settings/BusinessHoursForm";
+import { CompanySettingsForm } from "@/components/settings/CompanySettingsForm";
 import { EmptyValue } from "@/components/shared/EmptyValue";
 import { getCurrentUser } from "@/services/auth.service";
 import { listAllBusinessHours } from "@/services/business-hour.service";
 import { getCompany } from "@/services/company.service";
 import { formatCnpj, formatDateOnly } from "@/utils/format";
 
-// Configurações da empresa: dados cadastrais (só leitura) e horários de
-// funcionamento. Nome fantasia e logo passam a ser editáveis quando a API
-// permitir ao administrador alterar a própria empresa.
+// Configurações da empresa: identidade (nome fantasia e logo), dados cadastrais
+// (só leitura) e horários de funcionamento.
 export async function CompanySettingsPage() {
   const { company: current } = await getCurrentUser();
   const [company, hours] = await Promise.all([
@@ -16,7 +15,6 @@ export async function CompanySettingsPage() {
   ]);
 
   const rows: [string, React.ReactNode][] = [
-    ["Nome fantasia", company.fantasyName],
     ["Razão social", company.corporateReason],
     ["CNPJ", formatCnpj(company.cnpj)],
     ["Data de fundação", formatDateOnly(company.foundationDate)],
@@ -28,30 +26,36 @@ export async function CompanySettingsPage() {
     <div className="flex min-h-0 flex-1 flex-col gap-4">
       <h1 className="text-2xl font-semibold">Configurações da empresa</h1>
 
-      {/* key: depois de salvar, o formulário recomeça com os ids gravados. */}
-      <BusinessHoursForm
-        key={hours
-          .map((hour) => `${hour.id}${hour.openAt}${hour.closeAt}`)
-          .join("|")}
+      {/* key: depois de salvar, o formulário recomeça com o que foi gravado
+          (as janelas novas passam a ter id). */}
+      <CompanySettingsForm
+        key={[
+          company.fantasyName,
+          company.logoUrl,
+          ...hours.map((hour) => `${hour.id}${hour.openAt}${hour.closeAt}`),
+        ].join("|")}
+        fantasyName={company.fantasyName}
+        logoUrl={company.logoUrl}
         hours={hours}
-      >
-        <section className="border-b border-border p-4 md:p-6">
-          <h2 className="font-semibold">Dados da empresa</h2>
-          <p className="text-sm text-muted-foreground">
-            Dados cadastrais. Para alterá-los, fale com o suporte do Orari.
-          </p>
-          <dl className="mt-4 grid grid-cols-[auto_1fr] gap-x-4 gap-y-2 text-sm">
-            {rows.map(([label, value]) => (
-              <div key={label} className="contents">
-                <dt className="text-muted-foreground">{label}</dt>
-                <dd className="tabular-nums">
-                  <EmptyValue>{value}</EmptyValue>
-                </dd>
-              </div>
-            ))}
-          </dl>
-        </section>
-      </BusinessHoursForm>
+        details={
+          <section className="border-b border-border p-4 md:p-6">
+            <h2 className="font-semibold">Dados da empresa</h2>
+            <p className="text-sm text-muted-foreground">
+              Dados cadastrais. Para alterá-los, fale com o suporte do Orari.
+            </p>
+            <dl className="mt-4 grid grid-cols-[auto_1fr] gap-x-4 gap-y-2 text-sm">
+              {rows.map(([label, value]) => (
+                <div key={label} className="contents">
+                  <dt className="text-muted-foreground">{label}</dt>
+                  <dd className="tabular-nums">
+                    <EmptyValue>{value}</EmptyValue>
+                  </dd>
+                </div>
+              ))}
+            </dl>
+          </section>
+        }
+      />
     </div>
   );
 }

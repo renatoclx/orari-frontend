@@ -41,7 +41,12 @@ export function Header({ user, onOpenMobile }: HeaderProps) {
         <div className="flex items-center md:hidden">
           <CalendarShortcut placement="header" />
         </div>
-        <CompanyLogo name={user.company.name} logoUrl={user.company.logoUrl} />
+        {/* key: logo nova recomeça do zero (a anterior pode ter falhado). */}
+        <CompanyLogo
+          key={user.company.logoUrl}
+          name={user.company.name}
+          logoUrl={user.company.logoUrl}
+        />
         <div className="flex items-center gap-3">
           <div className="hidden text-right md:block">
             <p className="text-sm font-medium">{user.name}</p>

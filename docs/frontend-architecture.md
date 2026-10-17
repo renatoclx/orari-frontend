@@ -31,6 +31,9 @@ src/
       servicos/              Serviços: page e loading (cadastro e alteração
                              em dialog)
       recorrencias/          Recorrências: page, nova/, [id]/
+      configuracoes/         Configurações da empresa: page
+      company-actions.ts     Server Action das configurações (nome fantasia,
+                             logo e horários de funcionamento)
       clientes/              Clientes: page, loading, novo/, [id]/editar/
       funcionarios/          Funcionários (mesma estrutura)
       profissionais/         Profissionais (mesma estrutura)
@@ -48,6 +51,7 @@ src/
     services/                tela de Serviços (listagem e dialog de formulário)
     agenda/                  agenda do dia (grade, blocos, legenda, faixa)
     recurrences/             recorrências (lista, cadastro, detalhes, remanejar)
+    settings/                configurações da empresa (formulário, logo, horários)
     <tela>/                  componentes das demais telas (auth/)
   services/                  comunicação com a API e sessão (somente servidor)
   types/                     tipos do domínio, espelhando o backend
@@ -77,7 +81,7 @@ Layout ──────────────────┘
 ```
 
 - **`apiFetch`** (`services/api.ts`) é o ponto único de chamada à API: monta a URL com `API_URL`, envia JSON sem cache, anexa o token da sessão e transforma erros em `ApiError` (status + mensagem). Status `0` = API fora do ar. Um 401 em chamada autenticada leva ao login (`/session-expired`).
-- **Services por assunto** (`auth.service.ts`, `people.service.ts`, `contact.service.ts`, `address.service.ts`, `location.service.ts`, `cep.service.ts`, `service.service.ts`, `appointment.service.ts`, `recurrence.service.ts`, `business-hour.service.ts`) conhecem os caminhos da API e são chamados pelas telas, layouts e Server Actions — nunca o `apiFetch` direto.
+- **Services por assunto** (`auth.service.ts`, `people.service.ts`, `contact.service.ts`, `address.service.ts`, `location.service.ts`, `cep.service.ts`, `service.service.ts`, `appointment.service.ts`, `recurrence.service.ts`, `business-hour.service.ts`, `company.service.ts`) conhecem os caminhos da API e são chamados pelas telas, layouts e Server Actions — nunca o `apiFetch` direto.
 - Os services importam `server-only`: rodam só no servidor. O navegador nunca fala com a API diretamente.
 - Server Actions tratam `ApiError` (viram mensagem na tela) e deixam estourar erros inesperados — inclusive o `redirect()` do Next, que também é lançado como erro.
 
@@ -134,6 +138,14 @@ As três telas são a mesma implementação, escolhida pelo tipo (`PeopleType`).
 - Cadastro: `RecurrenceDaysField` mostra, na linha de cada dia marcado, os horários livres da primeira ocorrência (`getAvailabilityAction` + `availableStarts` + `AvailableTimes`); `recurrence-schedule.ts` calcula as ocorrências do resumo e o limite de 12 meses (`addMonths`). O servidor valida de novo as datas e confere todas as sessões (tudo ou nada).
 - A busca de clientes do cadastro está em `useClientSearch` (a do dialog de novo agendamento ainda tem a mesma lógica própria).
 - O dialog de remanejar (`RescheduleSessionDialog`) é o mesmo da agenda: recebe o profissional, a duração, o período (opcional) e a função que grava.
+
+## Configurações da empresa
+
+- Página (`/configuracoes`) monta, no servidor, os dados da empresa (`GET /companies/:id`) e as janelas de funcionamento; `CompanySettingsForm` (Client Component) é o card único, com identidade, dados cadastrais (passados como `details`) e `BusinessHoursField`.
+- `saveCompanySettingsAction` recebe um `FormData` só com o que mudou (`fantasyName`, `logo` ou `removeLogo`, `hours` em JSON) e grava nas rotas `/companies/me`, `/companies/me/logo` e `/business-hours`, nessa ordem. Depois `revalidatePath("/", "layout")`, para o header (nome e logo) refletir a mudança.
+- Os horários são gravados pela diferença: o servidor lê as janelas atuais, exclui as que saíram, altera as que mudaram e cria as novas em lote. As regras (abertura antes do fechamento, sem sobreposição) estão em `business-hours-validation.ts` e valem na tela e na action.
+- A logo do header (`CompanyLogo`) usa `next/image` com `unoptimized` e some se não carregar; o `key` é o endereço da logo, para recomeçar quando ela muda.
+- O tema claro/escuro vive no menu do usuário (`ThemeMenuItem`); o switch com sol e lua (`ThemeToggle`) só aparece na tela de login.
 
 ## Sessão e rotas protegidas
 

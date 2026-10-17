@@ -41,10 +41,16 @@ regras de cada tela, em `docs/screens/`.
 
 - **2026-10-17 — Todo botão com texto tem ícone à esquerda,** sempre o mesmo para a mesma ação (mapa na skill `orari-ui`). _Por quê:_ reconhecimento mais rápido da ação; antes era parcial.
 
+## Configurações da empresa
+
+- **2026-10-17 — Área própria (`/configuracoes`), acessada pelo menu do usuário,** com identidade (nome fantasia e logo), dados cadastrais só para leitura e horários de funcionamento, num formulário único. O backend ganhou `PATCH /companies/me`, `POST` e `DELETE /companies/me/logo` para o administrador; razão social, CNPJ, fuso e demais dados continuam só do SUPER_ADMIN.
+- **2026-10-17 — Logo só em JPEG ou PNG** (a API não aceita SVG); aparece no header. Sem logo, ou se não carregar, nada aparece.
+- **2026-10-17 — O tema claro/escuro foi para o menu do usuário,** liberando o espaço do header para a logo da empresa.
+- **2026-10-17 — Horários gravados pela diferença com a API** (exclui, altera e cria só o necessário); não é uma transação única.
+
 ## Menu e próximos módulos
 
 - **2026-10-17 — Financeiro vira dropdown** com Pagamentos e Métodos de pagamento (métodos de pagamento: implementação do responsável pelo projeto).
-- **2026-10-17 — Configurações da empresa:** área própria para logo (futuramente exibida no menu), nome fantasia e horários de funcionamento; CNPJ, razão social e demais dados cadastrais só para leitura.
 
 ## Processo
 
@@ -56,4 +62,3 @@ regras de cada tela, em `docs/screens/`.
 
 - Almoço como duas janelas; a tela de horário de funcionamento entra em Configurações da empresa. Pausas lançadas pelo administrador são futuras.
 - Empresa sem nenhuma janela cadastrada: a API não restringe horários; falta definir o comportamento da agenda.
-- Ponto de acesso às Configurações da empresa (sidebar ou menu do usuário).

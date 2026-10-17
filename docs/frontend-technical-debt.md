@@ -15,7 +15,6 @@ Pontos conhecidos e aceitos por enquanto. Revisar quando o contexto mudar.
 - **Busca de clientes e serviços.** Clientes: busca no servidor (20 por vez). Serviços: até 100 ativos, filtrados na tela.
 - **Profissionais da agenda.** A grade carrega até 100 profissionais (uma página). Acima disso, os demais não aparecem.
 - **Pausas por profissional.** O backend só tem o horário de funcionamento da empresa; a agenda não desenha pausas (previsto: o administrador poderá lançá-las).
-- **Horário de funcionamento sem tela.** As janelas (e o almoço como duas janelas) só são cadastradas pela API; a tela entra em Configurações da empresa.
 - **Posição inicial da grade.** No celular a grade abre no início da faixa (2 h antes do expediente); falta rolar até o primeiro agendamento ou até o horário atual.
 - **Nomes de profissional fora da lista.** Agendamentos de profissionais inativos não aparecem (a agenda deles será remanejada, fora do MVP).
 
@@ -26,6 +25,12 @@ Pontos conhecidos e aceitos por enquanto. Revisar quando o contexto mudar.
 - **Ordem da lista.** A API ordena pela data inicial crescente: as mais novas ficam nas últimas páginas.
 - **Busca de clientes duplicada.** `useClientSearch` (recorrência) e o dialog de novo agendamento têm a mesma lógica; unificar quando o dialog for revisto.
 - **Remanejar pela agenda busca a recorrência ao abrir** (a resposta do agendamento não traz o período). O dialog aparece depois dessa busca.
+
+## Configurações da empresa
+
+- **Gravação em etapas.** Nome fantasia, logo e cada janela de horário usam chamadas separadas. Se uma falhar no meio, o que veio antes já foi gravado; a mensagem diz qual parte falhou e a tela recarrega o que ficou salvo. Uma rota que gravasse a semana inteira de uma vez (como o `batch`, mas substituindo) evitaria isso.
+- **Dias da semana.** A lista `WEEK_DAYS` (usada também na recorrência) está em `components/recurrences/`; mover para `utils/` quando um terceiro módulo precisar.
+- **Dados cadastrais só leitura.** Razão social, CNPJ, fuso e demais dados só o SUPER_ADMIN altera (sem tela no frontend).
 
 ## Pessoas
 

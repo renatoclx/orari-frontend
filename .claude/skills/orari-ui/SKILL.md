@@ -130,7 +130,7 @@ Fonte das regras: `docs/screen-patterns.md` (padrões) e `docs/screens/` (campos
 
 - Itens de menu podem ser grupos (ex.: "Pessoas", com Clientes, Funcionários e Profissionais): expandida, a seção abre; recolhida, vira um menu ao lado do ícone.
 - Sidebar escura com a logo colorida no topo (`/logo/logo-full-color.svg` aberta, `/logo/logo-icon-color.svg` recolhida). O botão de recolher é um ícone pequeno ao lado da logo; recolhida, a logo vira o botão de expandir ao passar o mouse.
-- Header com atalhos, toggle (switch) de tema claro/escuro e usuário logado.
+- Header: nome fantasia da empresa à esquerda (só do tablet em diante), logo da empresa (`CompanyLogo`; some sem logo ou se não carregar) e usuário logado. O menu do usuário (avatar) reúne Configurações da empresa, o tema claro/escuro (item com switch, que não fecha o menu) e Sair. Na tela de login, o tema continua como switch com sol e lua (`ThemeToggle`).
 - Componentes da estrutura ficam em `src/components/layout/`; o estado da sidebar recolhida fica em cookie, lido no servidor.
 - Celular: header com botão de menu e ícone da logo; a sidebar abre como gaveta por cima do conteúdo.
 - Mobile first: escreva o estilo do celular primeiro e amplie com `md:` / `lg:`.

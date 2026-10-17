@@ -2,7 +2,9 @@
 
 import { Hint } from "@/components/shared/Hint";
 import { useState, useTransition } from "react";
-import { LogOut } from "lucide-react";
+import Link from "next/link";
+import { Building2, LogOut } from "lucide-react";
+import { ThemeMenuItem } from "@/components/layout/ThemeToggle";
 import { logout } from "@/app/(admin)/actions";
 import { PersonAvatar } from "@/components/shared/PersonAvatar";
 import {
@@ -29,7 +31,7 @@ type UserMenuProps = {
   user: CurrentUser;
 };
 
-/** Menu do usuário logado, com a saída (que pede confirmação). */
+/** Menu do usuário logado: configurações da empresa, tema e saída (que pede confirmação). */
 export function UserMenu({ user }: UserMenuProps) {
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [pending, startTransition] = useTransition();
@@ -66,6 +68,14 @@ export function UserMenu({ user }: UserMenuProps) {
               {user.company.name}
             </p>
           </DropdownMenuLabel>
+          <DropdownMenuSeparator className="my-1.5" />
+          <DropdownMenuItem asChild className="gap-2.5 px-3 py-2">
+            <Link href="/configuracoes">
+              <Building2 aria-hidden="true" />
+              Configurações da empresa
+            </Link>
+          </DropdownMenuItem>
+          <ThemeMenuItem />
           <DropdownMenuSeparator className="my-1.5" />
           <DropdownMenuItem
             onSelect={() => setConfirmOpen(true)}

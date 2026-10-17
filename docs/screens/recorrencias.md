@@ -26,10 +26,10 @@
 
 ### Regras específicas
 
-- Filtros: profissional, cliente e status. ❓ Busca por nome do cliente depende do backend (hoje só filtra por código).
+- Filtros: profissional, cliente e status.
 - Paginação como nas demais listagens.
 - Botão "Nova recorrência".
-- ❓ As recorrências geradas por um pacote aparecem aqui? Proposta: não; a lista mostra só recorrências avulsas, e as de pacote ficam na contratação.
+- As recorrências geradas por pacote não devem aparecer nas recorrências.
 
 ---
 
@@ -50,10 +50,10 @@
 - O cliente deve ser do tipo Cliente e o profissional do tipo Profissional; o serviço deve estar ativo e ter preço (o valor de cada sessão é o preço vigente do serviço).
 - É necessário ao menos um dia. Dois dias no mesmo dia da semana não podem se sobrepor.
 - A data final não pode ser anterior à inicial, e a data inicial não pode ser no passado.
-- **Período:** o tempo da recorrência é definido na tela. ❓ Proposta: a tela limita a data final a no máximo 12 meses após a data inicial (limite prévio, definido em uma constante, que pode ser ajustado).
+- **Período:** o tempo da recorrência é definido na tela. A tela limita a data final a no máximo 12 meses após a data inicial (limite prévio, definido em uma constante, que pode ser ajustado).
 - Antes de salvar, um resumo informa quantas sessões serão geradas e o período (ex.: "26 sessões, de 20/10/2026 a 20/04/2027"). Sessões no passado não são geradas.
 - Cada sessão segue as regras de agendamento comum: precisa caber inteira em uma janela de atendimento e não pode conflitar com agendamento do profissional nem do cliente. Não há encaixe em recorrência.
-- A criação é tudo ou nada: se qualquer sessão conflitar, nenhuma é criada e a tela exibe o motivo. ❓ O ideal é o servidor informar qual data e horário conflitaram (pedido ao backend).
+- A criação é tudo ou nada: se qualquer sessão conflitar, nenhuma é criada e a tela exibe o motivo. - o Servidor informa qual data e horário conflitaram.
 - Cada sessão gerada nasce com um pagamento pendente, vencendo na data da sessão (o Financeiro trata a cobrança).
 - Não há dialog de confirmação ao salvar. Após salvar, um aviso informa o período e a quantidade de sessões, e o usuário vai para a listagem.
 
@@ -69,7 +69,9 @@
   - **Cancelar sessão:** pede confirmação; só antes de iniciar; o horário fica livre e o pagamento pendente da sessão é cancelado.
   - **Remanejar sessão:** escolhe nova data e horário (mesmo seletor de horários do novo agendamento), apenas dentro do período da recorrência e antes de iniciar; mantém o pagamento (o vencimento acompanha a nova data) e a quantidade de sessões.
 - Os dados da recorrência (cliente, profissional, serviço, dias e período) não são alterados: para mudá-los, cancela-se a recorrência e cria-se outra.
-- ❓ Pagamento integral: baixa em lote dos pagamentos pendentes (método de pagamento e data). Pertence a esta tela ou ao Financeiro?
+- Pagamento integral: baixa em lote dos pagamentos pendentes (método de pagamento e data).
+- O pagamento integral será feito no financeiro.
+  Ao criar a recorrência com pagamento integral,
 
 ---
 
@@ -80,7 +82,6 @@
   - **Cancelar agendamento:** cancela a sessão (pela recorrência), com as mesmas condições (antes de iniciar).
   - **Alterar:** vira "Remanejar": só data e horário, dentro do período. Cliente, serviço e profissional não mudam.
   - Há um atalho "Ver recorrência" que abre os detalhes da recorrência.
-- ❓ A observação da sessão pode ser editada pela agenda?
 
 ---
 

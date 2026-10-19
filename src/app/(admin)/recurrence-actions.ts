@@ -12,10 +12,15 @@ import {
   cancelRecurrenceSession,
   createRecurrence,
   getRecurrence,
+  listRecurrenceSessions,
   rescheduleRecurrenceSession,
   updateRecurrenceNote,
 } from "@/services/recurrence.service";
-import type { NewRecurrenceInput, RecurrenceItem } from "@/types/recurrence";
+import type {
+  NewRecurrenceInput,
+  RecurrenceItem,
+  RecurrenceSession,
+} from "@/types/recurrence";
 import {
   dayBounds,
   isDateString,
@@ -34,6 +39,20 @@ export async function getRecurrenceAction(
 ): Promise<GetRecurrenceResult> {
   try {
     return { ok: true, recurrence: await getRecurrence(id) };
+  } catch (error) {
+    return failureFrom(error);
+  }
+}
+
+export type RecurrenceSessionsResult =
+  { ok: true; sessions: RecurrenceSession[] } | ActionFailure;
+
+/** Sessões de uma recorrência (ex.: agenda de um serviço, no diálogo da contratação). */
+export async function listRecurrenceSessionsAction(
+  id: string,
+): Promise<RecurrenceSessionsResult> {
+  try {
+    return { ok: true, sessions: await listRecurrenceSessions(id) };
   } catch (error) {
     return failureFrom(error);
   }

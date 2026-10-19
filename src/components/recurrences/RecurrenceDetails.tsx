@@ -1,23 +1,19 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import { Ban, CalendarClock, Pencil, Save, X } from "lucide-react";
+import { Ban, Pencil, Save, X } from "lucide-react";
 import { toast } from "sonner";
 import {
   cancelRecurrenceAction,
-  cancelRecurrenceSessionAction,
-  rescheduleRecurrenceSessionAction,
   updateRecurrenceNoteAction,
 } from "@/app/(admin)/recurrence-actions";
-import { APPOINTMENT_STATUS } from "@/components/agenda/appointment-status";
 import { useAgendaClock } from "@/components/agenda/useAgendaClock";
 import { describeDays } from "@/components/recurrences/recurrence-schedule";
 import { RecurrenceStatusBadge } from "@/components/recurrences/RecurrenceStatusBadge";
-import { RescheduleSessionDialog } from "@/components/recurrences/RescheduleSessionDialog";
+import { RecurrenceSessions } from "@/components/recurrences/RecurrenceSessions";
 import { ConfirmDialog } from "@/components/shared/ConfirmDialog";
 import { EmptyValue } from "@/components/shared/EmptyValue";
 import { FormField } from "@/components/shared/FormField";
-import { Hint } from "@/components/shared/Hint";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -30,7 +26,6 @@ import {
 import { Textarea } from "@/components/ui/textarea";
 import type { RecurrenceItem, RecurrenceSession } from "@/types/recurrence";
 import { formatDateOnly, formatDuration } from "@/utils/format";
-import { toDateString, toTimeString } from "@/utils/time";
 
 type RecurrenceDetailsProps = {
   recurrence: RecurrenceItem;
@@ -50,30 +45,9 @@ export function RecurrenceDetails({
   const { today, nowTime } = useAgendaClock(timeZone, serverNow);
 
   const [cancellingAll, setCancellingAll] = useState(false);
-  const [cancellingSession, setCancellingSession] =
-    useState<RecurrenceSession | null>(null);
-  const [rescheduling, setRescheduling] = useState<RecurrenceSession | null>(
-    null,
-  );
   const [editingNote, setEditingNote] = useState(false);
   const [noteDraft, setNoteDraft] = useState("");
   const [pending, startTransition] = useTransition();
-
-  const dateOf = (session: RecurrenceSession) =>
-    toDateString(new Date(session.startAt), timeZone);
-  const timeOf = (iso: string) => toTimeString(iso, timeZone);
-
-  // Só se mexe em sessão que ainda não começou e não está encerrada.
-  function editable(session: RecurrenceSession): boolean {
-    if (!recurrence.isActive) return false;
-    if (session.status !== "SCHEDULED" && session.status !== "CONFIRMED") {
-      return false;
-    }
-    const date = dateOf(session);
-    return (
-      date > today || (date === today && timeOf(session.startAt) > nowTime)
-    );
-  }
 
   function cancelAll() {
     startTransition(async () => {
@@ -85,27 +59,6 @@ export function RecurrenceDetails({
         setCancellingAll(false);
       } else {
         toast.error("Não foi possível cancelar a recorrência.", {
-          description: result.message,
-        });
-      }
-    });
-  }
-
-  function cancelSession() {
-    if (!cancellingSession) return;
-    const target = cancellingSession;
-    startTransition(async () => {
-      const result = await cancelRecurrenceSessionAction(
-        recurrence.id,
-        target.id,
-      );
-      if (result.ok) {
-        toast.success("Sessão cancelada.", {
-          description: `${formatDateOnly(dateOf(target))}, ${timeOf(target.startAt)}`,
-        });
-        setCancellingSession(null);
-      } else {
-        toast.error("Não foi possível cancelar a sessão.", {
           description: result.message,
         });
       }
@@ -146,9 +99,6 @@ export function RecurrenceDetails({
       : []),
     ["Observações", <EmptyValue key="note">{recurrence.note}</EmptyValue>],
   ];
-
-  const headerClass =
-    "sticky top-0 z-10 border-b border-border bg-card px-4 py-3 font-medium text-muted-foreground";
 
   return (
     <div className="flex min-h-0 flex-1 flex-col gap-4 overflow-auto">
@@ -199,94 +149,20 @@ export function RecurrenceDetails({
           Sessões ({sessions.length})
         </h2>
         <div className="min-h-0 flex-1 overflow-auto">
-          <table className="w-full text-left text-sm">
-            <thead>
-              <tr>
-                {["Data", "Horário", "Status", "Ações"].map((title) => (
-                  <th key={title} scope="col" className={headerClass}>
-                    {title}
-                  </th>
-                ))}
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-border">
-              {sessions.map((session) => {
-                const { label, icon: StatusIcon } =
-                  APPOINTMENT_STATUS[session.status];
-                return (
-                  <tr key={session.id} className="hover:bg-background">
-                    <td className="px-4 py-3 whitespace-nowrap tabular-nums">
-                      {formatDateOnly(`${dateOf(session)}T00:00:00Z`)}
-                    </td>
-                    <td className="px-4 py-3 whitespace-nowrap tabular-nums">
-                      {timeOf(session.startAt)} às {timeOf(session.endAt)}
-                    </td>
-                    <td className="px-4 py-3">
-                      <span className="inline-flex items-center gap-1.5">
-                        <StatusIcon
-                          className="size-4 text-muted-foreground"
-                          aria-hidden="true"
-                        />
-                        {label}
-                      </span>
-                    </td>
-                    <td className="px-4 py-2">
-                      {editable(session) && (
-                        <div className="flex items-center gap-1">
-                          <Hint label="Remanejar sessão">
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              aria-label={`Remanejar a sessão de ${formatDateOnly(`${dateOf(session)}T00:00:00Z`)}`}
-                              onClick={() => setRescheduling(session)}
-                            >
-                              <CalendarClock aria-hidden="true" />
-                            </Button>
-                          </Hint>
-                          <Hint label="Cancelar sessão">
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              aria-label={`Cancelar a sessão de ${formatDateOnly(`${dateOf(session)}T00:00:00Z`)}`}
-                              onClick={() => setCancellingSession(session)}
-                            >
-                              <Ban aria-hidden="true" />
-                            </Button>
-                          </Hint>
-                        </div>
-                      )}
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
+          <RecurrenceSessions
+            recurrenceId={recurrence.id}
+            sessions={sessions}
+            active={recurrence.isActive}
+            timeZone={timeZone}
+            today={today}
+            nowTime={nowTime}
+            professional={recurrence.professional}
+            clientName={recurrence.client.name}
+            duration={recurrence.service.duration}
+            period={{ start: recurrence.startDate, end: recurrence.endDate }}
+          />
         </div>
       </section>
-
-      <RescheduleSessionDialog
-        professional={recurrence.professional}
-        clientName={recurrence.client.name}
-        duration={recurrence.service.duration}
-        period={{ start: recurrence.startDate, end: recurrence.endDate }}
-        onSubmit={(date, time) =>
-          rescheduleRecurrenceSessionAction(
-            recurrence.id,
-            rescheduling?.id ?? "",
-            date,
-            time,
-          )
-        }
-        session={
-          rescheduling && {
-            id: rescheduling.id,
-            date: dateOf(rescheduling),
-            time: timeOf(rescheduling.startAt),
-          }
-        }
-        today={today}
-        onOpenChange={(open) => !open && setRescheduling(null)}
-      />
 
       <ConfirmDialog
         open={cancellingAll}
@@ -300,24 +176,6 @@ export function RecurrenceDetails({
         pending={pending}
         destructive
         onConfirm={cancelAll}
-      />
-
-      <ConfirmDialog
-        open={cancellingSession !== null}
-        onOpenChange={(open) => !open && setCancellingSession(null)}
-        title="Cancelar sessão?"
-        description={
-          cancellingSession
-            ? `A sessão de ${formatDateOnly(`${dateOf(cancellingSession)}T00:00:00Z`)}, das ${timeOf(cancellingSession.startAt)} às ${timeOf(cancellingSession.endAt)}, será cancelada e o horário ficará livre. As demais sessões continuam.`
-            : ""
-        }
-        confirmLabel="Cancelar sessão"
-        icon={Ban}
-        pendingLabel="Cancelando…"
-        cancelLabel="Voltar"
-        pending={pending}
-        destructive
-        onConfirm={cancelSession}
       />
 
       <Dialog open={editingNote} onOpenChange={setEditingNote}>

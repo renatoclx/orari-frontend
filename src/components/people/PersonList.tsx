@@ -44,6 +44,8 @@ type PersonListProps = {
   people: PersonListItem[];
   /** Termo da busca atual, para a mensagem de lista vazia. */
   search: string;
+  /** Há filtro de status aplicado, para a mensagem de lista vazia. */
+  filtered: boolean;
   /** Rodapé fixo do card (paginação). */
   footer: React.ReactNode;
 };
@@ -55,7 +57,13 @@ function formatContact(person: PersonListItem): string | null {
 }
 
 /** Card da listagem: tabela (computador) ou lista empilhada (celular), com as ações de cada pessoa. */
-export function PersonList({ kind, people, search, footer }: PersonListProps) {
+export function PersonList({
+  kind,
+  people,
+  search,
+  filtered,
+  footer,
+}: PersonListProps) {
   const [viewing, setViewing] = useState<PersonListItem | null>(null);
   const [deleting, setDeleting] = useState<PersonListItem | null>(null);
   const [pending, startTransition] = useTransition();
@@ -102,7 +110,9 @@ export function PersonList({ kind, people, search, footer }: PersonListProps) {
           <p className="flex h-full items-center justify-center p-8 text-center text-sm text-muted-foreground">
             {search
               ? `Nenhum ${kind.singular} encontrado para “${search}”.`
-              : `Nenhum ${kind.singular} cadastrado. Cadastre o primeiro!`}
+              : filtered
+                ? `Nenhum ${kind.singular} encontrado com este status.`
+                : `Nenhum ${kind.singular} cadastrado. Cadastre o primeiro!`}
           </p>
         ) : (
           <>

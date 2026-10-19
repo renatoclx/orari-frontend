@@ -14,11 +14,13 @@ type ListPeopleParams = {
   type: PeopleType;
   /** Busca parcial pelo nome, sem diferenciar acentos nem maiúsculas. */
   name?: string;
+  /** `true`: só ativas; `false`: só inativas; sem ele, as duas. */
+  isActive?: boolean;
   page: number;
   limit: number;
 };
 
-/** Pessoas de um tipo, com busca por nome e paginação. */
+/** Pessoas de um tipo, com busca por nome, status e paginação. */
 export function listPeople(
   params: ListPeopleParams,
 ): Promise<Paginated<PersonListItem>> {
@@ -29,6 +31,9 @@ export function listPeople(
   });
   const name = params.name?.trim();
   if (name) query.set("name", name);
+  if (params.isActive !== undefined) {
+    query.set("isActive", String(params.isActive));
+  }
 
   return apiFetch<Paginated<PersonListItem>>(`/people?${query}`);
 }

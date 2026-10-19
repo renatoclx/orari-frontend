@@ -26,6 +26,9 @@ export async function EditPersonPage({ kind, id }: EditPersonPageProps) {
     throw error;
   });
 
+  // Inativo: a API consulta, mas não altera (o histórico é só leitura).
+  if (person.deletedAt !== null) notFound();
+
   // A API devolve só o código da cidade; resolve o nome (uma busca por cidade).
   const cityIds = [...new Set(addresses.map((address) => address.cityId))];
   const cities = new Map(

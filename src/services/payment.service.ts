@@ -28,3 +28,24 @@ export async function listClientPlanPayments(
     dueDate: item.dueDate && item.dueDate.slice(0, 10),
   }));
 }
+
+/** Pagamentos de um cliente (avulsos e parcelas de pacote), por vencimento. */
+export async function listClientPayments(params: {
+  clientId: string;
+  page: number;
+  limit: number;
+}): Promise<Paginated<PaymentItem>> {
+  const query = new URLSearchParams({
+    clientId: params.clientId,
+    page: String(params.page),
+    limit: String(params.limit),
+  });
+  const result = await apiFetch<Paginated<PaymentItem>>(`/payments?${query}`);
+  return {
+    ...result,
+    items: result.items.map((item) => ({
+      ...item,
+      dueDate: item.dueDate && item.dueDate.slice(0, 10),
+    })),
+  };
+}

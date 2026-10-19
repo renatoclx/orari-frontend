@@ -100,14 +100,24 @@ export function ClientPlanSchedules({
   );
 }
 
-// Situação da parcela: pendente com vencimento passado consta como atrasada.
-function PaymentBadge({ payment }: { payment: PaymentItem }) {
-  if (payment.status === "PAID") return <Badge variant="success">Paga</Badge>;
+// Situação do pagamento: pendente com vencimento passado consta como atrasado.
+// `feminine`: concorda com "parcela" (Paga, Atrasada, Cancelada).
+export function PaymentBadge({
+  payment,
+  feminine = true,
+}: {
+  payment: PaymentItem;
+  feminine?: boolean;
+}) {
+  const end = feminine ? "a" : "o";
+  if (payment.status === "PAID") {
+    return <Badge variant="success">Pag{end}</Badge>;
+  }
   if (payment.status === "CANCELLED") {
-    return <Badge variant="secondary">Cancelada</Badge>;
+    return <Badge variant="secondary">Cancelad{end}</Badge>;
   }
   return payment.isOverdue ? (
-    <Badge variant="destructive">Atrasada</Badge>
+    <Badge variant="destructive">Atrasad{end}</Badge>
   ) : (
     <Badge variant="outline">Pendente</Badge>
   );

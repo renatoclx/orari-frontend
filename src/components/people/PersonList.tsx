@@ -5,6 +5,7 @@ import Link from "next/link";
 import {
   EllipsisVertical,
   Eye,
+  History,
   Pencil,
   RotateCcw,
   Trash2,
@@ -135,6 +136,7 @@ export function PersonList({
                         onReactivate={reactivate}
                         busy={reactivating}
                         basePath={kind.path}
+                        withHistory={kind.type === "CLIENT"}
                       />
                     </div>
                     <dl className="mt-1 grid grid-cols-[auto_1fr] gap-x-3 gap-y-0.5 text-sm [&_dd]:whitespace-nowrap">
@@ -165,6 +167,7 @@ export function PersonList({
               onReactivate={reactivate}
               busy={reactivating}
               basePath={kind.path}
+              withHistory={kind.type === "CLIENT"}
             />
           </>
         )}
@@ -209,6 +212,8 @@ type RowHandlers = {
   onReactivate: (person: PersonListItem) => void;
   /** Caminho da listagem (base do link de alteração). */
   basePath: string;
+  /** Clientes: botão "Histórico" à vista, no lugar do "Visualizar" do menu. */
+  withHistory: boolean;
   /** Há uma reativação em andamento. */
   busy: boolean;
 };
@@ -294,6 +299,7 @@ function PersonActions({
   onReactivate,
   busy,
   basePath,
+  withHistory,
 }: { person: PersonListItem } & RowHandlers) {
   // Excluído: Alterar e Excluir ficam desabilitados (screens/pessoas.md).
   const removed = person.deletedAt !== null;
@@ -327,6 +333,21 @@ function PersonActions({
         </Hint>
       )}
 
+      {/* Histórico do cliente (screens/pessoas.md): também para o inativo,
+          só para consulta. */}
+      {withHistory && (
+        <Hint label={`Histórico de ${person.name}`}>
+          <Button variant="ghost" size="icon" asChild>
+            <Link
+              href={`${basePath}/${person.id}`}
+              aria-label={`Histórico de ${person.name}`}
+            >
+              <History aria-hidden="true" />
+            </Link>
+          </Button>
+        </Hint>
+      )}
+
       {/* modal={false}: o menu fecha antes do diálogo abrir, sem travar a página. */}
       <DropdownMenu modal={false}>
         <DropdownMenuTrigger asChild>
@@ -341,10 +362,13 @@ function PersonActions({
           </Hint>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
-          <DropdownMenuItem onSelect={() => onView(person)}>
-            <Eye aria-hidden="true" />
-            Visualizar
-          </DropdownMenuItem>
+          {/* Clientes: os dados cadastrais estão no cabeçalho do histórico. */}
+          {!withHistory && (
+            <DropdownMenuItem onSelect={() => onView(person)}>
+              <Eye aria-hidden="true" />
+              Visualizar
+            </DropdownMenuItem>
+          )}
           {removed && (
             <DropdownMenuItem
               disabled={busy}

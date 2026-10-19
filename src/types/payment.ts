@@ -12,4 +12,11 @@ export type PaymentItem = {
   status: PaymentStatus;
   /** Pendente com vencimento já passado (calculado pela API, no fuso da empresa). */
   isOverdue: boolean;
+  /** Origem (só na listagem): o atendimento avulso/da recorrência ou a contratação. */
+  appointment?: {
+    id: string;
+    startAt: string;
+    service: { id: string; name: string };
+  } | null;
+  clientPlan?: { id: string; plan: { id: string; name: string } } | null;
 };

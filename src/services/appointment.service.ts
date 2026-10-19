@@ -2,7 +2,7 @@ import "server-only";
 
 import { apiFetch } from "@/services/api";
 import type { Paginated } from "@/types/api";
-import type { AppointmentItem } from "@/types/appointment";
+import type { AppointmentItem, AppointmentStatus } from "@/types/appointment";
 
 // Máximo que a API aceita por página.
 const PAGE_SIZE = 100;
@@ -42,6 +42,31 @@ export async function listAppointments(period: {
   }
 
   return items;
+}
+
+/**
+ * Uma página de agendamentos de um cliente (histórico): a partir de `from` ou
+ * antes de `to`, na ordem pedida (`desc` = o mais recente primeiro).
+ */
+export function listClientAppointments(params: {
+  clientId: string;
+  from?: Date;
+  to?: Date;
+  status?: AppointmentStatus;
+  order: "asc" | "desc";
+  page: number;
+  limit: number;
+}): Promise<Paginated<AppointmentItem>> {
+  const query = new URLSearchParams({
+    clientId: params.clientId,
+    order: params.order,
+    page: String(params.page),
+    limit: String(params.limit),
+  });
+  if (params.from) query.set("from", params.from.toISOString());
+  if (params.to) query.set("to", params.to.toISOString());
+  if (params.status) query.set("status", params.status);
+  return apiFetch<Paginated<AppointmentItem>>(`/appointments?${query}`);
 }
 
 /** Dados de um agendamento comum (o fim é calculado pela API: início + duração). */

@@ -1,0 +1,117 @@
+"use server";
+
+import { revalidatePath } from "next/cache";
+import {
+  validatePassword,
+  validateUpdateUserForm,
+  validateUserForm,
+  type UserFormErrors,
+  type UserFormValues,
+} from "@/components/users/user-validation";
+import { failureFrom, type ActionFailure } from "@/lib/action-result";
+import {
+  createUser,
+  deleteUser,
+  resetUserPassword,
+  restoreUser,
+  updateUser,
+} from "@/services/user.service";
+import type { UserType } from "@/types/auth";
+
+/** Campos do formulário de usuário a que um erro pode se referir. */
+export type UserField = keyof UserFormValues;
+
+export type UserActionResult = { ok: true } | ActionFailure<UserField>;
+
+const PATH = "/usuarios";
+
+// Primeiro erro da validação, no formato de falha da action (vai para o campo).
+function firstError(errors: UserFormErrors): UserActionResult | null {
+  const field = (Object.keys(errors) as UserField[])[0];
+  return field ? { ok: false, message: errors[field] ?? "", field } : null;
+}
+
+/** Cadastro: valida de novo no servidor; e-mail repetido (409) vai para o campo. */
+export async function createUserAction(
+  values: UserFormValues,
+): Promise<UserActionResult> {
+  const invalid = firstError(validateUserForm(values));
+  if (invalid) return invalid;
+
+  try {
+    await createUser({
+      name: values.name.trim(),
+      email: values.email.trim(),
+      password: values.password,
+      passwordConfirmation: values.passwordConfirmation,
+      type: values.type as UserType,
+    });
+  } catch (error) {
+    return failureFrom(error, "email" as const);
+  }
+  revalidatePath(PATH);
+  return { ok: true };
+}
+
+/** Alteração de nome, e-mail e tipo (a senha tem rota própria). */
+export async function updateUserAction(
+  id: string,
+  values: Pick<UserFormValues, "name" | "email" | "type">,
+): Promise<UserActionResult> {
+  const invalid = firstError(validateUpdateUserForm(values));
+  if (invalid) return invalid;
+
+  try {
+    await updateUser(id, {
+      name: values.name.trim(),
+      email: values.email.trim(),
+      type: values.type as UserType,
+    });
+  } catch (error) {
+    return failureFrom(error, "email" as const);
+  }
+  revalidatePath(PATH);
+  return { ok: true };
+}
+
+/** Troca de senha, com confirmação. */
+export async function resetUserPasswordAction(
+  id: string,
+  password: string,
+  confirmation: string,
+): Promise<UserActionResult> {
+  const invalid = firstError(validatePassword(password, confirmation));
+  if (invalid) return invalid;
+
+  try {
+    await resetUserPassword(id, {
+      newPassword: password,
+      newPasswordConfirmation: confirmation,
+    });
+  } catch (error) {
+    return failureFrom(error);
+  }
+  return { ok: true };
+}
+
+/** Reativação: limpa o deletedAt (409 se o e-mail já estiver com outro ativo). */
+export async function restoreUserAction(id: string): Promise<UserActionResult> {
+  try {
+    await restoreUser(id);
+  } catch (error) {
+    return failureFrom(error);
+  }
+  revalidatePath(PATH);
+  return { ok: true };
+}
+
+/** Inativação (exclusão lógica: preenche o deletedAt). */
+export async function deleteUserAction(id: string): Promise<UserActionResult> {
+  try {
+    await deleteUser(id);
+  } catch (error) {
+    return failureFrom(error);
+  }
+  revalidatePath(PATH);
+  return { ok: true };
+}

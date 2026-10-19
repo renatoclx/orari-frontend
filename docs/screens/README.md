@@ -25,6 +25,7 @@ diferente. Em caso de conflito, prevalece o arquivo da tela.
 | [recorrencias.md](recorrencias.md) | Recorrências                                            |
 | [configuracoes.md](configuracoes.md) | Configurações da empresa                              |
 | [pacotes.md](pacotes.md)           | Planos e contratações                                   |
+| [usuarios.md](usuarios.md)         | Usuários (acesso ao sistema)                            |
 
 ## Convenções
 

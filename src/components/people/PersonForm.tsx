@@ -195,7 +195,9 @@ export function PersonForm({ kind, states, editing }: PersonFormProps) {
             value={editing.mainContact.id}
           />
         )}
-        <div className="min-h-0 flex-1 overflow-auto p-4 md:p-6">
+        {/* relative: os inputs escondidos do Radix (Select num form) são
+            absolutos; presos aqui, não aumentam a altura da página. */}
+        <div className="relative min-h-0 flex-1 overflow-auto p-4 md:p-6">
           {/* Foto centralizada, acima das colunas (screens/pessoas.md). */}
           <div className="mb-6 flex justify-center">
             <PhotoUpload currentUrl={editing?.person.photoUrl} />

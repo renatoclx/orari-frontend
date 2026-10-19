@@ -42,7 +42,7 @@ Página própria (`/recorrencias/nova`), não dialog.
 - Cliente (seleção com busca no servidor).
 - Serviço (seleção com busca; apenas serviços ativos e com preço).
 - Profissional.
-- Data inicial e data final (começam vazias).
+- Data inicial e data final (começam vazias). Abaixo da data inicial, o dia da semana (ex.: "terça-feira").
 - Dias da semana: os sete dias em lista. Ao marcar um dia, a mesma linha exibe a caixa de seleção de período e os horários disponíveis, como no novo agendamento. O horário final é calculado pela duração do serviço.
 - Observações.
 
@@ -52,8 +52,8 @@ Página própria (`/recorrencias/nova`), não dialog.
 - É necessário ao menos um dia, com horário.
 - A data final não pode ser anterior à inicial, e a data inicial não pode ser no passado.
 - **Período:** o tempo da recorrência é definido na tela, com no máximo 12 meses após a data inicial (constante `MAX_RECURRENCE_MONTHS`, que pode ser ajustada).
-- **Horários de cada dia:** os horários livres são os da primeira ocorrência daquele dia da semana a partir da data inicial (janela de atendimento e agendamentos do profissional). As demais ocorrências são conferidas pelo servidor ao salvar. Sem profissional, serviço e data inicial, a linha pede que sejam escolhidos. Trocar um deles limpa os horários escolhidos (os dias marcados continuam).
-- O rodapé do formulário mostra o resumo: quantas sessões serão geradas e o período (ex.: "26 sessões, de 20/10/2026 a 20/04/2027"). Sessões no passado não são geradas.
+- **Horários de cada dia:** um horário só é oferecido se estiver livre em **todas** as datas daquele dia da semana entre a data inicial e a final: cabe inteiro na janela de atendimento do dia, não conflita com agendamento do profissional nem do cliente (cancelados não contam) e não está no passado. O servidor confere de novo ao salvar. Sem cliente, profissional, serviço e as duas datas, a linha pede que sejam escolhidos. Trocar um deles limpa os horários escolhidos (os dias marcados continuam).
+- O rodapé do formulário mostra o resumo: quantas sessões serão geradas e quando é a primeira e a última (ex.: "13 sessões, a primeira em segunda, 26/10 e a última em 18/01/2027"). A primeira sessão é a do primeiro dia marcado a partir da data inicial, que não é necessariamente a própria data inicial. Sessões no passado não são geradas.
 - Cada sessão segue as regras de agendamento comum: precisa caber inteira em uma janela de atendimento e não pode conflitar com agendamento do profissional nem do cliente. Não há encaixe em recorrência.
 - A criação é tudo ou nada: se qualquer sessão conflitar, nenhuma é criada e a tela exibe o motivo (o servidor informa a data e o horário que conflitaram).
 - Cada sessão gerada nasce com um pagamento pendente, vencendo na data da sessão (o Financeiro trata a cobrança).
@@ -77,11 +77,11 @@ Página própria (`/recorrencias/nova`), não dialog.
 
 ## Impacto na tela de Agendamentos
 
-- Sessões de recorrência aparecem na agenda como os demais agendamentos, com um ícone de recorrência no bloco, no cartão e nos detalhes ("Recorrente", ou "Sessão de pacote" quando a recorrência é de um pacote). A legenda da agenda inclui o item "Recorrente".
+- Sessões de recorrência aparecem na agenda como os demais agendamentos, com um ícone no bloco, no cartão e nos detalhes: repetir para "Recorrente" e pacote para "Sessão de pacote". A legenda da agenda inclui os itens "Recorrente" e "Pacote".
 - No dialog de detalhes:
   - **Cancelar:** cancela a sessão pela rota da recorrência, com as mesmas condições (antes de iniciar).
   - **Remanejar:** abre o remanejamento da sessão (dentro do período da recorrência).
-  - **Ver recorrência:** abre os detalhes da recorrência. Substitui o "Alterar", que não vale para sessões de recorrência.
+  - **Ver sessões:** abre as sessões da recorrência em dialog, sem sair da agenda, com remanejar e cancelar sessão. Substitui o "Alterar", que não vale para sessões de recorrência.
 
 ---
 

@@ -19,7 +19,7 @@
   - Linha do horário atual, somente quando o dia exibido é hoje.
   - Áreas fora das janelas de atendimento (antes da abertura e depois do fechamento) sombreadas, com hachura.
   - O intervalo entre duas janelas de atendimento (almoço, por exemplo) em cinza, com a indicação "Intervalo". É apenas indicação visual: não tem regra própria.
-- Legenda dos ícones de status, do encaixe e da recorrência no rodapé da página, alinhada à direita.
+- Legenda dos ícones de status, do encaixe, da recorrência e do pacote no rodapé da página, alinhada à direita.
 
 ### Profissionais exibidos
 
@@ -81,7 +81,7 @@
 
 ## Detalhes do agendamento
 
-- Exibe foto e nome do cliente, serviço com cor e duração, horário, profissional, status, indicação de encaixe, indicação de recorrência ("Recorrente" ou "Sessão de pacote") e observação.
+- Exibe foto e nome do cliente, serviço com cor e duração, horário, profissional, status, indicação de encaixe, indicação de recorrência ("Recorrente" ou "Sessão de pacote", cada uma com o seu ícone) e observação.
 - Ações, lado a lado, exibidas apenas enquanto o agendamento ainda não iniciou: **Cancelar** e **Remanejar** (ver "Remanejar agendamento").
 - A única ação de status é **Cancelar**:
   - Botão vermelho, centralizado, exibido apenas enquanto o agendamento ainda não iniciou (status Agendado ou Confirmado, com o horário de início no futuro).
@@ -90,7 +90,9 @@
   - A regra também é imposta pelo backend: a API recusa (400) o cancelamento de agendamento que já iniciou, concluído, com "Não compareceu" ou já cancelado, e a tela exibe a mensagem do servidor. Cancelado é um estado final (não pode ser reaberto).
 - Não há ação manual para os demais status: o início e a conclusão do atendimento são automáticos, pelo horário (o backend atualiza o status), e a confirmação (status Confirmado) será feita pelo cliente em uma funcionalidade futura. "Não compareceu" ainda não tem regra no backend.
 - O botão "Alterar" abre o dialog de alteração (ver "Alterar agendamento"). Aparece apenas enquanto o agendamento ainda não iniciou, como o cancelamento: nada no passado é alterado.
-- Em sessão de recorrência, o "Alterar" dá lugar a **Ver recorrência**, que abre os detalhes da recorrência.
+- Em sessão de recorrência, o "Alterar" dá lugar a **Ver sessões**, que abre as sessões da recorrência em dialog (sem sair da agenda), com remanejar e cancelar sessão.
+- Em sessão de pacote, há também **Ver contratação**: dialog com os dados, os valores, as agendas e as parcelas da contratação; dali, "Ver sessões" troca para o dialog de sessões. O cancelamento da contratação fica na página da contratação.
+- Informação de outra tela abre em dialog, e não em outra página: o usuário não perde o dia nem o filtro da agenda.
 
 ---
 
@@ -189,5 +191,5 @@ Segue a mesma estrutura de um novo agendamento.
 - Limpar o campo Observações remove a observação.
 - O botão "Salvar alterações" só fica habilitado quando algo foi alterado. Não há dialog de confirmação.
 - Se o profissional ou o cliente já tiverem agendamento no novo horário, o servidor recusa (conflito), e o dialog informa e atualiza os horários.
-- Agendamentos gerados por recorrência não são alterados por este dialog (a API recusa): o detalhe oferece Remanejar e Ver recorrência.
+- Agendamentos gerados por recorrência não são alterados por este dialog (a API recusa): o detalhe oferece Remanejar e Ver sessões.
 - Após salvar, um aviso informa o novo dia e horário (ex.: "Quinta-feira, 22 de outubro, das 10:00 às 11:00"). A agenda permanece no dia em que estava; se o agendamento foi para outro dia, o bloco deixa de aparecer nela e o aviso informa para onde foi.

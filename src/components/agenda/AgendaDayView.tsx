@@ -5,6 +5,8 @@ import { toast } from "sonner";
 import { useAgendaClock } from "@/components/agenda/useAgendaClock";
 import { timeToMinutes } from "@/utils/time";
 import { RescheduleAppointmentDialog } from "@/components/agenda/RescheduleAppointmentDialog";
+import { RecurrenceSessionsDialog } from "@/components/recurrences/RecurrenceSessionsDialog";
+import { ClientPlanDialog } from "@/components/client-plans/ClientPlanDialog";
 import { AppointmentDetailsDialog } from "@/components/agenda/AppointmentDetailsDialog";
 import { AgendaToolbar } from "@/components/agenda/AgendaToolbar";
 import { DayGrid } from "@/components/agenda/DayGrid";
@@ -76,6 +78,10 @@ export function AgendaDayView({
   const [viewing, setViewing] = useState<AgendaAppointment | null>(null);
   // Agendamento em alteração (o dialog de novo agendamento em modo de edição).
   const [editing, setEditing] = useState<AgendaAppointment | null>(null);
+  // Recorrência cujas sessões estão abertas em diálogo ("Ver sessões").
+  const [sessionsOf, setSessionsOf] = useState<string | null>(null);
+  // Contratação aberta em diálogo ("Ver contratação" na sessão de pacote).
+  const [clientPlanOf, setClientPlanOf] = useState<string | null>(null);
   // Sessão de recorrência em remanejamento.
   const [rescheduling, setRescheduling] = useState<AgendaAppointment | null>(
     null,
@@ -230,11 +236,37 @@ export function AgendaDayView({
           setEditing(appointment);
           setEditOpen(true);
         }}
+        onViewSessions={(recurrenceId) => {
+          setViewing(null);
+          setSessionsOf(recurrenceId);
+        }}
+        onViewClientPlan={(clientPlanId) => {
+          setViewing(null);
+          setClientPlanOf(clientPlanId);
+        }}
         onReschedule={(appointment) => {
           setViewing(null);
           setRescheduling(appointment);
         }}
         onOpenChange={(open) => !open && setViewing(null)}
+      />
+
+      <ClientPlanDialog
+        clientPlanId={clientPlanOf}
+        today={today}
+        onViewSessions={(recurrenceId) => {
+          setClientPlanOf(null);
+          setSessionsOf(recurrenceId);
+        }}
+        onOpenChange={(open) => !open && setClientPlanOf(null)}
+      />
+
+      <RecurrenceSessionsDialog
+        recurrenceId={sessionsOf}
+        timeZone={timeZone}
+        today={today}
+        nowTime={nowTime}
+        onOpenChange={(open) => !open && setSessionsOf(null)}
       />
 
       <RescheduleAppointmentDialog

@@ -1,12 +1,12 @@
 "use client";
 
-import Link from "next/link";
 import {
   CalendarClock,
   CalendarSync,
   Clock,
+  ListChecks,
+  Package,
   Pencil,
-  Repeat,
   StickyNote,
   UserRound,
   X,
@@ -17,7 +17,10 @@ import { toast } from "sonner";
 import { cancelAppointmentAction } from "@/app/(admin)/appointment-actions";
 import { cancelRecurrenceSessionAction } from "@/app/(admin)/recurrence-actions";
 import { APPOINTMENT_STATUS } from "@/components/agenda/appointment-status";
-import { recurrenceLabel } from "@/components/agenda/recurrence-label";
+import {
+  RecurrenceOriginIcon,
+  recurrenceLabel,
+} from "@/components/agenda/recurrence-label";
 import { ConfirmDialog } from "@/components/shared/ConfirmDialog";
 import { PersonAvatar } from "@/components/shared/PersonAvatar";
 import { Button } from "@/components/ui/button";
@@ -40,6 +43,10 @@ type AppointmentDetailsDialogProps = {
   onEdit: (appointment: AgendaAppointment) => void;
   /** Abre o remanejamento (agendamento comum ou sessão de recorrência). */
   onReschedule: (appointment: AgendaAppointment) => void;
+  /** Abre as sessões da recorrência (ou do pacote) em diálogo. */
+  onViewSessions: (recurrenceId: string) => void;
+  /** Abre o resumo da contratação (sessão de pacote) em diálogo. */
+  onViewClientPlan: (clientPlanId: string) => void;
   onOpenChange: (open: boolean) => void;
 };
 
@@ -51,6 +58,8 @@ export function AppointmentDetailsDialog({
   canCancel,
   onEdit,
   onReschedule,
+  onViewSessions,
+  onViewClientPlan,
   onOpenChange,
 }: AppointmentDetailsDialogProps) {
   return (
@@ -62,6 +71,14 @@ export function AppointmentDetailsDialog({
             cancellable={canCancel(appointment)}
             onEdit={() => onEdit(appointment)}
             onReschedule={() => onReschedule(appointment)}
+            onViewSessions={() =>
+              appointment.recurrence &&
+              onViewSessions(appointment.recurrence.id)
+            }
+            onViewClientPlan={() =>
+              appointment.recurrence?.clientPlanId &&
+              onViewClientPlan(appointment.recurrence.clientPlanId)
+            }
             onClose={() => onOpenChange(false)}
           />
         )}
@@ -75,12 +92,16 @@ function Details({
   cancellable,
   onEdit,
   onReschedule,
+  onViewSessions,
+  onViewClientPlan,
   onClose,
 }: {
   appointment: AgendaAppointment;
   cancellable: boolean;
   onEdit: () => void;
   onReschedule: () => void;
+  onViewSessions: () => void;
+  onViewClientPlan: () => void;
   onClose: () => void;
 }) {
   const [confirmOpen, setConfirmOpen] = useState(false);
@@ -173,9 +194,9 @@ function Details({
         )}
         {appointment.recurrence && (
           <li className="flex items-center gap-2">
-            <Repeat
+            <RecurrenceOriginIcon
+              recurrence={appointment.recurrence}
               className="size-4 shrink-0 text-muted-foreground"
-              aria-hidden="true"
             />
             {recurrenceLabel(appointment.recurrence)}
           </li>
@@ -233,12 +254,23 @@ function Details({
         </Button>
         {/* Nada no passado é alterado: mesma condição do cancelamento. */}
         {appointment.recurrence ? (
-          <Button asChild variant="outline">
-            <Link href={`/recorrencias/${appointment.recurrence.id}`}>
-              <Repeat aria-hidden="true" />
-              Ver recorrência
-            </Link>
-          </Button>
+          <>
+            <Button type="button" variant="outline" onClick={onViewSessions}>
+              <ListChecks aria-hidden="true" />
+              Ver sessões
+            </Button>
+            {/* Sessão de pacote: o resumo da contratação, sem sair da agenda. */}
+            {appointment.recurrence.clientPlanId && (
+              <Button
+                type="button"
+                variant="outline"
+                onClick={onViewClientPlan}
+              >
+                <Package aria-hidden="true" />
+                Ver contratação
+              </Button>
+            )}
+          </>
         ) : (
           cancellable && (
             <Button type="button" onClick={onEdit}>

@@ -34,10 +34,23 @@ regras de cada tela, em `docs/screens/`.
 - **2026-10-16 — Período máximo de 12 meses, definido no frontend** (constante `MAX_RECURRENCE_MONTHS`). O backend deixou de limitar a 60 dias.
 - **2026-10-16 — Recorrência não é alterada:** só a observação muda; cancelar a recorrência cancela as sessões futuras. Sessões são canceladas ou remanejadas uma a uma, pela rota da recorrência.
 - **2026-10-16 — Recorrências de pacote aparecem na lista, sem "Cancelar".** _Por quê:_ a API não filtra por pacote (filtrar na tela quebraria a paginação) e recusa o cancelamento (a contratação encerra a agenda).
-- **2026-10-17 — Horários livres por dia da semana pela primeira ocorrência.** _Por quê:_ conferir todas as datas exigiria uma rota nova; o servidor confere tudo ao salvar (tudo ou nada, com a data do conflito na mensagem).
-- **2026-10-16 — Origem na agenda:** sessões de recorrência têm o ícone de repetir ("Recorrente" ou "Sessão de pacote"), vindo de `recurringAppointment` na resposta do agendamento.
+- **2026-10-19 — Horários livres conferidos no período inteiro** (substitui "pela primeira ocorrência", de 2026-10-17): um horário só aparece se estiver livre em todas as datas do dia da semana, para o profissional e o cliente. Uma busca por período e a conta no navegador, sem rota nova. _Por quê:_ evitar o erro só no salvar; vale para recorrência e contratação.
+- **2026-10-19 — A tela diz quando é a primeira sessão** (dia da semana da data inicial e "primeira em segunda, 26/10"). _Por quê:_ a data inicial não é o dia da primeira sessão, e isso confundia.
+- **2026-10-16 — Origem na agenda:** sessões de recorrência têm o ícone de repetir ("Recorrente") e as de pacote, o de pacote ("Sessão de pacote", desde 2026-10-19), vindos de `recurringAppointment` na resposta do agendamento. A legenda mostra os dois.
+
+## Pacotes
+
+- **2026-10-19 — Plano com frequência por serviço** (atendimentos por semana, 1 a 7; backend: `PlanItem.sessionsPerWeek`). _Por quê:_ sem ela, o valor mensal não dizia quanto atendimento cobria.
+- **2026-10-19 — Valor sugerido:** preço avulso × vezes por semana × **4 semanas**, somado; botão "Usar valor sugerido". Valor abaixo do sugerido só gera aviso (promoções). Serviço sem preço conta como zero.
+- **2026-10-19 — Contratação com exatamente a frequência do plano** em dias da semana (tela e backend); ao atingir o limite, os outros dias ficam desabilitados.
+- **2026-10-19 — Comparativo com o avulso na contratação** (sessões × preço × economia), só informativo.
+- **2026-10-19 — Data de início da contratação começa vazia;** os horários consideram também as sessões dos outros serviços da mesma contratação.
+- **2026-10-19 — Formulários de plano e contratação em página;** parcelas só leitura (a baixa é do Financeiro).
+- **2026-10-19 — Reposição por falta (NO_SHOW) fica para depois do MVP.**
 
 ## Interface
+
+- **2026-10-19 — Informação de outra tela abre em dialog, não em outra página** (sessões da contratação, sessões e contratação a partir da agenda). _Por quê:_ abrir outra página quebrava o fluxo e fazia o usuário perder o dia e o filtro da agenda.
 
 - **2026-10-17 — Todo botão com texto tem ícone à esquerda,** sempre o mesmo para a mesma ação (mapa na skill `orari-ui`). _Por quê:_ reconhecimento mais rápido da ação; antes era parcial.
 

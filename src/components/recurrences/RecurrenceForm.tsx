@@ -15,9 +15,11 @@ import {
   addMonths,
   MAX_RECURRENCE_MONTHS,
   occurrences,
+  shortDayLabel,
   WEEK_DAYS,
 } from "@/components/recurrences/recurrence-schedule";
 import { useClientSearch } from "@/components/recurrences/useClientSearch";
+import { WeekDayHint } from "@/components/recurrences/WeekDayHint";
 import { Combobox } from "@/components/shared/Combobox";
 import { DatePicker } from "@/components/shared/DatePicker";
 import { FormField } from "@/components/shared/FormField";
@@ -108,7 +110,7 @@ export function RecurrenceForm({
       ? occurrences(startDate, endDate, days, today, nowMinutes)
       : [];
 
-  // Profissional, serviço e data inicial mudam os horários livres: os horários
+  // Cliente, profissional, serviço e período mudam os horários livres: os horários
   // já escolhidos deixam de valer (os dias marcados continuam).
   function resetTimes() {
     setDayTimes((current) =>
@@ -191,7 +193,9 @@ export function RecurrenceForm({
       onSubmit={handleSubmit}
       className="flex min-h-0 flex-1 flex-col rounded-card border border-border bg-card"
     >
-      <div className="min-h-0 flex-1 space-y-4 overflow-auto p-4 md:p-6">
+      {/* relative: os inputs escondidos do Radix (Switch e Select num form) são
+          absolutos; presos aqui, não aumentam a altura da página. */}
+      <div className="relative min-h-0 flex-1 space-y-4 overflow-auto p-4 md:p-6">
         <div className="grid gap-4 md:grid-cols-2">
           <FormField
             id="recurrence-client"
@@ -209,6 +213,7 @@ export function RecurrenceForm({
               onValueChange={(next) => {
                 setClientId(next);
                 clientSearch.pick(next);
+                resetTimes();
                 clear("client");
               }}
               placeholder="Selecione o cliente..."
@@ -288,6 +293,7 @@ export function RecurrenceForm({
                   clear("start");
                 }}
               />
+              {startDate && <WeekDayHint date={startDate} />}
             </FormField>
             <FormField
               id="recurrence-end"
@@ -303,6 +309,7 @@ export function RecurrenceForm({
                 maxDate={maxEnd ? parseDay(maxEnd) : undefined}
                 onValueChange={(next) => {
                   setEndDate(next);
+                  resetTimes();
                   clear("end");
                 }}
               />
@@ -322,10 +329,13 @@ export function RecurrenceForm({
               setDayTimes(next);
               clear("days");
             }}
+            id="recurrence-days"
             invalid={Boolean(errors.days)}
+            clientId={clientId}
             professionalId={professionalId}
             duration={service?.duration ?? 0}
             startDate={startDate}
+            endDate={endDate}
           />
         </FormField>
 
@@ -350,7 +360,9 @@ export function RecurrenceForm({
       <FormFooter
         note={
           sessions.length > 0
-            ? `${sessions.length} ${sessions.length === 1 ? "sessão" : "sessões"}, de ${formatDateOnly(sessions[0].date)} a ${formatDateOnly(sessions[sessions.length - 1].date)}`
+            ? sessions.length === 1
+              ? `1 sessão, em ${shortDayLabel(sessions[0].date)}`
+              : `${sessions.length} sessões, a primeira em ${shortDayLabel(sessions[0].date)} e a última em ${formatDateOnly(sessions[sessions.length - 1].date)}`
             : "Campos marcados com * são obrigatórios."
         }
       >

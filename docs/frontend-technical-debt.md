@@ -20,11 +20,18 @@ Pontos conhecidos e aceitos por enquanto. Revisar quando o contexto mudar.
 
 ## Recorrências
 
-- **Horários do cadastro pela primeira ocorrência.** Cada dia da semana mostra os horários livres só da primeira data; as demais são conferidas ao salvar (tudo ou nada, com a data do conflito). Uma simulação no backend (dry-run) mostraria todos os conflitos antes.
+- **Disponibilidade do período calculada no frontend.** A tela busca de uma vez os agendamentos do profissional e do cliente no período e cruza as datas no navegador. Num período longo (12 meses) são várias páginas da API. Uma rota de disponibilidade no backend centralizaria as regras.
 - **Recorrências de pacote na lista.** A API não filtra por pacote; elas aparecem, sem a ação de cancelar.
 - **Ordem da lista.** A API ordena pela data inicial crescente: as mais novas ficam nas últimas páginas.
 - **Busca de clientes duplicada.** `useClientSearch` (recorrência) e o dialog de novo agendamento têm a mesma lógica; unificar quando o dialog for revisto.
 - **Remanejar pela agenda busca a recorrência ao abrir** (a resposta do agendamento não traz o período). O dialog aparece depois dessa busca.
+
+## Pacotes
+
+- **Prévia dos valores no frontend.** `plan-pricing.ts` repete o cálculo do backend (arredondamento e parcelas) só para exibir; o servidor calcula e congela na contratação. Se as regras mudarem, mudar nos dois lados.
+- **Parcelas por contratação.** Os detalhes buscam todas as páginas de `GET /payments?clientPlanId=`; a baixa fica para o Financeiro.
+- **Cliente filtrado na listagem de contratações.** Se o cliente do filtro não estiver entre os primeiros 100, o nome é buscado à parte (`GET /people/:id`).
+- **Inputs escondidos do Radix.** Switch e Select dentro de um form criam inputs absolutos; o contêiner com rolagem dos formulários de contratação, recorrência e plano é `relative` para eles não aumentarem a altura da página. O `PersonForm` ainda não tem esse ajuste.
 
 ## Configurações da empresa
 

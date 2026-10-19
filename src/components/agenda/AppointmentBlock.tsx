@@ -1,11 +1,8 @@
-import { recurrenceLabel } from "@/components/agenda/recurrence-label";
 import {
-  CalendarClock,
-  Clock,
-  Repeat,
-  StickyNote,
-  UserRound,
-} from "lucide-react";
+  RecurrenceOriginIcon,
+  recurrenceLabel,
+} from "@/components/agenda/recurrence-label";
+import { CalendarClock, Clock, StickyNote, UserRound } from "lucide-react";
 import { APPOINTMENT_STATUS } from "@/components/agenda/appointment-status";
 import { PersonAvatar } from "@/components/shared/PersonAvatar";
 import {
@@ -89,8 +86,12 @@ export function AppointmentBlock({
             {appointment.overbooking && (
               <CalendarClock className="size-3 shrink-0" aria-hidden="true" />
             )}
+            {/* Pacote ou recorrência: cada origem tem o seu ícone (ver a legenda). */}
             {appointment.recurrence && (
-              <Repeat className="size-3 shrink-0" aria-hidden="true" />
+              <RecurrenceOriginIcon
+                recurrence={appointment.recurrence}
+                className="size-3 shrink-0"
+              />
             )}
             <span className="truncate">{appointment.serviceName}</span>
           </p>
@@ -143,7 +144,10 @@ export function AppointmentBlock({
           )}
           {appointment.recurrence && (
             <li className="flex items-center gap-2">
-              <Repeat className="size-4 shrink-0" aria-hidden="true" />
+              <RecurrenceOriginIcon
+                recurrence={appointment.recurrence}
+                className="size-4 shrink-0"
+              />
               {recurrenceLabel(appointment.recurrence)}
             </li>
           )}

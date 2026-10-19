@@ -26,6 +26,7 @@ diferente. Em caso de conflito, prevalece o arquivo da tela.
 | [configuracoes.md](configuracoes.md) | Configurações da empresa                              |
 | [pacotes.md](pacotes.md)           | Planos e contratações                                   |
 | [usuarios.md](usuarios.md)         | Usuários (acesso ao sistema)                            |
+| [metodos-pagamento.md](metodos-pagamento.md) | Métodos de pagamento                         |
 
 ## Convenções
 

@@ -15,6 +15,18 @@ export const WEEK_DAYS: { id: WeekDay; short: string; long: string }[] = [
 
 const SHORT = Object.fromEntries(WEEK_DAYS.map((d) => [d.id, d.short]));
 
+/** "2026-10-20" → "terça-feira" */
+export function weekDayName(date: string): string {
+  const long = WEEK_DAYS.find((day) => day.id === weekDayOf(date))?.long ?? "";
+  return long.toLowerCase();
+}
+
+/** "2026-10-26" → "segunda, 26/10" (primeira sessão de uma agenda). */
+export function shortDayLabel(date: string): string {
+  const [, month, day] = date.split("-");
+  return `${weekDayName(date).replace("-feira", "")}, ${day}/${month}`;
+}
+
 /** "Seg 09:00–10:00, Qua 14:00–15:00" */
 export function describeDays(days: RecurrenceDay[]): string {
   const order = WEEK_DAYS.map((d) => d.id);

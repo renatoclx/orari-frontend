@@ -17,6 +17,8 @@ export async function listAppointments(period: {
   to: Date;
   /** Só os agendamentos deste profissional. */
   professionalId?: string;
+  /** Só os agendamentos deste cliente. */
+  clientId?: string;
 }): Promise<AppointmentItem[]> {
   const items: AppointmentItem[] = [];
 
@@ -30,6 +32,7 @@ export async function listAppointments(period: {
     if (period.professionalId) {
       query.set("professionalId", period.professionalId);
     }
+    if (period.clientId) query.set("clientId", period.clientId);
     const result = await apiFetch<Paginated<AppointmentItem>>(
       `/appointments?${query}`,
     );

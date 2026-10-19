@@ -9,9 +9,13 @@ import {
   updateAppointment,
 } from "@/services/appointment.service";
 import { getCurrentUser } from "@/services/auth.service";
-import { listBusinessHours } from "@/services/business-hour.service";
+import {
+  listAllBusinessHours,
+  listBusinessHours,
+} from "@/services/business-hour.service";
 import { listPeople } from "@/services/people.service";
 import type { TimeRange } from "@/types/agenda";
+import type { WeekDay } from "@/types/business-hour";
 import {
   dayBounds,
   formatLongDate,
@@ -91,6 +95,96 @@ export async function getAvailabilityAction(
           })),
         // Hoje, só depois de agora (a API exige início futuro).
         notBefore: date === today ? timeToMinutes(nowTime) + 1 : 0,
+      },
+    };
+  } catch (error) {
+    return failureFrom(error);
+  }
+}
+
+/**
+ * O que a tela precisa para achar horários livres em TODAS as datas de um
+ * período (recorrência e contratação de pacote).
+ */
+export type PeriodAvailability = {
+  /** Janelas de atendimento de cada dia da semana. */
+  windows: Partial<Record<WeekDay, TimeRange[]>>;
+  /** Horários ocupados por data ("aaaa-mm-dd"): profissional e cliente. */
+  busy: Record<string, TimeRange[]>;
+  /** Hoje e agora no fuso da empresa: o passado não se agenda. */
+  today: string;
+  nowMinutes: number;
+};
+
+export type PeriodAvailabilityResult =
+  { ok: true; availability: PeriodAvailability } | ActionFailure;
+
+/**
+ * Janelas da semana e agendamentos (não cancelados) do profissional e do
+ * cliente entre `startDate` e `endDate`, no fuso da empresa. A tela cruza isso
+ * para oferecer só horários livres em todas as datas do período.
+ */
+export async function getPeriodAvailabilityAction(input: {
+  professionalId: string;
+  clientId: string;
+  startDate: string;
+  endDate: string;
+}): Promise<PeriodAvailabilityResult> {
+  const { professionalId, clientId, startDate, endDate } = input;
+  if (
+    !professionalId ||
+    !clientId ||
+    !isDateString(startDate) ||
+    !isDateString(endDate) ||
+    endDate < startDate
+  ) {
+    return {
+      ok: false,
+      message: "Informe o cliente, o profissional e o período.",
+    };
+  }
+
+  try {
+    const { company } = await getCurrentUser();
+    const timeZone = company.timezone;
+    const period = {
+      from: dayBounds(startDate, timeZone).from,
+      to: dayBounds(endDate, timeZone).to,
+    };
+    const [hours, ofProfessional, ofClient] = await Promise.all([
+      listAllBusinessHours(),
+      listAppointments({ ...period, professionalId }),
+      listAppointments({ ...period, clientId }),
+    ]);
+
+    const windows: PeriodAvailability["windows"] = {};
+    for (const hour of hours) {
+      (windows[hour.weekDay] ??= []).push({
+        start: hour.openAt,
+        end: hour.closeAt,
+      });
+    }
+
+    // Cada agendamento ocupa a sua data; o que passa da meia-noite vai até 24:00.
+    const busy: PeriodAvailability["busy"] = {};
+    for (const item of [...ofProfessional, ...ofClient]) {
+      if (item.status === "CANCELLED") continue;
+      const date = toDateString(new Date(item.startAt), timeZone);
+      const sameDay = toDateString(new Date(item.endAt), timeZone) === date;
+      (busy[date] ??= []).push({
+        start: toTimeString(item.startAt, timeZone),
+        end: sameDay ? toTimeString(item.endAt, timeZone) : "24:00",
+      });
+    }
+
+    const now = new Date();
+    return {
+      ok: true,
+      availability: {
+        windows,
+        busy,
+        today: toDateString(now, timeZone),
+        nowMinutes: timeToMinutes(toTimeString(now.toISOString(), timeZone)),
       },
     };
   } catch (error) {

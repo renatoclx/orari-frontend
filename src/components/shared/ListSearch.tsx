@@ -12,27 +12,42 @@ type ListSearchProps = {
   search: string;
   /** Texto para leitores de tela (ex.: "Buscar cliente por nome"). */
   label: string;
+  /** Outros parâmetros da URL a manter na busca (ex.: filtro de status). */
+  query?: Record<string, string | undefined>;
 };
 
 // A busca atualiza a listagem durante a digitação (screen-patterns.md): depois
 // de uma pequena pausa, o termo vai para a URL e a página é renderizada de novo
 // no servidor, a partir da primeira página.
-export function ListSearch({ basePath, search, label }: ListSearchProps) {
+export function ListSearch({
+  basePath,
+  search,
+  label,
+  query = {},
+}: ListSearchProps) {
   const router = useRouter();
   const [value, setValue] = useState(search);
+
+  // Parâmetros mantidos, como texto: serve de dependência estável do efeito.
+  const kept = new URLSearchParams(
+    Object.entries(query).filter((entry): entry is [string, string] =>
+      Boolean(entry[1]),
+    ),
+  ).toString();
 
   useEffect(() => {
     const term = value.trim();
     if (term === search) return;
 
     const timer = setTimeout(() => {
-      const params = new URLSearchParams();
+      const params = new URLSearchParams(kept);
       if (term) params.set("q", term);
-      router.replace(term ? `${basePath}?${params}` : basePath);
+      const next = params.toString();
+      router.replace(next ? `${basePath}?${next}` : basePath);
     }, 350);
 
     return () => clearTimeout(timer);
-  }, [value, search, router, basePath]);
+  }, [value, search, router, basePath, kept]);
 
   return (
     <div className="relative w-full sm:w-72">

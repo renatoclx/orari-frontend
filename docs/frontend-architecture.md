@@ -22,15 +22,23 @@ src/
                              exclusão, reativação, contatos, endereços)
       service-actions.ts     Server Actions de serviços (cadastro, alteração,
                              inativação, exclusão)
-      appointment-actions.ts Server Actions da agenda (disponibilidade, busca
-                             de clientes, criar, alterar e cancelar)
+      appointment-actions.ts Server Actions da agenda (disponibilidade do dia e
+                             do período, busca de clientes, criar, alterar e
+                             cancelar)
       recurrence-actions.ts  Server Actions de recorrências (criar, consultar,
-                             cancelar, cancelar e remanejar sessão, observação)
+                             listar sessões, cancelar, cancelar e remanejar
+                             sessão, observação)
+      plan-actions.ts        Server Actions de planos (cadastro, alteração,
+                             inativação e ativação)
+      client-plan-actions.ts Server Actions de contratações (contratar,
+                             consultar com parcelas, cancelar)
       location-actions.ts    busca de cidades e consulta de CEP
       page.tsx               Agendamentos ("/"): agenda do dia (?date=)
       servicos/              Serviços: page e loading (cadastro e alteração
                              em dialog)
       recorrencias/          Recorrências: page, nova/, [id]/
+      pacotes/               Pacotes: planos/ (page, loading, novo/,
+                             [id]/editar/) e contratacoes/ (page, nova/, [id]/)
       configuracoes/         Configurações da empresa: page
       company-actions.ts     Server Action das configurações (nome fantasia,
                              logo e horários de funcionamento)
@@ -50,7 +58,10 @@ src/
                              (uma implementação, parametrizada por tipo)
     services/                tela de Serviços (listagem e dialog de formulário)
     agenda/                  agenda do dia (grade, blocos, legenda, faixa)
-    recurrences/             recorrências (lista, cadastro, detalhes, remanejar)
+    recurrences/             recorrências (lista, cadastro, detalhes, sessões,
+                             remanejar)
+    plans/                   planos (lista, formulário, preços e validação)
+    client-plans/            contratações (lista, nova, detalhes, dialog)
     settings/                configurações da empresa (formulário, logo, horários)
     <tela>/                  componentes das demais telas (auth/)
   services/                  comunicação com a API e sessão (somente servidor)
@@ -81,7 +92,7 @@ Layout ──────────────────┘
 ```
 
 - **`apiFetch`** (`services/api.ts`) é o ponto único de chamada à API: monta a URL com `API_URL`, envia JSON sem cache, anexa o token da sessão e transforma erros em `ApiError` (status + mensagem). Status `0` = API fora do ar. Um 401 em chamada autenticada leva ao login (`/session-expired`).
-- **Services por assunto** (`auth.service.ts`, `people.service.ts`, `contact.service.ts`, `address.service.ts`, `location.service.ts`, `cep.service.ts`, `service.service.ts`, `appointment.service.ts`, `recurrence.service.ts`, `business-hour.service.ts`, `company.service.ts`) conhecem os caminhos da API e são chamados pelas telas, layouts e Server Actions — nunca o `apiFetch` direto.
+- **Services por assunto** (`auth.service.ts`, `people.service.ts`, `contact.service.ts`, `address.service.ts`, `location.service.ts`, `cep.service.ts`, `service.service.ts`, `appointment.service.ts`, `recurrence.service.ts`, `plan.service.ts`, `client-plan.service.ts`, `payment.service.ts`, `business-hour.service.ts`, `company.service.ts`) conhecem os caminhos da API e são chamados pelas telas, layouts e Server Actions — nunca o `apiFetch` direto.
 - Os services importam `server-only`: rodam só no servidor. O navegador nunca fala com a API diretamente.
 - Server Actions tratam `ApiError` (viram mensagem na tela) e deixam estourar erros inesperados — inclusive o `redirect()` do Next, que também é lançado como erro.
 
@@ -128,16 +139,24 @@ As três telas são a mesma implementação, escolhida pelo tipo (`PeopleType`).
 - **Cancelar:** única ação de status no dialog de detalhes, só antes de o agendamento iniciar. A regra também é imposta pelo backend (400 ao cancelar o que já iniciou); a tela só esconde o botão e mostra a mensagem do servidor se ele recusar.
 - No celular, um profissional por vez, trocado por um menu ao lado do nome no cabeçalho da coluna; no computador, uma coluna por profissional (padrão: todos os ativos; o filtro mostra só um).
 - **Remanejar** (`RescheduleAppointmentDialog` → `RescheduleSessionDialog`): só data e horário. O agendamento comum grava por `updateAppointmentAction`; a sessão de recorrência, por `rescheduleRecurrenceSessionAction`, e o período da recorrência é buscado ao abrir (`getRecurrenceAction`), porque a agenda não o conhece. O encaixe não tem remanejar.
-- Sessões de recorrência vêm marcadas pela API (`recurringAppointment: { id, clientPlanId }`); o cancelamento delas vai pela rota da recorrência.
+- Sessões de recorrência vêm marcadas pela API (`recurringAppointment: { id, clientPlanId }`); o cancelamento delas vai pela rota da recorrência. `recurrence-label.tsx` dá o rótulo e o ícone da origem (`Repeat` ou `Package`). No detalhe, "Ver sessões" e "Ver contratação" abrem dialogs (`RecurrenceSessionsDialog`, `ClientPlanDialog`) sem sair da agenda.
 - `getCurrentUser` usa `cache` do React: layout e página compartilham a chamada a `/auth/me` na mesma requisição.
 
 ## Recorrências
 
 - Listagem (`/recorrencias`) com filtros de profissional e status na URL; detalhes (`/recorrencias/[id]`) com as sessões, que vêm de `GET /appointments?recurringAppointmentId=` (todas as páginas); cadastro em página (`/recorrencias/nova`).
 - `recurrence.service.ts` converte as datas de calendário da API (instante à meia-noite UTC) para `aaaa-mm-dd`.
-- Cadastro: `RecurrenceDaysField` mostra, na linha de cada dia marcado, os horários livres da primeira ocorrência (`getAvailabilityAction` + `availableStarts` + `AvailableTimes`); `recurrence-schedule.ts` calcula as ocorrências do resumo e o limite de 12 meses (`addMonths`). O servidor valida de novo as datas e confere todas as sessões (tudo ou nada).
+- Cadastro: `RecurrenceDaysField` mostra, na linha de cada dia marcado, os horários livres em **todas** as datas do período. Uma busca só (`getPeriodAvailabilityAction`: janelas da semana e agendamentos não cancelados do profissional e do cliente entre as datas) e a conta no navegador (`period-availability.ts` → `periodStarts`, que cruza o `availableStarts` de cada data). O campo aceita `extraBusy` (sessões já escolhidas na mesma tela) e `maxDays` (limite de dias, usado na contratação). `recurrence-schedule.ts` calcula as ocorrências do resumo, o limite de 12 meses (`addMonths`) e os rótulos de dia. O servidor confere tudo de novo (tudo ou nada).
+- Sessões: `RecurrenceSessions` (tabela com remanejar e cancelar sessão) é usada na página da recorrência e no `RecurrenceSessionsDialog`, que busca a recorrência e as sessões ao abrir (agenda e contratação) e mostra "Tentar de novo" se a busca falhar.
 - A busca de clientes do cadastro está em `useClientSearch` (a do dialog de novo agendamento ainda tem a mesma lógica própria).
 - O dialog de remanejar (`RescheduleSessionDialog`) é o mesmo da agenda: recebe o profissional, a duração, o período (opcional) e a função que grava.
+
+## Pacotes (planos e contratações)
+
+- **Planos** (`/pacotes/planos`): listagem com busca e status na URL (o `ListSearch` aceita `query` para manter outros filtros); cadastro e alteração em página (`PlanForm`), com `ServicesPicker` (serviços com preço e atendimentos por semana) e `PlanPeriodsField` (períodos com a prévia). `plan-pricing.ts` faz as contas em centavos inteiros (`BigInt`), com o mesmo arredondamento do backend, e o valor sugerido (preço × vezes por semana × 4). `plan-validation.ts` vale na tela e na action. A API recebe `services: [{ serviceId, sessionsPerWeek }]`.
+- **Contratações** (`/pacotes/contratacoes`): listagem com filtros de cliente, plano e status (`?status=` da API); a situação é derivada por `clientPlanStatus` (mesma regra do filtro). Nova contratação (`ClientPlanForm`): um `ScheduleBlock` por serviço, que usa o `RecurrenceDaysField` com `maxDays` (frequência do plano) e `extraBusy` (sessões dos outros serviços). `ClientPlanSummary` mostra a prévia dos valores e o comparativo com o avulso.
+- Detalhes e dialog: `ClientPlanParts` (dados, agendas e parcelas) é usado pela página (`ClientPlanDetails`, com cancelar) e pelo `ClientPlanDialog`, aberto pela agenda. As parcelas vêm de `GET /payments?clientPlanId=` (`payment.service.ts`), só leitura.
+- `client-plan.service.ts` converte as datas de calendário para `aaaa-mm-dd` e renomeia `recurringAppointments` para `schedules`.
 
 ## Configurações da empresa
 

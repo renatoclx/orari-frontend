@@ -24,6 +24,7 @@ diferente. Em caso de conflito, prevalece o arquivo da tela.
 | [agendamentos.md](agendamentos.md) | Agenda, novo agendamento, encaixe, detalhes e alteração |
 | [recorrencias.md](recorrencias.md) | Recorrências                                            |
 | [configuracoes.md](configuracoes.md) | Configurações da empresa                              |
+| [pacotes.md](pacotes.md)           | Planos e contratações                                   |
 
 ## Convenções
 

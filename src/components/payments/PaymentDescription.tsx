@@ -5,7 +5,7 @@ import { toDateString, toTimeString } from "@/utils/time";
 
 /** Descrição pela origem: o atendimento (serviço, dia e hora) ou o pacote. */
 export function describePayment(
-  payment: PaymentItem,
+  payment: Pick<PaymentItem, "appointment" | "clientPlan">,
   timeZone: string,
 ): string {
   if (payment.appointment) {
@@ -25,7 +25,7 @@ export function PaymentDescription({
   payment,
   timeZone,
 }: {
-  payment: PaymentItem;
+  payment: Pick<PaymentItem, "appointment" | "clientPlan">;
   timeZone: string;
 }) {
   const Icon = payment.clientPlan

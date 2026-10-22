@@ -1,4 +1,5 @@
 // Espelha a resposta de /payments do backend (só o que as telas usam).
+import type { AppointmentStatus } from "@/types/appointment";
 
 export type PaymentStatus = "PENDING" | "PAID" | "CANCELLED";
 
@@ -32,37 +33,43 @@ export type PaymentItem = {
   } | null;
 };
 
-/** Pagamento dentro da comanda (GET /payments/checkouts). */
-export type CheckoutPayment = {
+/** Pagamento de um atendimento de hoje, dentro da comanda (sem origem nem cliente). */
+export type CheckoutAppointmentPayment = Pick<
+  PaymentItem,
+  | "id"
+  | "amount"
+  | "dueDate"
+  | "paidAt"
+  | "status"
+  | "isOverdue"
+  | "paymentMethod"
+>;
+
+/** Atendimento do cliente hoje (GET /payments/checkouts). */
+export type CheckoutAppointment = {
   id: string;
-  /** Em reais (texto decimal). */
-  amount: string;
-  /** Data de calendário "aaaa-mm-dd"; nula no integral sem vencimento. */
-  dueDate: string | null;
-  paidAt: string | null;
-  status: PaymentStatus;
-  paymentMethod: { id: string; name: string } | null;
-  appointment: {
-    id: string;
-    startAt: string;
-    service: { id: string; name: string };
-  } | null;
-  /** A modalidade diz se é a parcela mensal ou o pagamento integral. */
-  clientPlan: {
-    id: string;
-    billingType: "INTEGRAL" | "MONTHLY";
-    plan: { id: string; name: string };
-  } | null;
+  startAt: string;
+  status: AppointmentStatus;
+  service: { id: string; name: string };
+  professional: { id: string; name: string };
+  /** Preenchido quando o atendimento é uma sessão de recorrência (ou de pacote). */
+  recurringAppointmentId: string | null;
+  /** Preenchido quando a sessão é de um pacote: não tem cobrança própria. */
+  clientPlanId: string | null;
+  /** Nulo enquanto o pagamento não existe (avulso ainda não concluído) ou no pacote. */
+  payment: CheckoutAppointmentPayment | null;
 };
 
-/** Comanda do dia: o que o cliente movimenta hoje (pendente e pago). */
+/** Comanda do dia: a visão de hoje de um cliente. */
 export type CheckoutItem = {
   client: { id: string; name: string };
-  /** Soma de todos os pagamentos da comanda, em reais. */
-  total: string;
-  /** Soma dos pendentes: zero quando a comanda está paga. */
-  pendingTotal: string;
-  payments: CheckoutPayment[];
+  appointments: CheckoutAppointment[];
+  /** Pendências anteriores e o que foi pago hoje fora dos atendimentos de hoje. */
+  previousPayments: Omit<PaymentItem, "client">[];
+  /** Em reais (texto decimal). */
+  todayPending: string;
+  previousPending: string;
+  paidToday: string;
 };
 
 /** Totais do resumo (GET /payments/summary): em reais (texto) e quantidade. */

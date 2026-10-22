@@ -5,8 +5,7 @@ import { Check, X } from "lucide-react";
 import { toast } from "sonner";
 import { settlePaymentsAction } from "@/app/(admin)/payment-actions";
 import { describePayment } from "@/components/payments/PaymentDescription";
-import { DatePicker } from "@/components/shared/DatePicker";
-import { FormField } from "@/components/shared/FormField";
+import { SettleFields } from "@/components/payments/SettleFields";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -16,13 +15,6 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import type { PaymentItem } from "@/types/payment";
 import type { PaymentMethodItem } from "@/types/payment-method";
 import { formatPrice } from "@/utils/format";
@@ -147,58 +139,22 @@ function SettleForm({
         <span>{formatPrice(total)}</span>
       </div>
 
-      <FormField
-        id="settle-method"
-        label="Método de pagamento"
-        required
-        error={errors.method}
-      >
-        <Select
-          value={methodId}
-          onValueChange={(value) => {
-            setMethodId(value);
-            setErrors({});
-          }}
-        >
-          <SelectTrigger
-            id="settle-method"
-            className="w-full"
-            aria-invalid={errors.method ? true : undefined}
-          >
-            <SelectValue placeholder="Selecione" />
-          </SelectTrigger>
-          <SelectContent>
-            {methods.map((method) => (
-              <SelectItem key={method.id} value={method.id}>
-                {method.name}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-      </FormField>
-      {methods.length === 0 && (
-        <p className="text-sm text-muted-foreground">
-          Nenhum método de pagamento ativo. Cadastre um em Financeiro → Métodos
-          de pagamento.
-        </p>
-      )}
-
-      <FormField
-        id="settle-date"
-        label="Data do pagamento"
-        error={errors.paidAt}
-      >
-        <DatePicker
-          id="settle-date"
-          name="paidDate"
-          maxDate={new Date(`${today}T12:00:00`)}
-          initialValue={today}
-          onValueChange={(value) => {
-            setPaidDate(value);
-            setErrors({});
-          }}
-        />
-      </FormField>
+      <SettleFields
+        idPrefix="settle"
+        methods={methods}
+        methodId={methodId}
+        onMethodChange={(value) => {
+          setMethodId(value);
+          setErrors({});
+        }}
+        methodError={errors.method}
+        today={today}
+        onDateChange={(value) => {
+          setPaidDate(value);
+          setErrors({});
+        }}
+        dateError={errors.paidAt}
+      />
 
       <DialogFooter>
         <Button

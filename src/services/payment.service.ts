@@ -71,13 +71,22 @@ export async function listCheckouts(params: {
   const result = await apiFetch<Paginated<CheckoutItem>>(
     `/payments/checkouts?${query}`,
   );
+  // Vencimento é data de calendário: "aaaa-mm-dd".
+  const day = (value: string | null) => value && value.slice(0, 10);
   return {
     ...result,
     items: result.items.map((item) => ({
       ...item,
-      payments: item.payments.map((payment) => ({
+      appointments: item.appointments.map((appointment) => ({
+        ...appointment,
+        payment: appointment.payment && {
+          ...appointment.payment,
+          dueDate: day(appointment.payment.dueDate),
+        },
+      })),
+      previousPayments: item.previousPayments.map((payment) => ({
         ...payment,
-        dueDate: payment.dueDate && payment.dueDate.slice(0, 10),
+        dueDate: day(payment.dueDate),
       })),
     })),
   };

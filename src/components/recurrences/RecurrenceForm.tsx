@@ -216,7 +216,7 @@ export function RecurrenceForm({
                 resetTimes();
                 clear("client");
               }}
-              placeholder="Selecione o cliente..."
+              placeholder="Selecione o cliente…"
               searchPlaceholder="Buscar cliente…"
               emptyMessage="Nenhum cliente encontrado."
               loading={clientSearch.loading}
@@ -242,7 +242,7 @@ export function RecurrenceForm({
                 resetTimes();
                 clear("service");
               }}
-              placeholder="Selecione o serviço..."
+              placeholder="Selecione o serviço…"
               searchPlaceholder="Buscar serviço…"
               emptyMessage="Nenhum serviço encontrado."
             />
@@ -263,7 +263,7 @@ export function RecurrenceForm({
               }}
             >
               <SelectTrigger id="recurrence-professional" className="w-full">
-                <SelectValue placeholder="Selecione o profissional..." />
+                <SelectValue placeholder="Selecione o profissional…" />
               </SelectTrigger>
               <SelectContent>
                 {professionals.map((item) => (
@@ -352,7 +352,7 @@ export function RecurrenceForm({
             rows={4}
             value={note}
             onChange={(event) => setNote(event.target.value)}
-            placeholder="Preferências, cuidados, informações úteis para os atendimentos..."
+            placeholder="Preferências, cuidados, informações úteis para os atendimentos…"
           />
         </FormField>
       </div>

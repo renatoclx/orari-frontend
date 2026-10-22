@@ -155,6 +155,11 @@
     @apply bg-background text-foreground;
   }
 
+  /* Toque: sem o atraso do duplo toque para dar zoom, em botões e campos. */
+  :where(a, button, input, select, textarea, summary, [role="button"]) {
+    touch-action: manipulation;
+  }
+
   /* Foco de teclado global: o contorno surge com uma transição curta.
      O contorno transparente já existe antes do foco para que a cor e o
      afastamento possam ser animados. */
@@ -179,9 +184,16 @@
     outline-offset: 0;
   }
 
+  /* Quem pede menos movimento não vê animações nem transições (diálogos,
+     gavetas, esqueletos, toasts e o próprio foco), nem rolagem suave. */
   @media (prefers-reduced-motion: reduce) {
-    :where(a, button, input, select, textarea, summary, [tabindex]) {
-      transition: none;
+    *,
+    ::before,
+    ::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
     }
   }
 }

@@ -1,10 +1,12 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { toAgendaAppointment } from "@/components/agenda/agenda-data";
 import { failureFrom, type ActionFailure } from "@/lib/action-result";
 import {
   cancelAppointment,
   createAppointment,
+  getAppointment,
   listAppointments,
   updateAppointment,
 } from "@/services/appointment.service";
@@ -14,7 +16,7 @@ import {
   listBusinessHours,
 } from "@/services/business-hour.service";
 import { listPeople } from "@/services/people.service";
-import type { TimeRange } from "@/types/agenda";
+import type { AgendaAppointment, TimeRange } from "@/types/agenda";
 import type { WeekDay } from "@/types/business-hour";
 import {
   dayBounds,
@@ -363,5 +365,32 @@ export async function updateAppointmentAction(
   } catch (error) {
     // O 409 é conflito de horário (do profissional ou do cliente).
     return failureFrom(error, "time" as const);
+  }
+}
+
+export type AppointmentDetailsResult =
+  { ok: true; appointment: AgendaAppointment; date: string } | ActionFailure;
+
+/** Um agendamento no formato da agenda e o seu dia, para o dialog de detalhes. */
+export async function getAppointmentDetailsAction(
+  id: string,
+): Promise<AppointmentDetailsResult> {
+  try {
+    const [{ company }, item] = await Promise.all([
+      getCurrentUser(),
+      getAppointment(id),
+    ]);
+    const date = toDateString(new Date(item.startAt), company.timezone);
+    return {
+      ok: true,
+      date,
+      appointment: toAgendaAppointment(
+        item,
+        company.timezone,
+        dayBounds(date, company.timezone).to,
+      ),
+    };
+  } catch (error) {
+    return failureFrom(error);
   }
 }

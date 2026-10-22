@@ -131,3 +131,8 @@ export function updateAppointment(
     body: JSON.stringify(input),
   });
 }
+
+/** Um agendamento pelo id (detalhes a partir do pagamento). */
+export function getAppointment(id: string): Promise<AppointmentItem> {
+  return apiFetch<AppointmentItem>(`/appointments/${id}`);
+}

@@ -48,10 +48,26 @@ regras de cada tela, em `docs/screens/`.
 - **2026-10-19 — Formulários de plano e contratação em página;** parcelas só leitura (a baixa é do Financeiro).
 - **2026-10-19 — Reposição por falta (NO_SHOW) fica para depois do MVP.**
 
+## Usuários, métodos de pagamento e histórico do cliente
+
+- **2026-10-19 — Reativar é uma rota própria** (`PATCH /:id/restore`) em usuários e métodos de pagamento; a listagem traz ativos e inativos. _Por quê:_ a inativação é lógica e o histórico continua apontando para o registro.
+- **2026-10-19 — Nome do método de pagamento é único sem diferenciar maiúsculas nem acentos** ("PIX" e "Pix" são o mesmo), garantido no banco (índice no nome normalizado). Reativar com o nome em uso responde 409.
+- **2026-10-19 — O usuário logado não se inativa nem muda o próprio tipo;** o ADMIN não atribui SUPER_ADMIN.
+- **2026-10-19 — Histórico do cliente é uma página** (`/clientes/[id]`), só para clientes, também para o inativo (só consulta). _Por quê:_ tem abas e muita informação; um dialog perderia o filtro e a lista. Cancelados e não comparecidos aparecem no histórico.
+
+## Financeiro
+
+- **2026-10-22 — Duas telas, sem entidade nova:** **Pagamentos** (`/financeiro`, todas as cobranças, filtros e baixa) e **Comandas** (`/financeiro/comandas`, o fechamento do atendimento). _Por quê:_ a primeira ideia de comanda (pagamentos que vencem no dia) não era a do appBarber, que fecha um atendimento; uma comanda ligada a pagamentos deixava os atrasados e os pacotes sem onde cobrar.
+- **2026-10-22 — A comanda nasce das visitas do dia** (cliente com atendimento hoje ou que pagou hoje) e traz também as pendências anteriores dele; sessão de pacote aparece como "Incluído no pacote" e o avulso não concluído, como "Aguardando conclusão". Cliente sem visita é cobrado em Pagamentos. Não compareceu não entra.
+- **2026-10-22 — Os totais do resumo respeitam cliente e vencimento, não a situação,** e "Recebido" soma pelo vencimento. _Por quê:_ com um filtro de situação, os outros cartões zerariam; vencimento é o que une os três.
+- **2026-10-22 — Baixa em lote só de um cliente,** tudo ou nada, com método ativo e data do pagamento (passada sim, futura não).
+- **2026-10-22 — Parcelamento no cartão fica fora do MVP,** junto com taxas, valor líquido e repasse da operadora (conciliação). _Por quê:_ o parcelamento no cartão não muda a cobrança do cliente (está paga); só importa para o fluxo de caixa. Parcelar uma dívida interna é outro conceito (o pacote mensal já gera parcelas).
+
 ## Interface
 
 - **2026-10-19 — Informação de outra tela abre em dialog, não em outra página** (sessões da contratação, sessões e contratação a partir da agenda). _Por quê:_ abrir outra página quebrava o fluxo e fazia o usuário perder o dia e o filtro da agenda.
 
+- **2026-10-22 — Cartões de resumo são atalhos de filtro,** com ícone, faixa colorida à esquerda e fundo tingido quando ativos; clicar no ativo desfaz o filtro. No celular, quando os cartões filtram, a barra de filtros não aparece.
 - **2026-10-17 — Todo botão com texto tem ícone à esquerda,** sempre o mesmo para a mesma ação (mapa na skill `orari-ui`). _Por quê:_ reconhecimento mais rápido da ação; antes era parcial.
 
 ## Configurações da empresa
@@ -63,7 +79,7 @@ regras de cada tela, em `docs/screens/`.
 
 ## Menu e próximos módulos
 
-- **2026-10-17 — Financeiro vira dropdown** com Pagamentos e Métodos de pagamento (métodos de pagamento: implementação do responsável pelo projeto).
+- **2026-10-17 — Financeiro vira dropdown** com Pagamentos e Métodos de pagamento (métodos de pagamento: implementação do responsável pelo projeto). **2026-10-22:** passou a ter também Comandas, na frente de Pagamentos.
 
 ## Processo
 

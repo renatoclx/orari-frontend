@@ -32,6 +32,12 @@ src/
                              inativação e ativação)
       client-plan-actions.ts Server Actions de contratações (contratar,
                              consultar com parcelas, cancelar)
+      user-actions.ts        Server Actions de usuários (cadastro, alteração,
+                             senha, inativação e reativação)
+      payment-method-actions.ts Server Actions de métodos de pagamento
+                             (cadastro, alteração, inativação e reativação)
+      payment-actions.ts     Server Action da baixa de pagamentos (um ou vários
+                             do mesmo cliente)
       location-actions.ts    busca de cidades e consulta de CEP
       page.tsx               Agendamentos ("/"): agenda do dia (?date=)
       servicos/              Serviços: page e loading (cadastro e alteração
@@ -42,7 +48,12 @@ src/
       configuracoes/         Configurações da empresa: page
       company-actions.ts     Server Action das configurações (nome fantasia,
                              logo e horários de funcionamento)
-      clientes/              Clientes: page, loading, novo/, [id]/editar/
+      clientes/              Clientes: page, loading, novo/, [id] (histórico) e
+                             [id]/editar/
+      usuarios/              Usuários: page e loading (cadastro, alteração e
+                             senha em dialog)
+      financeiro/            Financeiro: page (Pagamentos), comandas/ e
+                             metodos-de-pagamento/ (cada um com page e loading)
       funcionarios/          Funcionários (mesma estrutura)
       profissionais/         Profissionais (mesma estrutura)
     (auth)/                  telas públicas (sem sidebar)
@@ -55,13 +66,19 @@ src/
                              UserMenu, ThemeToggle, AppToaster, Logo
     shared/                  componentes do Orari usados em várias telas
     people/                  telas de Clientes, Funcionários e Profissionais
-                             (uma implementação, parametrizada por tipo)
+                             (uma implementação, parametrizada por tipo);
+                             history/ tem o histórico do cliente
     services/                tela de Serviços (listagem e dialog de formulário)
     agenda/                  agenda do dia (grade, blocos, legenda, faixa)
     recurrences/             recorrências (lista, cadastro, detalhes, sessões,
                              remanejar)
     plans/                   planos (lista, formulário, preços e validação)
     client-plans/            contratações (lista, nova, detalhes, dialog)
+    users/                   usuários (lista, dialogs de formulário e senha,
+                             validação)
+    payment-methods/         métodos de pagamento (lista e dialog de formulário)
+    payments/                pagamentos (resumo, filtros, lista, baixa)
+    checkouts/               comandas do dia (lista e dialog da comanda)
     settings/                configurações da empresa (formulário, logo, horários)
     <tela>/                  componentes das demais telas (auth/)
   services/                  comunicação com a API e sessão (somente servidor)
@@ -92,7 +109,7 @@ Layout ──────────────────┘
 ```
 
 - **`apiFetch`** (`services/api.ts`) é o ponto único de chamada à API: monta a URL com `API_URL`, envia JSON sem cache, anexa o token da sessão e transforma erros em `ApiError` (status + mensagem). Status `0` = API fora do ar. Um 401 em chamada autenticada leva ao login (`/session-expired`).
-- **Services por assunto** (`auth.service.ts`, `people.service.ts`, `contact.service.ts`, `address.service.ts`, `location.service.ts`, `cep.service.ts`, `service.service.ts`, `appointment.service.ts`, `recurrence.service.ts`, `plan.service.ts`, `client-plan.service.ts`, `payment.service.ts`, `business-hour.service.ts`, `company.service.ts`) conhecem os caminhos da API e são chamados pelas telas, layouts e Server Actions — nunca o `apiFetch` direto.
+- **Services por assunto** (`auth.service.ts`, `people.service.ts`, `contact.service.ts`, `address.service.ts`, `location.service.ts`, `cep.service.ts`, `service.service.ts`, `appointment.service.ts`, `recurrence.service.ts`, `plan.service.ts`, `client-plan.service.ts`, `payment.service.ts`, `payment-method.service.ts`, `user.service.ts`, `business-hour.service.ts`, `company.service.ts`) conhecem os caminhos da API e são chamados pelas telas, layouts e Server Actions — nunca o `apiFetch` direto.
 - Os services importam `server-only`: rodam só no servidor. O navegador nunca fala com a API diretamente.
 - Server Actions tratam `ApiError` (viram mensagem na tela) e deixam estourar erros inesperados — inclusive o `redirect()` do Next, que também é lançado como erro.
 
@@ -111,8 +128,16 @@ As três telas são a mesma implementação, escolhida pelo tipo (`PeopleType`).
 - **`PersonForm`** serve ao cadastro e à alteração (prop `editing`). `ContactsField` e `AddressesField` também têm os dois modos.
 - **Cadastro:** o formulário inteiro vai por `FormData` a `createPersonAction`; o contato principal e as listas vão em `POST /people` (uma transação na API). A foto é enviada em seguida, por rota própria; se falhar, só avisa.
 - **Alteração:** `updatePersonAction` faz `PATCH /people/:id` (a API recusa contatos e endereços nesse corpo), atualiza o contato principal e trata a foto. Contatos e endereços adicionais usam as rotas próprias e valem na hora. Falhas depois de salvar a pessoa viram avisos, não erro.
-- **Inativos:** a listagem traz ativos e inativos (status derivado de `deletedAt`); excluir inativa e há "Reativar". As rotas por id respondem 404 para inativos (a tela mostra "não encontrado").
+- **Inativos:** a listagem traz ativos e inativos (status derivado de `deletedAt`); excluir inativa e há "Reativar". A consulta por id também serve inativos (é o que o histórico usa); a tela de alteração trata o inativo como "não encontrado".
 - O cadastro rápido de cliente (nome e telefone) usa o campo `phone` da API; o completo envia o contato principal em `contacts`.
+- **Filtro de status** (`?status=` na URL: todos, ativos, inativos): `PeopleToolbar` troca o filtro e a API recebe `isActive`. A listagem de inativos só mostra o botão "Reativar".
+- O formulário (`PersonForm`) tem o contêiner de rolagem `relative`: os inputs escondidos do Radix (Select, Switch) são absolutos e, sem isso, aumentavam a altura da página.
+
+## Histórico do cliente
+
+- Página `/clientes/[id]` (botão "Histórico" na coluna Ações, também para o cliente inativo, que só é consultado); só clientes (os outros tipos dão 404).
+- `ClientHistoryPage` (Server Component) busca a pessoa, o contato principal e cinco contagens do cabeçalho (próximo agendamento, concluídos, pacotes ativos, cancelamentos e faltas), cada uma com os filtros que a API já tem. Só a aba aberta (`?aba=`) carrega os dados; o filtro dos agendamentos fica em `?quando=` (`history-filters.ts`, um `.ts` comum: um valor importado de um módulo `"use client"` chegaria ao servidor só como referência).
+- Os agendamentos usam as ações da agenda em dialog (detalhes, alterar, remanejar, ver sessões e contratação), com o mesmo `AppointmentDetailsDialog`. Pagamentos: só leitura.
 
 ## Fotos
 
@@ -157,6 +182,27 @@ As três telas são a mesma implementação, escolhida pelo tipo (`PeopleType`).
 - **Contratações** (`/pacotes/contratacoes`): listagem com filtros de cliente, plano e status (`?status=` da API); a situação é derivada por `clientPlanStatus` (mesma regra do filtro). Nova contratação (`ClientPlanForm`): um `ScheduleBlock` por serviço, que usa o `RecurrenceDaysField` com `maxDays` (frequência do plano) e `extraBusy` (sessões dos outros serviços). `ClientPlanSummary` mostra a prévia dos valores e o comparativo com o avulso.
 - Detalhes e dialog: `ClientPlanParts` (dados, agendas e parcelas) é usado pela página (`ClientPlanDetails`, com cancelar) e pelo `ClientPlanDialog`, aberto pela agenda. As parcelas vêm de `GET /payments?clientPlanId=` (`payment.service.ts`), só leitura.
 - `client-plan.service.ts` converte as datas de calendário para `aaaa-mm-dd` e renomeia `recurringAppointments` para `schedules`.
+
+## Usuários
+
+- Listagem (`/usuarios`) paginada, com o tipo em badge (`UserTypeBadge`) e o status; cadastro e alteração em dialog (`UserFormDialog`) e troca de senha em outro (`PasswordDialog`). A validação (`user-validation.ts`) vale na tela e nas Server Actions, com as regras de senha do backend (8 a 72 bytes).
+- Inativar e reativar (`PATCH /users/:id/restore`) por ação à vista na linha. O usuário logado não se inativa nem muda o próprio tipo, e o ADMIN não atribui SUPER_ADMIN (a API também recusa).
+
+## Métodos de pagamento
+
+- Listagem em `/financeiro/metodos-de-pagamento`, com busca, status e paginação pela URL; cadastro e alteração no mesmo dialog (`PaymentMethodFormDialog`).
+- A listagem traz ativos e inativos (`deletedAt`); as baixas usam só os ativos (`isActive=true`). Inativar e reativar à vista na linha; o nome é único sem diferenciar maiúsculas nem acentos (o servidor responde 409 e a tela mostra no campo).
+
+## Financeiro
+
+Duas telas, sem entidade nova no backend: a comanda é uma visão montada a partir de atendimentos e pagamentos.
+
+- **Pagamentos** (`/financeiro`): `PaymentsListPage` (Server Component) lê os filtros da URL (`?status=`, `?de=`, `?ate=`, `?cliente=`, `?metodo=`, `?page=`) e busca, em paralelo, a listagem, o resumo, os métodos e os clientes. As situações do filtro e o `paymentQuery`, que monta a URL mantendo só o que não é o padrão, ficam em `payment-filters.ts` (`.ts` comum, usado pelo servidor e pela barra de filtros). Data inválida na URL é ignorada.
+- **Resumo:** `GET /payments/summary` devolve atrasado, a vencer e recebido, respeitando cliente e vencimento mas não a situação. Cada cartão é um link que aplica a situação; o cartão ativo desfaz o filtro. No celular a barra de filtros some e só os cartões filtram.
+- **Baixa:** `PaymentList` (Client Component) guarda a seleção (só pagamentos pendentes de um cliente por vez, que é a exigência da API) e abre o `SettlePaymentsDialog`. O método e a data do pagamento (`SettleFields`) são compartilhados com a comanda. `settlePaymentsAction` grava com `PATCH /payments/settle` (tudo ou nada); uma data passada vai ao meio-dia do fuso da empresa, para não virar o dia anterior, e a data futura é recusada.
+- **Atendimento e contratação:** o ícone de olho abre o mesmo `AppointmentDetailsDialog` da agenda, só para consulta (`getAppointmentDetailsAction`); pagamento de pacote abre `ClientPlanDialog`.
+- **Comandas** (`/financeiro/comandas`): `GET /payments/checkouts` parte das visitas do dia (clientes com atendimento hoje ou que pagaram hoje) e devolve, por cliente, os atendimentos de hoje, as pendências anteriores e os totais. `CheckoutList` mostra aberta ou paga; `CheckoutDialog` tem as seções "Atendimentos de hoje", "Pendências anteriores" e "Pagos hoje" e dá baixa nos itens marcados. Os da visita começam marcados e as pendências, não; a comanda paga abre só para consulta.
+- Soma de valores sempre em centavos inteiros, para não acumular erro de ponto flutuante. Depois da baixa, `revalidatePath` recarrega as duas telas.
 
 ## Configurações da empresa
 

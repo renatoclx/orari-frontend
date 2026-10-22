@@ -196,7 +196,14 @@ Fonte: `docs/screens/agendamentos.md`. Modelo: `src/components/agenda/`.
 
 ## Acessibilidade
 
-- HTML semântico: `<header>`, `<nav>`, `<main>`, `<button>` para ações, `<a>` para navegação.
-- Todo elemento interativo tem foco visível: use elementos nativos (`button`, `a`, `input`) ou `tabindex`, que já recebem o contorno global.
-- Botões só com ícone têm `aria-label`; imagens têm `alt`.
-- Respeite `prefers-reduced-motion` (variante `motion-safe:`).
+Verificada com `axe-core` (todas as rotas, claro e escuro, computador e celular) e com a skill `web-design-guidelines` (Etapa 9, 2026-10-22). Tela nova: confira o mesmo antes de fechar.
+
+- HTML semântico: `<header>`, `<nav>`, `<main>`, `<aside>` (com `aria-label`), `<button>` para ações, `<a>` para navegação. Elemento que se comporta como botão e não é `<button>` (ex.: o bloco da agenda) leva `role="button"`, `tabIndex={0}` e abre com Enter **e** Espaço. `role="button"` não vale em `<article>`.
+- Todo elemento interativo tem foco visível: use elementos nativos ou `tabindex`, que já recebem o contorno global (azul, 1 px; a cor é decisão do projeto e não muda). Não use `outline-none` sem substituto.
+- **Nome acessível:** botões só com ícone têm `aria-label`; imagens têm `alt`. Se o botão tem texto visível, o `aria-label` **começa pelo texto visível** (WCAG 2.5.3: "Agendar às 07:30 com Carol", não "Novo agendamento com Carol"). `role="combobox"` não toma o nome do conteúdo: o `Combobox` sem `<label>` recebe `ariaLabel`. `<th>` nunca fica vazio: coluna só de botões usa `<span className="sr-only">Ações</span>`.
+- **Contraste mínimo de 4,5:1 para texto pequeno**, inclusive sobre fundo tingido (badge, botão suave, avatar). Os tokens já cumprem; não use `opacity` para esmaecer texto (o bloco concluído da agenda clareia só o fundo e a faixa). Cor de texto sempre por token (`text-muted-foreground`, `text-destructive`, `text-success`), nunca valor solto.
+- **Texto de carregamento ou de espera** ("Buscando…", "Carregando…") é `role="status"`, para o leitor de tela anunciar sem tirar o foco. Erro de campo é `role="alert"` (`FormField` já faz).
+- Primeiro item de teclado em `AdminShell`: "Pular para o conteúdo" (`#conteudo`, só aparece com foco).
+- **Movimento:** a regra global de `globals.css` já zera animações e transições para quem pede `prefers-reduced-motion`; use a variante `motion-safe:` em animações novas de enfeite. Transição só nas propriedades que mudam (`transition-colors`, `transition-[...]`), nunca `transition-all`.
+- Toque: `touch-action: manipulation` é global. Diálogos e gavetas têm `overscroll-contain`.
+- Texto da interface usa `…` (um caractere), nunca `...`. Botões seguem o padrão em pt-BR (só a primeira letra maiúscula).

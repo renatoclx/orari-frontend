@@ -78,6 +78,7 @@ const navItems: (NavLink | NavGroup)[] = [
     label: "Financeiro",
     icon: Wallet,
     children: [
+      { href: "/financeiro/comandas", label: "Comandas" },
       { href: "/financeiro", label: "Pagamentos" },
       {
         href: "/financeiro/metodos-de-pagamento",

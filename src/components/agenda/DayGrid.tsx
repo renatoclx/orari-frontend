@@ -301,7 +301,7 @@ export function DayGrid({
                     key={slot}
                     type="button"
                     onClick={() => onSlotOverbooking?.(professional.id, time)}
-                    aria-label={`Encaixar ${professional.name} às ${time}, fora do horário de funcionamento`}
+                    aria-label={`Encaixar às ${time} com ${professional.name}, fora do horário de funcionamento`}
                     className={`relative z-[1] flex w-full cursor-pointer items-center justify-center text-xs text-transparent transition-colors hover:bg-muted hover:text-foreground focus-visible:bg-muted focus-visible:text-foreground ${line}`}
                     style={{ height: SLOT_HEIGHT }}
                   >
@@ -320,7 +320,7 @@ export function DayGrid({
                   key={slot}
                   type="button"
                   onClick={() => onSlotSelect(professional.id, time)}
-                  aria-label={`Novo agendamento com ${professional.name} às ${time}`}
+                  aria-label={`Agendar às ${time} com ${professional.name}`}
                   className={`group/slot flex w-full cursor-pointer items-center justify-center text-xs text-transparent transition-colors hover:bg-brand/10 hover:text-brand focus-visible:bg-brand/10 focus-visible:text-brand ${line}`}
                   style={{ height: SLOT_HEIGHT }}
                 >

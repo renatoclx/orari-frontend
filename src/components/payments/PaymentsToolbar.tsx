@@ -107,6 +107,7 @@ export function PaymentsToolbar({
       <div className="w-60">
         <Combobox
           id="filter-client"
+          ariaLabel="Filtrar por cliente"
           options={[
             { value: ALL, label: "Todos os clientes" },
             ...clientSearch.options.map((client) => ({

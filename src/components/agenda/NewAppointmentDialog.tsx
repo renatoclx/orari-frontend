@@ -477,7 +477,10 @@ function NewAppointmentForm({
         error={errors.time}
       >
         {timesHint ? (
-          <p className="rounded-control border border-dashed border-border px-3 py-2 text-sm text-muted-foreground">
+          <p
+            role="status"
+            className="rounded-control border border-dashed border-border px-3 py-2 text-sm text-muted-foreground"
+          >
             {timesHint}
           </p>
         ) : (

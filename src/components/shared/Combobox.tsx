@@ -33,6 +33,8 @@ type ComboboxProps = {
   searchPlaceholder?: string;
   emptyMessage?: string;
   disabled?: boolean;
+  /** Nome do campo quando não há um `<label>` (ex.: filtros de listagem). */
+  ariaLabel?: string;
   /** Mostra "Carregando…" no lugar das opções. */
   loading?: boolean;
   /**
@@ -53,6 +55,7 @@ export function Combobox({
   searchPlaceholder = "Buscar…",
   emptyMessage = "Nenhum resultado.",
   disabled,
+  ariaLabel,
   loading,
   onSearchChange,
 }: ComboboxProps) {
@@ -84,6 +87,7 @@ export function Combobox({
           variant="outline"
           role="combobox"
           aria-expanded={open}
+          aria-label={ariaLabel}
           disabled={disabled}
           className="w-full justify-between bg-transparent px-2.5 font-normal"
         >
@@ -114,7 +118,10 @@ export function Combobox({
           />
           <CommandList>
             {loading ? (
-              <p className="py-6 text-center text-sm text-muted-foreground">
+              <p
+                role="status"
+                className="py-6 text-center text-sm text-muted-foreground"
+              >
                 Carregando…
               </p>
             ) : (

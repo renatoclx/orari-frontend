@@ -59,6 +59,7 @@ export function ClientPlansToolbar({
       <div className="w-full sm:w-60">
         <Combobox
           id="filter-client"
+          ariaLabel="Filtrar por cliente"
           options={[
             { value: ALL, label: "Todos os clientes" },
             ...clientSearch.options.map((client) => ({

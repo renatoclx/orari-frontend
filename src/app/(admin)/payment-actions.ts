@@ -57,5 +57,6 @@ export async function settlePaymentsAction(input: {
     return failureFrom(error);
   }
   revalidatePath("/financeiro");
+  revalidatePath("/financeiro/comandas");
   return { ok: true };
 }

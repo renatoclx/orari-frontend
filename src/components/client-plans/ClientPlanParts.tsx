@@ -106,7 +106,7 @@ export function PaymentBadge({
   payment,
   feminine = true,
 }: {
-  payment: PaymentItem;
+  payment: Pick<PaymentItem, "status" | "isOverdue">;
   feminine?: boolean;
 }) {
   const end = feminine ? "a" : "o";

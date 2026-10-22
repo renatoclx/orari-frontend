@@ -29,9 +29,9 @@ Pontos conhecidos e aceitos por enquanto. Revisar quando o contexto mudar.
 ## Pacotes
 
 - **Prévia dos valores no frontend.** `plan-pricing.ts` repete o cálculo do backend (arredondamento e parcelas) só para exibir; o servidor calcula e congela na contratação. Se as regras mudarem, mudar nos dois lados.
-- **Parcelas por contratação.** Os detalhes buscam todas as páginas de `GET /payments?clientPlanId=`; a baixa fica para o Financeiro.
+- **Parcelas por contratação.** Os detalhes buscam todas as páginas de `GET /payments?clientPlanId=`; a baixa é feita no Financeiro (Pagamentos e Comandas).
 - **Cliente filtrado na listagem de contratações.** Se o cliente do filtro não estiver entre os primeiros 100, o nome é buscado à parte (`GET /people/:id`).
-- **Inputs escondidos do Radix.** Switch e Select dentro de um form criam inputs absolutos; o contêiner com rolagem dos formulários de contratação, recorrência e plano é `relative` para eles não aumentarem a altura da página. O `PersonForm` ainda não tem esse ajuste.
+- **Inputs escondidos do Radix.** Switch e Select dentro de um form criam inputs absolutos; o contêiner com rolagem dos formulários de contratação, recorrência, plano e pessoa é `relative` para eles não aumentarem a altura da página.
 
 ## Configurações da empresa
 
@@ -44,9 +44,19 @@ Pontos conhecidos e aceitos por enquanto. Revisar quando o contexto mudar.
 - **Foto fora da transação.** No cadastro, a pessoa é criada e a foto enviada depois, por rota própria. Se a foto falhar, a pessoa já existe (o usuário é avisado e pode enviar na alteração). Idem para o contato principal e a foto na alteração: falhas após o `PATCH` da pessoa viram avisos.
 - **Contatos e endereços na alteração valem na hora.** Adicionar e excluir não esperam o "Salvar alterações" (a API os mantém em rotas próprias). Cancelar a tela não desfaz o que já foi adicionado ou excluído.
 - **Cidade dos endereços.** `GET /addresses` devolve só `cityId`; a tela de alteração busca cada cidade (`GET /cities/:id`) para exibir nome e UF. Se o backend passar a devolver cidade e estado, eliminar essas buscas.
-- **Filtro de status na listagem.** A lista mostra ativos e inativos juntos; falta o filtro por status (previsto).
 - **Reescrita de `/uploads`.** Depende de `API_URL` definida na hora do build/início do servidor; sem ela, as fotos não aparecem.
-- **Teste com backend real.** O fluxo (cadastro, foto, alteração, busca de cidade) foi verificado contra uma API simulada; falta a verificação com login e backend reais.
+- **Histórico do cliente.** Cada aba faz a sua busca e o cabeçalho faz cinco consultas de contagem (próximo agendamento, concluídos, pacotes ativos, cancelamentos e faltas). Uma rota de resumo no backend as reuniria.
+
+## Financeiro
+
+- **Parcelamento no cartão não existe.** A baixa registra método, valor e data; número de parcelas, taxas, valor líquido e data de repasse da operadora ficam para a conciliação (decisão de 2026-10-22). O método de pagamento é só um nome: não há tipo para saber qual é crédito.
+- **A comanda não acompanha a virada do dia.** O dia é o que a API devolveu ao carregar; com a tela aberta na meia-noite, só ao recarregar.
+- **Baixa em lote de um cliente por vez.** A API exige o mesmo cliente nos pagamentos; a tela desabilita a seleção dos outros. Não há "marcar todos".
+- **Listas de apoio até 100.** Métodos de pagamento e os primeiros clientes do filtro vêm numa página só (100). O cliente filtrado fora dos primeiros é buscado à parte (`GET /people/:id`), como nas contratações.
+- **Data passada da baixa ao meio-dia.** A tela envia o meio-dia do fuso da empresa, não a hora real; o horário do pagamento lançado depois não é preciso.
+- **Busca de clientes do filtro duplicada.** Pagamentos e Contratações usam `useClientSearch`, que ainda tem a mesma lógica do dialog de novo agendamento.
+- **Resumo e lista em chamadas separadas.** Os totais (`/payments/summary`) e a lista (`/payments`) são duas consultas; se um pagamento mudar entre elas, os números podem divergir até a próxima carga.
+- **Pagamento sem cobrança própria na comanda.** Sessões de pacote aparecem como "Incluído no pacote", e o avulso ainda não concluído, como "Aguardando conclusão"; receber antes de concluir (sinal) não existe.
 
 ## Acessibilidade
 

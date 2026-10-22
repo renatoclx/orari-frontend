@@ -1,4 +1,5 @@
 import { CalendarShortcut } from "@/components/layout/CalendarShortcut";
+import { QuickCheckoutShortcut } from "@/components/layout/QuickCheckoutShortcut";
 import { QuickClientShortcut } from "@/components/layout/QuickClientShortcut";
 import { QuickRecurrenceShortcut } from "@/components/layout/QuickRecurrenceShortcut";
 import { QuickServiceShortcut } from "@/components/layout/QuickServiceShortcut";
@@ -14,6 +15,7 @@ export function ActionBar() {
         <QuickClientShortcut />
         <QuickServiceShortcut />
         <QuickRecurrenceShortcut />
+        <QuickCheckoutShortcut />
       </div>
     </div>
   );

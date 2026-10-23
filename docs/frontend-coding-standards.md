@@ -52,3 +52,8 @@ Complementa o `coding-standards.md` do backend com regras pontuais do frontend.
 ## Comentários
 
 - Mesma regra do backend: comentar somente quando necessário, explicando o motivo da implementação, e não o que o código faz.
+
+## Testes
+
+- Função pura nova (cálculo, validação, formatação, filtro) leva um `arquivo.spec.ts` ao lado, com os casos de borda. Ver `frontend-testing.md`.
+- Antes do PR: `npm test`, `npm run lint` e `npx tsc --noEmit` (o CI roda os três e o build).

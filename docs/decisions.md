@@ -89,6 +89,12 @@ regras de cada tela, em `docs/screens/`.
 
 - **2026-10-17 — Financeiro vira dropdown** com Pagamentos e Métodos de pagamento (métodos de pagamento: implementação do responsável pelo projeto). **2026-10-22:** passou a ter também Comandas, na frente de Pagamentos.
 
+## Qualidade e testes
+
+- **2026-10-23 — Testes automáticos só de funções puras e de pontos de borda do servidor,** com Vitest (a mesma ferramenta do backend) e `arquivo.spec.ts` ao lado do código. _Por quê:_ é onde está a regra que quebra sem barulho (fuso, arredondamento, disponibilidade de horários); componentes e telas seguem verificados à mão e com `axe-core`. Ponta a ponta (Playwright) fica fora por ora.
+- **2026-10-23 — CI do frontend** (`.github/workflows/ci.yml`): lint, tipos, testes e build, como no backend. Sem meta mínima de cobertura.
+- **2026-10-23 — Teste que mostra bug não é ajustado para passar:** o bug é registrado e corrigido à parte. O primeiro ciclo (236 testes) não encontrou nenhum.
+
 ## Processo
 
 - **2026-10-14 — Comentários:** todo código novo leva comentário curto explicando o porquê (regra herdada do backend).

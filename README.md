@@ -29,13 +29,14 @@ npm run dev                  # http://localhost:3000
 
 ### Scripts
 
-| Comando          | O que faz                                |
-| ---------------- | ---------------------------------------- |
-| `npm run dev`    | Servidor de desenvolvimento              |
-| `npm run build`  | Build de produção (também confere tipos) |
-| `npm run start`  | Serve o build de produção                |
-| `npm run lint`   | ESLint                                   |
-| `npm run format` | Prettier em todo o projeto               |
+| Comando          | O que faz                                  |
+| ---------------- | ------------------------------------------ |
+| `npm run dev`    | Servidor de desenvolvimento                |
+| `npm run build`  | Build de produção (também confere tipos)   |
+| `npm run start`  | Serve o build de produção                  |
+| `npm run lint`   | ESLint                                     |
+| `npm test`       | Testes (Vitest); `test:watch` e `test:cov` |
+| `npm run format` | Prettier em todo o projeto                 |
 
 ## Como o projeto é organizado
 
@@ -61,6 +62,7 @@ Tudo em `docs/`:
 - `screens/`: especificação das telas, um arquivo por tela (comece pelo `README.md`)
 - `screen-patterns.md`: padrões comuns das telas (listagem, tabela, formulário, diálogos)
 - `decisions.md`: decisões do projeto e o porquê
+- `frontend-testing.md`: testes automáticos (o que cobrem, convenções e como escrever)
 - `frontend-technical-debt.md`: pontos conhecidos adiados de propósito
 - `stack-tecnologico.md`: tecnologias usadas
 
@@ -72,4 +74,4 @@ Regras de interface (cores, tamanhos, componentes): skill
 
 - Código e arquivos em inglês; textos da interface em pt-BR.
 - Imports com o alias `@/`; comentários curtos explicando o porquê.
-- Antes de commitar: `npm run lint`, `npx tsc --noEmit` e `npm run format`.
+- Antes de commitar: `npm run lint`, `npx tsc --noEmit`, `npm test` e `npm run format`.

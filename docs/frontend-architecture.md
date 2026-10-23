@@ -90,6 +90,8 @@ docs/                        documentação; screens/ tem um arquivo por tela
   proxy.ts                   proteção das rotas (antigo middleware)
 next.config.ts               modo standalone, limite das Server Actions e rewrite de /uploads
 Dockerfile, .dockerignore    imagem de produção (ver "Deploy")
+vitest.config.mts            testes (arquivo.spec.ts ao lado do código; ver frontend-testing.md)
+.github/workflows/ci.yml     lint, tipos, testes e build a cada push e PR
 ```
 
 - Pastas entre parênteses (`(admin)`, `(auth)`) são **grupos de rotas**: organizam layouts sem mudar a URL.

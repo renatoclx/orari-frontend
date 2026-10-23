@@ -1,0 +1,417 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<title>Manual do administrador — Orari</title>
+<link rel="stylesheet" href="manual.css">
+</head>
+<body>
+
+<!-- ===== Capa ===== -->
+<section class="cover">
+  <img class="logo" src="assets/logo-white.svg" alt="Orari">
+  <div class="spacer"></div>
+  <div class="bar"></div>
+  <div class="kicker">Manual do administrador</div>
+  <h1>Organize a agenda e o financeiro da sua clínica</h1>
+  <p>Guia passo a passo para usar o Orari no computador e no celular: agenda, clientes, serviços, pacotes e recebimentos.</p>
+  <div class="foot">As telas deste manual usam dados fictícios da “Clínica Bem-Estar”.</div>
+</section>
+
+<!-- ===== Sumário (os números de página são preenchidos pelo build) ===== -->
+<section class="toc">
+  <h2>Sumário</h2>
+  <ol id="toc"></ol>
+  <div class="intro">
+    <b>Como usar este manual.</b> Cada capítulo explica uma parte do sistema, com os passos na ordem em que você os executa. Os quadros azuis trazem dicas; os amarelos, avisos importantes. Os nomes de botões e campos aparecem <span class="ui">assim</span>, como na tela.
+  </div>
+</section>
+
+<!-- ===== 1 ===== -->
+<h1 class="chapter" data-toc="Primeiros passos"><span class="num"></span>Primeiros passos</h1>
+<p class="lead">Como entrar no sistema e se orientar pela tela.</p>
+
+<h2>Entrar no Orari</h2>
+<ol class="steps">
+  <li>Abra o endereço do sistema no navegador (Chrome, Edge, Firefox ou Safari) e informe o seu <b>e-mail</b> e a sua <b>senha</b>.</li>
+  <li>Use o ícone de olho, no campo de senha, para ver o que você digitou.</li>
+  <li>Clique em <span class="ui">Entrar</span>. Você chega à tela de Agendamentos.</li>
+</ol>
+<figure class="w70"><img src="images/01-login.png" alt=""><figcaption>Tela de entrada.</figcaption></figure>
+<div class="box warn"><b class="t">Senha</b><p>Não compartilhe a sua senha. Se errar a senha várias vezes seguidas, o sistema bloqueia novas tentativas por alguns instantes: aguarde um minuto e tente de novo.</p></div>
+
+<h2>Conhecendo a tela</h2>
+<p>Depois do login, a tela tem quatro áreas: o <b>menu lateral</b>, à esquerda; o <b>cabeçalho</b>, no topo, com o nome da clínica e o seu usuário; a <b>área de trabalho</b>, no centro; e a <b>barra de atalhos</b>, na borda direita.</p>
+<figure><img src="images/02-agenda-dia.png" alt=""><figcaption>A tela de Agendamentos, onde você passa a maior parte do tempo.</figcaption></figure>
+
+<h2>Menu lateral</h2>
+<div class="side">
+  <figure class="flat" style="width:42mm"><img src="images/33-menu-lateral.png" alt=""></figure>
+  <div>
+    <p>O menu leva a cada parte do sistema:</p>
+    <ul>
+      <li><b>Agendamentos</b>: a agenda do dia.</li>
+      <li><b>Recorrências</b>: horários fixos toda semana.</li>
+      <li><b>Pessoas</b>: clientes e profissionais.</li>
+      <li><b>Serviços</b>: o que a clínica oferece.</li>
+      <li><b>Pacotes</b>: planos e contratações.</li>
+      <li><b>Financeiro</b>: comandas, pagamentos e métodos de pagamento.</li>
+    </ul>
+    <p>Os itens com uma seta (<span class="ui">Pessoas</span>, <span class="ui">Pacotes</span>, <span class="ui">Financeiro</span>) abrem uma lista com mais opções. O botão no topo do menu o recolhe, para sobrar mais espaço na tela.</p>
+  </div>
+</div>
+
+<h2>Barra de atalhos</h2>
+<div class="side">
+  <figure class="flat" style="width:16mm"><img src="images/34-atalhos.png" alt=""></figure>
+  <div>
+    <p>Na borda direita ficam os atalhos para as tarefas mais comuns. De cima para baixo:</p>
+    <ul>
+      <li><b>Calendário</b>: vai direto a um dia da agenda.</li>
+      <li><b>Cadastrar cliente rapidamente</b>: só nome e celular.</li>
+      <li><b>Novo agendamento</b>.</li>
+      <li><b>Nova Recorrência</b>.</li>
+      <li><b>Comandas</b>: o fechamento dos atendimentos do dia.</li>
+    </ul>
+  </div>
+</div>
+
+<h2>Seu usuário, tema e saída</h2>
+<p>Clique no seu nome, no canto superior direito, para abrir o menu do usuário. Nele você acessa as <span class="ui">Configurações da empresa</span>, troca entre o tema <b>claro</b> e o <b>escuro</b> e <b>sai</b> do sistema.</p>
+<figure class="w55"><img src="images/03-menu-usuario.png" alt=""><figcaption>Menu do usuário.</figcaption></figure>
+<div class="box tip"><b class="t">Dica</b><p>Ao terminar de usar um computador que não é só seu, use <span class="ui">Sair</span>. Assim ninguém acessa os dados da clínica depois de você.</p></div>
+
+<!-- ===== 2 ===== -->
+<h1 class="chapter" data-toc="Agenda"><span class="num"></span>Agenda</h1>
+<p class="lead">Ver, criar, remarcar e cancelar atendimentos.</p>
+
+<h2>A agenda do dia</h2>
+<p>A agenda mostra um dia por vez, com uma coluna para cada profissional. Os horários ficam à esquerda, de 30 em 30 minutos. Cada atendimento é um bloco colorido com o horário, o nome do cliente e o serviço. A cor segue o serviço.</p>
+<ul>
+  <li>Áreas <b>listradas</b> são fora do horário de funcionamento. O intervalo entre duas janelas (almoço, por exemplo) aparece em cinza.</li>
+  <li>Quando você olha o dia de hoje, uma linha marca o horário atual.</li>
+  <li>Passe o mouse sobre um bloco para ver um resumo com foto do cliente, serviço, profissional e observações.</li>
+</ul>
+
+<h3>Navegar entre os dias</h3>
+<p>Use as setas <span class="ui">&lsaquo;</span> e <span class="ui">&rsaquo;</span> para o dia anterior e o próximo, <span class="ui">Hoje</span> para voltar ao dia atual, ou o <b>calendário</b> da barra de atalhos para ir a uma data específica.</p>
+<figure class="w55"><img src="images/04-calendario.png" alt=""><figcaption>Calendário de atalho: escolha o dia e a agenda abre nele.</figcaption></figure>
+
+<h3>Filtrar por profissional</h3>
+<p>Para ver só a agenda de uma pessoa, escolha o nome em <span class="ui">Filtrar por profissional</span>. O botão <span class="ui">Mostrar Todos</span> volta à visão completa. (No celular, a agenda mostra um profissional por vez.)</p>
+<figure><img src="images/05-agenda-filtro.png" alt=""><figcaption>Agenda filtrada por profissional.</figcaption></figure>
+
+<h3>Legenda dos ícones</h3>
+<p>No rodapé da agenda, a legenda explica os ícones que aparecem no canto de cada bloco: situação do atendimento (agendado, confirmado, em andamento, concluído, cancelado, não compareceu), encaixe, recorrência e pacote.</p>
+<figure class="flat"><img src="images/35-legenda.png" alt=""></figure>
+<div class="box tip"><b class="t">Dica</b><p>Atendimentos <b>em andamento</b> e <b>concluídos</b> mudam de situação sozinhos, pelo horário. Você não precisa marcar nada.</p></div>
+
+<h2>Marcar um novo atendimento</h2>
+<ol class="steps">
+  <li>Clique em <span class="ui">Novo Agendamento</span>. Se preferir, clique em um horário livre da agenda: o profissional e o horário já vêm preenchidos.</li>
+  <li>Em <b>Cliente</b>, comece a digitar o nome e escolha na lista.</li>
+  <li>Em <b>Serviço</b>, escolha o serviço. Só então os horários disponíveis aparecem.</li>
+  <li>Escolha o <b>Profissional</b> e a <b>Data</b>.</li>
+  <li>Escolha o <b>período</b> (manhã, tarde ou noite) e clique no <b>horário</b>. O sistema mostra o término previsto, de acordo com a duração do serviço.</li>
+  <li>Se quiser, anote preferências ou cuidados em <b>Observações</b>.</li>
+  <li>Clique em <span class="ui">Agendar</span>. Um aviso confirma o dia e o horário marcados.</li>
+</ol>
+<figure class="w70"><img src="images/06-novo-agendamento-vazio.png" alt=""><figcaption>O formulário de novo agendamento.</figcaption></figure>
+<figure class="w70"><img src="images/07-novo-agendamento-horarios.png" alt=""><figcaption>Depois de escolher cliente, serviço, profissional e data, os horários livres aparecem.</figcaption></figure>
+<div class="box warn"><b class="t">Atenção</b>
+  <ul>
+    <li>Não é possível agendar em data ou horário que já passou.</li>
+    <li>Só aparecem horários em que o atendimento cabe inteiro no expediente e que o profissional está livre.</li>
+    <li>Se o cliente já tiver outro atendimento no mesmo horário, o sistema avisa e não agenda.</li>
+  </ul>
+</div>
+
+<h2>Encaixe: atendimento fora do expediente</h2>
+<p>O <b>encaixe</b> serve para atender fora do horário de funcionamento (cedo, tarde, em um dia fechado ou durante o intervalo do almoço). Ele aparece na agenda em <b>cinza</b>.</p>
+<ol class="steps">
+  <li>Clique em <span class="ui">Encaixar horário</span> ou clique em uma <b>área listrada</b> da agenda.</li>
+  <li>Preencha os campos como em um novo agendamento e confirme.</li>
+</ol>
+<figure class="w70"><img src="images/08-encaixe.png" alt=""><figcaption>Encaixar agendamento.</figcaption></figure>
+
+<h2>Ver os detalhes de um atendimento</h2>
+<p>Clique no bloco do atendimento. Abre uma janela com cliente, serviço, horário, profissional, situação e observações. Se o atendimento fizer parte de uma recorrência ou de um pacote, isso também aparece.</p>
+<figure class="w55"><img src="images/09-detalhes-agendamento.png" alt=""><figcaption>Detalhes do atendimento.</figcaption></figure>
+
+<h2>Remanejar (mudar de dia ou horário)</h2>
+<p>Quando o cliente pede outro dia ou horário, não cancele: use <span class="ui">Remanejar</span>.</p>
+<ol class="steps">
+  <li>Abra o atendimento e clique em <span class="ui">Remanejar</span>.</li>
+  <li>Escolha a nova <b>data</b> e o novo <b>horário</b>. Cliente, serviço e profissional continuam os mesmos.</li>
+  <li>Confirme. O atendimento sai do dia antigo e aparece no novo.</li>
+</ol>
+<figure class="w55"><img src="images/10-remanejar.png" alt=""><figcaption>Remanejar atendimento.</figcaption></figure>
+
+<h2>Cancelar um atendimento</h2>
+<ol class="steps">
+  <li>Abra o atendimento e clique em <span class="ui">Cancelar</span>.</li>
+  <li>Confirme em <span class="ui">Cancelar agendamento</span>. O horário fica livre para outro cliente.</li>
+</ol>
+<div class="box warn"><b class="t">Atenção</b><p>Só é possível remanejar ou cancelar atendimentos que ainda não começaram. Um atendimento cancelado não pode ser reaberto: se for preciso, faça um novo agendamento.</p></div>
+
+<!-- ===== 3 ===== -->
+<h1 class="chapter" data-toc="Clientes e profissionais"><span class="num"></span>Clientes e profissionais</h1>
+<p class="lead">Cadastro de pessoas: quem é atendido e quem atende.</p>
+
+<h2>Lista de clientes</h2>
+<p>No menu, abra <span class="ui">Pessoas</span> e escolha <span class="ui">Clientes</span>. A lista mostra foto, nome, celular, CPF, data de nascimento, profissão e situação.</p>
+<ul>
+  <li><b>Busca</b>: digite parte do nome para encontrar alguém.</li>
+  <li><b>Situação</b>: filtre por <span class="ui">Todos</span>, <span class="ui">Ativos</span> ou <span class="ui">Inativos</span>.</li>
+  <li>Na coluna <b>Ações</b> ficam os botões para ver, alterar e inativar.</li>
+</ul>
+<figure><img src="images/11-clientes-lista.png" alt=""><figcaption>Lista de clientes.</figcaption></figure>
+
+<h2>Cadastro rápido</h2>
+<p>Está com o cliente no telefone e precisa só marcar o horário? Use o atalho <span class="ui">Cadastrar cliente rapidamente</span>, na barra da direita. Basta informar o <b>nome</b> e o <b>celular</b>; o restante pode ser completado depois.</p>
+<figure class="w55"><img src="images/12-cliente-rapido.png" alt=""><figcaption>Cadastro rápido.</figcaption></figure>
+
+<h2>Cadastro completo</h2>
+<ol class="steps">
+  <li>Em <span class="ui">Clientes</span>, clique em <span class="ui">Novo cliente</span>.</li>
+  <li>Se quiser, adicione uma <b>foto</b>: escolha um arquivo ou use a câmera do aparelho.</li>
+  <li>Preencha o <b>nome</b> e o <b>celular</b>, que são obrigatórios. O e-mail é opcional.</li>
+  <li>Na coluna da direita, se quiser, informe CPF, data de nascimento, profissão, outros contatos e endereços.</li>
+  <li>Clique em <span class="ui">Salvar</span>.</li>
+</ol>
+<figure><img src="images/13-cliente-novo.png" alt=""><figcaption>Cadastro completo de cliente.</figcaption></figure>
+<div class="box tip"><b class="t">Dica</b><p>O celular e o CPF são formatados sozinhos enquanto você digita. Não precisa colocar parênteses, traços ou pontos.</p></div>
+
+<h2>Alterar, inativar e reativar</h2>
+<ul>
+  <li><b>Alterar</b>: abra o cadastro pela coluna Ações, corrija os dados e salve.</li>
+  <li><b>Inativar</b>: o cliente deixa de aparecer nas buscas dos agendamentos, mas o histórico dele é mantido. O cadastro nunca é apagado.</li>
+  <li><b>Reativar</b>: em clientes inativos, o botão <span class="ui">Reativar</span> devolve o cadastro à lista de ativos.</li>
+</ul>
+
+<h2>Histórico do cliente</h2>
+<p>O histórico reúne os atendimentos e os pagamentos de um cliente. Para abri-lo, clique no nome do cliente nas listas de comandas e pagamentos.</p>
+<figure><img src="images/14-cliente-historico.png" alt=""><figcaption>Histórico do cliente.</figcaption></figure>
+
+<h2>Profissionais</h2>
+<p>Em <span class="ui">Pessoas</span> &rarr; <span class="ui">Profissionais</span>, ficam cadastradas as pessoas que atendem. O cadastro funciona como o de clientes. Cada profissional ativo ganha uma coluna na agenda.</p>
+<figure><img src="images/15-profissionais-lista.png" alt=""><figcaption>Lista de profissionais.</figcaption></figure>
+
+<!-- ===== 4 ===== -->
+<h1 class="chapter" data-toc="Serviços"><span class="num"></span>Serviços</h1>
+<p class="lead">O catálogo do que a clínica oferece, com duração e preço.</p>
+
+<p>Cada serviço tem <b>nome</b>, <b>duração</b>, <b>preço</b> e <b>cor</b>. A duração define quanto tempo o atendimento ocupa na agenda; a cor identifica o serviço nos blocos da agenda.</p>
+<figure><img src="images/16-servicos-lista.png" alt=""><figcaption>Lista de serviços.</figcaption></figure>
+
+<h2>Cadastrar um serviço</h2>
+<ol class="steps">
+  <li>No menu, clique em <span class="ui">Serviços</span>.</li>
+  <li>Clique em <span class="ui">Novo serviço</span>.</li>
+  <li>Preencha o nome, a duração e o preço, e escolha a cor.</li>
+  <li>Clique em <span class="ui">Salvar</span>.</li>
+</ol>
+<figure class="w55"><img src="images/17-servico-novo.png" alt=""><figcaption>Cadastro de serviço.</figcaption></figure>
+<div class="box warn"><b class="t">Atenção</b><p>Só serviços <b>ativos</b> e <b>com preço</b> podem ser usados em recorrências e pacotes. Ao mudar o preço de um serviço, os atendimentos já marcados mantêm o valor antigo.</p></div>
+
+<!-- ===== 5 ===== -->
+<h1 class="chapter" data-toc="Recorrências"><span class="num"></span>Recorrências</h1>
+<p class="lead">Para o cliente que vem toda semana no mesmo dia e horário.</p>
+
+<p>Uma <b>recorrência</b> reserva dias e horários fixos da semana, com um profissional e um serviço, durante um período. O sistema cria todos os agendamentos de uma só vez, em vez de você marcar um por um.</p>
+<figure><img src="images/18-recorrencias-lista.png" alt=""><figcaption>Lista de recorrências.</figcaption></figure>
+
+<h2>Criar uma recorrência</h2>
+<ol class="steps">
+  <li>Clique em <span class="ui">Recorrências</span> no menu e depois em <span class="ui">Nova Recorrência</span> (ou use o atalho da barra da direita).</li>
+  <li>Escolha o <b>cliente</b>, o <b>serviço</b> e o <b>profissional</b>.</li>
+  <li>Informe a <b>data inicial</b> e a <b>data final</b>. O período pode ter até 12 meses.</li>
+  <li>Marque os <b>dias da semana</b>. Em cada dia marcado, escolha o período e o horário.</li>
+  <li>Confira o resumo no rodapé: ele diz quantas sessões serão criadas, a primeira e a última.</li>
+  <li>Clique em <span class="ui">Salvar</span>.</li>
+</ol>
+<figure><img src="images/19-recorrencia-nova.png" alt=""><figcaption>Nova recorrência.</figcaption></figure>
+<div class="box warn"><b class="t">Tudo ou nada</b><p>Se qualquer uma das sessões esbarrar em outro agendamento, <b>nenhuma</b> é criada, e o sistema informa a data e o horário que deram conflito. Só são oferecidos horários livres em <b>todas</b> as semanas do período.</p></div>
+
+<h2>Acompanhar e alterar</h2>
+<p>Clique em uma recorrência para ver as sessões, com data, horário e situação.</p>
+<figure><img src="images/20-recorrencia-detalhe.png" alt=""><figcaption>Detalhe da recorrência e suas sessões.</figcaption></figure>
+<ul>
+  <li><b>Remanejar uma sessão</b>: muda a data e o horário de uma sessão, dentro do período da recorrência.</li>
+  <li><b>Cancelar uma sessão</b>: libera o horário daquela semana e cancela a cobrança correspondente.</li>
+  <li><b>Cancelar a recorrência</b>: cancela todas as sessões futuras que ainda não começaram. As sessões passadas permanecem.</li>
+  <li><b>Observações</b>: podem ser editadas a qualquer momento.</li>
+</ul>
+<div class="box tip"><b class="t">Dica</b><p>Para mudar o dia, o horário ou o profissional de toda a recorrência, cancele-a e crie uma nova.</p></div>
+
+<!-- ===== 6 ===== -->
+<h1 class="chapter" data-toc="Pacotes"><span class="num"></span>Pacotes</h1>
+<p class="lead">Vender um conjunto de serviços por um período, com pagamento à vista ou mensal.</p>
+
+<p>O menu <span class="ui">Pacotes</span> tem duas partes: os <b>Planos</b> (o que você oferece) e as <b>Contratações</b> (o plano vendido a um cliente).</p>
+
+<h2>Planos</h2>
+<p>Um plano reúne serviços, a quantidade de atendimentos por semana de cada um, um valor mensal e os períodos que o cliente pode contratar (3, 6 ou 12 meses, por exemplo), cada um com seu desconto.</p>
+<figure><img src="images/21-planos-lista.png" alt=""><figcaption>Lista de planos.</figcaption></figure>
+
+<h3>Criar ou alterar um plano</h3>
+<ol class="steps">
+  <li>Em <span class="ui">Pacotes</span> &rarr; <span class="ui">Planos</span>, clique em <span class="ui">Novo plano</span>.</li>
+  <li>Informe o <b>nome</b> e escolha os <b>serviços</b>. Para cada um, defina quantos atendimentos por semana (de 1 a 7).</li>
+  <li>Informe o <b>valor mensal</b>. O botão <span class="ui">Usar valor sugerido</span> calcula pelo preço dos serviços; você pode ajustar.</li>
+  <li>Em <b>Períodos</b>, adicione cada duração em meses e os descontos para pagamento <b>integral</b> e <b>mensal</b>. A tela mostra uma prévia dos valores.</li>
+  <li>Clique em <span class="ui">Salvar</span>.</li>
+</ol>
+<figure><img src="images/22-plano-form.png" alt=""><figcaption>Cadastro de plano.</figcaption></figure>
+<div class="box warn"><b class="t">Atenção</b><p>Um plano sem períodos pode ser salvo, mas <b>não pode ser contratado</b>. Planos não são apagados: use <span class="ui">Inativar</span>. As contratações já feitas continuam valendo.</p></div>
+
+<h2>Contratações</h2>
+<p>A lista de contratações mostra cada plano vendido, o cliente e a situação.</p>
+<figure><img src="images/23-contratacoes-lista.png" alt=""><figcaption>Lista de contratações.</figcaption></figure>
+
+<h3>Vender um plano</h3>
+<ol class="steps">
+  <li>Em <span class="ui">Contratações</span>, clique em <span class="ui">Nova contratação</span>.</li>
+  <li>Escolha o <b>cliente</b>, o <b>plano</b> e o <b>período</b> (em meses).</li>
+  <li>Escolha a forma de pagamento: <b>integral</b> (à vista) ou <b>mensal</b> (em parcelas).</li>
+  <li>Informe a data de início e o vencimento. Para cada serviço do plano, defina os dias e horários da semana.</li>
+  <li>Clique em <span class="ui">Salvar</span>. O sistema cria as sessões na agenda e as cobranças.</li>
+</ol>
+<figure><img src="images/25-contratacao-nova.png" alt=""><figcaption>Nova contratação.</figcaption></figure>
+
+<h3>Acompanhar uma contratação</h3>
+<p>Ao abrir uma contratação, você vê os valores, as agendas de cada serviço e as parcelas, com a situação de cada uma.</p>
+<figure><img src="images/24-contratacao-detalhe.png" alt=""><figcaption>Detalhe da contratação.</figcaption></figure>
+<div class="box tip"><b class="t">Dica</b><p>Os atendimentos do pacote aparecem na agenda com o ícone de pacote. Eles não geram cobrança avulsa: o valor já está nas parcelas do pacote. As parcelas são recebidas em <span class="ui">Financeiro</span> &rarr; <span class="ui">Pagamentos</span>.</p></div>
+
+<!-- ===== 7 ===== -->
+<h1 class="chapter" data-toc="Financeiro"><span class="num"></span>Financeiro</h1>
+<p class="lead">Receber os atendimentos e acompanhar o que está pago, a vencer ou atrasado.</p>
+
+<p>O menu <span class="ui">Financeiro</span> tem três partes. <b>Comandas</b> é o fechamento no balcão, quando o cliente está na clínica. <b>Pagamentos</b> mostra todas as cobranças. <b>Métodos de pagamento</b> cadastra as formas de pagamento aceitas.</p>
+<div class="box warn"><b class="t">Primeiro, cadastre os métodos</b><p>Para receber qualquer pagamento, é preciso ter ao menos um método de pagamento ativo (Pix, dinheiro, cartão…). Veja a seção “Métodos de pagamento”, mais adiante neste capítulo.</p></div>
+
+<h2>Comandas</h2>
+<p>A comanda reúne, para cada cliente, o que ele deve na visita de hoje. Ela aparece para quem tem atendimento no dia ou pagou algo hoje.</p>
+<figure><img src="images/26-comandas-lista.png" alt=""><figcaption>Comandas do dia.</figcaption></figure>
+
+<h3>Fechar uma comanda</h3>
+<ol class="steps">
+  <li>Em <span class="ui">Financeiro</span> &rarr; <span class="ui">Comandas</span>, encontre o cliente (use a busca, se precisar) e clique em <span class="ui">Receber</span>.</li>
+  <li>Confira os itens. Os <b>atendimentos de hoje</b> vêm marcados. As <b>pendências anteriores</b> (parcelas ou atendimentos atrasados) vêm desmarcadas: marque as que o cliente vai pagar agora.</li>
+  <li>Escolha o <b>método de pagamento</b> e confirme a <b>data do pagamento</b> (por padrão, hoje).</li>
+  <li>Clique em <span class="ui">Finalizar comanda</span>. Todos os itens marcados são baixados de uma vez; os desmarcados continuam pendentes.</li>
+</ol>
+<figure class="w55"><img src="images/27-comanda-receber.png" alt=""><figcaption>Comanda de um cliente.</figcaption></figure>
+<div class="box tip"><b class="t">Dica</b><p>Um atendimento mostra “Aguardando conclusão” até terminar. A cobrança dele nasce quando o atendimento é concluído, depois do horário. Sessões de pacote aparecem como “Incluído no pacote”, sem valor a receber.</p></div>
+
+<h2>Pagamentos</h2>
+<p>Em <span class="ui">Financeiro</span> &rarr; <span class="ui">Pagamentos</span> está tudo o que a clínica tem a receber e já recebeu. Os três cartões do topo somam os valores:</p>
+<ul>
+  <li><b>Atrasado</b>: venceu antes de hoje e não foi pago.</li>
+  <li><b>A vencer</b>: vence de hoje em diante.</li>
+  <li><b>Recebido</b>: já foi pago.</li>
+</ul>
+<p>Clique em um cartão para filtrar a lista por ele. Os filtros acima da tabela permitem escolher a situação, o período de vencimento, o cliente e o método.</p>
+<figure><img src="images/28-pagamentos.png" alt=""><figcaption>Lista de pagamentos, com o resumo no topo.</figcaption></figure>
+
+<h3>Dar baixa em um pagamento</h3>
+<ol class="steps">
+  <li>Na linha do pagamento, clique em <span class="ui">Dar baixa</span>.</li>
+  <li>Escolha o <b>método de pagamento</b>. A <b>data do pagamento</b> vem com a de hoje; se você esqueceu de lançar um recebimento, escolha a data certa (não pode ser futura).</li>
+  <li>Clique em <span class="ui">Confirmar baixa</span>.</li>
+</ol>
+<figure class="w55"><img src="images/29-pagamento-baixa.png" alt=""><figcaption>Dar baixa em um pagamento.</figcaption></figure>
+<div class="box tip"><b class="t">Vários de uma vez</b><p>Para quitar vários pagamentos <b>do mesmo cliente</b>, marque as caixas de seleção das linhas e use <span class="ui">Dar baixa em lote</span>, com o mesmo método. Ou todos ficam pagos, ou nenhum.</p></div>
+
+<h2>Métodos de pagamento</h2>
+<p>É a lista das formas de pagamento que a clínica aceita. Fica em <span class="ui">Financeiro</span> &rarr; <span class="ui">Métodos de pagamento</span>.</p>
+<figure><img src="images/30-metodos-lista.png" alt=""><figcaption>Métodos de pagamento.</figcaption></figure>
+<ol class="steps">
+  <li>Clique em <span class="ui">Novo método de pagamento</span>.</li>
+  <li>Digite o nome (por exemplo, Pix ou Cartão de crédito) e salve.</li>
+</ol>
+<figure class="w55"><img src="images/31-metodo-novo.png" alt=""><figcaption>Novo método de pagamento.</figcaption></figure>
+<p>Para deixar de usar um método, <span class="ui">Inativar</span>: ele some das opções de baixa, e os pagamentos já recebidos com ele não mudam. O botão <span class="ui">Reativar</span> o traz de volta. O nome não pode repetir (“PIX” e “Pix” são o mesmo método).</p>
+
+<!-- ===== 8 ===== -->
+<h1 class="chapter" data-toc="Configurações da empresa"><span class="num"></span>Configurações da empresa</h1>
+<p class="lead">Nome, logo e horários de funcionamento da clínica.</p>
+
+<p>Clique no seu nome, no canto superior direito, e escolha <span class="ui">Configurações da empresa</span>.</p>
+<figure><img src="images/32-configuracoes.png" alt=""><figcaption>Configurações da empresa.</figcaption></figure>
+
+<h2>Identidade</h2>
+<ul>
+  <li><b>Nome fantasia</b>: é o nome que aparece no topo de todas as telas.</li>
+  <li><b>Logo</b>: clique em <span class="ui">Selecionar logo</span> e escolha uma imagem JPEG ou PNG de até 2 MB. Ela aparece no cabeçalho.</li>
+</ul>
+
+<h2>Dados da empresa</h2>
+<p>Razão social, CNPJ, data de fundação, subdomínio e fuso horário são só para consulta. Se algum estiver errado, fale com o suporte do Orari.</p>
+
+<h2>Horários de funcionamento</h2>
+<p>É aqui que você diz ao sistema quando a clínica atende. A agenda só oferece horários dentro desses períodos.</p>
+<ol class="steps">
+  <li>Para cada dia da semana, defina a abertura e o fechamento de cada <b>janela</b> de atendimento.</li>
+  <li>Para registrar um intervalo (almoço, por exemplo), crie <b>duas janelas</b> no dia: de manhã e à tarde. Use <span class="ui">Adicionar janela</span>.</li>
+  <li>Um dia sem nenhuma janela fica <b>fechado</b> e só aceita encaixe.</li>
+  <li>Clique em <span class="ui">Salvar alterações</span>. Para desfazer o que mudou, use <span class="ui">Descartar alterações</span>.</li>
+</ol>
+<div class="box warn"><b class="t">Atenção</b><p>Mudar os horários <b>não altera</b> os agendamentos que já estão marcados. Eles continuam onde estão.</p></div>
+
+<!-- ===== 9 ===== -->
+<h1 class="chapter" data-toc="No celular"><span class="num"></span>No celular</h1>
+<p class="lead">O Orari funciona no navegador do celular, sem instalar nada.</p>
+
+<p>Abra o mesmo endereço no navegador do aparelho e entre com o seu e-mail e a sua senha. A tela se adapta ao tamanho: o menu vira um botão no canto superior esquerdo, e as tabelas viram listas.</p>
+<div class="row">
+  <figure><img src="images/40-m-agenda.png" alt=""><figcaption>Agenda no celular: um profissional por vez.</figcaption></figure>
+  <figure><img src="images/41-m-menu.png" alt=""><figcaption>Menu: toque no botão de três linhas.</figcaption></figure>
+</div>
+<ul>
+  <li>Na agenda, o ícone ao lado do nome do profissional troca a coluna exibida.</li>
+  <li>O botão com um calendário, no topo, leva a outro dia.</li>
+  <li>Os filtros de tabelas ficam ocultos no celular. Na tela de Pagamentos, os cartões de resumo continuam filtrando.</li>
+</ul>
+<div class="row">
+  <figure><img src="images/42-m-comandas.png" alt=""><figcaption>Comandas em lista.</figcaption></figure>
+  <figure><img src="images/43-m-novo-agendamento.png" alt=""><figcaption>Novo agendamento: o formulário ocupa a tela.</figcaption></figure>
+</div>
+<div class="box tip"><b class="t">Dica</b><p>No cadastro de clientes pelo celular, você pode tirar a foto na hora, com a câmera do aparelho.</p></div>
+
+<!-- ===== 10 ===== -->
+<h1 class="chapter" data-toc="Dúvidas comuns"><span class="num"></span>Dúvidas comuns</h1>
+<p class="lead">Respostas rápidas e o significado de alguns termos.</p>
+
+<h2>Perguntas frequentes</h2>
+<h3>Não consigo escolher um horário no novo agendamento.</h3>
+<p>Primeiro escolha o <b>serviço</b>: os horários só aparecem depois, pois dependem da duração. Se ainda assim não houver horário, o profissional está ocupado, o dia está fechado ou o atendimento não cabe no expediente. Tente outra data ou use o encaixe.</p>
+<h3>O cliente quer outro dia. Cancelo e marco de novo?</h3>
+<p>Não. Use <span class="ui">Remanejar</span> no atendimento: ele muda de dia e horário e mantém a cobrança.</p>
+<h3>Não consigo cancelar ou remanejar um atendimento.</h3>
+<p>Só é possível antes de o atendimento começar. Atendimentos em andamento, concluídos ou já cancelados não aceitam essas ações.</p>
+<h3>A comanda de um cliente não aparece.</h3>
+<p>Ela aparece para quem tem atendimento hoje, ou pagou algo hoje. Um cliente que só tem pendências antigas é cobrado em <span class="ui">Financeiro</span> &rarr; <span class="ui">Pagamentos</span>.</p>
+<h3>Não consigo dar baixa: não há métodos de pagamento.</h3>
+<p>Cadastre ao menos um método ativo em <span class="ui">Financeiro</span> &rarr; <span class="ui">Métodos de pagamento</span>.</p>
+<h3>Um cliente foi cadastrado errado.</h3>
+<p>Abra o cadastro e corrija pelo botão de alterar. Os agendamentos dele continuam ligados ao mesmo cadastro.</p>
+<h3>Esqueci a minha senha.</h3>
+<p>A recuperação de senha pela própria tela ainda não existe. Entre em contato com o suporte do Orari.</p>
+
+<h2>Glossário</h2>
+<dl class="gloss">
+  <dt>Encaixe</dt><dd>Atendimento marcado fora do horário de funcionamento.</dd>
+  <dt>Janela de atendimento</dt><dd>Período contínuo em que a clínica atende em um dia (por exemplo, 08:00 às 12:00).</dd>
+  <dt>Remanejar</dt><dd>Mudar a data e o horário de um atendimento sem cancelá-lo.</dd>
+  <dt>Recorrência</dt><dd>Reserva de dia e horário fixos toda semana, por um período, para um cliente.</dd>
+  <dt>Plano</dt><dd>Conjunto de serviços com frequência semanal, valor mensal e períodos de contratação.</dd>
+  <dt>Contratação</dt><dd>Plano vendido a um cliente, com a agenda e as parcelas.</dd>
+  <dt>Comanda</dt><dd>Visão do dia de um cliente, com o que ele deve na visita, para receber de uma vez.</dd>
+  <dt>Baixa</dt><dd>Registro de que um pagamento foi recebido, com o método e a data.</dd>
+  <dt>Inativar</dt><dd>Tirar da lista de uso sem apagar. O histórico fica preservado e dá para reativar.</dd>
+</dl>
+
+</body>
+</html>

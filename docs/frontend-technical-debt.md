@@ -67,6 +67,7 @@ Pontos conhecidos e aceitos por enquanto. Revisar quando o contexto mudar.
 - **Fotos e logos passam pelo Next.** `/uploads` é uma reescrita servida pelo processo Node; o Caddy poderia servir esses arquivos direto da API.
 - **O healthcheck não testa a API.** `/login` é renderizada sem chamar a API, então o contêiner fica "saudável" mesmo com a API fora do ar (as telas autenticadas mostram o erro de conexão).
 - **Sem otimização de imagem.** Sem `sharp` na imagem: `next/image` só com SVG e `unoptimized`. Imagens raster otimizadas exigiriam instalá-lo.
+- **Cabeçalhos de segurança do site (melhoria pendente, 2026-10-23).** Em produção o site devolve só `X-Powered-By: Next.js`: faltam `Strict-Transport-Security`, `X-Content-Type-Options: nosniff`, `X-Frame-Options` (ou `frame-ancestors`) e `Referrer-Policy`. Plano: os quatro no bloco do frontend do `Caddyfile` (repositório do backend) e `poweredByHeader: false` no `next.config.ts`; ensaiar com a pilha local antes de publicar. Depende dos dois repositórios.
 - **Testes de integração contínua do frontend** (lint, tipos, testes e build) ainda não rodam em um workflow (previsto na Etapa 10).
 
 ## Acessibilidade

@@ -41,23 +41,33 @@ export function AppointmentBlock({
   return (
     <HoverCard openDelay={250} closeDelay={80}>
       <HoverCardTrigger asChild>
-        <article
+        <div
           // Focável para o cartão também abrir pelo teclado.
           tabIndex={0}
+          role="button"
           onClick={() => onSelect?.(appointment)}
           onKeyDown={(event) => {
-            if (event.key === "Enter") onSelect?.(appointment);
+            if (event.key === "Enter" || event.key === " ") {
+              // Espaço rolaria a grade: aqui ele abre, como num botão.
+              event.preventDefault();
+              onSelect?.(appointment);
+            }
           }}
-          aria-label={`${appointment.clientName}, ${appointment.serviceName}, das ${appointment.start} às ${appointment.end}, com ${appointment.professionalName}. ${statusLabel}${appointment.overbooking ? ". Encaixe fora do horário de funcionamento" : ""}${appointment.recurrence ? `. ${recurrenceLabel(appointment.recurrence)}` : ""}`}
+          aria-label={`${appointment.start} ${appointment.clientName} ${appointment.serviceName}. Das ${appointment.start} às ${appointment.end}, com ${appointment.professionalName}. ${statusLabel}${appointment.overbooking ? ". Encaixe fora do horário de funcionamento" : ""}${appointment.recurrence ? `. ${recurrenceLabel(appointment.recurrence)}` : ""}`}
           className={`absolute inset-x-1 z-[1] cursor-pointer overflow-hidden rounded-control border-l-[3px] px-2 py-1 ${
-            faded ? "opacity-55" : ""
+            faded ? "text-muted-foreground" : ""
           }`}
           style={{
             top,
             height,
-            borderLeftColor: serviceColor,
+            // Esmaecido (concluído, cancelado, falta): só o fundo e a faixa
+            // clareiam. O texto fica legível (opacity no bloco todo o deixava
+            // abaixo do contraste mínimo).
+            borderLeftColor: faded
+              ? `color-mix(in srgb, ${serviceColor} 55%, transparent)`
+              : serviceColor,
             // A cor do serviço vem do cadastro; aqui só suavizamos o fundo.
-            backgroundColor: `color-mix(in srgb, ${serviceColor} 16%, transparent)`,
+            backgroundColor: `color-mix(in srgb, ${serviceColor} ${faded ? 8 : 16}%, transparent)`,
           }}
         >
           <div className="flex items-center gap-1.5">
@@ -95,7 +105,7 @@ export function AppointmentBlock({
             )}
             <span className="truncate">{appointment.serviceName}</span>
           </p>
-        </article>
+        </div>
       </HoverCardTrigger>
 
       <HoverCardContent side="right" align="start" collisionPadding={16}>

@@ -70,11 +70,18 @@ export function ClientPlanSchedules({
     <table className="w-full text-left text-sm">
       <thead>
         <tr>
-          {["Serviço", "Profissional", "Dias e horários", ""].map((title) => (
-            <th key={title} scope="col" className={headerClass}>
-              {title}
-            </th>
-          ))}
+          {["Serviço", "Profissional", "Dias e horários", "Ações"].map(
+            (title) => (
+              <th key={title} scope="col" className={headerClass}>
+                {/* A última coluna só tem botões: o título fica para leitor de tela. */}
+                {title === "Ações" ? (
+                  <span className="sr-only">{title}</span>
+                ) : (
+                  title
+                )}
+              </th>
+            ),
+          )}
         </tr>
       </thead>
       <tbody className="divide-y divide-border">

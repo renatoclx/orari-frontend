@@ -70,6 +70,14 @@ regras de cada tela, em `docs/screens/`.
 - **2026-10-22 — Cartões de resumo são atalhos de filtro,** com ícone, faixa colorida à esquerda e fundo tingido quando ativos; clicar no ativo desfaz o filtro. No celular, quando os cartões filtram, a barra de filtros não aparece.
 - **2026-10-17 — Todo botão com texto tem ícone à esquerda,** sempre o mesmo para a mesma ação (mapa na skill `orari-ui`). _Por quê:_ reconhecimento mais rápido da ação; antes era parcial.
 
+## Acessibilidade e revisão de UX
+
+- **2026-10-22 — A interface é verificada com `axe-core`** (todas as rotas, claro e escuro, computador e celular, mais diálogos e menus) e com a skill `web-design-guidelines` da Vercel, instalada no projeto. _Por quê:_ a Etapa 9 pedia uma revisão objetiva das telas prontas.
+- **2026-10-22 — O azul do foco não muda,** mesmo com ~2,6:1 de contraste; é identidade visual e fica registrado na dívida técnica. As outras cores de texto cumprem 4,5:1 (tokens ajustados).
+- **2026-10-22 — Esmaecido sem `opacity`:** concluído, cancelado e falta clareiam só o fundo e a faixa do bloco; o texto continua legível.
+- **2026-10-22 — Nome acessível começa pelo texto visível,** e elemento clicável que não é `<button>` leva `role="button"` com Enter e Espaço.
+- **2026-10-22 — Movimento reduzido é regra global;** a skill da Vercel foi adotada só nas regras que cabem no nosso padrão (Title Case nos botões, por exemplo, não vale em pt-BR).
+
 ## Configurações da empresa
 
 - **2026-10-17 — Área própria (`/configuracoes`), acessada pelo menu do usuário,** com identidade (nome fantasia e logo), dados cadastrais só para leitura e horários de funcionamento, num formulário único. O backend ganhou `PATCH /companies/me`, `POST` e `DELETE /companies/me/logo` para o administrador; razão social, CNPJ, fuso e demais dados continuam só do SUPER_ADMIN.

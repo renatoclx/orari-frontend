@@ -7,6 +7,7 @@ import { Building2, LogOut } from "lucide-react";
 import { ThemeMenuItem } from "@/components/layout/ThemeToggle";
 import { logout } from "@/app/(admin)/actions";
 import { PersonAvatar } from "@/components/shared/PersonAvatar";
+import { getInitials } from "@/utils/format";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -49,7 +50,7 @@ export function UserMenu({ user }: UserMenuProps) {
           <Hint label={`Minha conta: ${user.name}`} side="bottom">
             <button
               type="button"
-              aria-label="Menu do usuário"
+              aria-label={`Menu do usuário ${getInitials(user.name)}`}
               className="rounded-full"
             >
               <PersonAvatar name={user.name} size="lg" />

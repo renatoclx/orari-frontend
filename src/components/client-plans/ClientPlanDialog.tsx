@@ -132,7 +132,10 @@ export function ClientPlanDialog({
               </section>
             </>
           ) : (
-            <p className="p-6 text-center text-sm text-muted-foreground">
+            <p
+              role="status"
+              className="p-6 text-center text-sm text-muted-foreground"
+            >
               Buscando a contratação…
             </p>
           )}

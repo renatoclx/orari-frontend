@@ -188,7 +188,10 @@ export function RecurrenceDaysField({
 
 function Hint({ children }: { children: React.ReactNode }) {
   return (
-    <p className="flex min-h-10 items-center rounded-control border border-dashed border-border px-3 text-sm text-muted-foreground">
+    <p
+      role="status"
+      className="flex min-h-10 items-center rounded-control border border-dashed border-border px-3 text-sm text-muted-foreground"
+    >
       {children}
     </p>
   );

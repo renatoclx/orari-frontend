@@ -60,4 +60,12 @@ Pontos conhecidos e aceitos por enquanto. Revisar quando o contexto mudar.
 
 ## Acessibilidade
 
-- **Contraste do foco.** O contorno blue-400 de 1 px tem ~2,6:1 contra o branco, abaixo dos 3:1 recomendados (WCAG).
+Auditoria da Etapa 9 (2026-10-22): `axe-core` em todas as rotas e em 11 diálogos e menus, sem achados de contraste, nomes ou marcos. Restos aceitos:
+
+- **Contraste do foco.** O contorno blue-400 de 1 px tem ~2,6:1 contra o branco, abaixo dos 3:1 recomendados (WCAG 1.4.11). Mantido por decisão do projeto (a cor do foco é identidade visual); o `axe` não o mede.
+- **Horários passados cobertos na agenda.** Na agenda de hoje, dois botões de horário que já passou ficam parcialmente cobertos por blocos de agendamento (`target-size`, WCAG 2.5.8). São alvos sob o bloco, não clicáveis na prática; esconder da leitura os horários cobertos resolveria.
+- **Menus em portal (`region`).** O axe reclama de conteúdo fora de marcos nos menus do Radix, que abrem num portal. Falso positivo conhecido; não tratado.
+- **Nome do bloco cancelado.** Um bloco cancelado da agenda ainda é apontado por `label-content-name-mismatch`, embora o nome acessível comece pelo texto visível; causa não encontrada.
+- **Formulário não salvo.** Sair de um formulário com alterações não pergunta nada (previsto pela web-design-guidelines).
+- **Áreas de segurança do iPhone.** Não há `viewport-fit=cover` nem `env(safe-area-inset-*)`; só importa se o Orari virar app instalado.
+- **Sem testes automáticos de acessibilidade.** A auditoria é manual (`axe-core` em script de teste); falta rodar no CI quando houver testes (Etapa 10).

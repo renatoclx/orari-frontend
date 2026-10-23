@@ -187,7 +187,10 @@ function RescheduleForm({
 
       <FormField id="reschedule-time" label="Horário" required error={error}>
         {hint ? (
-          <p className="rounded-control border border-dashed border-border px-3 py-2 text-sm text-muted-foreground">
+          <p
+            role="status"
+            className="rounded-control border border-dashed border-border px-3 py-2 text-sm text-muted-foreground"
+          >
             {hint}
           </p>
         ) : (

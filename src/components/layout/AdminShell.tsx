@@ -31,6 +31,13 @@ export function AdminShell({
 
   return (
     <>
+      {/* Primeiro item do teclado: leva ao conteúdo sem passar por todo o menu. */}
+      <a
+        href="#conteudo"
+        className="sr-only z-50 rounded-control bg-card px-4 py-2 text-sm font-medium text-foreground shadow-lg focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:px-4 focus:py-2"
+      >
+        Pular para o conteúdo
+      </a>
       <div className="flex h-dvh overflow-hidden bg-background text-foreground">
         <Sidebar
           collapsed={collapsed}
@@ -42,7 +49,11 @@ export function AdminShell({
         <div className="flex min-w-0 flex-1 flex-col">
           <Header user={user} onOpenMobile={() => setMobileOpen(true)} />
           {/* A página não rola: cada componente cuida da própria rolagem. */}
-          <main className="flex min-h-0 flex-1 flex-col p-4 md:p-8">
+          <main
+            id="conteudo"
+            tabIndex={-1}
+            className="flex min-h-0 flex-1 flex-col p-4 md:p-8"
+          >
             {children}
           </main>
         </div>

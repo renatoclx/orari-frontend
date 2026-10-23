@@ -227,6 +227,7 @@ As regras visuais (tokens, componentes, padrão de página, barra de ações, to
 - A página não rola; o componente principal tem rolagem própria.
 - Barra de ações fixa à direita em todas as telas administrativas (no celular, os atalhos vão para o header).
 - Toasts (Sonner) pelo `AppToaster`, já presente no layout raiz.
+- Acessibilidade: o `AdminShell` tem o link "Pular para o conteúdo" e a barra de atalhos é um `<aside>` com nome; `globals.css` reúne a regra de movimento reduzido e o `touch-action`. As regras e as verificações estão na seção "Acessibilidade" da skill.
 
 ## Configuração
 

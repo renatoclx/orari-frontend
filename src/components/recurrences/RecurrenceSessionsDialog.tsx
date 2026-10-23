@@ -136,7 +136,10 @@ export function RecurrenceSessionsDialog({
               onChanged={() => setVersion((value) => value + 1)}
             />
           ) : (
-            <p className="p-6 text-center text-sm text-muted-foreground">
+            <p
+              role="status"
+              className="p-6 text-center text-sm text-muted-foreground"
+            >
               Buscando sessões…
             </p>
           )}

@@ -5,14 +5,15 @@ import {
   APPOINTMENT_STATUS_ORDER,
 } from "@/components/agenda/appointment-status";
 
-/** Legenda dos ícones de status, no rodapé da página, alinhada à direita. */
+/**
+ * Legenda dos ícones de status, no rodapé da página, alinhada à direita. Só do
+ * tablet em diante: no celular ela truncava e ocupava a altura da grade.
+ */
 export function AgendaLegend() {
   return (
     <ul
       aria-label="Legenda dos status"
-      // Celular: itens distribuídos por igual e centralizados em cada linha.
-      // A partir do md: em linha, à direita.
-      className="flex shrink-0 flex-wrap justify-evenly gap-x-3 gap-y-2 text-xs whitespace-nowrap text-muted-foreground md:justify-end md:gap-x-4 md:gap-y-1"
+      className="hidden shrink-0 flex-wrap justify-end gap-x-4 gap-y-1 text-xs whitespace-nowrap text-muted-foreground md:flex"
     >
       {APPOINTMENT_STATUS_ORDER.map((status) => {
         const { label, icon: Icon } = APPOINTMENT_STATUS[status];

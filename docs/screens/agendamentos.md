@@ -19,7 +19,7 @@
   - Linha do horário atual, somente quando o dia exibido é hoje.
   - Áreas fora das janelas de atendimento (antes da abertura e depois do fechamento) sombreadas, com hachura.
   - O intervalo entre duas janelas de atendimento (almoço, por exemplo) em cinza, com a indicação "Intervalo". É apenas indicação visual: não tem regra própria.
-- Legenda dos ícones de status, do encaixe, da recorrência e do pacote no rodapé da página, alinhada à direita.
+- Legenda dos ícones de status, do encaixe, da recorrência e do pacote no rodapé da página, alinhada à direita. Só do tablet em diante: no celular ela não aparece (truncava).
 
 ### Profissionais exibidos
 

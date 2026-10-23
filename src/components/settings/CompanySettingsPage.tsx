@@ -3,7 +3,7 @@ import { EmptyValue } from "@/components/shared/EmptyValue";
 import { getCurrentUser } from "@/services/auth.service";
 import { listAllBusinessHours } from "@/services/business-hour.service";
 import { getCompany } from "@/services/company.service";
-import { formatCnpj, formatDateOnly } from "@/utils/format";
+import { documentLabel, formatDateOnly, formatDocument } from "@/utils/format";
 
 // Configurações da empresa: identidade (nome fantasia e logo), dados cadastrais
 // (só leitura) e horários de funcionamento.
@@ -14,10 +14,16 @@ export async function CompanySettingsPage() {
     listAllBusinessHours(),
   ]);
 
+  // Quem usa CPF não tem data de fundação: a linha some em vez de mostrar "--".
   const rows: [string, React.ReactNode][] = [
     ["Razão social", company.corporateReason],
-    ["CNPJ", formatCnpj(company.cnpj)],
-    ["Data de fundação", formatDateOnly(company.foundationDate)],
+    [documentLabel(company.document), formatDocument(company.document)],
+    ...(company.foundationDate
+      ? ([["Data de fundação", formatDateOnly(company.foundationDate)]] as [
+          string,
+          React.ReactNode,
+        ][])
+      : []),
     ["Subdomínio", company.subdomain],
     ["Fuso horário", company.timezone],
   ];

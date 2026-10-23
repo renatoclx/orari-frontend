@@ -80,7 +80,7 @@ regras de cada tela, em `docs/screens/`.
 
 ## Configurações da empresa
 
-- **2026-10-17 — Área própria (`/configuracoes`), acessada pelo menu do usuário,** com identidade (nome fantasia e logo), dados cadastrais só para leitura e horários de funcionamento, num formulário único. O backend ganhou `PATCH /companies/me`, `POST` e `DELETE /companies/me/logo` para o administrador; razão social, CNPJ, fuso e demais dados continuam só do SUPER_ADMIN.
+- **2026-10-17 — Área própria (`/configuracoes`), acessada pelo menu do usuário,** com identidade (nome fantasia e logo), dados cadastrais só para leitura e horários de funcionamento, num formulário único. O backend ganhou `PATCH /companies/me`, `POST` e `DELETE /companies/me/logo` para o administrador; razão social, documento (CPF ou CNPJ), fuso e demais dados continuam só do SUPER_ADMIN.
 - **2026-10-17 — Logo só em JPEG ou PNG** (a API não aceita SVG); aparece no header. Sem logo, ou se não carregar, nada aparece.
 - **2026-10-17 — O tema claro/escuro foi para o menu do usuário,** liberando o espaço do header para a logo da empresa.
 - **2026-10-17 — Horários gravados pela diferença com a API** (exclui, altera e cria só o necessário); não é uma transação única.

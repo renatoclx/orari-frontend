@@ -37,7 +37,7 @@ Pontos conhecidos e aceitos por enquanto. Revisar quando o contexto mudar.
 
 - **Gravação em etapas.** Nome fantasia, logo e cada janela de horário usam chamadas separadas. Se uma falhar no meio, o que veio antes já foi gravado; a mensagem diz qual parte falhou e a tela recarrega o que ficou salvo. Uma rota que gravasse a semana inteira de uma vez (como o `batch`, mas substituindo) evitaria isso.
 - **Dias da semana.** A lista `WEEK_DAYS` (usada também na recorrência) está em `components/recurrences/`; mover para `utils/` quando um terceiro módulo precisar.
-- **Dados cadastrais só leitura.** Razão social, CNPJ, fuso e demais dados só o SUPER_ADMIN altera (sem tela no frontend).
+- **Dados cadastrais só leitura.** Razão social, documento (CPF ou CNPJ), fuso e demais dados só o SUPER_ADMIN altera (sem tela no frontend).
 
 ## Pessoas
 

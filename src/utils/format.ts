@@ -70,10 +70,29 @@ export function formatDuration(minutes: number): string {
   return `${minutes} ${minutes === 1 ? "minuto" : "minutos"}`;
 }
 
-/** "12345678000190" → "12.345.678/0001-90" */
+/**
+ * "12345678000190" → "12.345.678/0001-90". O CNPJ alfanumérico tem letras nas
+ * 12 primeiras posições e dois dígitos no fim ("12ABC34501DE35" →
+ * "12.ABC.345/01DE-35").
+ */
 export function formatCnpj(cnpj: string): string {
   return cnpj.replace(
-    /^(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})$/,
+    /^([0-9A-Z]{2})([0-9A-Z]{3})([0-9A-Z]{3})([0-9A-Z]{4})(\d{2})$/,
     "$1.$2.$3/$4-$5",
   );
+}
+
+// O documento da empresa é um CPF (11 dígitos) ou um CNPJ (14 caracteres).
+const CPF_LENGTH = 11;
+
+/** "CPF" ou "CNPJ", pelo tamanho do documento da empresa. */
+export function documentLabel(document: string): "CPF" | "CNPJ" {
+  return document.length === CPF_LENGTH ? "CPF" : "CNPJ";
+}
+
+/** Documento da empresa com máscara: CPF (11) ou CNPJ (14); outro tamanho fica como veio. */
+export function formatDocument(document: string): string {
+  return document.length === CPF_LENGTH
+    ? formatCpf(document)
+    : formatCnpj(document);
 }

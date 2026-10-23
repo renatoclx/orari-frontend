@@ -19,7 +19,7 @@ Um único card, com rolagem própria e rodapé fixo, com três seções e um só
 
 ### Dados da empresa (só leitura)
 
-- Razão social, CNPJ (formatado), data de fundação, subdomínio e fuso horário.
+- Razão social, documento (CPF ou CNPJ, formatado; o rótulo segue o tamanho), data de fundação, subdomínio e fuso horário. Quem usa CPF não tem data de fundação e a linha não aparece; a razão social é o nome da pessoa.
 - Para alterar, fale com o suporte do Orari (só o SUPER_ADMIN altera esses dados).
 
 ### Horários de funcionamento

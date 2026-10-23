@@ -15,19 +15,20 @@ diferente. Em caso de conflito, prevalece o arquivo da tela.
 
 ## Índice
 
-| Arquivo                            | Conteúdo                                                |
-| ---------------------------------- | ------------------------------------------------------- |
-| [login.md](login.md)               | Login e recuperação de senha                            |
-| [layout.md](layout.md)             | Sidebar e barra de ações lateral                        |
-| [pessoas.md](pessoas.md)           | Clientes, funcionários e profissionais                  |
-| [servicos.md](servicos.md)         | Serviços                                                |
-| [agendamentos.md](agendamentos.md) | Agenda, novo agendamento, encaixe, detalhes e alteração |
-| [recorrencias.md](recorrencias.md) | Recorrências                                            |
-| [configuracoes.md](configuracoes.md) | Configurações da empresa                              |
-| [pacotes.md](pacotes.md)           | Planos e contratações                                   |
-| [usuarios.md](usuarios.md)         | Usuários (acesso ao sistema)                            |
-| [metodos-pagamento.md](metodos-pagamento.md) | Métodos de pagamento                         |
-| [financeiro.md](financeiro.md)     | Pagamentos e Comandas                                   |
+| Arquivo                                      | Conteúdo                                                |
+| -------------------------------------------- | ------------------------------------------------------- |
+| [login.md](login.md)                         | Login e recuperação de senha                            |
+| [layout.md](layout.md)                       | Sidebar e barra de ações lateral                        |
+| [pessoas.md](pessoas.md)                     | Clientes, funcionários e profissionais                  |
+| [servicos.md](servicos.md)                   | Serviços                                                |
+| [agendamentos.md](agendamentos.md)           | Agenda, novo agendamento, encaixe, detalhes e alteração |
+| [recorrencias.md](recorrencias.md)           | Recorrências                                            |
+| [configuracoes.md](configuracoes.md)         | Configurações da empresa                                |
+| [pacotes.md](pacotes.md)                     | Planos e contratações                                   |
+| [usuarios.md](usuarios.md)                   | Usuários (acesso ao sistema)                            |
+| [metodos-pagamento.md](metodos-pagamento.md) | Métodos de pagamento                                    |
+| [financeiro.md](financeiro.md)               | Pagamentos e Comandas                                   |
+| [empresas.md](empresas.md)                   | Empresas (só SUPER_ADMIN)                               |
 
 ## Convenções
 

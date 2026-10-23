@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
+  Building2,
   CalendarDays,
   ChevronDown,
   ClipboardList,
@@ -88,11 +89,19 @@ const navItems: (NavLink | NavGroup)[] = [
   },
 ];
 
+// Só o SUPER_ADMIN gerencia empresas (screens/empresas.md): o item entra no fim do
+// menu e some para os demais perfis.
+const superAdminItems: NavLink[] = [
+  { href: "/empresas", label: "Empresas", icon: Building2 },
+];
+
 // Botões de ícone da sidebar (recolher, fechar no celular).
 const iconButtonClass =
   "rounded-control p-1.5 text-sidebar-muted hover:bg-sidebar-accent hover:text-sidebar-foreground";
 
 type SidebarProps = {
+  /** Perfil de quem está logado: o SUPER_ADMIN vê o item Empresas. */
+  isSuperAdmin: boolean;
   collapsed: boolean;
   onToggleCollapsed: () => void;
   mobileOpen: boolean;
@@ -101,6 +110,7 @@ type SidebarProps = {
 
 /** Menu lateral: fixo e recolhível no computador, gaveta no celular. */
 export function Sidebar({
+  isSuperAdmin,
   collapsed,
   onToggleCollapsed,
   mobileOpen,
@@ -149,7 +159,7 @@ export function Sidebar({
           </div>
         )}
 
-        <SidebarNav collapsed={collapsed} />
+        <SidebarNav collapsed={collapsed} isSuperAdmin={isSuperAdmin} />
       </aside>
 
       {/* Gaveta do celular: o Sheet cuida do fundo escuro, do Esc e do foco. */}
@@ -171,7 +181,11 @@ export function Sidebar({
               </SheetClose>
             </Hint>
           </div>
-          <SidebarNav collapsed={false} onNavigate={onCloseMobile} />
+          <SidebarNav
+            collapsed={false}
+            isSuperAdmin={isSuperAdmin}
+            onNavigate={onCloseMobile}
+          />
         </SheetContent>
       </Sheet>
     </>
@@ -180,6 +194,7 @@ export function Sidebar({
 
 type SidebarNavProps = {
   collapsed: boolean;
+  isSuperAdmin: boolean;
   onNavigate?: () => void;
 };
 
@@ -207,13 +222,14 @@ const itemClass = (active: boolean) =>
       : "text-sidebar-muted hover:bg-sidebar-accent hover:text-sidebar-foreground"
   }`;
 
-function SidebarNav({ collapsed, onNavigate }: SidebarNavProps) {
+function SidebarNav({ collapsed, isSuperAdmin, onNavigate }: SidebarNavProps) {
   const pathname = usePathname();
+  const items = isSuperAdmin ? [...navItems, ...superAdminItems] : navItems;
 
   return (
     <nav aria-label="Menu principal" className="flex-1 p-2">
       <ul className="space-y-1">
-        {navItems.map((entry) =>
+        {items.map((entry) =>
           "children" in entry ? (
             <li key={entry.label}>
               <SidebarGroup

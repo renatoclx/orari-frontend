@@ -207,6 +207,13 @@ Duas telas, sem entidade nova no backend: a comanda é uma visão montada a part
 - **Comandas** (`/financeiro/comandas`): `GET /payments/checkouts` parte das visitas do dia (clientes com atendimento hoje ou que pagaram hoje) e devolve, por cliente, os atendimentos de hoje, as pendências anteriores e os totais. `CheckoutList` mostra aberta ou paga; `CheckoutDialog` tem as seções "Atendimentos de hoje", "Pendências anteriores" e "Pagos hoje" e dá baixa nos itens marcados. Os da visita começam marcados e as pendências, não; a comanda paga abre só para consulta.
 - Soma de valores sempre em centavos inteiros, para não acumular erro de ponto flutuante. Depois da baixa, `revalidatePath` recarrega as duas telas.
 
+## Empresas (SUPER_ADMIN)
+
+- Rota `/empresas` (`CompaniesListPage`, Server Component): quem não é SUPER_ADMIN recebe `notFound()`; o item do menu só entra para esse perfil (`Sidebar`, prop `isSuperAdmin`). Status (`?status=`) e página pela URL; `listCompanies` usa o filtro `isActive` da API.
+- `CompanyList` (lista, visualizar, inativar e reativar) e `CompanyFormDialog` (cadastro e alteração) seguem o padrão de Usuários. A validação (`company-validation.ts`, com os dígitos de CPF e CNPJ em `utils/document.ts`) vale na tela e em `company-admin-actions.ts`, que também confere o perfil antes de chamar a API.
+- Depois do cadastro, `CompaniesToolbar` abre o `UserFormDialog` com `forCompany` (tipo fixo ADMIN e `companyId`), reaproveitando o cadastro de usuários; `createUserAction` passou a aceitar o `companyId`.
+- As ações da própria empresa (nome fantasia, logo e horários) continuam em `company-actions.ts`; as do SUPER_ADMIN ficam em `company-admin-actions.ts`.
+
 ## Configurações da empresa
 
 - Página (`/configuracoes`) monta, no servidor, os dados da empresa (`GET /companies/:id`) e as janelas de funcionamento; `CompanySettingsForm` (Client Component) é o card único, com identidade, dados cadastrais (passados como `details`) e `BusinessHoursField`.

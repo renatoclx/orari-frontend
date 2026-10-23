@@ -42,6 +42,11 @@ type UserFormDialogProps = {
   typeOptions: UserType[];
   /** Usuário logado: não pode alterar o próprio tipo. */
   currentUserId: string;
+  /**
+   * Cadastro para outra empresa (o SUPER_ADMIN, ao criar uma empresa): o usuário
+   * nasce nela e com o tipo fixo, sem a escolha do tipo.
+   */
+  forCompany?: { id: string; name: string; type: UserType };
 };
 
 // Id de cada campo: liga o erro ao elemento que recebe o foco.
@@ -67,13 +72,14 @@ function UserForm({
   user,
   typeOptions,
   currentUserId,
+  forCompany,
 }: UserFormDialogProps) {
   const editing = user !== undefined;
   const isSelf = user?.id === currentUserId;
   const [values, setValues] = useState<UserFormValues>({
     name: user?.name ?? "",
     email: user?.email ?? "",
-    type: user?.type ?? "",
+    type: user?.type ?? forCompany?.type ?? "",
     password: "",
     passwordConfirmation: "",
   });
@@ -106,12 +112,17 @@ function UserForm({
     startTransition(async () => {
       const result = user
         ? await updateUserAction(user.id, values)
-        : await createUserAction(values);
+        : await createUserAction(values, forCompany?.id);
 
       if (result.ok) {
-        toast.success(editing ? "Usuário atualizado." : "Usuário cadastrado.", {
-          description: values.name.trim(),
-        });
+        toast.success(
+          editing
+            ? "Usuário atualizado."
+            : forCompany
+              ? "Administrador cadastrado."
+              : "Usuário cadastrado.",
+          { description: values.name.trim() },
+        );
         onOpenChange(false);
         return;
       }
@@ -132,12 +143,18 @@ function UserForm({
     <form noValidate onSubmit={handleSubmit} className="space-y-4">
       <DialogHeader>
         <DialogTitle>
-          {editing ? "Alterar usuário" : "Novo usuário"}
+          {editing
+            ? "Alterar usuário"
+            : forCompany
+              ? "Cadastrar administrador"
+              : "Novo usuário"}
         </DialogTitle>
         <DialogDescription>
           {editing
             ? `Atualize os dados de ${user.name}. A senha é alterada em "Alterar senha".`
-            : "Preencha os dados de acesso do novo usuário."}
+            : forCompany
+              ? `Acesso de administrador da empresa ${forCompany.name}.`
+              : "Preencha os dados de acesso do novo usuário."}
         </DialogDescription>
       </DialogHeader>
 
@@ -163,39 +180,41 @@ function UserForm({
         />
       </FormField>
 
-      <FormField
-        id={ids("type")}
-        label="Tipo de usuário"
-        required
-        error={errors.type}
-      >
-        <Select
-          value={values.type || undefined}
-          onValueChange={(next) => set("type", next)}
-          // O próprio tipo não muda (o backend recusa): evita rebaixar a si mesmo.
-          disabled={isSelf}
+      {!forCompany && (
+        <FormField
+          id={ids("type")}
+          label="Tipo de usuário"
+          required
+          error={errors.type}
         >
-          <SelectTrigger
-            id={ids("type")}
-            className="w-full"
-            aria-invalid={errors.type ? true : undefined}
+          <Select
+            value={values.type || undefined}
+            onValueChange={(next) => set("type", next)}
+            // O próprio tipo não muda (o backend recusa): evita rebaixar a si mesmo.
+            disabled={isSelf}
           >
-            <SelectValue placeholder="Selecione o tipo" />
-          </SelectTrigger>
-          <SelectContent>
-            {options.map((type) => (
-              <SelectItem key={type} value={type}>
-                {formatUserType(type)}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-        {isSelf && (
-          <p className="text-xs text-muted-foreground">
-            Você não pode alterar o seu próprio tipo.
-          </p>
-        )}
-      </FormField>
+            <SelectTrigger
+              id={ids("type")}
+              className="w-full"
+              aria-invalid={errors.type ? true : undefined}
+            >
+              <SelectValue placeholder="Selecione o tipo" />
+            </SelectTrigger>
+            <SelectContent>
+              {options.map((type) => (
+                <SelectItem key={type} value={type}>
+                  {formatUserType(type)}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          {isSelf && (
+            <p className="text-xs text-muted-foreground">
+              Você não pode alterar o seu próprio tipo.
+            </p>
+          )}
+        </FormField>
+      )}
 
       {!editing && (
         <div className="grid gap-4 sm:grid-cols-2">

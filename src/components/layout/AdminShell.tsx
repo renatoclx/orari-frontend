@@ -40,6 +40,7 @@ export function AdminShell({
       </a>
       <div className="flex h-dvh overflow-hidden bg-background text-foreground">
         <Sidebar
+          isSuperAdmin={user.type === "SUPER_ADMIN"}
           collapsed={collapsed}
           onToggleCollapsed={toggleCollapsed}
           mobileOpen={mobileOpen}

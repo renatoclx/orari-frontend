@@ -70,6 +70,13 @@ Pontos conhecidos e aceitos por enquanto. Revisar quando o contexto mudar.
 - **Cabeçalhos de segurança do site (melhoria pendente, 2026-10-23).** Em produção o site devolve só `X-Powered-By: Next.js`: faltam `Strict-Transport-Security`, `X-Content-Type-Options: nosniff`, `X-Frame-Options` (ou `frame-ancestors`) e `Referrer-Policy`. Plano: os quatro no bloco do frontend do `Caddyfile` (repositório do backend) e `poweredByHeader: false` no `next.config.ts`; ensaiar com a pilha local antes de publicar. Depende dos dois repositórios.
 - **Testes de integração contínua do frontend** (lint, tipos, testes e build) ainda não rodam em um workflow (previsto na Etapa 10).
 
+## Empresas
+
+- **Usuários do SUPER_ADMIN.** A API exige `companyId` quando o SUPER_ADMIN cria um usuário e lista os usuários de todas as empresas. A tela de Usuários não pede nem filtra por empresa: para o SUPER_ADMIN, o cadastro responde 400 ("companyId é obrigatório") e a lista mistura empresas. O fluxo "Cadastrar administrador" de Empresas já envia a empresa; falta um seletor de empresa na tela de Usuários.
+- **Logo de outras empresas.** A API só troca a logo da própria empresa (`/companies/me/logo`); o SUPER_ADMIN não consegue enviar a de uma empresa nova pela tela de Empresas (pendente de rota no backend).
+- **Documento validado nos dois lados.** O cálculo dos dígitos de CPF e CNPJ (`utils/document.ts`) repete o do backend (`document.validator.ts`); se a regra mudar, mudar nos dois.
+- **Conflito sem campo.** A API responde 409 com "documento ou subdomínio" sem dizer qual; a mensagem aparece no formulário, não num campo só.
+
 ## Acessibilidade
 
 Auditoria da Etapa 9 (2026-10-22): `axe-core` em todas as rotas e em 11 diálogos e menus, sem achados de contraste, nomes ou marcos. Restos aceitos:

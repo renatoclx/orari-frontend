@@ -89,6 +89,12 @@ regras de cada tela, em `docs/screens/`.
 
 - **2026-10-17 — Financeiro vira dropdown** com Pagamentos e Métodos de pagamento (métodos de pagamento: implementação do responsável pelo projeto). **2026-10-22:** passou a ter também Comandas, na frente de Pagamentos.
 
+## Empresas
+
+- **2026-10-23 — Empresas é uma tela só do SUPER_ADMIN** (`/empresas`, item no fim do menu, 404 para os outros perfis), em lista com cadastro e alteração em dialog; empresas não são excluídas, são inativadas e reativadas. _Por quê:_ cadastrar empresa por chamada direta à API não dá para o dia a dia.
+- **2026-10-23 — Fuso em lista curta (Brasil), com Brasília como padrão;** documento CPF ou CNPJ com a conferência dos dígitos na tela. A logo fica de fora (a API só troca a da própria empresa).
+- **2026-10-23 — "Cadastrar administrador" abre logo depois do cadastro da empresa,** reaproveitando o dialog de Usuários com o tipo fixo e a empresa já definida: uma empresa nova não tem quem entre.
+
 ## Qualidade e testes
 
 - **2026-10-23 — Testes automáticos só de funções puras e de pontos de borda do servidor,** com Vitest (a mesma ferramenta do backend) e `arquivo.spec.ts` ao lado do código. _Por quê:_ é onde está a regra que quebra sem barulho (fuso, arredondamento, disponibilidade de horários); componentes e telas seguem verificados à mão e com `axe-core`. Ponta a ponta (Playwright) fica fora por ora.

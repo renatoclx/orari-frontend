@@ -18,6 +18,8 @@ export type CreateUserInput = {
   password: string;
   passwordConfirmation: string;
   type: UserType;
+  /** Obrigatório para o SUPER_ADMIN (a empresa do novo usuário); o ADMIN usa a própria. */
+  companyId?: string;
 };
 
 // Corpo de PATCH /users/:id: só o que mudar. A senha tem rota própria.

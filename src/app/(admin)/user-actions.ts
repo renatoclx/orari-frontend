@@ -31,9 +31,14 @@ function firstError(errors: UserFormErrors): UserActionResult | null {
   return field ? { ok: false, message: errors[field] ?? "", field } : null;
 }
 
-/** Cadastro: valida de novo no servidor; e-mail repetido (409) vai para o campo. */
+/**
+ * Cadastro: valida de novo no servidor; e-mail repetido (409) vai para o campo.
+ * `companyId`: empresa do novo usuário, quando o SUPER_ADMIN o cadastra para
+ * outra empresa (ex.: o administrador de uma empresa nova).
+ */
 export async function createUserAction(
   values: UserFormValues,
+  companyId?: string,
 ): Promise<UserActionResult> {
   const invalid = firstError(validateUserForm(values));
   if (invalid) return invalid;
@@ -45,6 +50,7 @@ export async function createUserAction(
       password: values.password,
       passwordConfirmation: values.passwordConfirmation,
       type: values.type as UserType,
+      ...(companyId && { companyId }),
     });
   } catch (error) {
     return failureFrom(error, "email" as const);

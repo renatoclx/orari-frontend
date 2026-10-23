@@ -1,0 +1,4 @@
+images/
+*.pdf
+demo/avatars/
+.manual-build.html

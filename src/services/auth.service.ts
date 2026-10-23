@@ -1,16 +1,26 @@
 import "server-only";
 
 import { cache } from "react";
+import { forwardedForHeader } from "@/lib/client-ip";
 import { apiFetch } from "@/services/api";
 import type { AuthTokens, CurrentUser } from "@/types/auth";
 
 // Rotas de autenticação da API. Telas, layouts e Server Actions chamam estas
 // funções, nunca o apiFetch direto.
 
-export function login(email: string, password: string): Promise<AuthTokens> {
+/**
+ * `clientIp`: IP do usuário, para o limite de tentativas da API valer por
+ * pessoa (ela só enxerga o servidor do Next).
+ */
+export function login(
+  email: string,
+  password: string,
+  clientIp?: string,
+): Promise<AuthTokens> {
   return apiFetch<AuthTokens>("/auth/login", {
     authenticated: false,
     method: "POST",
+    headers: forwardedForHeader(clientIp),
     body: JSON.stringify({ email, password }),
   });
 }

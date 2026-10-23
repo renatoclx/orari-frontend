@@ -58,6 +58,17 @@ Pontos conhecidos e aceitos por enquanto. Revisar quando o contexto mudar.
 - **Resumo e lista em chamadas separadas.** Os totais (`/payments/summary`) e a lista (`/payments`) são duas consultas; se um pagamento mudar entre elas, os números podem divergir até a próxima carga.
 - **Pagamento sem cobrança própria na comanda.** Sessões de pacote aparecem como "Incluído no pacote", e o avulso ainda não concluído, como "Aguardando conclusão"; receber antes de concluir (sinal) não existe.
 
+## Deploy
+
+- **`API_URL` é lida no build para `/uploads`.** O `next.config.ts` grava o destino da reescrita no `next build`; trocar a `API_URL` só em tempo de execução não muda esse destino. Mudou o endereço da API: construir a imagem de novo.
+- **Uma instância só.** A renovação compartilhada do proxy (`refreshesInFlight`) vive na memória do processo. Com mais de uma instância do frontend, cada uma teria a sua e a rotação do refresh token poderia deslogar o usuário (já listado em Autenticação). O cache do Next e o resto também não são compartilhados.
+- **Nova versão invalida as páginas abertas.** Cada build gera chaves próprias das Server Actions: quem estava com a tela aberta durante um deploy vê erro na próxima ação até recarregar. Fixar `NEXT_SERVER_ACTIONS_ENCRYPTION_KEY` (e um identificador de deploy) resolveria; não é necessário com uma instância e poucos usuários.
+- **A porta 3000 não pode ser exposta.** O repasse do IP confia no Caddy para sobrescrever o `x-forwarded-for`; com o Next exposto direto, qualquer cliente forjaria o IP e escaparia do limite de tentativas da API. No Compose a porta fica só na rede interna.
+- **Fotos e logos passam pelo Next.** `/uploads` é uma reescrita servida pelo processo Node; o Caddy poderia servir esses arquivos direto da API.
+- **O healthcheck não testa a API.** `/login` é renderizada sem chamar a API, então o contêiner fica "saudável" mesmo com a API fora do ar (as telas autenticadas mostram o erro de conexão).
+- **Sem otimização de imagem.** Sem `sharp` na imagem: `next/image` só com SVG e `unoptimized`. Imagens raster otimizadas exigiriam instalá-lo.
+- **Testes de integração contínua do frontend** (lint, tipos, testes e build) ainda não rodam em um workflow (previsto na Etapa 10).
+
 ## Acessibilidade
 
 Auditoria da Etapa 9 (2026-10-22): `axe-core` em todas as rotas e em 11 diálogos e menus, sem achados de contraste, nomes ou marcos. Restos aceitos:

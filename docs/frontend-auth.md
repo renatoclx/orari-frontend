@@ -32,7 +32,7 @@ Gravar e apagar cookies só funciona em Server Actions, Route Handlers e no prox
 ## Login
 
 1. O formulário (`LoginForm`, Client Component com `useActionState`) envia para a Server Action `login`.
-2. A action valida os campos no servidor e chama `POST /auth/login`.
+2. A action valida os campos no servidor e chama `POST /auth/login`, repassando o IP do usuário (ver "IP do usuário").
 3. Sucesso: `setSession(tokens)` grava os cookies e redireciona para `/?loggedIn=1`.
 4. Erro: 401 vira "E-mail ou senha incorretos." (genérica, não revela qual campo errou); API fora do ar vira "Não foi possível conectar ao servidor.".
 
@@ -62,6 +62,17 @@ O `(admin)/layout.tsx` chama `getCurrentUser()` (`GET /auth/me`) uma vez e repas
 
 Os dois usam `id` fixo (evita duplicar em desenvolvimento) e limpam a URL com `router.replace`.
 
+## IP do usuário (limite de tentativas da API)
+
+A API limita tentativas por IP (em produção: login 5 por minuto e renovação 20 por minuto) e roda com `TRUST_PROXY=1`. Como todas as chamadas vêm do servidor do Next, sem ajuda ela enxergaria um IP só, e o limite valeria para **todos os usuários juntos**.
+
+- Em produção o Caddy recebe a requisição do navegador, sobrescreve o `x-forwarded-for` com o IP real da conexão e a repassa ao Next.
+- `lib/client-ip.ts` (`clientIpFrom`) lê esse cabeçalho: só o **primeiro valor**, e só se tiver formato de IP (IPv4 ou IPv6); ausente ou malformado, nada é enviado. Sem a validação, um valor forjado ou com quebra de linha viraria cabeçalho para a API.
+- **Login:** a Server Action lê `headers()` e passa o IP a `authService.login(email, senha, ip)`, que o envia à API em `X-Forwarded-For` pelo `apiFetch` (a regra de passar pelos services continua).
+- **Renovação:** o `proxy.ts` lê `request.headers` e envia o mesmo cabeçalho no `POST /auth/refresh` (a exceção que já existia à regra dos services).
+- Com `TRUST_PROXY=1`, a API usa o valor mais à direita do `X-Forwarded-For`; como o Next envia um valor só, é o do usuário.
+- Fora de produção (sem Caddy) não há cabeçalho, e nada é enviado.
+
 ## Proxy (`src/proxy.ts`)
 
 Roda antes de toda requisição, exceto arquivos estáticos. Duas tarefas:
@@ -84,7 +95,7 @@ sem access token, com refresh token → POST /auth/refresh
 
 - Sem sessão fora do login → `/login`.
 - Com sessão no login → `/`.
-- Desenvolvimento: `AUTH_GUARD=off` no `.env.local` desliga só estes redirecionamentos (a renovação continua valendo).
+- Desenvolvimento: `AUTH_GUARD=off` no `.env.local` desliga só estes redirecionamentos (a renovação continua valendo). **Em produção a variável é ignorada** (`lib/auth-guard.ts`, `isAuthGuardEnabled`): as rotas sempre pedem login, mesmo que `AUTH_GUARD=off` vá parar no servidor.
 
 ## Sessão recusada pela API (401)
 
@@ -113,6 +124,8 @@ Componente `AuthNoticeToast`, com `id` fixo e limpeza da URL.
 | Arquivo                                                                      | Papel                                           |
 | ---------------------------------------------------------------------------- | ----------------------------------------------- |
 | `proxy.ts`                                                                   | renovação e proteção das rotas                  |
+| `lib/client-ip.ts`                                                           | IP do usuário a partir do `x-forwarded-for`     |
+| `lib/auth-guard.ts`                                                          | `AUTH_GUARD=off` só fora de produção            |
 | `services/api.ts`                                                            | `apiFetch`: token, erros, 401 → sessão expirada |
 | `services/auth.service.ts`                                                   | `login`, `logout`, `getCurrentUser`             |
 | `services/session.ts` / `session-cookies.ts`                                 | ler, gravar e apagar os cookies                 |

@@ -1,0 +1,33 @@
+# Fora da imagem: dependências e resultados locais (a imagem instala e constrói
+# por conta própria).
+node_modules
+.next
+out
+build
+coverage
+*.tsbuildinfo
+next-env.d.ts
+
+# Variáveis locais e segredos. O .env.example fica (só documenta os nomes).
+.env*
+!.env.example
+
+# Controle de versão, editor e ferramentas.
+.git
+.gitignore
+.vscode
+.idea
+.claude
+.DS_Store
+
+# Documentação e prompts: não são usados no build.
+docs
+prompts
+*.md
+!README.md
+
+# O que o Docker mesmo não precisa.
+Dockerfile
+.dockerignore
+skills-lock.json
+npm-debug.log*

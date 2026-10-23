@@ -88,7 +88,8 @@ src/
                              (action-result.ts, form-data.ts)
 docs/                        documentação; screens/ tem um arquivo por tela
   proxy.ts                   proteção das rotas (antigo middleware)
-next.config.ts               limite das Server Actions e rewrite de /uploads
+next.config.ts               modo standalone, limite das Server Actions e rewrite de /uploads
+Dockerfile, .dockerignore    imagem de produção (ver "Deploy")
 ```
 
 - Pastas entre parênteses (`(admin)`, `(auth)`) são **grupos de rotas**: organizam layouts sem mudar a URL.
@@ -229,13 +230,47 @@ As regras visuais (tokens, componentes, padrão de página, barra de ações, to
 - Toasts (Sonner) pelo `AppToaster`, já presente no layout raiz.
 - Acessibilidade: o `AdminShell` tem o link "Pular para o conteúdo" e a barra de atalhos é um `<aside>` com nome; `globals.css` reúne a regra de movimento reduzido e o `touch-action`. As regras e as verificações estão na seção "Acessibilidade" da skill.
 
+## Deploy (Docker)
+
+Produção: `https://app.orariapp.com.br`, no mesmo servidor do backend (Docker Compose com `db`, `api`, `frontend` e Caddy). O Compose e o Caddy ficam no repositório do backend; aqui está a imagem.
+
+- **Imagem** (`Dockerfile` na raiz, `node:24-alpine`), em três etapas: `deps` (`npm ci`, camada reaproveitada enquanto o `package-lock.json` não muda), `build` (`next build`) e `run`. Só a última vai a produção: o resultado do `output: "standalone"` (45 MB, sem o `node_modules` inteiro) mais `.next/static` e `public/`, que o standalone não copia sozinho. Roda como o usuário `node` (não root) com `node server.js`.
+- **`sharp` não é necessário:** todas as imagens são SVG (logos do Orari) ou `unoptimized` (logo da empresa e prévia), então não há otimização de imagem.
+- **Medidas (2026-10-23):** imagem de 304 MB em disco (75,6 MB comprimida, a maior parte é a base do Node); construção a frio ~2 min (`npm ci` 86 s, compilação 14 s) e ~17 s com as dependências em cache; pico de 1,5 GB de memória no build, sem usar troca (o servidor tem 3,8 GB de RAM e 1 GB de troca); 62 MiB em repouso.
+- **`.dockerignore`** deixa de fora `node_modules`, `.next`, `.git`, `.env*` (menos o `.env.example`), `docs`, `prompts`, `.claude`, `coverage` e os `.md`. A imagem não contém nenhum `.env*` (conferido).
+
+### Variáveis
+
+| Variável           | Quando               | Observação                                                                                                                                                                                                                                                    |
+| ------------------ | -------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `API_URL`          | **build e execução** | `http://api:3333` dentro do Compose. No build (`--build-arg API_URL=...`, o build falha sem ela) porque o `next.config.ts` a grava na reescrita de `/uploads`; na execução, para o login, a renovação e as telas. O valor do build vira o padrão da execução. |
+| `PORT`, `HOSTNAME` | execução             | `3000` e `0.0.0.0` (já definidos na imagem).                                                                                                                                                                                                                  |
+| `NODE_ENV`         | execução             | `production` (já definida, só depois do build).                                                                                                                                                                                                               |
+| `AUTH_GUARD`       | nunca em produção    | `off` libera as rotas sem login em desenvolvimento; em produção o proxy a ignora, mas ela não deve existir no servidor.                                                                                                                                       |
+
+Sem segredos na imagem: nenhuma variável sensível é necessária (o token vive em cookies do usuário).
+
+### O que o Compose do backend precisa saber
+
+- **Build:** `context: ../orari-frontend` (a pasta do repositório ao lado de `orari-backend`) e `args: API_URL=http://api:3333`.
+- **Execução:** `environment: API_URL=http://api:3333`; a porta é a `3000`, **só na rede interna** (`expose`, sem `ports`). O Caddy faz `reverse_proxy frontend:3000`.
+- **Healthcheck** já está na imagem (`wget` em `http://127.0.0.1:3000/login`, que responde 200 sem sessão); o Compose pode usá-lo com `condition: service_healthy`.
+- **Caddy:** o `reverse_proxy` padrão já repassa o `Host` e sobrescreve o `X-Forwarded-For` com o IP real da conexão. As duas coisas importam: o Next compara `Origin` e `Host` nas Server Actions, e o IP é o que o frontend repassa à API (ver `frontend-auth.md`, "IP do usuário").
+- **HTTPS é obrigatório:** os cookies da sessão são `secure` em produção.
+
+### Verificado na prática
+
+Imagem real, contêiner atrás de um Caddy local com a API real: `/login` 200, healthcheck saudável, usuário `node`, redirecionamento de rota protegida para `/login`, estáticos e ícones sem sessão, `/uploads` (fotos e logo da empresa) chegando à API, login pela Server Action sem erro de origem, cookies `httpOnly`/`secure`/`SameSite=Lax`, e o `X-Forwarded-For` chegando à API (com o valor forjado pelo cliente descartado pelo Caddy).
+
 ## Configuração
 
-| Arquivo           | Conteúdo                                                          | No git |
-| ----------------- | ----------------------------------------------------------------- | ------ |
-| `.env.local`      | `API_URL`; `AUTH_GUARD=off` (só desenvolvimento: libera as rotas) | não    |
-| `.env.example`    | lista das variáveis, sem valores reais                            | sim    |
-| `components.json` | configuração do shadcn/ui                                         | sim    |
-| `next.config.ts`  | limite do corpo das Server Actions e rewrite de `/uploads`        | sim    |
+| Arquivo           | Conteúdo                                                                      | No git |
+| ----------------- | ----------------------------------------------------------------------------- | ------ |
+| `.env.local`      | `API_URL`; `AUTH_GUARD=off` (só desenvolvimento: libera as rotas)             | não    |
+| `.env.example`    | lista das variáveis, sem valores reais                                        | sim    |
+| `components.json` | configuração do shadcn/ui                                                     | sim    |
+| `next.config.ts`  | modo `standalone`, limite do corpo das Server Actions e rewrite de `/uploads` | sim    |
+| `Dockerfile`      | imagem de produção (três etapas)                                              | sim    |
+| `.dockerignore`   | o que não entra na imagem                                                     | sim    |
 
-`API_URL` não tem o prefixo `NEXT_PUBLIC_`: fica só no servidor.
+`API_URL` não tem o prefixo `NEXT_PUBLIC_`: fica só no servidor. Para o deploy (variáveis no build e na execução), ver a seção "Deploy (Docker)".

@@ -1,6 +1,8 @@
 "use server";
 
+import { headers } from "next/headers";
 import { redirect } from "next/navigation";
+import { FORWARDED_FOR_HEADER, clientIpFrom } from "@/lib/client-ip";
 import { ApiError } from "@/services/api";
 import * as authService from "@/services/auth.service";
 import { setSession } from "@/services/session";
@@ -44,8 +46,12 @@ export async function login(
     return { email, fieldErrors };
   }
 
+  // O Caddy coloca o IP do usuário no x-forwarded-for; a API o usa no limite
+  // de tentativas por IP.
+  const clientIp = clientIpFrom((await headers()).get(FORWARDED_FOR_HEADER));
+
   try {
-    const tokens = await authService.login(email, password);
+    const tokens = await authService.login(email, password, clientIp);
     await setSession(tokens);
   } catch (error) {
     if (!(error instanceof ApiError)) throw error;

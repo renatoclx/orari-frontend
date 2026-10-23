@@ -1,4 +1,10 @@
 import { NextResponse, type NextRequest } from "next/server";
+import { isAuthGuardEnabled } from "@/lib/auth-guard";
+import {
+  FORWARDED_FOR_HEADER,
+  clientIpFrom,
+  forwardedForHeader,
+} from "@/lib/client-ip";
 import {
   ACCESS_TOKEN_COOKIE,
   REFRESH_TOKEN_COOKIE,
@@ -18,14 +24,17 @@ const HOME_PATH = "/";
  */
 export async function proxy(request: NextRequest) {
   // Só para desenvolvimento: AUTH_GUARD=off desliga os redirecionamentos de
-  // proteção. A renovação continua valendo.
-  const guardEnabled = process.env.AUTH_GUARD !== "off";
+  // proteção (em produção a variável é ignorada). A renovação continua valendo.
+  const guardEnabled = isAuthGuardEnabled(process.env);
   const isLoginPage = request.nextUrl.pathname === LOGIN_PATH;
   const accessToken = request.cookies.get(ACCESS_TOKEN_COOKIE)?.value;
   const refreshToken = request.cookies.get(REFRESH_TOKEN_COOKIE)?.value;
 
   if (!accessToken && refreshToken) {
-    const result = await refreshOnce(refreshToken);
+    // A API só enxerga o servidor do Next: sem o IP do usuário, o limite de
+    // renovações valeria para todos juntos.
+    const clientIp = clientIpFrom(request.headers.get(FORWARDED_FOR_HEADER));
+    const result = await refreshOnce(refreshToken, clientIp);
 
     if (result === "invalid") {
       return endSession(request, isLoginPage);
@@ -65,10 +74,13 @@ const refreshesInFlight = new Map<string, Promise<RefreshResult>>();
 const SHARED_RESULT_MS = 10_000;
 
 // Uma renovação por refresh token, compartilhada entre as requisições simultâneas.
-function refreshOnce(refreshToken: string): Promise<RefreshResult> {
+function refreshOnce(
+  refreshToken: string,
+  clientIp: string | undefined,
+): Promise<RefreshResult> {
   let refresh = refreshesInFlight.get(refreshToken);
   if (!refresh) {
-    refresh = refreshSession(refreshToken);
+    refresh = refreshSession(refreshToken, clientIp);
     refreshesInFlight.set(refreshToken, refresh);
     // Mantém o resultado por alguns segundos para quem chegar logo depois.
     void refresh.finally(() =>
@@ -86,11 +98,17 @@ function refreshOnce(refreshToken: string): Promise<RefreshResult> {
  * importar "server-only", e o apiFetch lê cookies de um jeito que só funciona
  * em páginas e Server Actions.
  */
-async function refreshSession(refreshToken: string): Promise<RefreshResult> {
+async function refreshSession(
+  refreshToken: string,
+  clientIp: string | undefined,
+): Promise<RefreshResult> {
   try {
     const response = await fetch(`${process.env.API_URL}/auth/refresh`, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json",
+        ...forwardedForHeader(clientIp),
+      },
       body: JSON.stringify({ refreshToken }),
       cache: "no-store",
     });

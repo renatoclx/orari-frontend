@@ -131,8 +131,16 @@ Três grupos, nesta ordem:
 - Colunas: Cliente (link para o histórico), Atendimentos (quantidade hoje), A
   receber hoje (pendente dos atendimentos de hoje), Pendências (soma das
   anteriores), Status e Ações.
-- Status: **Aberta** (há algo pendente, de hoje ou anterior) ou **Paga**. Ações:
-  **Receber** (aberta) ou o ícone de olho (paga).
+- Status, na primeira que valer (regra em `utils/checkout.ts`):
+  1. **Aberta**: há valor pendente, de hoje ou anterior. Ação **Receber**.
+  2. **Aguardando conclusão**: nada pendente, mas há atendimento avulso sem
+     pagamento (a cobrança só nasce quando ele é concluído).
+  3. **Paga**: nada pendente nem aguardando, e algo foi pago (em atendimento
+     de hoje ou em pagamento anterior).
+  4. **Incluído no pacote**: só sessões de pacote, sem pendente nem pago.
+  Nos três últimos, a ação é o ícone de olho (só leitura). Um atendimento pago e
+  outro não concluído não deixam a comanda "Paga". Comanda sem nada (não deveria
+  existir) aparece como Aguardando conclusão.
 - No celular, lista empilhada.
 
 ### Dialog da comanda

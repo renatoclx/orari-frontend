@@ -95,6 +95,10 @@ regras de cada tela, em `docs/screens/`.
 - **2026-10-23 — Fuso em lista curta (Brasil), com Brasília como padrão;** documento CPF ou CNPJ com a conferência dos dígitos na tela. A logo fica de fora (a API só troca a da própria empresa).
 - **2026-10-23 — "Cadastrar administrador" abre logo depois do cadastro da empresa,** reaproveitando o dialog de Usuários com o tipo fixo e a empresa já definida: uma empresa nova não tem quem entre.
 
+## Financeiro
+
+- **2026-10-23 — O status da comanda tem quatro estados** (Aberta, Aguardando conclusão, Paga, Incluído no pacote), decididos no frontend a partir dos dados que a API já devolve. _Por quê:_ "nada pendente" não quer dizer "paga": o atendimento avulso só ganha cobrança quando é concluído, e a comanda de um atendimento futuro aparecia como Paga (bug visto em produção).
+
 ## Qualidade e testes
 
 - **2026-10-23 — Testes automáticos só de funções puras e de pontos de borda do servidor,** com Vitest (a mesma ferramenta do backend) e `arquivo.spec.ts` ao lado do código. _Por quê:_ é onde está a regra que quebra sem barulho (fuso, arredondamento, disponibilidade de horários); componentes e telas seguem verificados à mão e com `axe-core`. Ponta a ponta (Playwright) fica fora por ora.

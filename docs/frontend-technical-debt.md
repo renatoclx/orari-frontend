@@ -57,6 +57,7 @@ Pontos conhecidos e aceitos por enquanto. Revisar quando o contexto mudar.
 - **Busca de clientes do filtro duplicada.** Pagamentos e Contratações usam `useClientSearch`, que ainda tem a mesma lógica do dialog de novo agendamento.
 - **Resumo e lista em chamadas separadas.** Os totais (`/payments/summary`) e a lista (`/payments`) são duas consultas; se um pagamento mudar entre elas, os números podem divergir até a próxima carga.
 - **Pagamento sem cobrança própria na comanda.** Sessões de pacote aparecem como "Incluído no pacote", e o avulso ainda não concluído, como "Aguardando conclusão"; receber antes de concluir (sinal) não existe.
+- **Status da comanda só no frontend.** A regra dos quatro estados (`utils/checkout.ts`) deduz a situação de `appointments[].payment`, `clientPlanId` e dos pagamentos anteriores; o backend poderia devolver um `status` explícito por comanda e a tela deixaria de deduzir.
 
 ## Deploy
 

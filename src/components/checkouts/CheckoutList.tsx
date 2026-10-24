@@ -9,6 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import type { CheckoutItem } from "@/types/payment";
 import type { PaymentMethodItem } from "@/types/payment-method";
+import { checkoutState } from "@/utils/checkout";
 import { formatPrice } from "@/utils/format";
 
 type CheckoutListProps = {
@@ -24,20 +25,22 @@ type CheckoutListProps = {
   footer: React.ReactNode;
 };
 
-// Aberta enquanto houver algo pendente, de hoje ou anterior; senão, paga.
-function isOpen(checkout: CheckoutItem): boolean {
-  return Number(checkout.todayPending) + Number(checkout.previousPending) > 0;
-}
-
+// A situação vem de utils/checkout.ts; aqui só vira texto. "Paga" fica só para
+// quem de fato pagou: atendimento ainda não concluído não tem cobrança.
 function CheckoutBadge({ checkout }: { checkout: CheckoutItem }) {
-  return isOpen(checkout) ? (
-    <Badge variant="outline">Aberta</Badge>
-  ) : (
-    <Badge variant="success">Paga</Badge>
-  );
+  switch (checkoutState(checkout)) {
+    case "open":
+      return <Badge variant="outline">Aberta</Badge>;
+    case "paid":
+      return <Badge variant="success">Paga</Badge>;
+    case "package":
+      return <Badge variant="secondary">Incluído no pacote</Badge>;
+    case "awaiting":
+      return <Badge variant="secondary">Aguardando conclusão</Badge>;
+  }
 }
 
-// Receber na comanda aberta; Ver (só leitura) na paga.
+// Receber só na comanda aberta; nas demais, Ver (só leitura).
 function OpenButton({
   checkout,
   onOpen,
@@ -45,7 +48,7 @@ function OpenButton({
   checkout: CheckoutItem;
   onOpen: (checkout: CheckoutItem) => void;
 }) {
-  if (isOpen(checkout)) {
+  if (checkoutState(checkout) === "open") {
     return (
       <Button size="sm" onClick={() => onOpen(checkout)}>
         <HandCoins aria-hidden="true" />

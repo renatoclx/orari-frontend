@@ -10,6 +10,7 @@ import {
   type TemplateFormValues,
 } from "@/components/anamnesis/templates/template-validation";
 import { failureFrom, type ActionFailure } from "@/lib/action-result";
+import { isUuid } from "@/lib/uuid";
 import { anamnesisAccess } from "@/utils/anamnesis-access";
 import { getCurrentUser } from "@/services/auth.service";
 import {
@@ -69,6 +70,8 @@ export async function updateTemplateAction(
 ): Promise<TemplateActionResult> {
   const denied = await ensureAdmin();
   if (denied) return denied;
+  // O id vem do navegador: fora do formato, nem chega à API.
+  if (!isUuid(id)) return { ok: false, message: "Pedido inválido." };
 
   try {
     const current = await getTemplate(id);
@@ -111,6 +114,7 @@ export async function setTemplateActiveAction(
 ): Promise<TemplateActionResult> {
   const denied = await ensureAdmin();
   if (denied) return denied;
+  if (!isUuid(id)) return { ok: false, message: "Pedido inválido." };
 
   try {
     await updateTemplate(id, { isActive });

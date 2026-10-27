@@ -5,6 +5,7 @@ import { AnamnesisPdfDialog } from "@/components/anamnesis/records/AnamnesisPdfD
 import { AnamnesisTimeline } from "@/components/anamnesis/records/AnamnesisTimeline";
 import { CurrentAnswers } from "@/components/anamnesis/records/CurrentAnswers";
 import { Button } from "@/components/ui/button";
+import { isUuid } from "@/lib/uuid";
 import { requireAnamnesisAccess } from "@/lib/anamnesis-guard";
 import { ApiError } from "@/services/api";
 import { getAnamnesis } from "@/services/anamnesis.service";
@@ -51,6 +52,8 @@ export async function AnamnesisDetailPage({
   id,
 }: AnamnesisDetailPageProps) {
   const user = await requireAnamnesisAccess();
+  // Ids da URL fora do formato: 404 (e nunca vão para o caminho da API).
+  if (!isUuid(clientId) || !isUuid(id)) notFound();
   const orNotFound = (error: unknown): never => {
     if (error instanceof ApiError && error.status === 404) notFound();
     throw error;

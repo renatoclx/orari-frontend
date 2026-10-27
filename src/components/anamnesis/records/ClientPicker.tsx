@@ -19,19 +19,16 @@ type ClientPickerProps = {
  */
 export function ClientPicker({ initial, picked }: ClientPickerProps) {
   const router = useRouter();
-  const search = useClientSearch(initial, picked?.id ?? "");
+  const search = useClientSearch(initial, picked?.id ?? "", picked);
 
   return (
     <FormField id="anamnesis-client" label="Cliente" required>
       <Combobox
         id="anamnesis-client"
-        options={[
-          // O cliente da URL continua na lista mesmo fora dos primeiros.
-          ...(picked && !search.options.some((item) => item.id === picked.id)
-            ? [picked]
-            : []),
-          ...search.options,
-        ].map((item) => ({ value: item.id, label: item.name }))}
+        options={search.options.map((item) => ({
+          value: item.id,
+          label: item.name,
+        }))}
         value={picked?.id ?? ""}
         onValueChange={(next) => {
           search.pick(next);

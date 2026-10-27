@@ -133,7 +133,9 @@ export function AnswerField({
       <div
         id={id}
         tabIndex={-1}
-        role={question.type === "MULTIPLE_CHOICE" ? "group" : undefined}
+        // O rádio tem o próprio papel (radiogroup); os demais precisam de "group" para o
+        // enunciado ser lido junto dos botões ou caixas.
+        role={question.type === "SINGLE_CHOICE" ? undefined : "group"}
         aria-labelledby={`${id}-label`}
         className="space-y-2 outline-none"
       >

@@ -1,3 +1,4 @@
+import { isUuid } from "@/lib/uuid";
 import type { AuditAction } from "@/types/audit";
 import { dayBounds, isDateString } from "@/utils/time";
 
@@ -13,8 +14,6 @@ export const auditActionLabels: Record<AuditAction, string> = {
 };
 
 export const auditActions = Object.keys(auditActionLabels) as AuditAction[];
-
-const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 /** Filtros da tela, como vêm da URL ("aaaa-mm-dd" nas datas). */
 export type AuditFilters = {
@@ -42,8 +41,8 @@ export function parseAuditFilters(
   const from = single(searchParams.de);
   const to = single(searchParams.ate);
   return {
-    clientId: clientId && UUID.test(clientId) ? clientId : undefined,
-    userId: userId && UUID.test(userId) ? userId : undefined,
+    clientId: clientId && isUuid(clientId) ? clientId : undefined,
+    userId: userId && isUuid(userId) ? userId : undefined,
     action: auditActions.find((item) => item === action),
     from: from && isDateString(from) ? from : undefined,
     to: to && isDateString(to) ? to : undefined,

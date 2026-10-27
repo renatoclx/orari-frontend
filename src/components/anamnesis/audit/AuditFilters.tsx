@@ -47,7 +47,11 @@ export function AuditFilters({
   pickedClient,
 }: AuditFiltersProps) {
   const router = useRouter();
-  const clients = useClientSearch(initialClients, filters.clientId ?? "");
+  const clients = useClientSearch(
+    initialClients,
+    filters.clientId ?? "",
+    pickedClient,
+  );
   const hasFilters = Object.keys(auditQuery(filters)).length > 0;
 
   function apply(next: Partial<Omit<Filters, "page">>) {
@@ -64,13 +68,10 @@ export function AuditFilters({
       <Combobox
         id="audit-client"
         ariaLabel="Filtrar por cliente"
-        options={[
-          ...(pickedClient &&
-          !clients.options.some((item) => item.id === pickedClient.id)
-            ? [pickedClient]
-            : []),
-          ...clients.options,
-        ].map((item) => ({ value: item.id, label: item.name }))}
+        options={clients.options.map((item) => ({
+          value: item.id,
+          label: item.name,
+        }))}
         value={filters.clientId ?? ""}
         onValueChange={(next) => {
           clients.pick(next);

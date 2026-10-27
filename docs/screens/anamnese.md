@@ -129,4 +129,6 @@ Rotas: `/anamnese/modelos` (lista), `/anamnese/modelos/novo` e `/anamnese/modelo
 - **Sem cache:** as chamadas de anamnese usam `cache: "no-store"` (o `apiFetch` já faz isso) e as páginas são dinâmicas; nada de `"use cache"` nem ISR nessas rotas.
 - **Rascunho só em memória:** ao sair da tela, o que foi digitado é descartado.
 - **Erros:** mostram o texto da API (já em português), nunca o conteúdo da ficha.
+- **Ids de fora não entram crus na API:** os ids da URL e das Server Actions são conferidos como UUID (`lib/uuid.ts`, `isUuid`) antes de qualquer chamada: nas páginas, fora do formato é 404 (e não erro do servidor); nas actions, "Pedido inválido."; nos services, o id também passa por `encodeURIComponent`. Assim um caminho forjado (`..%2F..%2Fusers`) não vira outra rota da API nem outro `revalidatePath`.
+- **Cache do HTML:** nas páginas dinâmicas o Next já responde `private, no-cache, no-store` em produção (`no-cache, must-revalidate` é só do modo de desenvolvimento); não é preciso configurar cabeçalho extra. O PDF sai `no-store` pelo Route Handler.
 - Os registros são **imutáveis**: nenhuma tela oferece editar ou excluir ficha ou acompanhamento; corrige-se com um novo acompanhamento.

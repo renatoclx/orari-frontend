@@ -31,7 +31,7 @@ export function listAnamneses(
 
 /** Ficha completa, com as perguntas da versão em que nasceu e todo o histórico. */
 export function getAnamnesis(id: string): Promise<AnamnesisDetail> {
-  return apiFetch<AnamnesisDetail>(`/anamnesis/${id}`);
+  return apiFetch<AnamnesisDetail>(`/anamnesis/${encodeURIComponent(id)}`);
 }
 
 /**
@@ -42,10 +42,13 @@ export function createEntry(
   id: string,
   input: EntryInput,
 ): Promise<AnamnesisDetail> {
-  return apiFetch<AnamnesisDetail>(`/anamnesis/${id}/entries`, {
-    method: "POST",
-    body: JSON.stringify(input),
-  });
+  return apiFetch<AnamnesisDetail>(
+    `/anamnesis/${encodeURIComponent(id)}/entries`,
+    {
+      method: "POST",
+      body: JSON.stringify(input),
+    },
+  );
 }
 
 /**
@@ -95,5 +98,5 @@ export function listAnamnesisClients(
  */
 export function getAnamnesisPdf(id: string, includeHistory: boolean) {
   const query = new URLSearchParams({ includeHistory: String(includeHistory) });
-  return apiFetchBytes(`/anamnesis/${id}/pdf?${query}`);
+  return apiFetchBytes(`/anamnesis/${encodeURIComponent(id)}/pdf?${query}`);
 }

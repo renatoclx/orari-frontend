@@ -1,7 +1,6 @@
+import { isUuid } from "@/lib/uuid";
 import { ApiError } from "@/services/api";
 import { getAnamnesisPdf } from "@/services/anamnesis.service";
-
-const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 // Dado de saúde: nada de cache, nem do navegador nem de proxy.
 const NO_STORE = { "Cache-Control": "no-store" };
@@ -17,7 +16,7 @@ export async function GET(
   { params }: RouteContext<"/clientes/[id]/anamnese/[fichaId]/pdf">,
 ) {
   const { fichaId } = await params;
-  if (!UUID.test(fichaId)) {
+  if (!isUuid(fichaId)) {
     return Response.json(
       { message: "Ficha não encontrada." },
       { status: 404, headers: NO_STORE },

@@ -33,7 +33,9 @@ export function listTemplates(
 }
 
 export function getTemplate(id: string): Promise<TemplateItem> {
-  return apiFetch<TemplateItem>(`/anamnesis-templates/${id}`);
+  return apiFetch<TemplateItem>(
+    `/anamnesis-templates/${encodeURIComponent(id)}`,
+  );
 }
 
 /** Cadastro; nome repetido na empresa responde 409. */
@@ -49,8 +51,11 @@ export function updateTemplate(
   id: string,
   input: TemplateUpdateInput,
 ): Promise<TemplateItem> {
-  return apiFetch<TemplateItem>(`/anamnesis-templates/${id}`, {
-    method: "PATCH",
-    body: JSON.stringify(input),
-  });
+  return apiFetch<TemplateItem>(
+    `/anamnesis-templates/${encodeURIComponent(id)}`,
+    {
+      method: "PATCH",
+      body: JSON.stringify(input),
+    },
+  );
 }

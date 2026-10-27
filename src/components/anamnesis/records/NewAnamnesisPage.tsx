@@ -4,6 +4,7 @@ import { ChevronLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ClientPicker } from "@/components/anamnesis/records/ClientPicker";
 import { NewAnamnesisForm } from "@/components/anamnesis/records/NewAnamnesisForm";
+import { isUuid } from "@/lib/uuid";
 import { requireAnamnesisAccess } from "@/lib/anamnesis-guard";
 import { ApiError } from "@/services/api";
 import { listAnamneses } from "@/services/anamnesis.service";
@@ -16,8 +17,6 @@ type NewAnamnesisPageProps = {
   /** Cliente da URL (`?clienteId=`), se já escolhido. */
   clientId?: string;
 };
-
-const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 /**
  * Nova ficha: escolhe o cliente e, com ele, mostra o formulário com os modelos
@@ -35,7 +34,7 @@ export async function NewAnamnesisPage({ clientId }: NewAnamnesisPageProps) {
 
   // Cliente da URL: inexistente (ou de outro tipo) é 404; inativo não recebe ficha.
   const client = clientId
-    ? UUID.test(clientId)
+    ? isUuid(clientId)
       ? await getPerson(clientId).catch((error: unknown) => {
           if (error instanceof ApiError && error.status === 404) notFound();
           throw error;

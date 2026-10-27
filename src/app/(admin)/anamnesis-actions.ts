@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { EVOLUTION_MAX } from "@/components/anamnesis/records/entry-validation";
 import { failureFrom, type ActionFailure } from "@/lib/action-result";
+import { isUuid } from "@/lib/uuid";
 import {
   createAnamnesis,
   createEntry,
@@ -15,6 +16,8 @@ import type {
   EntryInput,
 } from "@/types/anamnesis";
 import { anamnesisAccess } from "@/utils/anamnesis-access";
+
+const INVALID_REQUEST = { ok: false, message: "Pedido inválido." } as const;
 
 export type EntryActionResult = { ok: true } | ActionFailure<"evolution">;
 
@@ -35,6 +38,8 @@ export async function createEntryAction(
       message: "Você não tem acesso às fichas de anamnese.",
     };
   }
+  // Ids vêm do navegador: fora do formato, nem chegam à API nem ao revalidatePath.
+  if (!isUuid(clientId) || !isUuid(anamnesisId)) return INVALID_REQUEST;
   const evolution = input.evolution.trim();
   if (!evolution || evolution.length > EVOLUTION_MAX) {
     return {
@@ -72,6 +77,10 @@ export async function createAnamnesisAction(
     };
   }
 
+  if (!isUuid(input.clientId) || !isUuid(input.templateId)) {
+    return INVALID_REQUEST;
+  }
+
   try {
     const created = await createAnamnesis(input);
     revalidatePath(`/clientes/${input.clientId}`);
@@ -98,6 +107,8 @@ export async function listClientAnamnesesAction(
       message: "Você não tem acesso às fichas de anamnese.",
     };
   }
+
+  if (!isUuid(clientId)) return INVALID_REQUEST;
 
   try {
     const result = await listAnamneses({ clientId, page: 1, limit: 100 });

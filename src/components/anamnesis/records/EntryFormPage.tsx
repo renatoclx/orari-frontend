@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import { EntryForm } from "@/components/anamnesis/records/EntryForm";
+import { isUuid } from "@/lib/uuid";
 import { requireAnamnesisAccess } from "@/lib/anamnesis-guard";
 import { ApiError } from "@/services/api";
 import { getAnamnesis } from "@/services/anamnesis.service";
@@ -25,6 +26,7 @@ const orNotFound = (error: unknown): never => {
  */
 export async function EntryFormPage({ clientId, id }: EntryFormPageProps) {
   const user = await requireAnamnesisAccess();
+  if (!isUuid(clientId) || !isUuid(id)) notFound();
   const timeZone = user.company.timezone;
   const [detail, client, appointments] = await Promise.all([
     getAnamnesis(id).catch(orNotFound),

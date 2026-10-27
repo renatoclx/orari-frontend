@@ -29,6 +29,7 @@ diferente. Em caso de conflito, prevalece o arquivo da tela.
 | [metodos-pagamento.md](metodos-pagamento.md) | Métodos de pagamento                                    |
 | [financeiro.md](financeiro.md)               | Pagamentos e Comandas                                   |
 | [empresas.md](empresas.md)                   | Empresas (só SUPER_ADMIN)                               |
+| [anamnese.md](anamnese.md)                   | Anamnese: modelos, fichas, PDF e auditoria              |
 
 ## Convenções
 

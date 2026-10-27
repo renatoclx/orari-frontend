@@ -63,6 +63,15 @@ Pontos conhecidos e aceitos por enquanto. Revisar quando o contexto mudar.
 
 - **Descrição do modelo não some.** A API não aceita descrição vazia nem `null` no `PATCH`; a tela recusa apagar uma descrição já preenchida. Se for preciso poder removê-la, o backend precisa aceitar `null`.
 - **Sem pré-visualização da ficha.** O editor de modelos mostra os cartões de pergunta, não a ficha como o profissional a verá.
+- **Nomes da auditoria por chamadas extras.** A API devolve só ids; a tela busca a lista de usuários (até 100) e um cliente por registro distinto da página (até 10). Se pesar, o backend pode devolver os nomes.
+- **Limites de 100.** Nova ficha lê até 100 modelos ativos e 100 fichas do cliente; o acompanhamento oferece os 100 agendamentos mais recentes do cliente; a auditoria lista até 100 usuários.
+- **Endpoint sem uso no backend.** `GET /anamnesis/appointments-with-entry` ficou depois que o aviso "Sem acompanhamento" da agenda foi removido; usar numa futura marcação ou remover.
+- **Corretor ortográfico do navegador no campo "Evolução".** Alguns navegadores enviam o texto a um serviço externo para corrigir. Desligar (`spellCheck={false}`) perde a correção; decisão pendente.
+- **CSP e o PDF.** Quando entrar a política de segurança de conteúdo (ver "Cabeçalhos de segurança", em Deploy), o iframe do PDF precisa de `frame-src blob:`.
+- **Acesso por contexto.** O `AnamnesisAccessProvider` leva um boolean a um único dialog; uma prop também serviria (mantido por o dialog aparecer em três telas).
+- **Listagens parecidas.** `TemplateList`, `HistoryAnamnesis`, `AnamnesisClientsList` e `AuditList` repetem o esqueleto card + tabela + lista de celular (padrão do projeto); extrair só se aparecer mais uma.
+- **Sem teste das Server Actions da anamnese.** Só o Route Handler do PDF e a lógica pura têm teste; as actions só conferem acesso e ids e delegam à API.
+- **Não verificado no celular** (editor de modelos, nova ficha, acompanhamento, PDF e auditoria) nem o conteúdo do PDF no visualizador do navegador automatizado.
 
 ## Deploy
 

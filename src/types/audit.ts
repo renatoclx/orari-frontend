@@ -3,6 +3,8 @@
 /** Ações registradas (enum AuditAction). Cresce junto com o backend. */
 export type AuditAction =
   | "USER_LINK_CHANGED"
+  | "USER_TYPE_CHANGED"
+  | "USER_RESTORED"
   | "ANAMNESIS_TEMPLATE_CREATED"
   | "ANAMNESIS_TEMPLATE_UPDATED"
   | "ANAMNESIS_VIEWED"

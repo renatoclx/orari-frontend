@@ -1,5 +1,7 @@
 import {
   auditActionLabels,
+  auditActorName,
+  auditTargetName,
   formatAuditDateTime,
   formatAuditIp,
 } from "@/components/anamnesis/audit/audit-filters";
@@ -29,8 +31,8 @@ export function AuditList({
 }: AuditListProps) {
   const headerClass =
     "sticky top-0 z-10 border-b border-border bg-card px-4 py-3 font-medium text-muted-foreground";
-  const userOf = (log: AuditLogItem) =>
-    userNames[log.userId] ?? "Usuário desconhecido";
+  const userOf = (log: AuditLogItem) => auditActorName(log, userNames);
+  const targetOf = (log: AuditLogItem) => auditTargetName(log, userNames);
   const clientOf = (log: AuditLogItem) =>
     log.clientId ? (clientNames[log.clientId] ?? "Cliente desconhecido") : null;
 
@@ -56,6 +58,7 @@ export function AuditList({
                   <p>
                     {userOf(log)}
                     {clientOf(log) && ` · ${clientOf(log)}`}
+                    {targetOf(log) && ` · ${targetOf(log)}`}
                   </p>
                 </li>
               ))}
@@ -64,13 +67,18 @@ export function AuditList({
             <table className="hidden w-full text-left text-sm md:table">
               <thead>
                 <tr>
-                  {["Data e hora", "Usuário", "Ação", "Cliente", "IP"].map(
-                    (title) => (
-                      <th key={title} scope="col" className={headerClass}>
-                        {title}
-                      </th>
-                    ),
-                  )}
+                  {[
+                    "Data e hora",
+                    "Usuário",
+                    "Ação",
+                    "Cliente",
+                    "Alvo",
+                    "IP",
+                  ].map((title) => (
+                    <th key={title} scope="col" className={headerClass}>
+                      {title}
+                    </th>
+                  ))}
                 </tr>
               </thead>
               <tbody className="divide-y divide-border">
@@ -85,6 +93,9 @@ export function AuditList({
                     </td>
                     <td className="px-4 py-3">
                       <EmptyValue>{clientOf(log)}</EmptyValue>
+                    </td>
+                    <td className="px-4 py-3">
+                      <EmptyValue>{targetOf(log)}</EmptyValue>
                     </td>
                     <td className="px-4 py-3 tabular-nums">
                       <EmptyValue>{formatAuditIp(log.ip)}</EmptyValue>

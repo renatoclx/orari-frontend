@@ -58,6 +58,14 @@ Rotas: `/anamnese/modelos` (lista), `/anamnese/modelos/novo` e `/anamnese/modelo
 - **Validação:** o estado aberto/fechado fica no `TemplateForm` (só em memória). Ao enviar com erro, as perguntas com erro abrem sozinhas e o foco vai ao primeiro campo inválido; recolhida, a linha mostra "Revise esta pergunta".
 - Os campos de uma pergunta recolhida saem do DOM, mas os valores continuam no estado do formulário, então nada se perde ao recolher.
 
+## Fichas do cliente (aba "Anamnese")
+
+> Em andamento (etapa C): entregue a **lista**; nova ficha, ficha completa e acompanhamento vêm nos próximos passos.
+
+- A aba **Anamnese** fica na página do cliente (`/clientes/[id]?aba=anamnese`), depois de Pagamentos. Só aparece para quem tem acesso (ADMIN ou usuário vinculado a profissional, `anamnesisAccess`); sem acesso, `?aba=anamnese` cai em Agendamentos e a ficha nem é buscada.
+- Lista (`GET /anamnesis?clientId=`): Modelo, Versão em que a ficha nasceu, Acompanhamentos e Última consulta. "Acompanhamentos" é `entriesCount - 1`, porque a API conta também o registro inicial.
+- **Datas de consulta** chegam como data pura (`…T00:00:00.000Z`) e são exibidas em **UTC** (`formatDateOnly`); no fuso local apareceria o dia anterior.
+
 ## Regras de privacidade no frontend (valem em todas as etapas)
 
 > Destaque técnico: estas regras protegem o dado de saúde e não podem ser quebradas por conveniência.

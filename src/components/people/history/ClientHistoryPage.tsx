@@ -9,6 +9,7 @@ import {
   Pencil,
   UserX,
 } from "lucide-react";
+import { HistoryAnamnesis } from "@/components/anamnesis/records/HistoryAnamnesis";
 import { toAgendaAppointment } from "@/components/agenda/agenda-data";
 import {
   HistoryAppointments,
@@ -30,6 +31,7 @@ import { StatusBadge } from "@/components/shared/StatusBadge";
 import { TablePagination } from "@/components/shared/TablePagination";
 import { Button } from "@/components/ui/button";
 import { ApiError } from "@/services/api";
+import { listAnamneses } from "@/services/anamnesis.service";
 import { listClientAppointments } from "@/services/appointment.service";
 import { getCurrentUser } from "@/services/auth.service";
 import { listClientPlans } from "@/services/client-plan.service";
@@ -38,6 +40,7 @@ import { listClientPayments } from "@/services/payment.service";
 import { getPerson, listPeople } from "@/services/people.service";
 import { listRecurrences } from "@/services/recurrence.service";
 import { listServices } from "@/services/service.service";
+import { anamnesisAccess } from "@/utils/anamnesis-access";
 import { formatDateOnly, formatPhone } from "@/utils/format";
 import { dayBounds, toDateString, toTimeString } from "@/utils/time";
 
@@ -71,7 +74,7 @@ export async function ClientHistoryPage({
   searchParams,
 }: ClientHistoryPageProps) {
   const renderedAt = new Date();
-  const tab: HistoryTab =
+  const requestedTab: HistoryTab =
     HISTORY_TABS.find((item) => item.id === searchParams.aba)?.id ??
     "agendamentos";
   const when: HistoryFilter =
@@ -80,7 +83,7 @@ export async function ClientHistoryPage({
   const page = Math.max(1, Number(searchParams.page) || 1);
   const basePath = `/clientes/${id}`;
 
-  const [{ company }, client, contacts] = await Promise.all([
+  const [user, client, contacts] = await Promise.all([
     getCurrentUser(),
     getPerson(id),
     listContacts(id),
@@ -90,7 +93,13 @@ export async function ClientHistoryPage({
     throw error;
   });
   if (client.type !== "CLIENT") notFound();
-  const timeZone = company.timezone;
+  const timeZone = user.company.timezone;
+  // Sem acesso às fichas, a aba Anamnese não existe: cai na primeira.
+  const canAccessAnamnesis = anamnesisAccess(user).canAccess;
+  const tab: HistoryTab =
+    requestedTab === "anamnese" && !canAccessAnamnesis
+      ? "agendamentos"
+      : requestedTab;
   const principal = contacts.find((contact) => contact.isPrincipal);
 
   // Resumo do cabeçalho, com os filtros que a API já tem.
@@ -210,6 +219,18 @@ export async function ClientHistoryPage({
         footer={pagination(result.total, {})}
       />
     );
+  } else if (tab === "anamnese") {
+    const result = await listAnamneses({
+      clientId: id,
+      page,
+      limit: PAGE_SIZE,
+    });
+    content = (
+      <HistoryAnamnesis
+        anamneses={result.items}
+        footer={pagination(result.total, {})}
+      />
+    );
   } else {
     const result = await listClientPayments({
       clientId: id,
@@ -313,7 +334,11 @@ export async function ClientHistoryPage({
         ))}
       </div>
 
-      <HistoryTabs basePath={basePath} current={tab} />
+      <HistoryTabs
+        basePath={basePath}
+        current={tab}
+        showAnamnesis={canAccessAnamnesis}
+      />
       {content}
     </div>
   );

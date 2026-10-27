@@ -6,6 +6,7 @@ export const HISTORY_TABS = [
   { id: "recorrencias", label: "Recorrências" },
   { id: "pacotes", label: "Pacotes" },
   { id: "pagamentos", label: "Pagamentos" },
+  { id: "anamnese", label: "Anamnese" },
 ] as const;
 
 export type HistoryTab = (typeof HISTORY_TABS)[number]["id"];
@@ -14,14 +15,19 @@ export type HistoryTab = (typeof HISTORY_TABS)[number]["id"];
 export function HistoryTabs({
   basePath,
   current,
+  showAnamnesis,
 }: {
   basePath: string;
   current: HistoryTab;
+  /** A aba Anamnese só aparece para quem tem acesso às fichas. */
+  showAnamnesis: boolean;
 }) {
   return (
     <nav aria-label="Histórico do cliente" className="border-b border-border">
       <ul className="-mb-px flex gap-1 overflow-x-auto">
-        {HISTORY_TABS.map((tab) => {
+        {HISTORY_TABS.filter(
+          (tab) => showAnamnesis || tab.id !== "anamnese",
+        ).map((tab) => {
           const active = tab.id === current;
           return (
             <li key={tab.id}>

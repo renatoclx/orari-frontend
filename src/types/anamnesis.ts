@@ -59,3 +59,18 @@ export type TemplateInput = {
 export type TemplateUpdateInput = Partial<TemplateInput> & {
   isActive?: boolean;
 };
+
+// ---- Fichas dos clientes (GET /anamnesis?clientId=)
+
+/** Ficha na listagem do cliente (resumo; o conteúdo vem em GET /anamnesis/:id). */
+export type AnamnesisListItem = {
+  id: string;
+  createdAt: string;
+  template: { id: string; name: string };
+  /** Versão do modelo em que a ficha nasceu (não muda). */
+  templateVersion: number;
+  /** Todos os registros, o inicial incluído. */
+  entriesCount: number;
+  /** Data pura (`…T00:00:00.000Z`): exibir em UTC. */
+  lastConsultationDate: string;
+};

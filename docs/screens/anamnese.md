@@ -60,11 +60,21 @@ Rotas: `/anamnese/modelos` (lista), `/anamnese/modelos/novo` e `/anamnese/modelo
 
 ## Fichas do cliente (aba "Anamnese")
 
-> Em andamento (etapa C): entregue a **lista**; nova ficha, ficha completa e acompanhamento vêm nos próximos passos.
+> Em andamento (etapa C): entregues a **lista** e a **ficha completa** (somente leitura); nova ficha e acompanhamento vêm nos próximos passos.
 
 - A aba **Anamnese** fica na página do cliente (`/clientes/[id]?aba=anamnese`), depois de Pagamentos. Só aparece para quem tem acesso (ADMIN ou usuário vinculado a profissional, `anamnesisAccess`); sem acesso, `?aba=anamnese` cai em Agendamentos e a ficha nem é buscada.
 - Lista (`GET /anamnesis?clientId=`): Modelo, Versão em que a ficha nasceu, Acompanhamentos e Última consulta. "Acompanhamentos" é `entriesCount - 1`, porque a API conta também o registro inicial.
 - **Datas de consulta** chegam como data pura (`…T00:00:00.000Z`) e são exibidas em **UTC** (`formatDateOnly`); no fuso local apareceria o dia anterior.
+
+### Ficha completa (`/clientes/[id]/anamnese/[fichaId]`)
+
+- Abre pelo nome do modelo na lista. Duas colunas em tela larga (**Situação atual** à esquerda, **Evolução** à direita), empilhadas no celular.
+- **Destaque técnico:** a ficha é desenhada com `version.questions` (a versão em que ela **nasceu**), nunca com a versão atual do modelo. É por isso que renomear ou reordenar perguntas do modelo não mexe nas fichas já preenchidas.
+- **Situação atual:** a resposta mais recente de cada pergunta (`current`); sem resposta aparece "--". Respondida de novo num acompanhamento, mostra "atualizada em dd/mm/aaaa".
+- **Evolução:** do registro mais recente para o mais antigo, com selo Inicial/Acompanhamento, data, autor (`authorProfessional` ou, se não houver, `authorUser`), texto da evolução e as respostas daquele registro (no acompanhamento, só as alteradas). O agendamento vinculado aparece só como "Vinculado a um agendamento".
+- **Formato das respostas** (`answer-format.ts`, com testes): sim/não ("Sim: detalhe"), escolhas separadas por vírgula, data dd/mm/aaaa, escala "7 de 10", número pt-BR. Valor fora do formato esperado vira "--", sem exibir o valor cru.
+- **404** quando a ficha não existe, é de outro cliente que o da URL ou o usuário não tem acesso (`requireAnamnesisAccess`).
+- Sem botões de editar ou excluir: a ficha e os acompanhamentos são imutáveis.
 
 ## Regras de privacidade no frontend (valem em todas as etapas)
 

@@ -13,3 +13,13 @@ export async function requireAnamnesisAdmin() {
   if (!anamnesisAccess(user).isAdmin) notFound();
   return user;
 }
+
+/**
+ * Fichas dos clientes: ADMIN ou usuário vinculado a profissional. Os demais
+ * veem 404 (a API também recusa com 403).
+ */
+export async function requireAnamnesisAccess() {
+  const user = await getCurrentUser();
+  if (!anamnesisAccess(user).canAccess) notFound();
+  return user;
+}

@@ -2,7 +2,7 @@ import "server-only";
 
 import { apiFetch } from "@/services/api";
 import type { Paginated } from "@/types/api";
-import type { AnamnesisListItem } from "@/types/anamnesis";
+import type { AnamnesisDetail, AnamnesisListItem } from "@/types/anamnesis";
 
 type ListAnamnesesParams = {
   /** Obrigatório: a API não tem listagem geral de fichas. */
@@ -21,4 +21,9 @@ export function listAnamneses(
     limit: String(params.limit),
   });
   return apiFetch<Paginated<AnamnesisListItem>>(`/anamnesis?${query}`);
+}
+
+/** Ficha completa, com as perguntas da versão em que nasceu e todo o histórico. */
+export function getAnamnesis(id: string): Promise<AnamnesisDetail> {
+  return apiFetch<AnamnesisDetail>(`/anamnesis/${id}`);
 }

@@ -1,13 +1,20 @@
+import Link from "next/link";
 import type { AnamnesisListItem } from "@/types/anamnesis";
 import { formatDateOnly } from "@/utils/format";
 
 type HistoryAnamnesisProps = {
+  /** Cliente dono das fichas: a ficha abre em /clientes/[clientId]/anamnese/[id]. */
+  clientId: string;
   anamneses: AnamnesisListItem[];
   footer: React.ReactNode;
 };
 
 /** Fichas de anamnese do cliente, na aba "Anamnese" (só leitura nesta lista). */
-export function HistoryAnamnesis({ anamneses, footer }: HistoryAnamnesisProps) {
+export function HistoryAnamnesis({
+  clientId,
+  anamneses,
+  footer,
+}: HistoryAnamnesisProps) {
   const headerClass =
     "sticky top-0 z-10 border-b border-border bg-card px-4 py-3 font-medium text-muted-foreground";
 
@@ -35,7 +42,12 @@ export function HistoryAnamnesis({ anamneses, footer }: HistoryAnamnesisProps) {
               {anamneses.map((item) => (
                 <tr key={item.id} className="tabular-nums">
                   <td className="px-4 py-3 font-medium">
-                    {item.template.name}
+                    <Link
+                      href={`/clientes/${clientId}/anamnese/${item.id}`}
+                      className="hover:underline"
+                    >
+                      {item.template.name}
+                    </Link>
                   </td>
                   <td className="px-4 py-3 whitespace-nowrap">
                     v{item.templateVersion}

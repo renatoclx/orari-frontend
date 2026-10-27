@@ -74,3 +74,47 @@ export type AnamnesisListItem = {
   /** Data pura (`…T00:00:00.000Z`): exibir em UTC. */
   lastConsultationDate: string;
 };
+
+// ---- Ficha completa (GET /anamnesis/:id)
+
+/** Pergunta da ficha: a mesma forma do modelo, mas da versão em que a ficha nasceu. */
+export type AnamnesisQuestion = TemplateQuestion;
+
+/**
+ * Valor guardado de uma resposta, que depende do tipo da pergunta (texto,
+ * número, lista, `{ answer, detail? }` no sim ou não). Chega como `unknown`
+ * e é interpretado por `formatAnswer`, conferindo o formato.
+ */
+export type AnswerValue = unknown;
+
+export type AnamnesisAnswer = { questionId: string; value: AnswerValue };
+
+export type AnamnesisEntry = {
+  id: string;
+  kind: "INITIAL" | "FOLLOW_UP";
+  /** Data pura (`…T00:00:00.000Z`): exibir em UTC. */
+  consultationDate: string;
+  appointmentId: string | null;
+  /** Texto do acompanhamento; nulo no registro inicial. */
+  evolution: string | null;
+  authorUser: { id: string; name: string };
+  /** Nulo quando quem registrou não tem vínculo com profissional. */
+  authorProfessional: { id: string; name: string } | null;
+  createdAt: string;
+  /** No registro inicial, todas as respostas; no acompanhamento, só as alteradas. */
+  answers: AnamnesisAnswer[];
+};
+
+export type AnamnesisDetail = {
+  id: string;
+  createdAt: string;
+  client: { id: string; name: string };
+  template: { id: string; name: string };
+  version: { id: string; version: number; questions: AnamnesisQuestion[] };
+  /** Resposta mais recente de cada pergunta já respondida. */
+  current: Array<
+    AnamnesisAnswer & { entryId: string; consultationDate: string }
+  >;
+  /** Do registro inicial ao último acompanhamento. */
+  entries: AnamnesisEntry[];
+};

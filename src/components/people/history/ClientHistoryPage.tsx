@@ -227,6 +227,7 @@ export async function ClientHistoryPage({
     });
     content = (
       <HistoryAnamnesis
+        clientId={id}
         anamneses={result.items}
         footer={pagination(result.total, {})}
       />

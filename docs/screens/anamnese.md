@@ -60,7 +60,7 @@ Rotas: `/anamnese/modelos` (lista), `/anamnese/modelos/novo` e `/anamnese/modelo
 
 ## Fichas do cliente (aba "Anamnese")
 
-> Em andamento (etapa C): entregues a **lista**, a **ficha completa** e o **acompanhamento**; falta a **nova ficha** (C2).
+> Etapa C entregue: **lista**, **ficha completa**, **acompanhamento** e **nova ficha**.
 
 - A aba **Anamnese** fica na página do cliente (`/clientes/[id]?aba=anamnese`), depois de Pagamentos. Só aparece para quem tem acesso (ADMIN ou usuário vinculado a profissional, `anamnesisAccess`); sem acesso, `?aba=anamnese` cai em Agendamentos e a ficha nem é buscada.
 - Lista (`GET /anamnesis?clientId=`): Modelo, Versão em que a ficha nasceu, Acompanhamentos e Última consulta. "Acompanhamentos" é `entriesCount - 1`, porque a API conta também o registro inicial.
@@ -87,11 +87,24 @@ Rotas: `/anamnese/modelos` (lista), `/anamnese/modelos/novo` e `/anamnese/modelo
 - A conversão tela → API e a validação ficam em funções puras testadas (`answer-form.ts`, `entry-validation.ts`), fora dos componentes.
 - Server Action `createEntryAction`: confere o acesso e o texto da evolução, mostra o erro da API como veio e atualiza a ficha (`revalidatePath`). O rascunho fica só em memória.
 
+### Fichas preenchidas (`/anamnese/fichas`)
+
+- Tela de entrada das fichas, no menu **Anamnese** (o ADMIN a vê no grupo; o **profissional vinculado**, que só tem esse item, o vê direto). Lista os **clientes que já têm ficha**: Cliente, quantidade de **Fichas**, **Status** (ativo ou inativo, que continua legível) e a ação de ver as fichas. Tem busca por nome (sem acento nem maiúscula) e paginação; o botão **Nova ficha** fica no topo.
+- **Destaque técnico:** a API não tem listagem geral de fichas (`GET /anamnesis` exige o cliente). A tabela usa `GET /anamnesis/clients`, que devolve nome e contagem numa chamada só e grava **uma** auditoria; contar cliente a cliente geraria uma auditoria por linha só de abrir a tela.
+- **Dialog "Fichas de {cliente}":** abre pela ação da linha e busca as fichas do cliente só nesse momento (Server Action). Mostra modelo, versão, acompanhamentos e última consulta, com **Abrir** em cada uma (é na ficha aberta que se usa **Novo acompanhamento**; a ficha preenchida não é editada). O botão **Nova ficha** (cliente ativo) leva ao formulário com o cliente já escolhido.
+
+### Nova ficha (`/anamnese/fichas/nova`)
+
+- **Duas entradas, uma tela:** o botão **Nova ficha** da tela **Fichas preenchidas** (e do dialog dela), em que se escolhe o cliente, e o botão **Nova ficha** da aba Anamnese do cliente (some com cliente inativo), que chega com o cliente já escolhido (`?clienteId=`, só o id na URL). Assim ninguém precisa abrir o cliente, a aba e só então lançar a ficha.
+- **Cliente:** seletor com busca no servidor (`useClientSearch`, os mesmos clientes ativos do agendamento). Escolher leva à mesma página com o cliente na URL; `?clienteId=` inválido é 404 e cliente inativo mostra o aviso.
+- **Modelo:** só os modelos **ativos** que o cliente **ainda não usou** (uma ficha por cliente e modelo). Com um só, já vem escolhido. Sem nenhum disponível, a tela explica o motivo: **o cliente já tem ficha de todos os modelos ativos** (com o caminho para abrir a ficha e usar Novo acompanhamento e o botão "Ver fichas do cliente") ou **não há modelo ativo** na empresa (o ADMIN ganha o link para os Modelos). **Trocar o modelo descarta as respostas digitadas**, porque as perguntas mudam.
+- **Data da consulta:** hoje no fuso da empresa; pode ser passada, nunca futura (`validateConsultationDate`, compartilhada com o acompanhamento).
+- **Perguntas:** as da versão vigente do modelo, com o mesmo `AnswerField` do acompanhamento (os 8 tipos), agora com `*` nas obrigatórias. **Destaque técnico:** `buildNewAnswers` envia as respondidas, **omite a opcional vazia** (nunca `null`) e acusa a obrigatória vazia no campo; o foco vai ao primeiro erro.
+- Ao criar, abre a ficha completa. Erros da API (409, 400) aparecem como vieram; o rascunho fica só em memória.
+
 ### Atalho a partir do agendamento
 
 - **Atalho:** o dialog de detalhes do agendamento (agenda, histórico do cliente e financeiro) tem o botão **Anamnese**, que abre a aba de fichas do cliente. Só aparece para quem tem acesso; o acesso chega por um contexto (`AnamnesisAccessProvider`, no `AdminShell`), sem repassar prop pelas três telas.
-- **"Sem acompanhamento" no cartão de hover:** ao passar o mouse (ou focar com o teclado) num agendamento **Concluído** ou **Em andamento** da agenda do dia que ainda não tem acompanhamento, o cartão mostra "Sem acompanhamento", com o ícone de prancheta com X. Só no cartão: o bloco da grade já tem ícones demais. Só para quem tem acesso à anamnese; nos demais status não há o que anotar.
-- **Destaque técnico:** a informação vem de `GET /anamnesis/appointments-with-entry?appointmentIds=` (backend), que devolve **só ids** de agendamento: nenhum conteúdo da ficha chega à agenda. Foi um endpoint próprio, e não um campo no `/appointments`, porque a agenda é lida também por quem não tem acesso à anamnese. A agenda consulta só os atendimentos concluídos ou em andamento do dia (em lotes de até 100) e, se a chamada falhar, abre normalmente sem o aviso.
 
 ## Regras de privacidade no frontend (valem em todas as etapas)
 

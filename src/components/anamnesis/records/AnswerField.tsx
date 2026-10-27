@@ -21,6 +21,8 @@ type AnswerFieldProps = {
   value: AnswerDraft;
   onChange: (value: AnswerDraft) => void;
   error?: string;
+  /** Marca com * as perguntas obrigatórias (só na ficha nova: no acompanhamento nenhuma é). */
+  showRequired?: boolean;
 };
 
 // Botão de alternância (sim ou não e escala): pressionado = escolhido.
@@ -64,7 +66,9 @@ export function AnswerField({
   value,
   onChange,
   error,
+  showRequired = false,
 }: AnswerFieldProps) {
+  const required = showRequired && question.isRequired;
   const set = (patch: Partial<AnswerDraft>) => onChange({ ...value, ...patch });
   const label = `${question.position}. ${question.label}`;
   const invalid = error ? true : undefined;
@@ -80,7 +84,7 @@ export function AnswerField({
     question.type === "DATE"
   ) {
     return (
-      <FormField id={id} label={label} error={error}>
+      <FormField id={id} label={label} required={required} error={error}>
         {question.type === "LONG_TEXT" ? (
           <Textarea
             id={id}
@@ -119,6 +123,11 @@ export function AnswerField({
     <div className="space-y-2">
       <p id={`${id}-label`} className="text-sm leading-none font-medium">
         {label}
+        {required && (
+          <span className="ml-0.5 text-destructive" aria-hidden="true">
+            *
+          </span>
+        )}
       </p>
       {/* id e tabIndex: é para onde o foco vai quando a pergunta tem erro. */}
       <div

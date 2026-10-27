@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import {
+  buildNewAnswers,
   changedAnswers,
   draftFromValue,
   emptyDraft,
@@ -155,5 +156,61 @@ describe("changedAnswers", () => {
       b: draftFromValue(q[1], cur.b),
     };
     expect(changedAnswers(q, drafts, cur).answers).toEqual([]);
+  });
+});
+
+describe("buildNewAnswers", () => {
+  const questions = [
+    {
+      id: "a",
+      type: "SHORT_TEXT" as const,
+      options: [],
+      detailLabel: null,
+      isRequired: true,
+    },
+    {
+      id: "b",
+      type: "SCALE" as const,
+      options: [],
+      detailLabel: null,
+      isRequired: false,
+    },
+    {
+      id: "c",
+      type: "NUMBER" as const,
+      options: [],
+      detailLabel: null,
+      isRequired: false,
+    },
+  ];
+
+  it("envia as respondidas e omite a opcional vazia", () => {
+    const drafts = {
+      a: { ...emptyDraft(), text: "Dor lombar" },
+      b: emptyDraft(),
+      c: { ...emptyDraft(), text: "68,5" },
+    };
+    expect(buildNewAnswers(questions, drafts)).toEqual({
+      answers: [
+        { questionId: "a", value: "Dor lombar" },
+        { questionId: "c", value: 68.5 },
+      ],
+      errors: {},
+    });
+  });
+
+  it("pergunta obrigatória vazia é erro", () => {
+    const result = buildNewAnswers(questions, {});
+    expect(result.errors.a).toMatch(/obrigatória/);
+    expect(result.errors.b).toBeUndefined();
+    expect(result.answers).toEqual([]);
+  });
+
+  it("valor inválido é erro da pergunta", () => {
+    const drafts = {
+      a: { ...emptyDraft(), text: "ok" },
+      c: { ...emptyDraft(), text: "abc" },
+    };
+    expect(buildNewAnswers(questions, drafts).errors.c).toBeTruthy();
   });
 });

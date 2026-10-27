@@ -37,13 +37,28 @@ export function validateEntryForm(
     errors.evolution = `Use no máximo ${EVOLUTION_MAX.toLocaleString("pt-BR")} caracteres.`;
   }
 
-  const date = values.consultationDate;
-  if (!isDateString(date)) {
-    errors.consultationDate = "Informe a data da consulta.";
-  } else if (date > today) {
-    errors.consultationDate = "A data da consulta não pode ser futura.";
-  } else if (date < initialDate) {
-    errors.consultationDate = `A data não pode ser anterior ao registro inicial (${formatDateOnly(`${initialDate}T00:00:00Z`)}).`;
-  }
+  const dateError = validateConsultationDate(
+    values.consultationDate,
+    today,
+    initialDate,
+  );
+  if (dateError) errors.consultationDate = dateError;
   return errors;
+}
+
+/**
+ * Data da consulta ("aaaa-mm-dd"): não pode ser futura nem, quando há registro
+ * inicial (`minDate`), anterior a ele. Devolve o erro ou `null`.
+ */
+export function validateConsultationDate(
+  date: string,
+  today: string,
+  minDate?: string,
+): string | null {
+  if (!isDateString(date)) return "Informe a data da consulta.";
+  if (date > today) return "A data da consulta não pode ser futura.";
+  if (minDate && date < minDate) {
+    return `A data não pode ser anterior ao registro inicial (${formatDateOnly(`${minDate}T00:00:00Z`)}).`;
+  }
+  return null;
 }

@@ -3,7 +3,9 @@ import "server-only";
 import { apiFetch } from "@/services/api";
 import type { Paginated } from "@/types/api";
 import type {
+  AnamnesisClientItem,
   AnamnesisDetail,
+  AnamnesisInput,
   AnamnesisListItem,
   EntryInput,
 } from "@/types/anamnesis";
@@ -44,4 +46,44 @@ export function createEntry(
     method: "POST",
     body: JSON.stringify(input),
   });
+}
+
+/**
+ * Nova ficha (registro inicial). Cliente inativo, modelo inativo ou ficha já
+ * existente do cliente para o modelo respondem 409; pergunta obrigatória sem
+ * resposta, 400.
+ */
+export function createAnamnesis(
+  input: AnamnesisInput,
+): Promise<AnamnesisDetail> {
+  return apiFetch<AnamnesisDetail>("/anamnesis", {
+    method: "POST",
+    body: JSON.stringify(input),
+  });
+}
+
+type ListAnamnesisClientsParams = {
+  /** Busca parcial pelo nome, sem diferenciar acentos nem maiúsculas. */
+  name?: string;
+  page: number;
+  limit: number;
+};
+
+/**
+ * Clientes que têm ficha, com a quantidade (só nome e contagem). Uma consulta
+ * para a página inteira: listar as fichas cliente a cliente geraria uma
+ * auditoria por cliente.
+ */
+export function listAnamnesisClients(
+  params: ListAnamnesisClientsParams,
+): Promise<Paginated<AnamnesisClientItem>> {
+  const query = new URLSearchParams({
+    page: String(params.page),
+    limit: String(params.limit),
+  });
+  const name = params.name?.trim();
+  if (name) query.set("name", name);
+  return apiFetch<Paginated<AnamnesisClientItem>>(
+    `/anamnesis/clients?${query}`,
+  );
 }

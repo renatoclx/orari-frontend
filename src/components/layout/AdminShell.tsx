@@ -44,6 +44,7 @@ export function AdminShell({
         <Sidebar
           isSuperAdmin={user.type === "SUPER_ADMIN"}
           isAdmin={anamnesisAccess(user).isAdmin}
+          canAccessAnamnesis={anamnesisAccess(user).canAccess}
           collapsed={collapsed}
           onToggleCollapsed={toggleCollapsed}
           mobileOpen={mobileOpen}

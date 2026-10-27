@@ -3,9 +3,17 @@
 import { revalidatePath } from "next/cache";
 import { EVOLUTION_MAX } from "@/components/anamnesis/records/entry-validation";
 import { failureFrom, type ActionFailure } from "@/lib/action-result";
-import { createEntry } from "@/services/anamnesis.service";
+import {
+  createAnamnesis,
+  createEntry,
+  listAnamneses,
+} from "@/services/anamnesis.service";
 import { getCurrentUser } from "@/services/auth.service";
-import type { EntryInput } from "@/types/anamnesis";
+import type {
+  AnamnesisInput,
+  AnamnesisListItem,
+  EntryInput,
+} from "@/types/anamnesis";
 import { anamnesisAccess } from "@/utils/anamnesis-access";
 
 export type EntryActionResult = { ok: true } | ActionFailure<"evolution">;
@@ -44,4 +52,57 @@ export async function createEntryAction(
   revalidatePath(`/clientes/${clientId}/anamnese/${anamnesisId}`);
   revalidatePath(`/clientes/${clientId}`);
   return { ok: true };
+}
+
+export type AnamnesisActionResult = { ok: true; id: string } | ActionFailure;
+
+/**
+ * Nova ficha: o registro inicial, com as respostas. Confere o acesso e deixa a
+ * API validar o resto (modelo ativo, ficha repetida, obrigatórias, data). O erro
+ * da API volta tal como veio; nada do conteúdo vai para log nem para a URL.
+ */
+export async function createAnamnesisAction(
+  input: AnamnesisInput,
+): Promise<AnamnesisActionResult> {
+  const user = await getCurrentUser();
+  if (!anamnesisAccess(user).canAccess) {
+    return {
+      ok: false,
+      message: "Você não tem acesso às fichas de anamnese.",
+    };
+  }
+
+  try {
+    const created = await createAnamnesis(input);
+    revalidatePath(`/clientes/${input.clientId}`);
+    return { ok: true, id: created.id };
+  } catch (error) {
+    return failureFrom(error);
+  }
+}
+
+export type ClientAnamnesesResult =
+  { ok: true; items: AnamnesisListItem[] } | ActionFailure;
+
+/**
+ * Fichas de um cliente, buscadas só quando o dialog "Ver fichas" abre (a
+ * listagem dos clientes traz apenas a contagem). Até 100 fichas: uma por modelo.
+ */
+export async function listClientAnamnesesAction(
+  clientId: string,
+): Promise<ClientAnamnesesResult> {
+  const user = await getCurrentUser();
+  if (!anamnesisAccess(user).canAccess) {
+    return {
+      ok: false,
+      message: "Você não tem acesso às fichas de anamnese.",
+    };
+  }
+
+  try {
+    const result = await listAnamneses({ clientId, page: 1, limit: 100 });
+    return { ok: true, items: result.items };
+  } catch (error) {
+    return failureFrom(error);
+  }
 }

@@ -102,6 +102,13 @@ Rotas: `/anamnese/modelos` (lista), `/anamnese/modelos/novo` e `/anamnese/modelo
 - **Perguntas:** as da versão vigente do modelo, com o mesmo `AnswerField` do acompanhamento (os 8 tipos), agora com `*` nas obrigatórias. **Destaque técnico:** `buildNewAnswers` envia as respondidas, **omite a opcional vazia** (nunca `null`) e acusa a obrigatória vazia no campo; o foco vai ao primeiro erro.
 - Ao criar, abre a ficha completa. Erros da API (409, 400) aparecem como vieram; o rascunho fica só em memória.
 
+### Impressão (PDF)
+
+- Botão **Imprimir** na ficha completa: abre um dialog com a opção **"Incluir histórico de acompanhamento"** (marcada por padrão; desmarque para a via do cliente, só com a ficha para assinar) e o botão **Gerar PDF**. O PDF aparece no próprio dialog, no visualizador do navegador (que tem o botão de imprimir), e há **Abrir em nova aba** para quando o celular não embute o PDF. Mudar a opção descarta o PDF anterior.
+- **Destaque técnico:** a API exige o token no cabeçalho `Authorization`, então um link direto não funciona. O Route Handler `clientes/[id]/anamnese/[fichaId]/pdf/route.ts`, no servidor do Next, lê o token do cookie httpOnly (a renovação da sessão é a do `proxy`), busca o PDF e devolve os **bytes** com `Content-Type: application/pdf` e `Cache-Control: no-store`. A chamada usa `apiFetchBytes` (em `services/api.ts`), porque o `apiFetch` leria a resposta como texto e corromperia o arquivo.
+- **Privacidade:** o PDF vive só na memória da página (URL de blob, revogada ao fechar o dialog ou trocar a opção); sem cache e sem nome com dado pessoal (`ficha-anamnese.pdf`).
+- **Erros:** 403 ("sem acesso às fichas"), 404 e falha de conexão aparecem no dialog; sessão vencida leva ao login. O estado "Gerando…" cobre a geração.
+
 ### Atalho a partir do agendamento
 
 - **Atalho:** o dialog de detalhes do agendamento (agenda, histórico do cliente e financeiro) tem o botão **Anamnese**, que abre a aba de fichas do cliente. Só aparece para quem tem acesso; o acesso chega por um contexto (`AnamnesisAccessProvider`, no `AdminShell`), sem repassar prop pelas três telas.

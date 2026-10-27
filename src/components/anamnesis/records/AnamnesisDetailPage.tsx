@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ChevronLeft, Plus } from "lucide-react";
+import { AnamnesisPdfDialog } from "@/components/anamnesis/records/AnamnesisPdfDialog";
 import { AnamnesisTimeline } from "@/components/anamnesis/records/AnamnesisTimeline";
 import { CurrentAnswers } from "@/components/anamnesis/records/CurrentAnswers";
 import { Button } from "@/components/ui/button";
@@ -90,15 +91,20 @@ export async function AnamnesisDetailPage({
               ` · registro inicial em ${formatDateOnly(detail.entries[0].consultationDate)}`}
           </p>
         </div>
-        {/* Cliente inativo: a ficha só se consulta (a API recusa o acompanhamento). */}
-        {client.deletedAt === null && (
-          <Button asChild>
-            <Link href={`/clientes/${clientId}/anamnese/${id}/acompanhamento`}>
-              <Plus aria-hidden="true" />
-              Novo acompanhamento
-            </Link>
-          </Button>
-        )}
+        <div className="flex flex-wrap items-center gap-2">
+          <AnamnesisPdfDialog clientId={clientId} anamnesisId={id} />
+          {/* Cliente inativo: a ficha só se consulta (a API recusa o acompanhamento). */}
+          {client.deletedAt === null && (
+            <Button asChild>
+              <Link
+                href={`/clientes/${clientId}/anamnese/${id}/acompanhamento`}
+              >
+                <Plus aria-hidden="true" />
+                Novo acompanhamento
+              </Link>
+            </Button>
+          )}
+        </div>
       </div>
 
       <div className="grid min-h-0 flex-1 gap-4 overflow-auto lg:grid-cols-2 lg:overflow-hidden">

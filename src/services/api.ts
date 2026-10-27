@@ -98,3 +98,38 @@ export async function apiFetch<T>(
 
   return body as T;
 }
+
+/**
+ * Chamada autenticada cuja resposta é um arquivo (PDF): devolve os bytes, sem
+ * passar pelo parser de JSON. Diferente de `apiFetch`, o 401 não redireciona
+ * (quem chama é um Route Handler que responde ao navegador); vira `ApiError`
+ * como os demais erros.
+ */
+export async function apiFetchBytes(
+  path: string,
+): Promise<{ bytes: ArrayBuffer; contentType: string }> {
+  const baseUrl = process.env.API_URL;
+  if (!baseUrl) {
+    throw new Error("API_URL não definida. Confira o .env.local.");
+  }
+
+  const token = await getAccessToken();
+  let response: Response;
+  try {
+    response = await fetch(`${baseUrl}${path}`, {
+      headers: token ? { Authorization: `Bearer ${token}` } : undefined,
+      // Dado de saúde: nada de cache.
+      cache: "no-store",
+    });
+  } catch {
+    throw new ApiError(0, "Não foi possível conectar ao servidor.");
+  }
+
+  if (!response.ok) {
+    throw new ApiError(response.status, errorMessage(await readBody(response)));
+  }
+  return {
+    bytes: await response.arrayBuffer(),
+    contentType: response.headers.get("content-type") ?? "application/pdf",
+  };
+}

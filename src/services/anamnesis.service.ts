@@ -1,6 +1,6 @@
 import "server-only";
 
-import { apiFetch } from "@/services/api";
+import { apiFetch, apiFetchBytes } from "@/services/api";
 import type { Paginated } from "@/types/api";
 import type {
   AnamnesisClientItem,
@@ -86,4 +86,14 @@ export function listAnamnesisClients(
   return apiFetch<Paginated<AnamnesisClientItem>>(
     `/anamnesis/clients?${query}`,
   );
+}
+
+/**
+ * PDF da ficha, gerado no backend. Com `includeHistory`, traz também o histórico
+ * de acompanhamento (página própria, sem assinatura); sem ele, só a ficha, para
+ * a via do cliente.
+ */
+export function getAnamnesisPdf(id: string, includeHistory: boolean) {
+  const query = new URLSearchParams({ includeHistory: String(includeHistory) });
+  return apiFetchBytes(`/anamnesis/${id}/pdf?${query}`);
 }

@@ -118,3 +118,15 @@ export type AnamnesisDetail = {
   /** Do registro inicial ao último acompanhamento. */
   entries: AnamnesisEntry[];
 };
+
+/** Corpo de POST /anamnesis/:id/entries (acompanhamento). */
+export type EntryInput = {
+  /** Obrigatória, até 10.000 caracteres. */
+  evolution: string;
+  /** "aaaa-mm-dd"; padrão hoje, nunca futura nem anterior ao registro inicial. */
+  consultationDate?: string;
+  /** Agendamento do mesmo cliente (opcional). */
+  appointmentId?: string;
+  /** Só as perguntas cuja resposta mudou. */
+  answers?: AnamnesisAnswer[];
+};

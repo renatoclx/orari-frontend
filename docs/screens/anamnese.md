@@ -60,7 +60,7 @@ Rotas: `/anamnese/modelos` (lista), `/anamnese/modelos/novo` e `/anamnese/modelo
 
 ## Fichas do cliente (aba "Anamnese")
 
-> Em andamento (etapa C): entregues a **lista** e a **ficha completa** (somente leitura); nova ficha e acompanhamento vêm nos próximos passos.
+> Em andamento (etapa C): entregues a **lista**, a **ficha completa** e o **acompanhamento**; falta a **nova ficha** (C2).
 
 - A aba **Anamnese** fica na página do cliente (`/clientes/[id]?aba=anamnese`), depois de Pagamentos. Só aparece para quem tem acesso (ADMIN ou usuário vinculado a profissional, `anamnesisAccess`); sem acesso, `?aba=anamnese` cai em Agendamentos e a ficha nem é buscada.
 - Lista (`GET /anamnesis?clientId=`): Modelo, Versão em que a ficha nasceu, Acompanhamentos e Última consulta. "Acompanhamentos" é `entriesCount - 1`, porque a API conta também o registro inicial.
@@ -74,7 +74,24 @@ Rotas: `/anamnese/modelos` (lista), `/anamnese/modelos/novo` e `/anamnese/modelo
 - **Evolução:** do registro mais recente para o mais antigo, com selo Inicial/Acompanhamento, data, autor (`authorProfessional` ou, se não houver, `authorUser`), texto da evolução e as respostas daquele registro (no acompanhamento, só as alteradas). O agendamento vinculado aparece só como "Vinculado a um agendamento".
 - **Formato das respostas** (`answer-format.ts`, com testes): sim/não ("Sim: detalhe"), escolhas separadas por vírgula, data dd/mm/aaaa, escala "7 de 10", número pt-BR. Valor fora do formato esperado vira "--", sem exibir o valor cru.
 - **404** quando a ficha não existe, é de outro cliente que o da URL ou o usuário não tem acesso (`requireAnamnesisAccess`).
+- **Agendamento vinculado:** cada acompanhamento mostra qual agendamento é ("Massagem · 21/01/2027 às 14:30 · com Carol"). A API devolve só o `appointmentId`, então a página busca cada agendamento (`getAppointment`, sem repetir ids). Se um não puder ser lido, aparece "Agendamento indisponível", sem quebrar a página.
 - Sem botões de editar ou excluir: a ficha e os acompanhamentos são imutáveis.
+
+### Novo acompanhamento (`/clientes/[id]/anamnese/[fichaId]/acompanhamento`)
+
+- Botão **"Novo acompanhamento"** na ficha completa; **some com o cliente inativo** (a API recusaria com 409) e a página responde 404 nesse caso.
+- **Evolução do atendimento:** campo de texto grande, obrigatório, com contador (até 10.000 caracteres). É a anotação textual do profissional; fica no histórico da ficha.
+- **Data da consulta** (padrão: hoje no fuso da empresa; não pode ser futura nem anterior ao registro inicial) e **Agendamento** opcional (todos os agendamentos do cliente, do mais recente ao mais antigo).
+- **Atualizar respostas da ficha** (seção recolhida, opcional): cada pergunta vem preenchida com a resposta atual. **Destaque técnico:** só as respostas que **mudaram** vão no envio (`changedAnswers`); campo vazio nunca vai como `null` e uma resposta já dada **não pode ser apagada**, só atualizada.
+- **Um campo por tipo** (`AnswerField`, reaproveitado na nova ficha): texto curto e longo, sim/não (botões, com campo de detalhe quando a pergunta pede), escolha única (rádio), múltipla (caixas), número (aceita vírgula), data e escala 0–10 (botões).
+- A conversão tela → API e a validação ficam em funções puras testadas (`answer-form.ts`, `entry-validation.ts`), fora dos componentes.
+- Server Action `createEntryAction`: confere o acesso e o texto da evolução, mostra o erro da API como veio e atualiza a ficha (`revalidatePath`). O rascunho fica só em memória.
+
+### Atalho a partir do agendamento
+
+- **Atalho:** o dialog de detalhes do agendamento (agenda, histórico do cliente e financeiro) tem o botão **Anamnese**, que abre a aba de fichas do cliente. Só aparece para quem tem acesso; o acesso chega por um contexto (`AnamnesisAccessProvider`, no `AdminShell`), sem repassar prop pelas três telas.
+- **"Sem acompanhamento" no cartão de hover:** ao passar o mouse (ou focar com o teclado) num agendamento **Concluído** ou **Em andamento** da agenda do dia que ainda não tem acompanhamento, o cartão mostra "Sem acompanhamento", com o ícone de prancheta com X. Só no cartão: o bloco da grade já tem ícones demais. Só para quem tem acesso à anamnese; nos demais status não há o que anotar.
+- **Destaque técnico:** a informação vem de `GET /anamnesis/appointments-with-entry?appointmentIds=` (backend), que devolve **só ids** de agendamento: nenhum conteúdo da ficha chega à agenda. Foi um endpoint próprio, e não um campo no `/appointments`, porque a agenda é lida também por quem não tem acesso à anamnese. A agenda consulta só os atendimentos concluídos ou em andamento do dia (em lotes de até 100) e, se a chamada falhar, abre normalmente sem o aviso.
 
 ## Regras de privacidade no frontend (valem em todas as etapas)
 

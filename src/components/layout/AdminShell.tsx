@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { AnamnesisAccessProvider } from "@/components/anamnesis/AnamnesisAccessProvider";
 import { ActionBar } from "@/components/layout/ActionBar";
 import { Header } from "@/components/layout/Header";
 import { Sidebar } from "@/components/layout/Sidebar";
@@ -31,7 +32,7 @@ export function AdminShell({
   }
 
   return (
-    <>
+    <AnamnesisAccessProvider canAccess={anamnesisAccess(user).canAccess}>
       {/* Primeiro item do teclado: leva ao conteúdo sem passar por todo o menu. */}
       <a
         href="#conteudo"
@@ -64,6 +65,6 @@ export function AdminShell({
         <ActionBar />
         <WelcomeToast userName={user.name} />
       </div>
-    </>
+    </AnamnesisAccessProvider>
   );
 }

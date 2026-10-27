@@ -1,3 +1,4 @@
+import { CalendarClock } from "lucide-react";
 import { formatAnswer } from "@/components/anamnesis/records/answer-format";
 import { EmptyValue } from "@/components/shared/EmptyValue";
 import { Badge } from "@/components/ui/badge";
@@ -6,10 +7,15 @@ import { formatDateOnly } from "@/utils/format";
 
 type AnamnesisTimelineProps = {
   detail: AnamnesisDetail;
+  /** Texto de cada agendamento vinculado (pelo id); nulo se não pôde ser lido. */
+  appointments: Record<string, string | null>;
 };
 
 /** Histórico da ficha, do registro mais recente para o mais antigo. */
-export function AnamnesisTimeline({ detail }: AnamnesisTimelineProps) {
+export function AnamnesisTimeline({
+  detail,
+  appointments,
+}: AnamnesisTimelineProps) {
   const questions = new Map(
     detail.version.questions.map((question) => [question.id, question]),
   );
@@ -38,8 +44,9 @@ export function AnamnesisTimeline({ detail }: AnamnesisTimelineProps) {
             <p className="mt-3 whitespace-pre-wrap">{entry.evolution}</p>
           )}
           {entry.appointmentId && (
-            <p className="mt-2 text-sm text-muted-foreground">
-              Vinculado a um agendamento.
+            <p className="mt-2 flex items-center gap-1.5 text-sm text-muted-foreground">
+              <CalendarClock className="size-4 shrink-0" aria-hidden="true" />
+              {appointments[entry.appointmentId] ?? "Agendamento indisponível"}
             </p>
           )}
 

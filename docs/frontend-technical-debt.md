@@ -59,6 +59,11 @@ Pontos conhecidos e aceitos por enquanto. Revisar quando o contexto mudar.
 - **Pagamento sem cobrança própria na comanda.** Sessões de pacote aparecem como "Incluído no pacote", e o avulso ainda não concluído, como "Aguardando conclusão"; receber antes de concluir (sinal) não existe.
 - **Status da comanda só no frontend.** A regra dos quatro estados (`utils/checkout.ts`) deduz a situação de `appointments[].payment`, `clientPlanId` e dos pagamentos anteriores; o backend poderia devolver um `status` explícito por comanda e a tela deixaria de deduzir.
 
+## Anamnese
+
+- **Descrição do modelo não some.** A API não aceita descrição vazia nem `null` no `PATCH`; a tela recusa apagar uma descrição já preenchida. Se for preciso poder removê-la, o backend precisa aceitar `null`.
+- **Sem pré-visualização da ficha.** O editor de modelos mostra os cartões de pergunta, não a ficha como o profissional a verá.
+
 ## Deploy
 
 - **`API_URL` é lida no build para `/uploads`.** O `next.config.ts` grava o destino da reescrita no `next build`; trocar a `API_URL` só em tempo de execução não muda esse destino. Mudou o endereço da API: construir a imagem de novo.

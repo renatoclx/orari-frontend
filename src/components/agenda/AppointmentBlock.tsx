@@ -2,7 +2,13 @@ import {
   RecurrenceOriginIcon,
   recurrenceLabel,
 } from "@/components/agenda/recurrence-label";
-import { CalendarClock, Clock, StickyNote, UserRound } from "lucide-react";
+import {
+  CalendarClock,
+  ClipboardX,
+  Clock,
+  StickyNote,
+  UserRound,
+} from "lucide-react";
 import { APPOINTMENT_STATUS } from "@/components/agenda/appointment-status";
 import { PersonAvatar } from "@/components/shared/PersonAvatar";
 import {
@@ -70,7 +76,7 @@ export function AppointmentBlock({
             backgroundColor: `color-mix(in srgb, ${serviceColor} ${faded ? 8 : 16}%, transparent)`,
           }}
         >
-          <div className="flex items-center gap-1.5">
+          <div className="mb-0.5 flex items-center gap-1.5">
             <time className="text-xs text-muted-foreground tabular-nums">
               {appointment.start}
             </time>
@@ -83,7 +89,7 @@ export function AppointmentBlock({
             </h3>
 
             <StatusIcon
-              className={`ml-auto size-3.5 shrink-0 ${
+              className={`ml-auto size-4 shrink-0 ${
                 status === "IN_PROGRESS" ? "motion-safe:animate-pulse" : ""
               }`}
               style={
@@ -94,13 +100,13 @@ export function AppointmentBlock({
           </div>
           <p className="flex items-center gap-1 truncate text-xs text-muted-foreground">
             {appointment.overbooking && (
-              <CalendarClock className="size-3 shrink-0" aria-hidden="true" />
+              <CalendarClock className="size-4 shrink-0" aria-hidden="true" />
             )}
             {/* Pacote ou recorrência: cada origem tem o seu ícone (ver a legenda). */}
             {appointment.recurrence && (
               <RecurrenceOriginIcon
                 recurrence={appointment.recurrence}
-                className="size-3 shrink-0"
+                className="size-4 shrink-0"
               />
             )}
             <span className="truncate">{appointment.serviceName}</span>
@@ -159,6 +165,13 @@ export function AppointmentBlock({
                 className="size-4 shrink-0"
               />
               {recurrenceLabel(appointment.recurrence)}
+            </li>
+          )}
+          {/* Só no cartão de hover: o bloco da grade já está cheio de ícones. */}
+          {appointment.withoutEntry && (
+            <li className="flex items-center gap-2">
+              <ClipboardX className="size-4 shrink-0" aria-hidden="true" />
+              Sem acompanhamento
             </li>
           )}
           {appointment.note && (

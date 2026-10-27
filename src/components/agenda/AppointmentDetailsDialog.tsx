@@ -3,17 +3,19 @@
 import {
   CalendarClock,
   CalendarSync,
+  ClipboardList,
   Clock,
   ListChecks,
   Package,
   Pencil,
   StickyNote,
   UserRound,
-  X,
   Ban,
 } from "lucide-react";
+import Link from "next/link";
 import { useState, useTransition } from "react";
 import { toast } from "sonner";
+import { useCanAccessAnamnesis } from "@/components/anamnesis/AnamnesisAccessProvider";
 import { cancelAppointmentAction } from "@/app/(admin)/appointment-actions";
 import { cancelRecurrenceSessionAction } from "@/app/(admin)/recurrence-actions";
 import { APPOINTMENT_STATUS } from "@/components/agenda/appointment-status";
@@ -62,9 +64,23 @@ export function AppointmentDetailsDialog({
   onViewClientPlan,
   onOpenChange,
 }: AppointmentDetailsDialogProps) {
+  const canAccessAnamnesis = useCanAccessAnamnesis();
+  // Botões do rodapé: o atalho da anamnese e as ações do agendamento.
+  const footerButtons = appointment
+    ? (canAccessAnamnesis ? 1 : 0) +
+      (appointment.recurrence
+        ? 1 + (appointment.recurrence.clientPlanId ? 1 : 0)
+        : canCancel(appointment)
+          ? 1
+          : 0)
+    : 0;
+
   return (
     <Dialog open={appointment !== null} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-md">
+      {/* Mais botões no rodapé pedem mais largura (os botões não cabiam). */}
+      <DialogContent
+        className={footerButtons >= 3 ? "sm:max-w-xl" : "sm:max-w-md"}
+      >
         {appointment && (
           <Details
             appointment={appointment}
@@ -106,6 +122,7 @@ function Details({
 }) {
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [pending, startTransition] = useTransition();
+  const canAccessAnamnesis = useCanAccessAnamnesis();
 
   const { label: statusLabel, icon: StatusIcon } =
     APPOINTMENT_STATUS[appointment.status];
@@ -247,39 +264,47 @@ function Details({
         onConfirm={cancel}
       />
 
-      <DialogFooter>
-        <Button type="button" variant="outline" onClick={onClose}>
-          <X aria-hidden="true" />
-          Fechar
-        </Button>
-        {/* Nada no passado é alterado: mesma condição do cancelamento. */}
-        {appointment.recurrence ? (
-          <>
-            <Button type="button" variant="outline" onClick={onViewSessions}>
-              <ListChecks aria-hidden="true" />
-              Ver sessões
+      {/* Sem botões, sem rodapé (o dialog fecha pelo X do canto). */}
+      {(canAccessAnamnesis || appointment.recurrence || cancellable) && (
+        <DialogFooter className="sm:flex-nowrap sm:justify-center">
+          {/* Atalho para as fichas do cliente (só com acesso à anamnese). */}
+          {canAccessAnamnesis && (
+            <Button asChild variant="outline">
+              <Link href={`/clientes/${appointment.clientId}?aba=anamnese`}>
+                <ClipboardList aria-hidden="true" />
+                Anamnese
+              </Link>
             </Button>
-            {/* Sessão de pacote: o resumo da contratação, sem sair da agenda. */}
-            {appointment.recurrence.clientPlanId && (
-              <Button
-                type="button"
-                variant="outline"
-                onClick={onViewClientPlan}
-              >
-                <Package aria-hidden="true" />
-                Ver contratação
+          )}
+          {/* Nada no passado é alterado: mesma condição do cancelamento. */}
+          {appointment.recurrence ? (
+            <>
+              <Button type="button" variant="outline" onClick={onViewSessions}>
+                <ListChecks aria-hidden="true" />
+                Ver sessões
               </Button>
-            )}
-          </>
-        ) : (
-          cancellable && (
-            <Button type="button" onClick={onEdit}>
-              <Pencil aria-hidden="true" />
-              Alterar
-            </Button>
-          )
-        )}
-      </DialogFooter>
+              {/* Sessão de pacote: o resumo da contratação, sem sair da agenda. */}
+              {appointment.recurrence.clientPlanId && (
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={onViewClientPlan}
+                >
+                  <Package aria-hidden="true" />
+                  Ver contratação
+                </Button>
+              )}
+            </>
+          ) : (
+            cancellable && (
+              <Button type="button" onClick={onEdit}>
+                <Pencil aria-hidden="true" />
+                Alterar
+              </Button>
+            )
+          )}
+        </DialogFooter>
+      )}
     </>
   );
 }

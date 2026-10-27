@@ -1,11 +1,13 @@
 "use client";
 
 import { useState } from "react";
+import { AnamnesisAccessProvider } from "@/components/anamnesis/AnamnesisAccessProvider";
 import { ActionBar } from "@/components/layout/ActionBar";
 import { Header } from "@/components/layout/Header";
 import { Sidebar } from "@/components/layout/Sidebar";
 import { WelcomeToast } from "@/components/layout/WelcomeToast";
 import { SIDEBAR_COOKIE } from "@/components/layout/sidebar-cookie";
+import { anamnesisAccess } from "@/utils/anamnesis-access";
 import type { CurrentUser } from "@/types/auth";
 
 type AdminShellProps = {
@@ -30,7 +32,7 @@ export function AdminShell({
   }
 
   return (
-    <>
+    <AnamnesisAccessProvider canAccess={anamnesisAccess(user).canAccess}>
       {/* Primeiro item do teclado: leva ao conteúdo sem passar por todo o menu. */}
       <a
         href="#conteudo"
@@ -41,6 +43,7 @@ export function AdminShell({
       <div className="flex h-dvh overflow-hidden bg-background text-foreground">
         <Sidebar
           isSuperAdmin={user.type === "SUPER_ADMIN"}
+          isAdmin={anamnesisAccess(user).isAdmin}
           collapsed={collapsed}
           onToggleCollapsed={toggleCollapsed}
           mobileOpen={mobileOpen}
@@ -62,6 +65,6 @@ export function AdminShell({
         <ActionBar />
         <WelcomeToast userName={user.name} />
       </div>
-    </>
+    </AnamnesisAccessProvider>
   );
 }

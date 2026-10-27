@@ -7,6 +7,7 @@ import {
   CalendarDays,
   ChevronDown,
   ClipboardList,
+  FileHeart,
   Package,
   PanelLeftClose,
   PanelLeftOpen,
@@ -89,6 +90,18 @@ const navItems: (NavLink | NavGroup)[] = [
   },
 ];
 
+// Anamnese (screens/anamnese.md): modelos de ficha e auditoria são só do ADMIN.
+// As fichas dos clientes ficam na aba "Anamnese" do cliente, para o ADMIN e o
+// usuário vinculado a um profissional, e por isso não têm item no menu.
+const anamnesisGroup: NavGroup = {
+  label: "Anamnese",
+  icon: FileHeart,
+  children: [
+    { href: "/anamnese/modelos", label: "Modelos de ficha" },
+    { href: "/anamnese/auditoria", label: "Auditoria" },
+  ],
+};
+
 // Só o SUPER_ADMIN gerencia empresas (screens/empresas.md): o item entra no fim do
 // menu e some para os demais perfis.
 const superAdminItems: NavLink[] = [
@@ -102,6 +115,8 @@ const iconButtonClass =
 type SidebarProps = {
   /** Perfil de quem está logado: o SUPER_ADMIN vê o item Empresas. */
   isSuperAdmin: boolean;
+  /** O ADMIN vê o grupo Anamnese (modelos de ficha e auditoria). */
+  isAdmin: boolean;
   collapsed: boolean;
   onToggleCollapsed: () => void;
   mobileOpen: boolean;
@@ -111,6 +126,7 @@ type SidebarProps = {
 /** Menu lateral: fixo e recolhível no computador, gaveta no celular. */
 export function Sidebar({
   isSuperAdmin,
+  isAdmin,
   collapsed,
   onToggleCollapsed,
   mobileOpen,
@@ -159,7 +175,11 @@ export function Sidebar({
           </div>
         )}
 
-        <SidebarNav collapsed={collapsed} isSuperAdmin={isSuperAdmin} />
+        <SidebarNav
+          collapsed={collapsed}
+          isSuperAdmin={isSuperAdmin}
+          isAdmin={isAdmin}
+        />
       </aside>
 
       {/* Gaveta do celular: o Sheet cuida do fundo escuro, do Esc e do foco. */}
@@ -184,6 +204,7 @@ export function Sidebar({
           <SidebarNav
             collapsed={false}
             isSuperAdmin={isSuperAdmin}
+            isAdmin={isAdmin}
             onNavigate={onCloseMobile}
           />
         </SheetContent>
@@ -195,6 +216,7 @@ export function Sidebar({
 type SidebarNavProps = {
   collapsed: boolean;
   isSuperAdmin: boolean;
+  isAdmin: boolean;
   onNavigate?: () => void;
 };
 
@@ -222,9 +244,18 @@ const itemClass = (active: boolean) =>
       : "text-sidebar-muted hover:bg-sidebar-accent hover:text-sidebar-foreground"
   }`;
 
-function SidebarNav({ collapsed, isSuperAdmin, onNavigate }: SidebarNavProps) {
+function SidebarNav({
+  collapsed,
+  isSuperAdmin,
+  isAdmin,
+  onNavigate,
+}: SidebarNavProps) {
   const pathname = usePathname();
-  const items = isSuperAdmin ? [...navItems, ...superAdminItems] : navItems;
+  const items = [
+    ...navItems,
+    ...(isAdmin ? [anamnesisGroup] : []),
+    ...(isSuperAdmin ? superAdminItems : []),
+  ];
 
   return (
     <nav aria-label="Menu principal" className="flex-1 p-2">

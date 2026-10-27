@@ -7,6 +7,7 @@
 - Nome
 - E-mail
 - Tipo de Usuário
+- Profissional (badge Sim ou Não)
 - Status
 - Ações
   - Visualizar
@@ -33,6 +34,7 @@
 - Nome
 - E-mail
 - Tipo de Usuário
+- Este usuário é um profissional (interruptor) e, ligado, Profissional
 - Senha
 - Confirme a senha
 
@@ -44,6 +46,14 @@
 - Senha Obrigatória, de 8 a 72 caracteres (o limite é em bytes: letras acentuadas contam como 2);
 - A confirmação de senha deve ser igual ao campo de senha;
 - E-mail em formato válido e único entre os usuários ativos (o servidor responde no campo se já existir).
+
+### Vínculo com o profissional
+
+- O interruptor "Este usuário é um profissional" vincula o usuário ao cadastro de um profissional (`peopleId`). É o vínculo que dá acesso às fichas de anamnese; quem só atende o balcão (recepção) fica sem ele. Não há flag própria: ter ou não o vínculo é a informação.
+- Só aparece para ADMIN e USER, e não no cadastro do administrador de uma empresa nova. Ligado, mostra a seleção de Profissional (ativos, até 100, na própria página), obrigatória.
+- Um profissional liga-se a no máximo um usuário ativo: se já estiver ligado, a API responde 409 e a mensagem vai para o campo Profissional.
+- Na alteração, desligar o interruptor desfaz o vínculo. Um vínculo com profissional que ficou inativo aparece como "Profissional inativo".
+- A listagem e o "Visualizar" mostram só se há vínculo, não o nome (a API não o devolve).
 
 ---
 

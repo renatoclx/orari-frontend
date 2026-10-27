@@ -1,7 +1,11 @@
 import { describe, expect, it } from "vitest";
 import {
+  auditActionLabels,
+  auditActions,
+  auditActorName,
   auditPeriod,
   auditQuery,
+  auditTargetName,
   formatAuditDateTime,
   formatAuditIp,
   parseAuditFilters,
@@ -93,5 +97,59 @@ describe("formatação", () => {
     expect(formatAuditIp("::ffff:10.0.0.1")).toBe("10.0.0.1");
     expect(formatAuditIp("2001:db8::1")).toBe("2001:db8::1");
     expect(formatAuditIp(null)).toBeNull();
+  });
+});
+
+describe("rótulos das ações", () => {
+  it("toda ação tem rótulo em português, inclusive as de tipo e reativação de usuário", () => {
+    for (const action of auditActions) {
+      expect(auditActionLabels[action]).toBeTruthy();
+    }
+    expect(auditActionLabels.USER_TYPE_CHANGED).toBe(
+      "Tipo de usuário alterado",
+    );
+    expect(auditActionLabels.USER_RESTORED).toBe("Usuário reativado");
+    expect(auditActions).toContain("USER_TYPE_CHANGED");
+    expect(auditActions).toContain("USER_RESTORED");
+  });
+});
+
+describe("nomes de quem fez e do alvo", () => {
+  const names = { admin: "Helena", alvo: "Maria" };
+
+  it("mostra o nome de quem fez, quando está na lista", () => {
+    expect(
+      auditActorName({ action: "USER_TYPE_CHANGED", userId: "admin" }, names),
+    ).toBe("Helena");
+  });
+
+  it("quem não está na lista é administrador da plataforma nas ações sobre usuário", () => {
+    for (const action of [
+      "USER_LINK_CHANGED",
+      "USER_TYPE_CHANGED",
+      "USER_RESTORED",
+    ] as const) {
+      expect(auditActorName({ action, userId: "super" }, names)).toBe(
+        "Administrador da plataforma",
+      );
+    }
+  });
+
+  it("nas demais ações, quem não está na lista é desconhecido (não vira plataforma)", () => {
+    expect(
+      auditActorName({ action: "ANAMNESIS_VIEWED", userId: "x" }, names),
+    ).toBe("Usuário desconhecido");
+  });
+
+  it("o alvo é o usuário alterado, só nas ações sobre usuário", () => {
+    expect(
+      auditTargetName({ action: "USER_RESTORED", entityId: "alvo" }, names),
+    ).toBe("Maria");
+    expect(
+      auditTargetName({ action: "USER_RESTORED", entityId: "outro" }, names),
+    ).toBe("Usuário desconhecido");
+    expect(
+      auditTargetName({ action: "ANAMNESIS_VIEWED", entityId: "alvo" }, names),
+    ).toBeNull();
   });
 });

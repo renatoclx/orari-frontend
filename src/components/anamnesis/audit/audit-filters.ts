@@ -1,5 +1,5 @@
 import { isUuid } from "@/lib/uuid";
-import type { AuditAction } from "@/types/audit";
+import type { AuditAction, AuditLogItem } from "@/types/audit";
 import { dayBounds, isDateString } from "@/utils/time";
 
 /** Rótulo em português de cada ação, na ordem da lista de filtro. */
@@ -11,6 +11,8 @@ export const auditActionLabels: Record<AuditAction, string> = {
   ANAMNESIS_TEMPLATE_CREATED: "Modelo de ficha criado",
   ANAMNESIS_TEMPLATE_UPDATED: "Modelo de ficha alterado",
   USER_LINK_CHANGED: "Vínculo de usuário alterado",
+  USER_TYPE_CHANGED: "Tipo de usuário alterado",
+  USER_RESTORED: "Usuário reativado",
 };
 
 export const auditActions = Object.keys(auditActionLabels) as AuditAction[];
@@ -97,4 +99,41 @@ export function formatAuditDateTime(iso: string, timeZone: string): string {
 /** O IP chega no formato IPv6 mapeado ("::ffff:10.0.0.1"): mostra o IPv4 puro. */
 export function formatAuditIp(ip: string | null): string | null {
   return ip ? ip.replace(/^::ffff:/i, "") : null;
+}
+
+/** Ações sobre um usuário (o alvo é o usuário alterado, em `entityId`). */
+const userTargetActions: AuditAction[] = [
+  "USER_LINK_CHANGED",
+  "USER_TYPE_CHANGED",
+  "USER_RESTORED",
+];
+
+type AuditNames = Record<string, string>;
+
+/**
+ * Quem fez a ação. O ADMIN não enxerga o SUPER_ADMIN na lista de usuários da
+ * empresa, mas ele pode alterar usuários (e aparece na auditoria da clínica):
+ * nas ações sobre usuário, quem não está na lista é o administrador da
+ * plataforma; nas demais, é um usuário que a tela não conseguiu identificar.
+ */
+export function auditActorName(
+  log: Pick<AuditLogItem, "action" | "userId">,
+  userNames: AuditNames,
+): string {
+  return (
+    userNames[log.userId] ??
+    (userTargetActions.includes(log.action)
+      ? "Administrador da plataforma"
+      : "Usuário desconhecido")
+  );
+}
+
+/** Usuário alterado, nas ações sobre usuário; nas demais, não há alvo a mostrar. */
+export function auditTargetName(
+  log: Pick<AuditLogItem, "action" | "entityId">,
+  userNames: AuditNames,
+): string | null {
+  return userTargetActions.includes(log.action)
+    ? (userNames[log.entityId] ?? "Usuário desconhecido")
+    : null;
 }

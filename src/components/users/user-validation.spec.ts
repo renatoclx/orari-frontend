@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import {
+  profileLinkApplies,
   userFieldOrder,
   validatePassword,
   validateUpdateUserForm,
@@ -13,6 +14,8 @@ const valid = (overrides: Partial<UserFormValues> = {}): UserFormValues => ({
   type: "USER",
   password: "senha1234",
   passwordConfirmation: "senha1234",
+  linkProfessional: false,
+  peopleId: "",
   ...overrides,
 });
 
@@ -105,6 +108,7 @@ describe("validateUserForm (cadastro)", () => {
       "name",
       "email",
       "type",
+      "peopleId",
       "password",
       "passwordConfirmation",
     ]);
@@ -118,13 +122,62 @@ describe("validateUpdateUserForm (alteração)", () => {
         name: "Ana",
         email: "ana@empresa.com",
         type: "ADMIN",
+        linkProfessional: false,
+        peopleId: "",
       }),
     ).toEqual({});
   });
 
   it("confere nome, e-mail e tipo", () => {
-    const errors = validateUpdateUserForm({ name: "", email: "x", type: "" });
+    const errors = validateUpdateUserForm({
+      name: "",
+      email: "x",
+      type: "",
+      linkProfessional: false,
+      peopleId: "",
+    });
 
     expect(Object.keys(errors).sort()).toEqual(["email", "name", "type"]);
+  });
+});
+
+describe("vínculo com o profissional", () => {
+  it("sem o interruptor, o profissional não é exigido", () => {
+    expect(validateUserForm(valid())).toEqual({});
+  });
+
+  it("ligado, exige o profissional escolhido", () => {
+    expect(validateUserForm(valid({ linkProfessional: true })).peopleId).toBe(
+      "Selecione o profissional.",
+    );
+    expect(
+      validateUserForm(valid({ linkProfessional: true, peopleId: "p1" })),
+    ).toEqual({});
+  });
+
+  it("vale também na alteração", () => {
+    const errors = validateUpdateUserForm({
+      name: "Ana",
+      email: "ana@empresa.com",
+      type: "USER",
+      linkProfessional: true,
+      peopleId: "",
+    });
+
+    expect(errors.peopleId).toBe("Selecione o profissional.");
+  });
+
+  it("o SUPER_ADMIN não se vincula, mesmo com o interruptor ligado", () => {
+    const values = valid({ type: "SUPER_ADMIN", linkProfessional: true });
+
+    expect(profileLinkApplies(values)).toBe(false);
+    expect(validateUserForm(values)).toEqual({});
+  });
+
+  it("ADMIN e USER podem se vincular", () => {
+    expect(profileLinkApplies(valid({ linkProfessional: true }))).toBe(true);
+    expect(
+      profileLinkApplies(valid({ type: "ADMIN", linkProfessional: true })),
+    ).toBe(true);
   });
 });

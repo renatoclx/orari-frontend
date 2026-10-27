@@ -7,6 +7,8 @@ export type UserListItem = {
   name: string;
   email: string;
   type: UserType;
+  /** Profissional vinculado (pessoa do tipo PROFESSIONAL); nulo = não é profissional. */
+  peopleId: string | null;
   /** Nulo = ativo; preenchido = inativo (a listagem traz os dois). */
   deletedAt: string | null;
 };
@@ -20,6 +22,8 @@ export type CreateUserInput = {
   type: UserType;
   /** Obrigatório para o SUPER_ADMIN (a empresa do novo usuário); o ADMIN usa a própria. */
   companyId?: string;
+  /** Profissional que o usuário representa; sem ele, não há vínculo. */
+  peopleId?: string;
 };
 
 // Corpo de PATCH /users/:id: só o que mudar. A senha tem rota própria.
@@ -27,6 +31,8 @@ export type UpdateUserInput = Partial<{
   name: string;
   email: string;
   type: UserType;
+  /** `null` desfaz o vínculo com o profissional. */
+  peopleId: string | null;
 }>;
 
 // Corpo de PATCH /users/:id/password para troca de Senha

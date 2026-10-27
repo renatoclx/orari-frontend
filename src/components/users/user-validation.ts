@@ -7,6 +7,10 @@ export type UserFormValues = {
   password: string;
   passwordConfirmation: string;
   type: string;
+  /** "Este usuário é um profissional": liga o seletor de profissional. */
+  linkProfessional: boolean;
+  /** Profissional escolhido (só vale com `linkProfessional`). */
+  peopleId: string;
 };
 
 /**
@@ -23,6 +27,7 @@ export const userFieldOrder: (keyof UserFormValues)[] = [
   "name",
   "email",
   "type",
+  "peopleId",
   "password",
   "passwordConfirmation",
 ];
@@ -65,6 +70,24 @@ function validateIdentity(
 }
 
 /**
+ * Vínculo com o profissional: ligado, precisa de um profissional escolhido.
+ * O SUPER_ADMIN não se vincula (a tela esconde a opção), então nada a conferir.
+ */
+export function profileLinkApplies(
+  values: Pick<UserFormValues, "type" | "linkProfessional">,
+): boolean {
+  return values.linkProfessional && values.type !== "SUPER_ADMIN";
+}
+
+function validateProfessionalLink(
+  values: Pick<UserFormValues, "type" | "linkProfessional" | "peopleId">,
+): UserFormErrors {
+  return profileLinkApplies(values) && !values.peopleId
+    ? { peopleId: "Selecione o profissional." }
+    : {};
+}
+
+/**
  * Senha e confirmação: cadastro e troca de senha. A senha não passa por `trim`:
  * espaços fazem parte dela.
  */
@@ -96,13 +119,17 @@ export function validatePassword(
 export function validateUserForm(values: UserFormValues): UserFormErrors {
   return {
     ...validateIdentity(values),
+    ...validateProfessionalLink(values),
     ...validatePassword(values.password, values.passwordConfirmation),
   };
 }
 
 /** Alteração: nome, e-mail e tipo (a senha tem rota própria). */
 export function validateUpdateUserForm(
-  values: Pick<UserFormValues, "name" | "email" | "type">,
+  values: Pick<
+    UserFormValues,
+    "name" | "email" | "type" | "linkProfessional" | "peopleId"
+  >,
 ): UserFormErrors {
-  return validateIdentity(values);
+  return { ...validateIdentity(values), ...validateProfessionalLink(values) };
 }

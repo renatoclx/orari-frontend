@@ -18,9 +18,9 @@ import {
 import { PasswordDialog } from "@/components/users/PasswordDialog";
 import {
   UserFormDialog,
-  type ProfessionalOption,
+  type LinkOptions,
 } from "@/components/users/UserFormDialog";
-import { ProfessionalBadge } from "@/components/users/ProfessionalBadge";
+import { FunctionBadge } from "@/components/users/FunctionBadge";
 import { UserTypeBadge } from "@/components/users/UserTypeBadge";
 import { ConfirmDialog } from "@/components/shared/ConfirmDialog";
 import { Hint } from "@/components/shared/Hint";
@@ -49,8 +49,8 @@ type UserListProps = {
   typeOptions: UserType[];
   /** Usuário logado: não pode inativar a si mesmo nem mudar o próprio tipo. */
   currentUserId: string;
-  /** Profissionais ativos, para o vínculo na alteração. */
-  professionals: ProfessionalOption[];
+  /** Pessoas ativas que o usuário pode representar, para o vínculo na alteração. */
+  linkOptions: LinkOptions;
   /** Rodapé fixo do card (paginação). */
   footer: React.ReactNode;
 };
@@ -141,7 +141,7 @@ export function UserList({
   users,
   typeOptions,
   currentUserId,
-  professionals,
+  linkOptions,
   footer,
 }: UserListProps) {
   // O usuário fica guardado ao fechar, para o dialog não trocar de título
@@ -222,9 +222,9 @@ export function UserList({
                     <dd>
                       <UserTypeBadge type={user.type} />
                     </dd>
-                    <dt className="text-muted-foreground">Profissional</dt>
+                    <dt className="text-muted-foreground">Função</dt>
                     <dd>
-                      <ProfessionalBadge linked={user.peopleId !== null} />
+                      <FunctionBadge person={user.people} />
                     </dd>
                     <dt className="text-muted-foreground">Status</dt>
                     <dd>
@@ -242,7 +242,7 @@ export function UserList({
                     "Nome",
                     "E-mail",
                     "Tipo de usuário",
-                    "Profissional",
+                    "Função",
                     "Status",
                     "Ações",
                   ].map((title) => (
@@ -268,7 +268,7 @@ export function UserList({
                       <UserTypeBadge type={user.type} />
                     </td>
                     <td className="px-4 py-3">
-                      <ProfessionalBadge linked={user.peopleId !== null} />
+                      <FunctionBadge person={user.people} />
                     </td>
                     <td className="px-4 py-3">
                       <StatusBadge active={user.deletedAt === null} />
@@ -292,7 +292,7 @@ export function UserList({
         user={editing}
         typeOptions={typeOptions}
         currentUserId={currentUserId}
-        professionals={professionals}
+        linkOptions={linkOptions}
       />
 
       <PasswordDialog
@@ -318,9 +318,9 @@ export function UserList({
                 <dd>
                   <UserTypeBadge type={viewing.type} />
                 </dd>
-                <dt className="text-muted-foreground">Profissional</dt>
+                <dt className="text-muted-foreground">Função</dt>
                 <dd>
-                  <ProfessionalBadge linked={viewing.peopleId !== null} />
+                  <FunctionBadge person={viewing.people} />
                 </dd>
                 <dt className="text-muted-foreground">Status</dt>
                 <dd>

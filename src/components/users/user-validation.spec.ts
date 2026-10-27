@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import {
-  profileLinkApplies,
+  linkApplies,
   userFieldOrder,
   validatePassword,
   validateUpdateUserForm,
@@ -14,7 +14,7 @@ const valid = (overrides: Partial<UserFormValues> = {}): UserFormValues => ({
   type: "USER",
   password: "senha1234",
   passwordConfirmation: "senha1234",
-  linkProfessional: false,
+  linkType: "",
   peopleId: "",
   ...overrides,
 });
@@ -122,7 +122,7 @@ describe("validateUpdateUserForm (alteração)", () => {
         name: "Ana",
         email: "ana@empresa.com",
         type: "ADMIN",
-        linkProfessional: false,
+        linkType: "",
         peopleId: "",
       }),
     ).toEqual({});
@@ -133,7 +133,7 @@ describe("validateUpdateUserForm (alteração)", () => {
       name: "",
       email: "x",
       type: "",
-      linkProfessional: false,
+      linkType: "",
       peopleId: "",
     });
 
@@ -141,17 +141,20 @@ describe("validateUpdateUserForm (alteração)", () => {
   });
 });
 
-describe("vínculo com o profissional", () => {
-  it("sem o interruptor, o profissional não é exigido", () => {
+describe("vínculo com profissional ou funcionário", () => {
+  it("sem função, a pessoa não é exigida", () => {
     expect(validateUserForm(valid())).toEqual({});
   });
 
-  it("ligado, exige o profissional escolhido", () => {
-    expect(validateUserForm(valid({ linkProfessional: true })).peopleId).toBe(
+  it("com função, exige a pessoa escolhida", () => {
+    expect(validateUserForm(valid({ linkType: "PROFESSIONAL" })).peopleId).toBe(
       "Selecione o profissional.",
     );
+    expect(validateUserForm(valid({ linkType: "EMPLOYEE" })).peopleId).toBe(
+      "Selecione o funcionário.",
+    );
     expect(
-      validateUserForm(valid({ linkProfessional: true, peopleId: "p1" })),
+      validateUserForm(valid({ linkType: "EMPLOYEE", peopleId: "p1" })),
     ).toEqual({});
   });
 
@@ -160,24 +163,25 @@ describe("vínculo com o profissional", () => {
       name: "Ana",
       email: "ana@empresa.com",
       type: "USER",
-      linkProfessional: true,
+      linkType: "EMPLOYEE",
       peopleId: "",
     });
 
-    expect(errors.peopleId).toBe("Selecione o profissional.");
+    expect(errors.peopleId).toBe("Selecione o funcionário.");
   });
 
-  it("o SUPER_ADMIN não se vincula, mesmo com o interruptor ligado", () => {
-    const values = valid({ type: "SUPER_ADMIN", linkProfessional: true });
+  it("o SUPER_ADMIN não se vincula, mesmo com função escolhida", () => {
+    const values = valid({ type: "SUPER_ADMIN", linkType: "PROFESSIONAL" });
 
-    expect(profileLinkApplies(values)).toBe(false);
+    expect(linkApplies(values)).toBe(false);
     expect(validateUserForm(values)).toEqual({});
   });
 
   it("ADMIN e USER podem se vincular", () => {
-    expect(profileLinkApplies(valid({ linkProfessional: true }))).toBe(true);
+    expect(linkApplies(valid({ linkType: "EMPLOYEE" }))).toBe(true);
     expect(
-      profileLinkApplies(valid({ type: "ADMIN", linkProfessional: true })),
+      linkApplies(valid({ type: "ADMIN", linkType: "PROFESSIONAL" })),
     ).toBe(true);
+    expect(linkApplies(valid())).toBe(false);
   });
 });

@@ -2,13 +2,7 @@ import {
   RecurrenceOriginIcon,
   recurrenceLabel,
 } from "@/components/agenda/recurrence-label";
-import {
-  CalendarClock,
-  ClipboardX,
-  Clock,
-  StickyNote,
-  UserRound,
-} from "lucide-react";
+import { CalendarClock, Clock, StickyNote, UserRound } from "lucide-react";
 import { APPOINTMENT_STATUS } from "@/components/agenda/appointment-status";
 import { PersonAvatar } from "@/components/shared/PersonAvatar";
 import {
@@ -165,13 +159,6 @@ export function AppointmentBlock({
                 className="size-4 shrink-0"
               />
               {recurrenceLabel(appointment.recurrence)}
-            </li>
-          )}
-          {/* Só no cartão de hover: o bloco da grade já está cheio de ícones. */}
-          {appointment.withoutEntry && (
-            <li className="flex items-center gap-2">
-              <ClipboardX className="size-4 shrink-0" aria-hidden="true" />
-              Sem acompanhamento
             </li>
           )}
           {appointment.note && (

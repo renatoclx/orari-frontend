@@ -38,9 +38,4 @@ export type AgendaAppointment = {
   overbooking: boolean;
   /** Recorrência de origem (nulo no agendamento avulso). */
   recurrence: { id: string; clientPlanId: string | null } | null;
-  /**
-   * Atendimento já feito (ou em andamento) sem acompanhamento na anamnese. Só a
-   * agenda do dia preenche, e só para quem tem acesso às fichas.
-   */
-  withoutEntry?: boolean;
 };

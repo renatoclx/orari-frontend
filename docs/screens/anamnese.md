@@ -113,6 +113,14 @@ Rotas: `/anamnese/modelos` (lista), `/anamnese/modelos/novo` e `/anamnese/modelo
 
 - **Atalho:** o dialog de detalhes do agendamento (agenda, histórico do cliente e financeiro) tem o botão **Anamnese**, que abre a aba de fichas do cliente. Só aparece para quem tem acesso; o acesso chega por um contexto (`AnamnesisAccessProvider`, no `AdminShell`), sem repassar prop pelas três telas.
 
+## Auditoria (`/anamnese/auditoria`, só ADMIN)
+
+- Tela **somente leitura** com os registros de auditoria da empresa, do mais recente para o mais antigo: **Data e hora** (no fuso da empresa), **Usuário**, **Ação** (em português), **Cliente** e **IP**. Os demais perfis veem 404 (`requireAnamnesisAdmin`); a API também recusa (403). Não há editar nem excluir, e a própria consulta não é auditada.
+- **Filtros** (cliente com busca, usuário, ação, data inicial e final), guardados na URL (`?cliente=`, `?usuario=`, `?acao=`, `?de=`, `?ate=`, `?page=`, só ids, ação e datas). Valor inválido na URL é ignorado (`parseAuditFilters`). O período vai à API como o **dia inteiro no fuso da empresa** (do início do dia inicial ao último instante do dia final), porque ela lê data e hora completas e inclui as duas pontas.
+- **Rótulos:** ficha visualizada, fichas consultadas (lista de um cliente ou a tela Fichas preenchidas), ficha ou acompanhamento registrado, PDF da ficha gerado, modelo de ficha criado ou alterado e vínculo de usuário alterado (`auditActionLabels`).
+- **Destaque técnico:** a API devolve só ids. Os nomes de usuário vêm de **uma** chamada à lista de usuários (até 100, inativos incluídos) e os de cliente de **uma busca por cliente distinto da página** (no máximo 10, sem repetir; ler uma pessoa não gera auditoria). Sem nome, a tela mostra "Usuário desconhecido" ou "Cliente desconhecido". Se pesar, o backend pode passar a devolver os nomes.
+- O IP chega no formato IPv6 mapeado (`::ffff:10.0.0.1`) e é mostrado como IPv4.
+
 ## Regras de privacidade no frontend (valem em todas as etapas)
 
 > Destaque técnico: estas regras protegem o dado de saúde e não podem ser quebradas por conveniência.

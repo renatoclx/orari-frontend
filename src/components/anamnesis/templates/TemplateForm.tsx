@@ -57,6 +57,10 @@ export function TemplateForm({ template }: TemplateFormProps) {
   const [values, setValues] = useState(() => initialValues(template));
   const [errors, setErrors] = useState<TemplateFormErrors>({});
   const [pending, startTransition] = useTransition();
+  // Perguntas abertas no editor: no cadastro, a primeira; na alteração, todas recolhidas.
+  const [openKeys, setOpenKeys] = useState(
+    () => new Set(template ? [] : values.questions.map((item) => item.key)),
+  );
   const nextKey = useRef(0);
   const newKey = () => `n${nextKey.current++}`;
 
@@ -105,7 +109,8 @@ export function TemplateForm({ template }: TemplateFormProps) {
         : fields.detailLabel
           ? `q-${first.key}-detail`
           : `q-${first.key}-help`;
-    document.getElementById(target)?.focus();
+    // A pergunta pode estar recolhida: o campo só existe depois de ela abrir.
+    requestAnimationFrame(() => document.getElementById(target)?.focus());
   }
 
   function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
@@ -113,6 +118,12 @@ export function TemplateForm({ template }: TemplateFormProps) {
     const found = validateTemplateForm(values, Boolean(template?.description));
     setErrors(found);
     if (hasErrors(found)) {
+      // Abre as perguntas com erro, para o erro não ficar escondido.
+      if (found.items) {
+        setOpenKeys(
+          (current) => new Set([...current, ...Object.keys(found.items!)]),
+        );
+      }
       focusFirst(found);
       return;
     }
@@ -209,6 +220,8 @@ export function TemplateForm({ template }: TemplateFormProps) {
               value={values.questions}
               onChange={setQuestions}
               errors={errors.items}
+              openKeys={openKeys}
+              onOpenKeysChange={setOpenKeys}
               listError={errors.questions}
               newKey={newKey}
             />

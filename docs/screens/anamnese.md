@@ -50,6 +50,14 @@ Rotas: `/anamnese/modelos` (lista), `/anamnese/modelos/novo` e `/anamnese/modelo
 - Leitores de tela recebem avisos em **português** ("Pergunta 8 solta na posição 6"), configurados em `QuestionsEditor.tsx`.
 - Cada pergunta e cada opção tem uma **chave estável** (só da tela, não vai para a API): ela mantém o foco e os erros certos ao reordenar e remover.
 
+### Perguntas recolhíveis (accordion)
+
+- Cada pergunta é um `Collapsible` (Radix): **recolhida**, vira uma linha com a alça, o número, o enunciado e um resumo (tipo, obrigatória, nº de opções); **aberta**, mostra os campos. Várias podem ficar abertas ao mesmo tempo. Assim a lista longa cabe na tela e fica fácil arrastar.
+- A pergunta **nova nasce aberta** e recebe o foco; no cadastro, a primeira já vem aberta; na alteração, todas vêm recolhidas.
+- O botão **Recolher todas / Expandir todas** aparece com mais de uma pergunta.
+- **Validação:** o estado aberto/fechado fica no `TemplateForm` (só em memória). Ao enviar com erro, as perguntas com erro abrem sozinhas e o foco vai ao primeiro campo inválido; recolhida, a linha mostra "Revise esta pergunta".
+- Os campos de uma pergunta recolhida saem do DOM, mas os valores continuam no estado do formulário, então nada se perde ao recolher.
+
 ## Regras de privacidade no frontend (valem em todas as etapas)
 
 > Destaque técnico: estas regras protegem o dado de saúde e não podem ser quebradas por conveniência.

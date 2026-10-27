@@ -16,7 +16,7 @@ import {
   sortableKeyboardCoordinates,
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
-import { Plus } from "lucide-react";
+import { ChevronsDownUp, ChevronsUpDown, Plus } from "lucide-react";
 import { QuestionCard } from "@/components/anamnesis/templates/QuestionCard";
 import {
   emptyQuestion,
@@ -31,6 +31,9 @@ type QuestionsEditorProps = {
   onChange: (questions: QuestionDraft[]) => void;
   /** Erro de cada pergunta, pela chave. */
   errors?: Record<string, QuestionErrors>;
+  /** Chaves das perguntas abertas (o estado fica no formulário, que abre a que tem erro). */
+  openKeys: Set<string>;
+  onOpenKeysChange: (keys: Set<string>) => void;
   /** Erro da lista inteira (nenhuma pergunta). */
   listError?: string;
   newKey: () => string;
@@ -50,6 +53,8 @@ export function QuestionsEditor({
   value,
   onChange,
   errors = {},
+  openKeys,
+  onOpenKeysChange,
   listError,
   newKey,
 }: QuestionsEditorProps) {
@@ -86,11 +91,15 @@ export function QuestionsEditor({
   function add() {
     const key = newKey();
     onChange([...value, emptyQuestion(key)]);
+    // A pergunta nova nasce aberta; as outras ficam como estavam.
+    onOpenKeysChange(new Set(openKeys).add(key));
     // O campo novo só existe depois da renderização.
     requestAnimationFrame(() =>
       document.getElementById(`q-${key}-label`)?.focus(),
     );
   }
+
+  const allOpen = value.length > 0 && value.every((q) => openKeys.has(q.key));
 
   return (
     <div className="space-y-3">
@@ -114,6 +123,13 @@ export function QuestionsEditor({
                 question={question}
                 position={index + 1}
                 errors={errors[question.key]}
+                open={openKeys.has(question.key)}
+                onOpenChange={(open) => {
+                  const next = new Set(openKeys);
+                  if (open) next.add(question.key);
+                  else next.delete(question.key);
+                  onOpenKeysChange(next);
+                }}
                 newKey={newKey}
                 onChange={(next) =>
                   onChange(
@@ -153,6 +169,25 @@ export function QuestionsEditor({
         <span className="text-sm text-muted-foreground tabular-nums">
           {value.length} de {MAX_QUESTIONS} perguntas
         </span>
+        {value.length > 1 && (
+          <Button
+            type="button"
+            variant="ghost"
+            className="ml-auto"
+            onClick={() =>
+              onOpenKeysChange(
+                allOpen ? new Set() : new Set(value.map((q) => q.key)),
+              )
+            }
+          >
+            {allOpen ? (
+              <ChevronsDownUp aria-hidden="true" />
+            ) : (
+              <ChevronsUpDown aria-hidden="true" />
+            )}
+            {allOpen ? "Recolher todas" : "Expandir todas"}
+          </Button>
+        )}
       </div>
     </div>
   );

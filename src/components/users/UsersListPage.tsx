@@ -2,12 +2,15 @@ import { TablePagination } from "@/components/shared/TablePagination";
 import { UserList } from "@/components/users/UserList";
 import { UsersToolbar } from "@/components/users/UsersToolbar";
 import { getCurrentUser } from "@/services/auth.service";
+import { listPeople } from "@/services/people.service";
 import { listUsers } from "@/services/user.service";
 import type { UserType } from "@/types/auth";
 
 // Itens por página da listagem.
 const PAGE_SIZE = 10;
 const BASE_PATH = "/usuarios";
+// Profissionais para o vínculo: uma página só (clínicas têm poucos).
+const PROFESSIONALS_LIMIT = 100;
 
 type UsersListPageProps = {
   /** searchParams da rota (?page=). */
@@ -18,10 +21,20 @@ type UsersListPageProps = {
 // não tem busca por nome; a ordem é do mais recente para o mais antigo.
 export async function UsersListPage({ searchParams }: UsersListPageProps) {
   const page = Math.max(1, Number(searchParams.page) || 1);
-  const [currentUser, result] = await Promise.all([
+  const [currentUser, result, professionals] = await Promise.all([
     getCurrentUser(),
     listUsers({ page, limit: PAGE_SIZE }),
+    listPeople({
+      type: "PROFESSIONAL",
+      isActive: true,
+      page: 1,
+      limit: PROFESSIONALS_LIMIT,
+    }),
   ]);
+  const professionalOptions = professionals.items.map(({ id, name }) => ({
+    id,
+    name,
+  }));
 
   // Só o SUPER_ADMIN atribui SUPER_ADMIN (o backend também confere).
   const typeOptions: UserType[] =
@@ -32,11 +45,16 @@ export async function UsersListPage({ searchParams }: UsersListPageProps) {
   return (
     <div className="flex min-h-0 flex-1 flex-col gap-4">
       <h1 className="text-2xl font-semibold">Usuários</h1>
-      <UsersToolbar typeOptions={typeOptions} currentUserId={currentUser.id} />
+      <UsersToolbar
+        typeOptions={typeOptions}
+        currentUserId={currentUser.id}
+        professionals={professionalOptions}
+      />
       <UserList
         users={result.items}
         typeOptions={typeOptions}
         currentUserId={currentUser.id}
+        professionals={professionalOptions}
         footer={
           <TablePagination
             page={page}

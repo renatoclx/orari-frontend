@@ -22,6 +22,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import {
   Select,
   SelectContent,
@@ -29,6 +30,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Switch } from "@/components/ui/switch";
 import type { UserType } from "@/types/auth";
 import type { UserListItem } from "@/types/user";
 import { formatUserType } from "@/utils/format";
@@ -47,7 +49,12 @@ type UserFormDialogProps = {
    * nasce nela e com o tipo fixo, sem a escolha do tipo.
    */
   forCompany?: { id: string; name: string; type: UserType };
+  /** Profissionais ativos, para o vínculo (anamnese). Sem lista, não há vínculo. */
+  professionals?: ProfessionalOption[];
 };
+
+/** Profissional que pode ser vinculado a um usuário. */
+export type ProfessionalOption = { id: string; name: string };
 
 // Id de cada campo: liga o erro ao elemento que recebe o foco.
 const ids = (field: keyof UserFormValues) => `user-${field}`;
@@ -73,6 +80,7 @@ function UserForm({
   typeOptions,
   currentUserId,
   forCompany,
+  professionals = [],
 }: UserFormDialogProps) {
   const editing = user !== undefined;
   const isSelf = user?.id === currentUserId;
@@ -82,6 +90,8 @@ function UserForm({
     type: user?.type ?? forCompany?.type ?? "",
     password: "",
     passwordConfirmation: "",
+    linkProfessional: Boolean(user?.peopleId),
+    peopleId: user?.peopleId ?? "",
   });
   const [errors, setErrors] = useState<UserFormErrors>({});
   const [pending, startTransition] = useTransition();
@@ -92,16 +102,40 @@ function UserForm({
       ? [...typeOptions, user.type]
       : typeOptions;
 
-  function set(field: keyof UserFormValues, value: string) {
+  // O vínculo vale para ADMIN e USER (o SUPER_ADMIN não se vincula), e só quando
+  // a tela recebeu os profissionais (o cadastro do administrador da empresa nova
+  // não tem nenhum ainda).
+  const canLink = !forCompany && values.type !== "SUPER_ADMIN";
+  // Profissional vinculado que ficou inativo não vem na lista: continua visível.
+  const professionalOptions =
+    user?.peopleId && !professionals.some((p) => p.id === user.peopleId)
+      ? [...professionals, { id: user.peopleId, name: "Profissional inativo" }]
+      : professionals;
+
+  function set(
+    field:
+      | "name"
+      | "email"
+      | "type"
+      | "password"
+      | "passwordConfirmation"
+      | "peopleId",
+    value: string,
+  ) {
     setValues((current) => ({ ...current, [field]: value }));
     setErrors((current) => ({ ...current, [field]: undefined }));
   }
 
   function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    // Fora de `canLink` o vínculo não vale, mesmo que o interruptor tenha ficado ligado.
+    const sent = {
+      ...values,
+      linkProfessional: canLink && values.linkProfessional,
+    };
     const found = editing
-      ? validateUpdateUserForm(values)
-      : validateUserForm(values);
+      ? validateUpdateUserForm(sent)
+      : validateUserForm(sent);
     setErrors(found);
     const firstInvalid = userFieldOrder.find((field) => found[field]);
     if (firstInvalid) {
@@ -111,8 +145,8 @@ function UserForm({
 
     startTransition(async () => {
       const result = user
-        ? await updateUserAction(user.id, values)
-        : await createUserAction(values, forCompany?.id);
+        ? await updateUserAction(user.id, sent)
+        : await createUserAction(sent, forCompany?.id);
 
       if (result.ok) {
         toast.success(
@@ -214,6 +248,61 @@ function UserForm({
             </p>
           )}
         </FormField>
+      )}
+
+      {canLink && (
+        <div className="space-y-3">
+          <div className="flex items-center justify-between gap-3">
+            <div className="space-y-0.5">
+              <Label htmlFor="user-linkProfessional">
+                Este usuário é um profissional
+              </Label>
+              <p className="text-xs text-muted-foreground">
+                Vincule ao cadastro de um profissional para dar acesso às fichas
+                de anamnese. Quem só atende o balcão não precisa.
+              </p>
+            </div>
+            <Switch
+              id="user-linkProfessional"
+              checked={values.linkProfessional}
+              onCheckedChange={(checked) =>
+                setValues((current) => ({
+                  ...current,
+                  linkProfessional: checked,
+                  peopleId: checked ? current.peopleId : "",
+                }))
+              }
+            />
+          </div>
+          {values.linkProfessional && (
+            <FormField
+              id={ids("peopleId")}
+              label="Profissional"
+              required
+              error={errors.peopleId}
+            >
+              <Select
+                value={values.peopleId || undefined}
+                onValueChange={(next) => set("peopleId", next)}
+              >
+                <SelectTrigger
+                  id={ids("peopleId")}
+                  className="w-full"
+                  aria-invalid={errors.peopleId ? true : undefined}
+                >
+                  <SelectValue placeholder="Selecione o profissional" />
+                </SelectTrigger>
+                <SelectContent>
+                  {professionalOptions.map((professional) => (
+                    <SelectItem key={professional.id} value={professional.id}>
+                      {professional.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </FormField>
+          )}
+        </div>
       )}
 
       {!editing && (

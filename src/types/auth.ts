@@ -15,6 +15,8 @@ export type CurrentUser = {
   name: string;
   email: string;
   type: UserType;
+  /** Profissional vinculado ao usuário (ativo); nulo sem vínculo. Dá acesso à anamnese. */
+  professional: { id: string; name: string } | null;
   company: {
     id: string;
     /** Nome fantasia; sem ele, a razão social. */

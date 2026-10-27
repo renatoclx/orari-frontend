@@ -16,7 +16,11 @@ import {
   restoreUserAction,
 } from "@/app/(admin)/user-actions";
 import { PasswordDialog } from "@/components/users/PasswordDialog";
-import { UserFormDialog } from "@/components/users/UserFormDialog";
+import {
+  UserFormDialog,
+  type ProfessionalOption,
+} from "@/components/users/UserFormDialog";
+import { ProfessionalBadge } from "@/components/users/ProfessionalBadge";
 import { UserTypeBadge } from "@/components/users/UserTypeBadge";
 import { ConfirmDialog } from "@/components/shared/ConfirmDialog";
 import { Hint } from "@/components/shared/Hint";
@@ -45,6 +49,8 @@ type UserListProps = {
   typeOptions: UserType[];
   /** Usuário logado: não pode inativar a si mesmo nem mudar o próprio tipo. */
   currentUserId: string;
+  /** Profissionais ativos, para o vínculo na alteração. */
+  professionals: ProfessionalOption[];
   /** Rodapé fixo do card (paginação). */
   footer: React.ReactNode;
 };
@@ -135,6 +141,7 @@ export function UserList({
   users,
   typeOptions,
   currentUserId,
+  professionals,
   footer,
 }: UserListProps) {
   // O usuário fica guardado ao fechar, para o dialog não trocar de título
@@ -215,6 +222,10 @@ export function UserList({
                     <dd>
                       <UserTypeBadge type={user.type} />
                     </dd>
+                    <dt className="text-muted-foreground">Profissional</dt>
+                    <dd>
+                      <ProfessionalBadge linked={user.peopleId !== null} />
+                    </dd>
                     <dt className="text-muted-foreground">Status</dt>
                     <dd>
                       <StatusBadge active={user.deletedAt === null} />
@@ -227,13 +238,18 @@ export function UserList({
             <table className="hidden w-full text-left text-sm md:table">
               <thead>
                 <tr>
-                  {["Nome", "E-mail", "Tipo de usuário", "Status", "Ações"].map(
-                    (title) => (
-                      <th key={title} scope="col" className={headerClass}>
-                        {title}
-                      </th>
-                    ),
-                  )}
+                  {[
+                    "Nome",
+                    "E-mail",
+                    "Tipo de usuário",
+                    "Profissional",
+                    "Status",
+                    "Ações",
+                  ].map((title) => (
+                    <th key={title} scope="col" className={headerClass}>
+                      {title}
+                    </th>
+                  ))}
                 </tr>
               </thead>
               <tbody className="divide-y divide-border">
@@ -250,6 +266,9 @@ export function UserList({
                     <td className="px-4 py-3">{user.email}</td>
                     <td className="px-4 py-3">
                       <UserTypeBadge type={user.type} />
+                    </td>
+                    <td className="px-4 py-3">
+                      <ProfessionalBadge linked={user.peopleId !== null} />
                     </td>
                     <td className="px-4 py-3">
                       <StatusBadge active={user.deletedAt === null} />
@@ -273,6 +292,7 @@ export function UserList({
         user={editing}
         typeOptions={typeOptions}
         currentUserId={currentUserId}
+        professionals={professionals}
       />
 
       <PasswordDialog
@@ -297,6 +317,10 @@ export function UserList({
                 <dt className="text-muted-foreground">Tipo de usuário</dt>
                 <dd>
                   <UserTypeBadge type={viewing.type} />
+                </dd>
+                <dt className="text-muted-foreground">Profissional</dt>
+                <dd>
+                  <ProfessionalBadge linked={viewing.peopleId !== null} />
                 </dd>
                 <dt className="text-muted-foreground">Status</dt>
                 <dd>

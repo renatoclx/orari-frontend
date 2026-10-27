@@ -54,6 +54,13 @@ src/
                              senha em dialog)
       financeiro/            Financeiro: page (Pagamentos), comandas/ e
                              metodos-de-pagamento/ (cada um com page e loading)
+      anamnese/              Anamnese: modelos/ (lista, novo/, [id]/editar/),
+                             fichas/ (Fichas preenchidas, nova/) e auditoria/
+      clientes/[id]/anamnese/[fichaId]/  ficha completa, acompanhamento/ e
+                             pdf/route.ts (Route Handler que entrega o PDF)
+      anamnesis-actions.ts   Server Actions das fichas (nova ficha, acompanhamento
+                             e fichas de um cliente)
+      anamnesis-template-actions.ts  Server Actions dos modelos de ficha
       funcionarios/          Funcionários (mesma estrutura)
       profissionais/         Profissionais (mesma estrutura)
     (auth)/                  telas públicas (sem sidebar)
@@ -79,13 +86,17 @@ src/
     payment-methods/         métodos de pagamento (lista e dialog de formulário)
     payments/                pagamentos (resumo, filtros, lista, baixa)
     checkouts/               comandas do dia (lista e dialog da comanda)
+    anamnesis/               anamnese: templates/ (modelos e editor de perguntas),
+                             records/ (fichas, acompanhamento, PDF) e audit/
+                             (auditoria); AnamnesisAccessProvider (acesso)
     settings/                configurações da empresa (formulário, logo, horários)
     <tela>/                  componentes das demais telas (auth/)
   services/                  comunicação com a API e sessão (somente servidor)
   types/                     tipos do domínio, espelhando o backend
   utils/                     funções puras (datas, formatação, máscaras)
   lib/                       cn() do shadcn e helpers das Server Actions
-                             (action-result.ts, form-data.ts)
+                             (action-result.ts, form-data.ts), uuid.ts e
+                             anamnesis-guard.ts (404 sem acesso à anamnese)
 docs/                        documentação; screens/ tem um arquivo por tela
   proxy.ts                   proteção das rotas (antigo middleware)
 next.config.ts               modo standalone, limite das Server Actions e rewrite de /uploads
@@ -112,7 +123,8 @@ Layout ──────────────────┘
 ```
 
 - **`apiFetch`** (`services/api.ts`) é o ponto único de chamada à API: monta a URL com `API_URL`, envia JSON sem cache, anexa o token da sessão e transforma erros em `ApiError` (status + mensagem). Status `0` = API fora do ar. Um 401 em chamada autenticada leva ao login (`/session-expired`).
-- **Services por assunto** (`auth.service.ts`, `people.service.ts`, `contact.service.ts`, `address.service.ts`, `location.service.ts`, `cep.service.ts`, `service.service.ts`, `appointment.service.ts`, `recurrence.service.ts`, `plan.service.ts`, `client-plan.service.ts`, `payment.service.ts`, `payment-method.service.ts`, `user.service.ts`, `business-hour.service.ts`, `company.service.ts`) conhecem os caminhos da API e são chamados pelas telas, layouts e Server Actions — nunca o `apiFetch` direto.
+- **Services por assunto** (`auth.service.ts`, `people.service.ts`, `contact.service.ts`, `address.service.ts`, `location.service.ts`, `cep.service.ts`, `service.service.ts`, `appointment.service.ts`, `recurrence.service.ts`, `plan.service.ts`, `client-plan.service.ts`, `payment.service.ts`, `payment-method.service.ts`, `user.service.ts`, `business-hour.service.ts`, `company.service.ts`, `anamnesis.service.ts`, `anamnesis-template.service.ts`, `audit.service.ts`) conhecem os caminhos da API e são chamados pelas telas, layouts e Server Actions — nunca o `apiFetch` direto.
+- **`apiFetchBytes`** (`services/api.ts`) é a variante para respostas que são arquivo (o PDF da ficha): devolve os bytes sem passar pelo parser de JSON (o `apiFetch` leria como texto e corromperia o arquivo) e não redireciona no 401, porque quem chama é um Route Handler que responde ao navegador.
 - Os services importam `server-only`: rodam só no servidor. O navegador nunca fala com a API diretamente.
 - Server Actions tratam `ApiError` (viram mensagem na tela) e deixam estourar erros inesperados — inclusive o `redirect()` do Next, que também é lançado como erro.
 
@@ -195,6 +207,16 @@ As três telas são a mesma implementação, escolhida pelo tipo (`PeopleType`).
 
 - Listagem em `/financeiro/metodos-de-pagamento`, com busca, status e paginação pela URL; cadastro e alteração no mesmo dialog (`PaymentMethodFormDialog`).
 - A listagem traz ativos e inativos (`deletedAt`); as baixas usam só os ativos (`isActive=true`). Inativar e reativar à vista na linha; o nome é único sem diferenciar maiúsculas nem acentos (o servidor responde 409 e a tela mostra no campo).
+
+## Anamnese
+
+Módulo de dado de saúde (LGPD). Detalhes e destaques técnicos em `screens/anamnese.md`; decisões em `decisions.md`.
+
+- **Acesso:** ADMIN ou usuário vinculado a profissional ativo (`utils/anamnesis-access.ts`); só o ADMIN cuida de modelos e da auditoria. As páginas usam `lib/anamnesis-guard.ts` (404); as Server Actions conferem de novo; a API recusa (403) de qualquer forma. O `AnamnesisAccessProvider` (contexto no `AdminShell`) leva o acesso ao dialog do agendamento, que aparece em três telas.
+- **Privacidade:** nada de saúde em `localStorage`, cookies, URL ou log; sem cache; rascunho só em memória; fichas imutáveis. Os ids da URL e das actions são conferidos como UUID (`lib/uuid.ts`) antes de entrar no caminho da API.
+- **Lógica fora dos componentes:** `template-validation.ts`, `answer-form.ts` (tela ⇄ API: `parseAnswer`, `buildNewAnswers`, `changedAnswers`), `answer-format.ts`, `entry-validation.ts`, `audit-filters.ts` e `pdf-error.ts`, todos com teste.
+- **PDF:** `clientes/[id]/anamnese/[fichaId]/pdf/route.ts` lê o token do cookie httpOnly, busca o PDF com `apiFetchBytes` e devolve os bytes (`application/pdf`, `no-store`); o `AnamnesisPdfDialog` mostra o arquivo num iframe de URL de blob, que só existe na memória da página.
+- **Listagens:** `GET /anamnesis/clients` (clientes com ficha e quantidade, numa chamada e com uma auditoria) alimenta a tela Fichas preenchidas; a API não tem listagem geral de fichas.
 
 ## Financeiro
 

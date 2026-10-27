@@ -60,7 +60,7 @@ export type TemplateUpdateInput = Partial<TemplateInput> & {
   isActive?: boolean;
 };
 
-// ---- Fichas dos clientes (GET /anamnesis?clientId=)
+// ---- Fichas preenchidas (GET /anamnesis?clientId=)
 
 /** Ficha na listagem do cliente (resumo; o conteúdo vem em GET /anamnesis/:id). */
 export type AnamnesisListItem = {
@@ -129,4 +129,23 @@ export type EntryInput = {
   appointmentId?: string;
   /** Só as perguntas cuja resposta mudou. */
   answers?: AnamnesisAnswer[];
+};
+
+/** Corpo de POST /anamnesis (nova ficha, com o registro inicial). */
+export type AnamnesisInput = {
+  clientId: string;
+  templateId: string;
+  /** "aaaa-mm-dd"; padrão hoje, nunca futura. */
+  consultationDate?: string;
+  /** Pergunta opcional sem resposta fica de fora (nunca `null`). */
+  answers: AnamnesisAnswer[];
+};
+
+/** Cliente com ficha na tela "Fichas preenchidas" (GET /anamnesis/clients). */
+export type AnamnesisClientItem = {
+  clientId: string;
+  clientName: string;
+  /** Cliente inativo continua com as fichas legíveis. */
+  isActive: boolean;
+  anamnesisCount: number;
 };

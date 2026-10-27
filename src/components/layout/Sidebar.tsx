@@ -91,16 +91,23 @@ const navItems: (NavLink | NavGroup)[] = [
 ];
 
 // Anamnese (screens/anamnese.md): modelos de ficha e auditoria são só do ADMIN.
-// As fichas dos clientes ficam na aba "Anamnese" do cliente, para o ADMIN e o
-// usuário vinculado a um profissional, e por isso não têm item no menu.
+// "Fichas preenchidas" é de quem acessa as fichas (ADMIN e profissional
+// vinculado): o ADMIN a vê no grupo; o profissional, que só tem ela, como item
+// direto. A criação de ficha ("Nova ficha") parte dessa tela.
+const clientRecordsChild = {
+  href: "/anamnese/fichas",
+  label: "Fichas preenchidas",
+};
 const anamnesisGroup: NavGroup = {
   label: "Anamnese",
   icon: FileHeart,
   children: [
+    clientRecordsChild,
     { href: "/anamnese/modelos", label: "Modelos de ficha" },
     { href: "/anamnese/auditoria", label: "Auditoria" },
   ],
 };
+const clientRecordsLink: NavLink = { ...clientRecordsChild, icon: FileHeart };
 
 // Só o SUPER_ADMIN gerencia empresas (screens/empresas.md): o item entra no fim do
 // menu e some para os demais perfis.
@@ -115,8 +122,10 @@ const iconButtonClass =
 type SidebarProps = {
   /** Perfil de quem está logado: o SUPER_ADMIN vê o item Empresas. */
   isSuperAdmin: boolean;
-  /** O ADMIN vê o grupo Anamnese (modelos de ficha e auditoria). */
+  /** O ADMIN vê o grupo Anamnese (fichas dos clientes, modelos de ficha e auditoria). */
   isAdmin: boolean;
+  /** Quem acessa as fichas (ADMIN ou profissional vinculado) vê "Fichas preenchidas". */
+  canAccessAnamnesis: boolean;
   collapsed: boolean;
   onToggleCollapsed: () => void;
   mobileOpen: boolean;
@@ -127,6 +136,7 @@ type SidebarProps = {
 export function Sidebar({
   isSuperAdmin,
   isAdmin,
+  canAccessAnamnesis,
   collapsed,
   onToggleCollapsed,
   mobileOpen,
@@ -179,6 +189,7 @@ export function Sidebar({
           collapsed={collapsed}
           isSuperAdmin={isSuperAdmin}
           isAdmin={isAdmin}
+          canAccessAnamnesis={canAccessAnamnesis}
         />
       </aside>
 
@@ -205,6 +216,7 @@ export function Sidebar({
             collapsed={false}
             isSuperAdmin={isSuperAdmin}
             isAdmin={isAdmin}
+            canAccessAnamnesis={canAccessAnamnesis}
             onNavigate={onCloseMobile}
           />
         </SheetContent>
@@ -217,6 +229,7 @@ type SidebarNavProps = {
   collapsed: boolean;
   isSuperAdmin: boolean;
   isAdmin: boolean;
+  canAccessAnamnesis: boolean;
   onNavigate?: () => void;
 };
 
@@ -248,12 +261,17 @@ function SidebarNav({
   collapsed,
   isSuperAdmin,
   isAdmin,
+  canAccessAnamnesis,
   onNavigate,
 }: SidebarNavProps) {
   const pathname = usePathname();
   const items = [
     ...navItems,
-    ...(isAdmin ? [anamnesisGroup] : []),
+    ...(isAdmin
+      ? [anamnesisGroup]
+      : canAccessAnamnesis
+        ? [clientRecordsLink]
+        : []),
     ...(isSuperAdmin ? superAdminItems : []),
   ];
 

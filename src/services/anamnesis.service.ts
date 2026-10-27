@@ -1,9 +1,11 @@
 import "server-only";
 
-import { apiFetch } from "@/services/api";
+import { apiFetch, apiFetchBytes } from "@/services/api";
 import type { Paginated } from "@/types/api";
 import type {
+  AnamnesisClientItem,
   AnamnesisDetail,
+  AnamnesisInput,
   AnamnesisListItem,
   EntryInput,
 } from "@/types/anamnesis";
@@ -29,7 +31,7 @@ export function listAnamneses(
 
 /** Ficha completa, com as perguntas da versão em que nasceu e todo o histórico. */
 export function getAnamnesis(id: string): Promise<AnamnesisDetail> {
-  return apiFetch<AnamnesisDetail>(`/anamnesis/${id}`);
+  return apiFetch<AnamnesisDetail>(`/anamnesis/${encodeURIComponent(id)}`);
 }
 
 /**
@@ -40,30 +42,61 @@ export function createEntry(
   id: string,
   input: EntryInput,
 ): Promise<AnamnesisDetail> {
-  return apiFetch<AnamnesisDetail>(`/anamnesis/${id}/entries`, {
+  return apiFetch<AnamnesisDetail>(
+    `/anamnesis/${encodeURIComponent(id)}/entries`,
+    {
+      method: "POST",
+      body: JSON.stringify(input),
+    },
+  );
+}
+
+/**
+ * Nova ficha (registro inicial). Cliente inativo, modelo inativo ou ficha já
+ * existente do cliente para o modelo respondem 409; pergunta obrigatória sem
+ * resposta, 400.
+ */
+export function createAnamnesis(
+  input: AnamnesisInput,
+): Promise<AnamnesisDetail> {
+  return apiFetch<AnamnesisDetail>("/anamnesis", {
     method: "POST",
     body: JSON.stringify(input),
   });
 }
 
-// Máximo de ids por consulta da API (cabem na URL).
-const ENTRY_APPOINTMENTS_CHUNK = 100;
+type ListAnamnesisClientsParams = {
+  /** Busca parcial pelo nome, sem diferenciar acentos nem maiúsculas. */
+  name?: string;
+  page: number;
+  limit: number;
+};
 
 /**
- * Dos agendamentos informados, os que já têm acompanhamento. A API devolve só
- * ids (nada do conteúdo da ficha), em consultas de até 100.
+ * Clientes que têm ficha, com a quantidade (só nome e contagem). Uma consulta
+ * para a página inteira: listar as fichas cliente a cliente geraria uma
+ * auditoria por cliente.
  */
-export async function findAppointmentsWithEntry(
-  appointmentIds: string[],
-): Promise<Set<string>> {
-  const found = new Set<string>();
-  for (let i = 0; i < appointmentIds.length; i += ENTRY_APPOINTMENTS_CHUNK) {
-    const chunk = appointmentIds.slice(i, i + ENTRY_APPOINTMENTS_CHUNK);
-    const query = new URLSearchParams({ appointmentIds: chunk.join(",") });
-    const result = await apiFetch<{ appointmentIds: string[] }>(
-      `/anamnesis/appointments-with-entry?${query}`,
-    );
-    result.appointmentIds.forEach((id) => found.add(id));
-  }
-  return found;
+export function listAnamnesisClients(
+  params: ListAnamnesisClientsParams,
+): Promise<Paginated<AnamnesisClientItem>> {
+  const query = new URLSearchParams({
+    page: String(params.page),
+    limit: String(params.limit),
+  });
+  const name = params.name?.trim();
+  if (name) query.set("name", name);
+  return apiFetch<Paginated<AnamnesisClientItem>>(
+    `/anamnesis/clients?${query}`,
+  );
+}
+
+/**
+ * PDF da ficha, gerado no backend. Com `includeHistory`, traz também o histórico
+ * de acompanhamento (página própria, sem assinatura); sem ele, só a ficha, para
+ * a via do cliente.
+ */
+export function getAnamnesisPdf(id: string, includeHistory: boolean) {
+  const query = new URLSearchParams({ includeHistory: String(includeHistory) });
+  return apiFetchBytes(`/anamnesis/${encodeURIComponent(id)}/pdf?${query}`);
 }

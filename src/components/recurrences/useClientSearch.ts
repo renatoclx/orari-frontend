@@ -11,10 +11,15 @@ import {
  * Busca de clientes no servidor para um Combobox (a lista inicial traz os
  * primeiros). Mantém o cliente escolhido na lista mesmo que a busca o tire.
  */
-export function useClientSearch(initial: ClientOption[], pickedId: string) {
+export function useClientSearch(
+  initial: ClientOption[],
+  pickedId: string,
+  /** Cliente já escolhido ao abrir (ex.: o da URL), que pode estar fora dos primeiros. */
+  initialPicked?: ClientOption,
+) {
   const [options, setOptions] = useState(initial);
   const [loading, setLoading] = useState(false);
-  const [picked, setPicked] = useState<ClientOption>();
+  const [picked, setPicked] = useState<ClientOption | undefined>(initialPicked);
   const request = useRef(0);
   const debounce = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
   useEffect(() => () => clearTimeout(debounce.current), []);

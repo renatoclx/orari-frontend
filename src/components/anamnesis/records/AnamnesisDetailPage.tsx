@@ -1,9 +1,11 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ChevronLeft, Plus } from "lucide-react";
+import { AnamnesisPdfDialog } from "@/components/anamnesis/records/AnamnesisPdfDialog";
 import { AnamnesisTimeline } from "@/components/anamnesis/records/AnamnesisTimeline";
 import { CurrentAnswers } from "@/components/anamnesis/records/CurrentAnswers";
 import { Button } from "@/components/ui/button";
+import { isUuid } from "@/lib/uuid";
 import { requireAnamnesisAccess } from "@/lib/anamnesis-guard";
 import { ApiError } from "@/services/api";
 import { getAnamnesis } from "@/services/anamnesis.service";
@@ -50,6 +52,8 @@ export async function AnamnesisDetailPage({
   id,
 }: AnamnesisDetailPageProps) {
   const user = await requireAnamnesisAccess();
+  // Ids da URL fora do formato: 404 (e nunca vão para o caminho da API).
+  if (!isUuid(clientId) || !isUuid(id)) notFound();
   const orNotFound = (error: unknown): never => {
     if (error instanceof ApiError && error.status === 404) notFound();
     throw error;
@@ -90,15 +94,20 @@ export async function AnamnesisDetailPage({
               ` · registro inicial em ${formatDateOnly(detail.entries[0].consultationDate)}`}
           </p>
         </div>
-        {/* Cliente inativo: a ficha só se consulta (a API recusa o acompanhamento). */}
-        {client.deletedAt === null && (
-          <Button asChild>
-            <Link href={`/clientes/${clientId}/anamnese/${id}/acompanhamento`}>
-              <Plus aria-hidden="true" />
-              Novo acompanhamento
-            </Link>
-          </Button>
-        )}
+        <div className="flex flex-wrap items-center gap-2">
+          <AnamnesisPdfDialog clientId={clientId} anamnesisId={id} />
+          {/* Cliente inativo: a ficha só se consulta (a API recusa o acompanhamento). */}
+          {client.deletedAt === null && (
+            <Button asChild>
+              <Link
+                href={`/clientes/${clientId}/anamnese/${id}/acompanhamento`}
+              >
+                <Plus aria-hidden="true" />
+                Novo acompanhamento
+              </Link>
+            </Button>
+          )}
+        </div>
       </div>
 
       <div className="grid min-h-0 flex-1 gap-4 overflow-auto lg:grid-cols-2 lg:overflow-hidden">

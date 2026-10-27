@@ -1,18 +1,19 @@
 # Anamnese
 
-> Ficha de saúde do cliente. É dado **sensível** (LGPD): o acesso é restrito, o backend criptografa as respostas e audita toda ação. Este documento é atualizado a cada etapa implementada. Plano das etapas: `prompts/anamnese-frontend.md`.
+> Ficha de saúde do cliente. É dado **sensível** (LGPD): o acesso é restrito, o backend criptografa as respostas e audita toda ação. Módulo implementado (etapas A a E: menu, modelos, fichas do cliente, PDF e auditoria). Plano original: `prompts/anamnese-frontend.md`.
 
 ## Quem acessa
 
-- **Fichas dos clientes:** o ADMIN e o usuário vinculado a um **profissional** ativo. Funcionário vinculado e usuário sem vínculo não acessam (a API responde 403).
+- **Fichas (Fichas preenchidas, nova ficha, ficha completa, acompanhamento e PDF):** o ADMIN e o usuário vinculado a um **profissional** ativo. Funcionário vinculado e usuário sem vínculo não acessam (a API responde 403).
 - **Modelos de ficha e auditoria:** só o ADMIN.
 - O SUPER_ADMIN só acessa fichas se estiver vinculado a um profissional da própria empresa.
 - A regra de tela está em `utils/anamnesis-access.ts` (`anamnesisAccess`) e só esconde o que não vale; quem decide é a API.
 
 ## Menu (etapa A)
 
-- Grupo **Anamnese** na barra lateral, depois de Financeiro, **só para o ADMIN**: Modelos de ficha (`/anamnese/modelos`) e Auditoria (`/anamnese/auditoria`).
-- As fichas dos clientes não têm item no menu: ficam na aba "Anamnese" da página do cliente (etapa C), para o ADMIN e o profissional vinculado.
+- Grupo **Anamnese** na barra lateral, depois de Financeiro, para o **ADMIN**: **Fichas preenchidas** (`/anamnese/fichas`), **Modelos de ficha** (`/anamnese/modelos`) e **Auditoria** (`/anamnese/auditoria`).
+- O **profissional vinculado** (que acessa fichas, mas não modelos nem auditoria) vê só o item **Fichas preenchidas**, direto no menu, sem grupo.
+- As fichas de um cliente também ficam na aba "Anamnese" da página dele.
 
 ## Modelos de ficha (etapa B, só ADMIN)
 
@@ -60,7 +61,7 @@ Rotas: `/anamnese/modelos` (lista), `/anamnese/modelos/novo` e `/anamnese/modelo
 
 ## Fichas do cliente (aba "Anamnese")
 
-> Em andamento (etapa C): entregues a **lista**, a **ficha completa** e o **acompanhamento**; falta a **nova ficha** (C2).
+> Etapa C entregue: **lista**, **ficha completa**, **acompanhamento** e **nova ficha**.
 
 - A aba **Anamnese** fica na página do cliente (`/clientes/[id]?aba=anamnese`), depois de Pagamentos. Só aparece para quem tem acesso (ADMIN ou usuário vinculado a profissional, `anamnesisAccess`); sem acesso, `?aba=anamnese` cai em Agendamentos e a ficha nem é buscada.
 - Lista (`GET /anamnesis?clientId=`): Modelo, Versão em que a ficha nasceu, Acompanhamentos e Última consulta. "Acompanhamentos" é `entriesCount - 1`, porque a API conta também o registro inicial.
@@ -87,11 +88,39 @@ Rotas: `/anamnese/modelos` (lista), `/anamnese/modelos/novo` e `/anamnese/modelo
 - A conversão tela → API e a validação ficam em funções puras testadas (`answer-form.ts`, `entry-validation.ts`), fora dos componentes.
 - Server Action `createEntryAction`: confere o acesso e o texto da evolução, mostra o erro da API como veio e atualiza a ficha (`revalidatePath`). O rascunho fica só em memória.
 
+### Fichas preenchidas (`/anamnese/fichas`)
+
+- Tela de entrada das fichas, no menu **Anamnese** (o ADMIN a vê no grupo; o **profissional vinculado**, que só tem esse item, o vê direto). Lista os **clientes que já têm ficha**: Cliente, quantidade de **Fichas**, **Status** (ativo ou inativo, que continua legível) e a ação de ver as fichas. Tem busca por nome (sem acento nem maiúscula) e paginação; o botão **Nova ficha** fica no topo.
+- **Destaque técnico:** a API não tem listagem geral de fichas (`GET /anamnesis` exige o cliente). A tabela usa `GET /anamnesis/clients`, que devolve nome e contagem numa chamada só e grava **uma** auditoria; contar cliente a cliente geraria uma auditoria por linha só de abrir a tela.
+- **Dialog "Fichas de {cliente}":** abre pela ação da linha e busca as fichas do cliente só nesse momento (Server Action). Mostra modelo, versão, acompanhamentos e última consulta, com **Abrir** em cada uma (é na ficha aberta que se usa **Novo acompanhamento**; a ficha preenchida não é editada). O botão **Nova ficha** (cliente ativo) leva ao formulário com o cliente já escolhido.
+
+### Nova ficha (`/anamnese/fichas/nova`)
+
+- **Duas entradas, uma tela:** o botão **Nova ficha** da tela **Fichas preenchidas** (e do dialog dela), em que se escolhe o cliente, e o botão **Nova ficha** da aba Anamnese do cliente (some com cliente inativo), que chega com o cliente já escolhido (`?clienteId=`, só o id na URL). Assim ninguém precisa abrir o cliente, a aba e só então lançar a ficha.
+- **Cliente:** seletor com busca no servidor (`useClientSearch`, os mesmos clientes ativos do agendamento). Escolher leva à mesma página com o cliente na URL; `?clienteId=` inválido é 404 e cliente inativo mostra o aviso.
+- **Modelo:** só os modelos **ativos** que o cliente **ainda não usou** (uma ficha por cliente e modelo). Com um só, já vem escolhido. Sem nenhum disponível, a tela explica o motivo: **o cliente já tem ficha de todos os modelos ativos** (com o caminho para abrir a ficha e usar Novo acompanhamento e o botão "Ver fichas do cliente") ou **não há modelo ativo** na empresa (o ADMIN ganha o link para os Modelos). **Trocar o modelo descarta as respostas digitadas**, porque as perguntas mudam.
+- **Data da consulta:** hoje no fuso da empresa; pode ser passada, nunca futura (`validateConsultationDate`, compartilhada com o acompanhamento).
+- **Perguntas:** as da versão vigente do modelo, com o mesmo `AnswerField` do acompanhamento (os 8 tipos), agora com `*` nas obrigatórias. **Destaque técnico:** `buildNewAnswers` envia as respondidas, **omite a opcional vazia** (nunca `null`) e acusa a obrigatória vazia no campo; o foco vai ao primeiro erro.
+- Ao criar, abre a ficha completa. Erros da API (409, 400) aparecem como vieram; o rascunho fica só em memória.
+
+### Impressão (PDF)
+
+- Botão **Imprimir** na ficha completa: abre um dialog com a opção **"Incluir histórico de acompanhamento"** (marcada por padrão; desmarque para a via do cliente, só com a ficha para assinar) e o botão **Gerar PDF**. O PDF aparece no próprio dialog, no visualizador do navegador (que tem o botão de imprimir), e há **Abrir em nova aba** para quando o celular não embute o PDF. Mudar a opção descarta o PDF anterior.
+- **Destaque técnico:** a API exige o token no cabeçalho `Authorization`, então um link direto não funciona. O Route Handler `clientes/[id]/anamnese/[fichaId]/pdf/route.ts`, no servidor do Next, lê o token do cookie httpOnly (a renovação da sessão é a do `proxy`), busca o PDF e devolve os **bytes** com `Content-Type: application/pdf` e `Cache-Control: no-store`. A chamada usa `apiFetchBytes` (em `services/api.ts`), porque o `apiFetch` leria a resposta como texto e corromperia o arquivo.
+- **Privacidade:** o PDF vive só na memória da página (URL de blob, revogada ao fechar o dialog ou trocar a opção); sem cache e sem nome com dado pessoal (`ficha-anamnese.pdf`).
+- **Erros:** 403 ("sem acesso às fichas"), 404 e falha de conexão aparecem no dialog; sessão vencida leva ao login. O estado "Gerando…" cobre a geração.
+
 ### Atalho a partir do agendamento
 
 - **Atalho:** o dialog de detalhes do agendamento (agenda, histórico do cliente e financeiro) tem o botão **Anamnese**, que abre a aba de fichas do cliente. Só aparece para quem tem acesso; o acesso chega por um contexto (`AnamnesisAccessProvider`, no `AdminShell`), sem repassar prop pelas três telas.
-- **"Sem acompanhamento" no cartão de hover:** ao passar o mouse (ou focar com o teclado) num agendamento **Concluído** ou **Em andamento** da agenda do dia que ainda não tem acompanhamento, o cartão mostra "Sem acompanhamento", com o ícone de prancheta com X. Só no cartão: o bloco da grade já tem ícones demais. Só para quem tem acesso à anamnese; nos demais status não há o que anotar.
-- **Destaque técnico:** a informação vem de `GET /anamnesis/appointments-with-entry?appointmentIds=` (backend), que devolve **só ids** de agendamento: nenhum conteúdo da ficha chega à agenda. Foi um endpoint próprio, e não um campo no `/appointments`, porque a agenda é lida também por quem não tem acesso à anamnese. A agenda consulta só os atendimentos concluídos ou em andamento do dia (em lotes de até 100) e, se a chamada falhar, abre normalmente sem o aviso.
+
+## Auditoria (`/anamnese/auditoria`, só ADMIN)
+
+- Tela **somente leitura** com os registros de auditoria da empresa, do mais recente para o mais antigo: **Data e hora** (no fuso da empresa), **Usuário**, **Ação** (em português), **Cliente** e **IP**. Os demais perfis veem 404 (`requireAnamnesisAdmin`); a API também recusa (403). Não há editar nem excluir, e a própria consulta não é auditada.
+- **Filtros** (cliente com busca, usuário, ação, data inicial e final), guardados na URL (`?cliente=`, `?usuario=`, `?acao=`, `?de=`, `?ate=`, `?page=`, só ids, ação e datas). Valor inválido na URL é ignorado (`parseAuditFilters`). O período vai à API como o **dia inteiro no fuso da empresa** (do início do dia inicial ao último instante do dia final), porque ela lê data e hora completas e inclui as duas pontas.
+- **Rótulos:** ficha visualizada, fichas consultadas (lista de um cliente ou a tela Fichas preenchidas), ficha ou acompanhamento registrado, PDF da ficha gerado, modelo de ficha criado ou alterado e vínculo de usuário alterado (`auditActionLabels`).
+- **Destaque técnico:** a API devolve só ids. Os nomes de usuário vêm de **uma** chamada à lista de usuários (até 100, inativos incluídos) e os de cliente de **uma busca por cliente distinto da página** (no máximo 10, sem repetir; ler uma pessoa não gera auditoria). Sem nome, a tela mostra "Usuário desconhecido" ou "Cliente desconhecido". Se pesar, o backend pode passar a devolver os nomes.
+- O IP chega no formato IPv6 mapeado (`::ffff:10.0.0.1`) e é mostrado como IPv4.
 
 ## Regras de privacidade no frontend (valem em todas as etapas)
 
@@ -101,4 +130,6 @@ Rotas: `/anamnese/modelos` (lista), `/anamnese/modelos/novo` e `/anamnese/modelo
 - **Sem cache:** as chamadas de anamnese usam `cache: "no-store"` (o `apiFetch` já faz isso) e as páginas são dinâmicas; nada de `"use cache"` nem ISR nessas rotas.
 - **Rascunho só em memória:** ao sair da tela, o que foi digitado é descartado.
 - **Erros:** mostram o texto da API (já em português), nunca o conteúdo da ficha.
+- **Ids de fora não entram crus na API:** os ids da URL e das Server Actions são conferidos como UUID (`lib/uuid.ts`, `isUuid`) antes de qualquer chamada: nas páginas, fora do formato é 404 (e não erro do servidor); nas actions, "Pedido inválido."; nos services, o id também passa por `encodeURIComponent`. Assim um caminho forjado (`..%2F..%2Fusers`) não vira outra rota da API nem outro `revalidatePath`.
+- **Cache do HTML:** nas páginas dinâmicas o Next já responde `private, no-cache, no-store` em produção (`no-cache, must-revalidate` é só do modo de desenvolvimento); não é preciso configurar cabeçalho extra. O PDF sai `no-store` pelo Route Handler.
 - Os registros são **imutáveis**: nenhuma tela oferece editar ou excluir ficha ou acompanhamento; corrige-se com um novo acompanhamento.

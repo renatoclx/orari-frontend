@@ -228,6 +228,7 @@ export async function ClientHistoryPage({
     content = (
       <HistoryAnamnesis
         clientId={id}
+        canCreate={client.deletedAt === null}
         anamneses={result.items}
         footer={pagination(result.total, {})}
       />

@@ -190,7 +190,7 @@ export function EntryForm({
                 onValueChange={(date) => set("consultationDate", date)}
               />
             </FormField>
-            <FormField id="entry-appointment" label="Agendamento">
+            <FormField id="entry-appointment" label="Agendamento relacionado">
               <Select
                 value={values.appointmentId || NO_APPOINTMENT}
                 onValueChange={(next) =>

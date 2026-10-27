@@ -40,7 +40,7 @@ O `redirect()` fica fora do `try/catch`: ele funciona lançando um erro especial
 
 ## Chamadas autenticadas
 
-O `apiFetch` lê o `orari_access` e envia `Authorization: Bearer <token>` quando ele existe. Toda tela que usa a API lê cookies e, portanto, é renderizada a cada requisição.
+O `apiFetch` lê o `orari_access` e envia `Authorization: Bearer <token>` quando ele existe. Toda tela que usa a API lê cookies e, portanto, é renderizada a cada requisição. Para respostas que são arquivo (o PDF da anamnese), o `apiFetchBytes` faz o mesmo pelo servidor e devolve os bytes a um Route Handler, que os entrega ao navegador: o token continua só no cookie httpOnly.
 
 ## Usuário logado
 

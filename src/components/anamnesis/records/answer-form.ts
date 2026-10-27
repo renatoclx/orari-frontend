@@ -187,3 +187,30 @@ export function changedAnswers(
   }
   return result;
 }
+
+/**
+ * Respostas da ficha nova (registro inicial): todas as perguntas respondidas
+ * vão; opcional vazia é omitida; obrigatória vazia é erro da pergunta.
+ */
+export function buildNewAnswers(
+  questions: Pick<
+    AnamnesisQuestion,
+    "id" | "type" | "options" | "detailLabel" | "isRequired"
+  >[],
+  drafts: Record<string, AnswerDraft>,
+): ChangedAnswers {
+  const result: ChangedAnswers = { answers: [], errors: {} };
+  for (const question of questions) {
+    const parsed = parseAnswer(question, drafts[question.id] ?? emptyDraft());
+    if (parsed.kind === "error") {
+      result.errors[question.id] = parsed.message;
+    } else if (parsed.kind === "empty") {
+      if (question.isRequired) {
+        result.errors[question.id] = "Esta pergunta é obrigatória.";
+      }
+    } else {
+      result.answers.push({ questionId: question.id, value: parsed.value });
+    }
+  }
+  return result;
+}

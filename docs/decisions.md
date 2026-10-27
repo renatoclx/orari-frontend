@@ -99,7 +99,15 @@ regras de cada tela, em `docs/screens/`.
 - **2026-10-28 — Modelos de ficha só para o ADMIN** (`/anamnese/modelos`; 404 para os demais), no mesmo formato de Planos: lista, página de cadastro e alteração e dialog de visualização. Descrição na segunda linha do nome.
 - **2026-10-28 — Reordenar perguntas por arrastar e soltar com `@dnd-kit`** (mouse, toque e teclado, avisos em português). _Por quê:_ UX melhor que botões de subir e descer, e acessível.
 - **2026-10-28 — A alteração só envia as perguntas quando mudaram,** porque a API cria uma versão nova a cada envio de `questions`. As fichas já abertas ficam na versão em que nasceram.
-- **2026-10-28 — O profissional não tem item de menu para a anamnese;** as fichas ficam na aba "Anamnese" do cliente (a API não tem lista geral de fichas). O menu "Anamnese" (Modelos e Auditoria) é só do ADMIN.
+- **2026-10-28 — O menu "Anamnese" tem Fichas preenchidas, Modelos de ficha e Auditoria** para o ADMIN; o **profissional vinculado** vê só "Fichas preenchidas", direto no menu. As fichas também aparecem na aba "Anamnese" do cliente. _Por quê:_ ninguém deveria abrir o cliente, a aba e só então lançar uma ficha. (Substitui a decisão de 2026-10-28 de que o profissional não teria item de menu.)
+- **2026-10-27 — Privacidade antes da conveniência:** nada de saúde em `localStorage`, `sessionStorage`, cookies, URL ou log; sem cache; rascunho só em memória; fichas e acompanhamentos imutáveis; erro mostra só o texto da API; o PDF vive só na memória da página (URL de blob revogada ao fechar).
+- **2026-10-27 — A ficha é desenhada com as perguntas da versão em que nasceu,** nunca com a versão atual do modelo. As perguntas do modelo usam accordion (várias abertas), para a lista longa caber na tela e arrastar ficar fácil.
+- **2026-10-27 — "Alterar" uma ficha é registrar um acompanhamento:** evolução em texto grande (obrigatória), só as respostas que mudaram, resposta dada não se apaga, e o campo **Agendamento relacionado** liga a anotação ao atendimento.
+- **2026-10-27 — Tela "Fichas preenchidas"** (`/anamnese/fichas`) com clientes, quantidade de fichas, status e um dialog com as fichas de cada um; "Nova ficha" é botão nela, no dialog e na aba do cliente. Usa `GET /anamnesis/clients` (backend), porque contar cliente a cliente geraria uma auditoria por linha.
+- **2026-10-27 — PDF por Route Handler:** a API exige o token no cabeçalho, então o servidor do Next lê o cookie httpOnly e entrega os bytes (`apiFetchBytes`). O histórico de acompanhamento é opcional (marcado por padrão).
+- **2026-10-27 — Auditoria só do ADMIN, nomes resolvidos no servidor** (lista de usuários e uma busca por cliente da página); período como o dia inteiro no fuso da empresa.
+- **2026-10-27 — "Sem acompanhamento" na agenda foi testado e removido** (no bloco e no cartão de hover): a maioria dos atendimentos aparecia sem acompanhamento e o aviso ficou dúbio. O endpoint `GET /anamnesis/appointments-with-entry` ficou no backend, sem uso.
+- **2026-10-27 — Ids de fora são conferidos como UUID** antes de entrar no caminho da API (páginas dão 404; actions recusam; services usam `encodeURIComponent`).
 
 ## Empresas
 

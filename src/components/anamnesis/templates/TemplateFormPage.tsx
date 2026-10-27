@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import { TemplateForm } from "@/components/anamnesis/templates/TemplateForm";
+import { isUuid } from "@/lib/uuid";
 import { requireAnamnesisAdmin } from "@/lib/anamnesis-guard";
 import { ApiError } from "@/services/api";
 import { getTemplate } from "@/services/anamnesis-template.service";
@@ -13,6 +14,7 @@ type TemplateFormPageProps = {
 // perguntas da versão vigente e entrega ao formulário.
 export async function TemplateFormPage({ id }: TemplateFormPageProps) {
   await requireAnamnesisAdmin();
+  if (id !== undefined && !isUuid(id)) notFound();
   const template = id
     ? await getTemplate(id).catch((error: unknown) => {
         if (error instanceof ApiError && error.status === 404) notFound();

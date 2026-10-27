@@ -4,15 +4,12 @@ import { AgendaToolbar } from "@/components/agenda/AgendaToolbar";
 import { AgendaDayView } from "@/components/agenda/AgendaDayView";
 import { toAgendaAppointment } from "@/components/agenda/agenda-data";
 import { computeGridRange, gridAreas } from "@/components/agenda/agenda-range";
-import { findAppointmentsWithEntry } from "@/services/anamnesis.service";
-import { ApiError } from "@/services/api";
 import { listAppointments } from "@/services/appointment.service";
 import { getCurrentUser } from "@/services/auth.service";
 import { listBusinessHours } from "@/services/business-hour.service";
 import { listPeople } from "@/services/people.service";
 import { listServices } from "@/services/service.service";
 import type { TimeRange } from "@/types/agenda";
-import { anamnesisAccess } from "@/utils/anamnesis-access";
 import {
   dayBounds,
   formatLongDate,
@@ -26,32 +23,11 @@ type AgendaDayPageProps = {
   searchParams: Record<string, string | string[] | undefined>;
 };
 
-// Atendimentos já feitos (ou em andamento) que ainda não têm acompanhamento: o
-// cartão de hover do agendamento avisa. Nos agendados ou cancelados não há o que
-// anotar. Se a consulta falhar, a agenda segue sem o aviso.
-async function appointmentsWithoutEntry(
-  appointments: Awaited<ReturnType<typeof listAppointments>>,
-): Promise<Set<string>> {
-  const candidates = appointments
-    .filter(
-      (item) => item.status === "COMPLETED" || item.status === "IN_PROGRESS",
-    )
-    .map((item) => item.id);
-  if (candidates.length === 0) return new Set();
-  try {
-    const withEntry = await findAppointmentsWithEntry(candidates);
-    return new Set(candidates.filter((id) => !withEntry.has(id)));
-  } catch (error) {
-    if (error instanceof ApiError) return new Set();
-    throw error;
-  }
-}
-
 // Agenda de um dia (somente leitura): profissionais ativos, agendamentos do dia
 // e horário de funcionamento da empresa, tudo no fuso da empresa.
 export async function AgendaDayPage({ searchParams }: AgendaDayPageProps) {
-  const user = await getCurrentUser();
-  const timeZone = user.company.timezone;
+  const { company } = await getCurrentUser();
+  const timeZone = company.timezone;
   // Instante em que a página foi montada: o relógio da tela começa nele.
   const renderedAt = new Date();
   const today = toDateString(renderedAt, timeZone);
@@ -90,16 +66,9 @@ export async function AgendaDayPage({ searchParams }: AgendaDayPageProps) {
       ? requestedProfessional
       : null;
 
-  const visibleAppointments = appointments.filter((item) =>
-    visible.has(item.professionalId),
-  );
-  const withoutEntry = anamnesisAccess(user).canAccess
-    ? await appointmentsWithoutEntry(visibleAppointments)
-    : new Set<string>();
-  const agendaAppointments = visibleAppointments.map((item) => ({
-    ...toAgendaAppointment(item, timeZone, bounds.to),
-    withoutEntry: withoutEntry.has(item.id),
-  }));
+  const agendaAppointments = appointments
+    .filter((item) => visible.has(item.professionalId))
+    .map((item) => toAgendaAppointment(item, timeZone, bounds.to));
 
   const windows: TimeRange[] = businessHours.map((hours) => ({
     start: hours.openAt,

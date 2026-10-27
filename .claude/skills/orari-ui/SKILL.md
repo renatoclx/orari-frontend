@@ -94,6 +94,9 @@ Fonte das regras: `docs/screen-patterns.md` e `docs/screens/pessoas.md`. Modelo:
 - **Cartão de resumo** (`PaymentsSummary`): link para a listagem filtrada, na grade `sm:grid-cols-3`. Ícone em círculo tingido (`bg-destructive/10`, `bg-muted`, `bg-success/15`), faixa de 6 px na borda esquerda com a cor da situação (vermelho, neutro, verde; sem contornar o cartão), valor grande na mesma cor (neutro no "a vencer") e a contagem em `text-muted-foreground`. Ativo: só o fundo tingido (`bg-destructive/5`, `bg-muted/60`, `bg-success/5`) e `aria-current`; clicar no ativo desfaz o filtro. Cores sempre pelos tokens (`destructive`, `success`); no escuro, `dark:text-red-400` no vermelho, como na badge. Quando os cartões filtram, a barra de filtros some no celular.
 - **Lista com seleção e baixa em lote** (`PaymentList`): caixa de seleção na primeira coluna (`accent-primary`), só nas linhas que aceitam a ação; ao marcar uma, as que não podem entrar no mesmo lote ficam desabilitadas com `Hint` explicando. Uma barra `bg-muted` no topo do card mostra "N selecionados · total" e as ações.
 - **Dialog de comanda** (`CheckoutDialog`): seções com título pequeno e lista em `divide-y` dentro de um quadro com borda; as linhas quebram (`flex-wrap`) para o selo e o valor irem para baixo no celular; o total fica fora da área rolável. Estados de item com `Badge` (`secondary` para "Aguardando conclusão" e "Incluído no pacote").
+- **Status em coluna própria** (`StatusBadge` na coluna Status), também quando o item pode ser inativo (Fichas preenchidas): não encoste a badge no nome.
+- **Dialog aberto a partir de uma linha que busca os dados ao abrir** (`ClientAnamnesesDialog`): esqueleto enquanto carrega, erro em `role="alert"`, `key` pelo item para refazer a busca; sem caixa de orientação quando a tela já é intuitiva.
+- **Lista longa de itens editáveis em accordion** (`QuestionCard`): `Collapsible` por item, vários abertos ao mesmo tempo, linha de resumo (número, texto e tipo) com a alça de arrastar e a lixeira fora da área clicável, botão "Recolher todas / Expandir todas" e a pergunta com erro abre sozinha ao enviar.
 
 ## Formulários
 
@@ -165,6 +168,9 @@ Fonte: `docs/screens/agendamentos.md`. Modelo: `src/components/agenda/`.
 - **Detalhes do agendamento:** "Cancelar" (vermelho, com confirmação) e "Remanejar" lado a lado, centralizados, enquanto não iniciou; o encaixe não tem "Remanejar". Sessão de recorrência mostra "Recorrente" (ícone `Repeat`) e a de pacote, "Sessão de pacote" (ícone `Package`); as duas trocam o "Alterar" por "Ver sessões" (dialog), e a de pacote tem também "Ver contratação" (dialog). A legenda mostra "Recorrente" e "Pacote". Início e fim são automáticos (job do backend). **Nada no passado é alterado:** "Cancelar" e "Alterar" só aparecem antes do início.
 - **Alterar agendamento:** o mesmo `NewAppointmentDialog` em modo de alteração (prop `editing`), preenchido, com "Salvar alterações" habilitado só se algo mudou; envia só os campos alterados (`updateAppointmentAction`). Mantém o tipo: comum só dentro do expediente; encaixe só fora, reenviando `overBooking: true`. O próprio horário conta como livre (`ignoreAppointmentId` na busca de disponibilidade).
 - O carregamento usa `Suspense` com `key` no dia, no `page.tsx` (um `loading.tsx` na raiz de `(admin)` valeria para todas as telas).
+
+- **Ícones dentro do bloco do agendamento têm todos 16×16** (`size-4`): status, encaixe, recorrência e pacote.
+- **Dialog de detalhes do agendamento:** sem botão "Fechar" no rodapé (o X do canto fecha); os botões ficam **centralizados e em uma só linha** e o dialog alarga (`sm:max-w-xl`) quando são três ou mais; sem botões, sem rodapé. O atalho "Anamnese" aparece só para quem acessa as fichas.
 
 ## Barra de ações lateral
 

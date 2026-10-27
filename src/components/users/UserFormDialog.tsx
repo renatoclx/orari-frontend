@@ -22,7 +22,6 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import {
   Select,
   SelectContent,
@@ -30,9 +29,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Switch } from "@/components/ui/switch";
 import type { UserType } from "@/types/auth";
-import type { UserListItem } from "@/types/user";
+import type { LinkedPersonType, UserListItem } from "@/types/user";
 import { formatUserType } from "@/utils/format";
 
 type UserFormDialogProps = {
@@ -49,12 +47,20 @@ type UserFormDialogProps = {
    * nasce nela e com o tipo fixo, sem a escolha do tipo.
    */
   forCompany?: { id: string; name: string; type: UserType };
-  /** Profissionais ativos, para o vínculo (anamnese). Sem lista, não há vínculo. */
-  professionals?: ProfessionalOption[];
+  /** Pessoas ativas que o usuário pode representar, por função. Sem elas, não há vínculo. */
+  linkOptions?: LinkOptions;
 };
 
-/** Profissional que pode ser vinculado a um usuário. */
-export type ProfessionalOption = { id: string; name: string };
+/** Pessoa que pode ser vinculada a um usuário. */
+export type PersonOption = { id: string; name: string };
+export type LinkOptions = Record<LinkedPersonType, PersonOption[]>;
+
+// Função do usuário no formulário. O Radix Select não aceita valor vazio: "NONE" é "sem vínculo".
+const linkLabels: Record<LinkedPersonType, string> = {
+  PROFESSIONAL: "Profissional",
+  EMPLOYEE: "Funcionário",
+};
+const NO_LINK = "NONE";
 
 // Id de cada campo: liga o erro ao elemento que recebe o foco.
 const ids = (field: keyof UserFormValues) => `user-${field}`;
@@ -80,7 +86,7 @@ function UserForm({
   typeOptions,
   currentUserId,
   forCompany,
-  professionals = [],
+  linkOptions = { PROFESSIONAL: [], EMPLOYEE: [] },
 }: UserFormDialogProps) {
   const editing = user !== undefined;
   const isSelf = user?.id === currentUserId;
@@ -90,7 +96,7 @@ function UserForm({
     type: user?.type ?? forCompany?.type ?? "",
     password: "",
     passwordConfirmation: "",
-    linkProfessional: Boolean(user?.peopleId),
+    linkType: user?.people?.type ?? "",
     peopleId: user?.peopleId ?? "",
   });
   const [errors, setErrors] = useState<UserFormErrors>({});
@@ -102,15 +108,19 @@ function UserForm({
       ? [...typeOptions, user.type]
       : typeOptions;
 
-  // O vínculo vale para ADMIN e USER (o SUPER_ADMIN não se vincula), e só quando
-  // a tela recebeu os profissionais (o cadastro do administrador da empresa nova
-  // não tem nenhum ainda).
+  // O vínculo vale para ADMIN e USER (o SUPER_ADMIN não se vincula) e não existe
+  // no cadastro do administrador de uma empresa nova (ainda sem profissionais).
   const canLink = !forCompany && values.type !== "SUPER_ADMIN";
-  // Profissional vinculado que ficou inativo não vem na lista: continua visível.
-  const professionalOptions =
-    user?.peopleId && !professionals.some((p) => p.id === user.peopleId)
-      ? [...professionals, { id: user.peopleId, name: "Profissional inativo" }]
-      : professionals;
+  const linkType = values.linkType;
+  // Pessoa vinculada que ficou inativa não vem na lista: continua visível.
+  const personOptions = linkType ? linkOptions[linkType] : [];
+  const personChoices =
+    linkType &&
+    user?.peopleId &&
+    user.people?.type === linkType &&
+    !personOptions.some((person) => person.id === user.peopleId)
+      ? [...personOptions, { id: user.peopleId, name: "Cadastro inativo" }]
+      : personOptions;
 
   function set(
     field:
@@ -128,10 +138,10 @@ function UserForm({
 
   function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    // Fora de `canLink` o vínculo não vale, mesmo que o interruptor tenha ficado ligado.
-    const sent = {
+    // Fora de `canLink` o vínculo não vale, mesmo que a função tenha ficado escolhida.
+    const sent: UserFormValues = {
       ...values,
-      linkProfessional: canLink && values.linkProfessional,
+      linkType: canLink ? values.linkType : "",
     };
     const found = editing
       ? validateUpdateUserForm(sent)
@@ -251,33 +261,37 @@ function UserForm({
       )}
 
       {canLink && (
-        <div className="space-y-3">
-          <div className="flex items-center justify-between gap-3">
-            <div className="space-y-0.5">
-              <Label htmlFor="user-linkProfessional">
-                Este usuário é um profissional
-              </Label>
-              <p className="text-xs text-muted-foreground">
-                Vincule ao cadastro de um profissional para dar acesso às fichas
-                de anamnese. Quem só atende o balcão não precisa.
-              </p>
-            </div>
-            <Switch
-              id="user-linkProfessional"
-              checked={values.linkProfessional}
-              onCheckedChange={(checked) =>
+        <>
+          <FormField id={ids("linkType")} label="Função">
+            <Select
+              value={values.linkType || NO_LINK}
+              onValueChange={(next) =>
                 setValues((current) => ({
                   ...current,
-                  linkProfessional: checked,
-                  peopleId: checked ? current.peopleId : "",
+                  linkType: next === NO_LINK ? "" : (next as LinkedPersonType),
+                  // Trocar a função invalida a pessoa escolhida.
+                  peopleId: "",
                 }))
               }
-            />
-          </div>
-          {values.linkProfessional && (
+            >
+              <SelectTrigger id={ids("linkType")} className="w-full">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value={NO_LINK}>Nenhuma</SelectItem>
+                <SelectItem value="PROFESSIONAL">Profissional</SelectItem>
+                <SelectItem value="EMPLOYEE">Funcionário</SelectItem>
+              </SelectContent>
+            </Select>
+            <p className="text-xs text-muted-foreground">
+              Vincule ao cadastro de um profissional (acesso às fichas de
+              anamnese) ou de um funcionário, como a recepção.
+            </p>
+          </FormField>
+          {linkType && (
             <FormField
               id={ids("peopleId")}
-              label="Profissional"
+              label={linkLabels[linkType]}
               required
               error={errors.peopleId}
             >
@@ -290,19 +304,21 @@ function UserForm({
                   className="w-full"
                   aria-invalid={errors.peopleId ? true : undefined}
                 >
-                  <SelectValue placeholder="Selecione o profissional" />
+                  <SelectValue
+                    placeholder={`Selecione o ${linkLabels[linkType].toLowerCase()}`}
+                  />
                 </SelectTrigger>
                 <SelectContent>
-                  {professionalOptions.map((professional) => (
-                    <SelectItem key={professional.id} value={professional.id}>
-                      {professional.name}
+                  {personChoices.map((person) => (
+                    <SelectItem key={person.id} value={person.id}>
+                      {person.name}
                     </SelectItem>
                   ))}
                 </SelectContent>
               </Select>
             </FormField>
           )}
-        </div>
+        </>
       )}
 
       {!editing && (

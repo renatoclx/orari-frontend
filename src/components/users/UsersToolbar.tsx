@@ -4,7 +4,7 @@ import { useState } from "react";
 import { Plus } from "lucide-react";
 import {
   UserFormDialog,
-  type ProfessionalOption,
+  type LinkOptions,
 } from "@/components/users/UserFormDialog";
 import { Button } from "@/components/ui/button";
 import type { UserType } from "@/types/auth";
@@ -12,14 +12,14 @@ import type { UserType } from "@/types/auth";
 type UsersToolbarProps = {
   typeOptions: UserType[];
   currentUserId: string;
-  professionals: ProfessionalOption[];
+  linkOptions: LinkOptions;
 };
 
 /** Botão de novo usuário, que abre o dialog de cadastro. */
 export function UsersToolbar({
   typeOptions,
   currentUserId,
-  professionals,
+  linkOptions,
 }: UsersToolbarProps) {
   const [creating, setCreating] = useState(false);
 
@@ -38,7 +38,7 @@ export function UsersToolbar({
         onOpenChange={setCreating}
         typeOptions={typeOptions}
         currentUserId={currentUserId}
-        professionals={professionals}
+        linkOptions={linkOptions}
       />
     </div>
   );

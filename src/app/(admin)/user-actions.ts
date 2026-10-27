@@ -2,7 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import {
-  profileLinkApplies,
+  linkApplies,
   validatePassword,
   validateUpdateUserForm,
   validateUserForm,
@@ -33,10 +33,10 @@ function firstError(errors: UserFormErrors): UserActionResult | null {
   return field ? { ok: false, message: errors[field] ?? "", field } : null;
 }
 
-// A API responde 409 tanto para e-mail repetido quanto para profissional já
-// vinculado: a mensagem diz qual, e o erro vai para o campo certo.
+// A API responde 409 tanto para e-mail repetido quanto para pessoa já
+// vinculada: a mensagem diz qual, e o erro vai para o campo certo.
 function conflictField(error: unknown): UserField {
-  return error instanceof ApiError && /profissional/i.test(error.message)
+  return error instanceof ApiError && /vinculad/i.test(error.message)
     ? "peopleId"
     : "email";
 }
@@ -61,7 +61,7 @@ export async function createUserAction(
       passwordConfirmation: values.passwordConfirmation,
       type: values.type as UserType,
       ...(companyId && { companyId }),
-      ...(profileLinkApplies(values) && { peopleId: values.peopleId }),
+      ...(linkApplies(values) && { peopleId: values.peopleId }),
     });
   } catch (error) {
     return failureFrom(error, conflictField(error));
@@ -75,7 +75,7 @@ export async function updateUserAction(
   id: string,
   values: Pick<
     UserFormValues,
-    "name" | "email" | "type" | "linkProfessional" | "peopleId"
+    "name" | "email" | "type" | "linkType" | "peopleId"
   >,
 ): Promise<UserActionResult> {
   const invalid = firstError(validateUpdateUserForm(values));
@@ -87,7 +87,7 @@ export async function updateUserAction(
       email: values.email.trim(),
       type: values.type as UserType,
       // `null` desfaz o vínculo (desligou o interruptor ou virou SUPER_ADMIN).
-      peopleId: profileLinkApplies(values) ? values.peopleId : null,
+      peopleId: linkApplies(values) ? values.peopleId : null,
     });
   } catch (error) {
     return failureFrom(error, conflictField(error));

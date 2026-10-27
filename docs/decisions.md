@@ -89,6 +89,11 @@ regras de cada tela, em `docs/screens/`.
 
 - **2026-10-17 — Financeiro vira dropdown** com Pagamentos e Métodos de pagamento (métodos de pagamento: implementação do responsável pelo projeto). **2026-10-22:** passou a ter também Comandas, na frente de Pagamentos.
 
+## Usuários
+
+- **2026-10-27 — O usuário se vincula a uma pessoa (profissional ou funcionário) pelo mesmo `peopleId`,** sem flag no banco; a "Função" da listagem mostra o cargo da pessoa, com a cor do tipo. _Por quê:_ ter ou não o vínculo é a informação (uma flag teria de ser mantida em sincronia). Só o profissional dá acesso à anamnese; o acesso do funcionário será tratado à parte.
+- **2026-10-27 — Um profissional ou funcionário liga-se a no máximo um usuário ativo;** o 409 da API vai para o campo da pessoa.
+
 ## Empresas
 
 - **2026-10-23 — Empresas é uma tela só do SUPER_ADMIN** (`/empresas`, item no fim do menu, 404 para os outros perfis), em lista com cadastro e alteração em dialog; empresas não são excluídas, são inativadas e reativadas. _Por quê:_ cadastrar empresa por chamada direta à API não dá para o dia a dia.

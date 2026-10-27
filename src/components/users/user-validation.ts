@@ -1,4 +1,5 @@
 import type { UserType } from "@/types/auth";
+import type { LinkedPersonType } from "@/types/user";
 
 // Campos validados no cliente e de novo no servidor (mesmas regras do backend).
 export type UserFormValues = {
@@ -7,9 +8,9 @@ export type UserFormValues = {
   password: string;
   passwordConfirmation: string;
   type: string;
-  /** "Este usuário é um profissional": liga o seletor de profissional. */
-  linkProfessional: boolean;
-  /** Profissional escolhido (só vale com `linkProfessional`). */
+  /** Função do usuário: com quem ele se vincula ("" = sem vínculo). */
+  linkType: LinkedPersonType | "";
+  /** Pessoa escolhida (só vale com `linkType`). */
   peopleId: string;
 };
 
@@ -70,21 +71,26 @@ function validateIdentity(
 }
 
 /**
- * Vínculo com o profissional: ligado, precisa de um profissional escolhido.
- * O SUPER_ADMIN não se vincula (a tela esconde a opção), então nada a conferir.
+ * O vínculo só vale com uma função escolhida; o SUPER_ADMIN não se vincula (a
+ * tela esconde a opção), então nada a conferir nele.
  */
-export function profileLinkApplies(
-  values: Pick<UserFormValues, "type" | "linkProfessional">,
+export function linkApplies(
+  values: Pick<UserFormValues, "type" | "linkType">,
 ): boolean {
-  return values.linkProfessional && values.type !== "SUPER_ADMIN";
+  return values.linkType !== "" && values.type !== "SUPER_ADMIN";
 }
 
-function validateProfessionalLink(
-  values: Pick<UserFormValues, "type" | "linkProfessional" | "peopleId">,
+// Com função escolhida, a pessoa (profissional ou funcionário) é obrigatória.
+function validateLink(
+  values: Pick<UserFormValues, "type" | "linkType" | "peopleId">,
 ): UserFormErrors {
-  return profileLinkApplies(values) && !values.peopleId
-    ? { peopleId: "Selecione o profissional." }
-    : {};
+  if (!linkApplies(values) || values.peopleId) return {};
+  return {
+    peopleId:
+      values.linkType === "EMPLOYEE"
+        ? "Selecione o funcionário."
+        : "Selecione o profissional.",
+  };
 }
 
 /**
@@ -119,7 +125,7 @@ export function validatePassword(
 export function validateUserForm(values: UserFormValues): UserFormErrors {
   return {
     ...validateIdentity(values),
-    ...validateProfessionalLink(values),
+    ...validateLink(values),
     ...validatePassword(values.password, values.passwordConfirmation),
   };
 }
@@ -128,8 +134,8 @@ export function validateUserForm(values: UserFormValues): UserFormErrors {
 export function validateUpdateUserForm(
   values: Pick<
     UserFormValues,
-    "name" | "email" | "type" | "linkProfessional" | "peopleId"
+    "name" | "email" | "type" | "linkType" | "peopleId"
   >,
 ): UserFormErrors {
-  return { ...validateIdentity(values), ...validateProfessionalLink(values) };
+  return { ...validateIdentity(values), ...validateLink(values) };
 }

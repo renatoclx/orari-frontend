@@ -1,14 +1,19 @@
 // Espelha a resposta de /users do backend (sem a senha, que a API nunca devolve).
 import type { UserType } from "@/types/auth";
 
+/** Tipo da pessoa que um usuário pode representar. */
+export type LinkedPersonType = "PROFESSIONAL" | "EMPLOYEE";
+
 // Itens que retornam de GET /users para listagem
 export type UserListItem = {
   id: string;
   name: string;
   email: string;
   type: UserType;
-  /** Profissional vinculado (pessoa do tipo PROFESSIONAL); nulo = não é profissional. */
+  /** Pessoa vinculada (profissional ou funcionário); nulo = sem vínculo. */
   peopleId: string | null;
+  /** Tipo e cargo da pessoa vinculada, para a coluna Função. */
+  people: { type: LinkedPersonType; profession: string | null } | null;
   /** Nulo = ativo; preenchido = inativo (a listagem traz os dois). */
   deletedAt: string | null;
 };
@@ -22,7 +27,7 @@ export type CreateUserInput = {
   type: UserType;
   /** Obrigatório para o SUPER_ADMIN (a empresa do novo usuário); o ADMIN usa a própria. */
   companyId?: string;
-  /** Profissional que o usuário representa; sem ele, não há vínculo. */
+  /** Pessoa (profissional ou funcionário) que o usuário representa; sem ela, não há vínculo. */
   peopleId?: string;
 };
 

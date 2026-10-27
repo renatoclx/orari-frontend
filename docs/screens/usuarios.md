@@ -7,7 +7,7 @@
 - Nome
 - E-mail
 - Tipo de Usuário
-- Profissional (badge Sim ou Não)
+- Função (badge com o cargo da pessoa vinculada)
 - Status
 - Ações
   - Visualizar
@@ -34,7 +34,7 @@
 - Nome
 - E-mail
 - Tipo de Usuário
-- Este usuário é um profissional (interruptor) e, ligado, Profissional
+- Função (Nenhuma, Profissional ou Funcionário) e, escolhida, a pessoa (Profissional ou Funcionário)
 - Senha
 - Confirme a senha
 
@@ -47,13 +47,14 @@
 - A confirmação de senha deve ser igual ao campo de senha;
 - E-mail em formato válido e único entre os usuários ativos (o servidor responde no campo se já existir).
 
-### Vínculo com o profissional
+### Vínculo com um profissional ou funcionário
 
-- O interruptor "Este usuário é um profissional" vincula o usuário ao cadastro de um profissional (`peopleId`). É o vínculo que dá acesso às fichas de anamnese; quem só atende o balcão (recepção) fica sem ele. Não há flag própria: ter ou não o vínculo é a informação.
-- Só aparece para ADMIN e USER, e não no cadastro do administrador de uma empresa nova. Ligado, mostra a seleção de Profissional (ativos, até 100, na própria página), obrigatória.
-- Um profissional liga-se a no máximo um usuário ativo: se já estiver ligado, a API responde 409 e a mensagem vai para o campo Profissional.
-- Na alteração, desligar o interruptor desfaz o vínculo. Um vínculo com profissional que ficou inativo aparece como "Profissional inativo".
-- A listagem e o "Visualizar" mostram só se há vínculo, não o nome (a API não o devolve).
+- O campo **Função** vincula o usuário ao cadastro de uma pessoa (`peopleId`): **Profissional** ou **Funcionário** (recepção, secretaria), ou **Nenhuma**. Não há flag própria: ter ou não o vínculo é a informação.
+- Só o vínculo com **profissional** dá acesso às fichas de anamnese. O vínculo com funcionário identifica a função do usuário; o acesso dele será tratado à parte.
+- Só aparece para ADMIN e USER, e não no cadastro do administrador de uma empresa nova. Escolhida a função, mostra a seleção da pessoa (ativas daquele tipo, até 100 de cada, carregadas na própria página), obrigatória. Trocar a função limpa a pessoa escolhida.
+- Uma pessoa liga-se a no máximo um usuário ativo: se já estiver ligada, a API responde 409 e a mensagem vai para o campo da pessoa.
+- Na alteração, escolher "Nenhuma" desfaz o vínculo. Um vínculo com pessoa que ficou inativa aparece como "Cadastro inativo".
+- A coluna **Função** (e o "Visualizar") mostra o **cargo** da pessoa (`profession`), ou "Profissional" / "Funcionário" quando não há cargo. A cor diferencia profissional (verde) de funcionário (neutra). Sem vínculo, "--". O nome da pessoa não aparece (a API não o devolve).
 
 ---
 

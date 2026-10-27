@@ -9,8 +9,8 @@ import type { UserType } from "@/types/auth";
 // Itens por página da listagem.
 const PAGE_SIZE = 10;
 const BASE_PATH = "/usuarios";
-// Profissionais para o vínculo: uma página só (clínicas têm poucos).
-const PROFESSIONALS_LIMIT = 100;
+// Pessoas para o vínculo (profissionais e funcionários): uma página só cada (clínicas têm poucas).
+const LINK_LIMIT = 100;
 
 type UsersListPageProps = {
   /** searchParams da rota (?page=). */
@@ -21,20 +21,30 @@ type UsersListPageProps = {
 // não tem busca por nome; a ordem é do mais recente para o mais antigo.
 export async function UsersListPage({ searchParams }: UsersListPageProps) {
   const page = Math.max(1, Number(searchParams.page) || 1);
-  const [currentUser, result, professionals] = await Promise.all([
+  const [currentUser, result, professionals, employees] = await Promise.all([
     getCurrentUser(),
     listUsers({ page, limit: PAGE_SIZE }),
     listPeople({
       type: "PROFESSIONAL",
       isActive: true,
       page: 1,
-      limit: PROFESSIONALS_LIMIT,
+      limit: LINK_LIMIT,
+    }),
+    listPeople({
+      type: "EMPLOYEE",
+      isActive: true,
+      page: 1,
+      limit: LINK_LIMIT,
     }),
   ]);
-  const professionalOptions = professionals.items.map(({ id, name }) => ({
+  const toOption = ({ id, name }: { id: string; name: string }) => ({
     id,
     name,
-  }));
+  });
+  const linkOptions = {
+    PROFESSIONAL: professionals.items.map(toOption),
+    EMPLOYEE: employees.items.map(toOption),
+  };
 
   // Só o SUPER_ADMIN atribui SUPER_ADMIN (o backend também confere).
   const typeOptions: UserType[] =
@@ -48,13 +58,13 @@ export async function UsersListPage({ searchParams }: UsersListPageProps) {
       <UsersToolbar
         typeOptions={typeOptions}
         currentUserId={currentUser.id}
-        professionals={professionalOptions}
+        linkOptions={linkOptions}
       />
       <UserList
         users={result.items}
         typeOptions={typeOptions}
         currentUserId={currentUser.id}
-        professionals={professionalOptions}
+        linkOptions={linkOptions}
         footer={
           <TablePagination
             page={page}

@@ -94,6 +94,13 @@ regras de cada tela, em `docs/screens/`.
 - **2026-10-27 — O usuário se vincula a uma pessoa (profissional ou funcionário) pelo mesmo `peopleId`,** sem flag no banco; a "Função" da listagem mostra o cargo da pessoa, com a cor do tipo. _Por quê:_ ter ou não o vínculo é a informação (uma flag teria de ser mantida em sincronia). Só o profissional dá acesso à anamnese; o acesso do funcionário será tratado à parte.
 - **2026-10-27 — Um profissional ou funcionário liga-se a no máximo um usuário ativo;** o 409 da API vai para o campo da pessoa.
 
+## Anamnese
+
+- **2026-10-28 — Modelos de ficha só para o ADMIN** (`/anamnese/modelos`; 404 para os demais), no mesmo formato de Planos: lista, página de cadastro e alteração e dialog de visualização. Descrição na segunda linha do nome.
+- **2026-10-28 — Reordenar perguntas por arrastar e soltar com `@dnd-kit`** (mouse, toque e teclado, avisos em português). _Por quê:_ UX melhor que botões de subir e descer, e acessível.
+- **2026-10-28 — A alteração só envia as perguntas quando mudaram,** porque a API cria uma versão nova a cada envio de `questions`. As fichas já abertas ficam na versão em que nasceram.
+- **2026-10-28 — O profissional não tem item de menu para a anamnese;** as fichas ficam na aba "Anamnese" do cliente (a API não tem lista geral de fichas). O menu "Anamnese" (Modelos e Auditoria) é só do ADMIN.
+
 ## Empresas
 
 - **2026-10-23 — Empresas é uma tela só do SUPER_ADMIN** (`/empresas`, item no fim do menu, 404 para os outros perfis), em lista com cadastro e alteração em dialog; empresas não são excluídas, são inativadas e reativadas. _Por quê:_ cadastrar empresa por chamada direta à API não dá para o dia a dia.

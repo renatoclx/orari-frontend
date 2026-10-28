@@ -105,6 +105,19 @@ export function cancelAppointment(id: string): Promise<AppointmentItem> {
   });
 }
 
+/**
+ * Marca a falta (o cliente não compareceu). Vale para o agendamento avulso e
+ * para a sessão de recorrência ou de pacote, só depois de o atendimento iniciar.
+ * Não cobra: o backend cancela o pagamento pendente. É definitiva (a sessão de
+ * pacote tem a reposição, que é outro caminho).
+ */
+export function markAppointmentNoShow(id: string): Promise<AppointmentItem> {
+  return apiFetch<AppointmentItem>(`/appointments/${id}`, {
+    method: "PATCH",
+    body: JSON.stringify({ status: "NO_SHOW" }),
+  });
+}
+
 /** Campos que a alteração pode mudar; só o que for informado é enviado. */
 export type UpdateAppointmentInput = {
   clientId?: string;

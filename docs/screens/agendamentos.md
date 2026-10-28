@@ -83,12 +83,17 @@
 
 - Exibe foto e nome do cliente, serviço com cor e duração, horário, profissional, status, indicação de encaixe, indicação de recorrência ("Recorrente" ou "Sessão de pacote", cada uma com o seu ícone) e observação.
 - Ações, lado a lado, exibidas apenas enquanto o agendamento ainda não iniciou: **Cancelar** e **Remanejar** (ver "Remanejar agendamento").
-- A única ação de status é **Cancelar**:
+- As ações de status são **Cancelar** (antes de iniciar) e **Marcar falta** (depois de iniciar; ver abaixo). **Cancelar**:
   - Botão vermelho, centralizado, exibido apenas enquanto o agendamento ainda não iniciou (status Agendado ou Confirmado, com o horário de início no futuro).
   - Pede confirmação em dialog ("Cancelar agendamento?", com "Voltar" e "Cancelar agendamento"). Ao confirmar, o status passa a Cancelado, o horário fica livre e um aviso informa o cancelamento.
   - Agendamento gerado por recorrência é cancelado pela rota da recorrência; se a API recusar, o motivo é exibido.
   - A regra também é imposta pelo backend: a API recusa (400) o cancelamento de agendamento que já iniciou, concluído, com "Não compareceu" ou já cancelado, e a tela exibe a mensagem do servidor. Cancelado é um estado final (não pode ser reaberto).
-- Não há ação manual para os demais status: o início e a conclusão do atendimento são automáticos, pelo horário (o backend atualiza o status), e a confirmação (status Confirmado) será feita pelo cliente em uma funcionalidade futura. "Não compareceu" ainda não tem regra no backend.
+- **Marcar falta** (o cliente não compareceu), no mesmo lugar do Cancelar, para o atendimento que **já iniciou**:
+  - Botão neutro (`UserX`), exibido quando o status é Agendado ou Confirmado com o horário de início já passado, Em andamento ou Concluído, **e o pagamento ainda não foi recebido**. Não aparece em atendimento futuro, cancelado, que já é falta, nem em quem **já pagou** (a API recusa, e a tela nem oferece). A regra da tela é `canMarkNoShow` (`agenda/appointment-rules.ts`, com testes), que espelha a do backend; no cliente inativo (histórico), como no cancelamento, não aparece. No financeiro (só consulta) também não.
+  - Pede confirmação ("Marcar falta?", com "Voltar" e "Marcar falta"): o pagamento pendente será cancelado e a falta não poderá ser desfeita. Na sessão de pacote, o texto diz que ela poderá ser reposta em outra data (Ver sessões).
+  - **A falta não cobra:** o backend cancela o pagamento pendente na mesma transação, e a falta é definitiva (não volta a outro status). Vale para o avulso, a sessão de recorrência e a de pacote. O recebido (`PAID`) impede a falta.
+  - A recepção costuma anotá-la depois do horário, com o atendimento já concluído pelo job de status; por isso a falta vale também para o concluído que ainda não foi pago.
+- Início e conclusão do atendimento são automáticos, pelo horário (o backend atualiza o status), e a confirmação (status Confirmado) será feita pelo cliente em uma funcionalidade futura.
 - O botão "Alterar" abre o dialog de alteração (ver "Alterar agendamento"). Aparece apenas enquanto o agendamento ainda não iniciou, como o cancelamento: nada no passado é alterado.
 - Em sessão de recorrência, o "Alterar" dá lugar a **Ver sessões**, que abre as sessões da recorrência em dialog (sem sair da agenda), com remanejar e cancelar sessão.
 - Em sessão de pacote, há também **Ver contratação**: dialog com os dados, os valores, as agendas e as parcelas da contratação; dali, "Ver sessões" troca para o dialog de sessões. O cancelamento da contratação fica na página da contratação.
@@ -175,7 +180,7 @@ Segue a mesma estrutura de um novo agendamento.
 ### O que pode ser alterado
 
 - Agendamento ainda não iniciado (status Agendado ou Confirmado, com o horário de início no futuro): pode alterar cliente, serviço, profissional, data, horário e observações.
-- Nada no passado é alterado: agendamento já iniciado, concluído, cancelado ou com status "Não compareceu" não pode ser alterado, nem as observações. O botão "Alterar" não é exibido.
+- Nada no passado é alterado: agendamento já iniciado, concluído, cancelado ou com status "Não compareceu" não pode ser alterado, nem as observações. O botão "Alterar" não é exibido (para o que já iniciou existe a ação "Marcar falta", que só muda o status).
 - A restrição é da tela: o endpoint do backend continua aceitando mais formas de alteração (outras funcionalidades o usam), então a regra não é imposta lá.
 
 ### Regras específicas

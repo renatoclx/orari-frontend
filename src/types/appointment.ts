@@ -42,4 +42,12 @@ export type AppointmentItem = {
   service: AppointmentService;
   /** Recorrência de origem (nulo no agendamento avulso); `clientPlanId` se for de pacote. */
   recurringAppointment: { id: string; clientPlanId: string | null } | null;
+  /**
+   * Situação do pagamento do agendamento (nulo quando não há: a sessão de pacote
+   * não tem o seu). Só para a tela saber se já foi pago.
+   */
+  payment: {
+    status: "PENDING" | "PAID" | "CANCELLED";
+    deletedAt: string | null;
+  } | null;
 };

@@ -126,6 +126,7 @@ export function RecurrenceSessionsDialog({
               recurrenceId={recurrence.id}
               sessions={current.sessions}
               active={recurrence.isActive}
+              isPackage={Boolean(recurrence.clientPlanId)}
               timeZone={timeZone}
               today={today}
               nowTime={nowTime}

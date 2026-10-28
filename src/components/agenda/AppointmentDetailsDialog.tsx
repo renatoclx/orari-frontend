@@ -10,13 +10,17 @@ import {
   Pencil,
   StickyNote,
   UserRound,
+  UserX,
   Ban,
 } from "lucide-react";
 import Link from "next/link";
 import { useState, useTransition } from "react";
 import { toast } from "sonner";
 import { useCanAccessAnamnesis } from "@/components/anamnesis/AnamnesisAccessProvider";
-import { cancelAppointmentAction } from "@/app/(admin)/appointment-actions";
+import {
+  cancelAppointmentAction,
+  markNoShowAction,
+} from "@/app/(admin)/appointment-actions";
 import { cancelRecurrenceSessionAction } from "@/app/(admin)/recurrence-actions";
 import { APPOINTMENT_STATUS } from "@/components/agenda/appointment-status";
 import {
@@ -41,6 +45,8 @@ type AppointmentDetailsDialogProps = {
   appointment: AgendaAppointment | null;
   /** Pode ser cancelado ou alterado: ainda não começou e não está encerrado. */
   canCancel: (appointment: AgendaAppointment) => boolean;
+  /** Pode ter a falta marcada: já iniciou (ver `canMarkNoShow`). */
+  canMarkNoShow: (appointment: AgendaAppointment) => boolean;
   /** Abre o dialog de alteração do agendamento. */
   onEdit: (appointment: AgendaAppointment) => void;
   /** Abre o remanejamento (agendamento comum ou sessão de recorrência). */
@@ -52,12 +58,14 @@ type AppointmentDetailsDialogProps = {
   onOpenChange: (open: boolean) => void;
 };
 
-// Detalhes do agendamento. A única ação de status é cancelar: início e fim são
-// automáticos (o backend muda o status pelo horário) e a confirmação virá do
+// Detalhes do agendamento. As ações de status são cancelar (antes de iniciar) e
+// marcar a falta (depois): início e fim são automáticos (o backend muda o status
+// pelo horário) e a confirmação virá do
 // cliente. "Alterar" abre o dialog de alteração, só antes de o agendamento iniciar.
 export function AppointmentDetailsDialog({
   appointment,
   canCancel,
+  canMarkNoShow,
   onEdit,
   onReschedule,
   onViewSessions,
@@ -85,6 +93,7 @@ export function AppointmentDetailsDialog({
           <Details
             appointment={appointment}
             cancellable={canCancel(appointment)}
+            markable={canMarkNoShow(appointment)}
             onEdit={() => onEdit(appointment)}
             onReschedule={() => onReschedule(appointment)}
             onViewSessions={() =>
@@ -106,6 +115,7 @@ export function AppointmentDetailsDialog({
 function Details({
   appointment,
   cancellable,
+  markable,
   onEdit,
   onReschedule,
   onViewSessions,
@@ -114,6 +124,7 @@ function Details({
 }: {
   appointment: AgendaAppointment;
   cancellable: boolean;
+  markable: boolean;
   onEdit: () => void;
   onReschedule: () => void;
   onViewSessions: () => void;
@@ -121,6 +132,7 @@ function Details({
   onClose: () => void;
 }) {
   const [confirmOpen, setConfirmOpen] = useState(false);
+  const [noShowOpen, setNoShowOpen] = useState(false);
   const [pending, startTransition] = useTransition();
   const canAccessAnamnesis = useCanAccessAnamnesis();
 
@@ -144,6 +156,26 @@ function Details({
         onClose();
       } else {
         toast.error("Não foi possível cancelar o agendamento.", {
+          description: result.message,
+        });
+      }
+    });
+  }
+
+  // Sessão de pacote: a falta pode ser reposta em outra data, então não é "definitiva".
+  const isPackage = Boolean(appointment.recurrence?.clientPlanId);
+
+  function markNoShow() {
+    startTransition(async () => {
+      const result = await markNoShowAction(appointment.id);
+      if (result.ok) {
+        toast.success("Falta registrada.", {
+          description: `${appointment.clientName}, ${appointment.start} às ${appointment.end}`,
+        });
+        setNoShowOpen(false);
+        onClose();
+      } else {
+        toast.error("Não foi possível marcar a falta.", {
           description: result.message,
         });
       }
@@ -249,6 +281,41 @@ function Details({
           )}
         </div>
       )}
+
+      {/* Atendimento que já iniciou: não há o que cancelar ou remanejar, e a
+          recepção anota a falta. Não cobra (o pagamento pendente é cancelado). */}
+      {markable && (
+        <div className="flex justify-center border-t border-border pt-4">
+          <Button
+            type="button"
+            variant="outline"
+            className="max-sm:w-full"
+            onClick={() => setNoShowOpen(true)}
+          >
+            <UserX aria-hidden="true" />
+            Marcar falta
+          </Button>
+        </div>
+      )}
+
+      <ConfirmDialog
+        open={noShowOpen}
+        onOpenChange={setNoShowOpen}
+        title="Marcar falta?"
+        description={
+          `${appointment.clientName} não compareceu ao atendimento das ${appointment.start} às ${appointment.end}. ` +
+          (isPackage
+            ? "A sessão poderá ser reposta em outra data, em Ver sessões."
+            : "O pagamento pendente será cancelado e a falta não poderá ser desfeita.")
+        }
+        confirmLabel="Marcar falta"
+        icon={UserX}
+        pendingLabel="Marcando…"
+        cancelLabel="Voltar"
+        pending={pending}
+        destructive
+        onConfirm={markNoShow}
+      />
 
       <ConfirmDialog
         open={confirmOpen}

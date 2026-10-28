@@ -38,4 +38,6 @@ export type AgendaAppointment = {
   overbooking: boolean;
   /** Recorrência de origem (nulo no agendamento avulso). */
   recurrence: { id: string; clientPlanId: string | null } | null;
+  /** O pagamento já foi recebido: a falta não se marca (não há reembolso). */
+  paid: boolean;
 };

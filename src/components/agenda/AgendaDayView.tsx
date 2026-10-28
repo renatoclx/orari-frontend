@@ -7,6 +7,7 @@ import { timeToMinutes } from "@/utils/time";
 import { RescheduleAppointmentDialog } from "@/components/agenda/RescheduleAppointmentDialog";
 import { RecurrenceSessionsDialog } from "@/components/recurrences/RecurrenceSessionsDialog";
 import { ClientPlanDialog } from "@/components/client-plans/ClientPlanDialog";
+import { canMarkNoShow } from "@/components/agenda/appointment-rules";
 import { AppointmentDetailsDialog } from "@/components/agenda/AppointmentDetailsDialog";
 import { AgendaToolbar } from "@/components/agenda/AgendaToolbar";
 import { DayGrid } from "@/components/agenda/DayGrid";
@@ -231,6 +232,9 @@ export function AgendaDayView({
       <AppointmentDetailsDialog
         appointment={viewing}
         canCancel={canCancel}
+        canMarkNoShow={(appointment) =>
+          canMarkNoShow(appointment, date, today, nowMinutes)
+        }
         onEdit={(appointment) => {
           setViewing(null);
           setEditing(appointment);

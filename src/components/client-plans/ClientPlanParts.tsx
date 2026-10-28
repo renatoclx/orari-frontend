@@ -67,45 +67,72 @@ export function ClientPlanSchedules({
   onViewSessions: (recurrenceId: string) => void;
 }) {
   return (
-    <table className="w-full text-left text-sm">
-      <thead>
-        <tr>
-          {["Serviço", "Profissional", "Dias e horários", "Ações"].map(
-            (title) => (
-              <th key={title} scope="col" className={headerClass}>
-                {/* A última coluna só tem botões: o título fica para leitor de tela. */}
-                {title === "Ações" ? (
-                  <span className="sr-only">{title}</span>
-                ) : (
-                  title
-                )}
-              </th>
-            ),
-          )}
-        </tr>
-      </thead>
-      <tbody className="divide-y divide-border">
+    <>
+      {/* Celular: um cartão por agenda, sem rolagem lateral; a tabela vem do md. */}
+      <ul className="divide-y divide-border md:hidden">
         {item.schedules.map((schedule) => (
-          <tr key={schedule.id}>
-            <td className="px-4 py-3 font-medium">{schedule.service.name}</td>
-            <td className="px-4 py-3">{schedule.professional.name}</td>
-            <td className="px-4 py-3">{describeDays(schedule.days)}</td>
-            <td className="px-4 py-2 text-right">
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => onViewSessions(schedule.id)}
-                // No celular, só o ícone (o texto fica para leitor de tela).
-                className="max-sm:size-10 max-sm:p-0"
-              >
-                <ListChecks aria-hidden="true" />
-                <span className="max-sm:sr-only">Ver sessões</span>
-              </Button>
-            </td>
-          </tr>
+          <li
+            key={schedule.id}
+            className="flex items-center justify-between gap-2 p-4"
+          >
+            <div className="min-w-0 space-y-0.5 text-sm">
+              <p className="font-medium">{schedule.service.name}</p>
+              <p className="text-muted-foreground">
+                com {schedule.professional.name}
+              </p>
+              <p>{describeDays(schedule.days)}</p>
+            </div>
+            <Button
+              type="button"
+              variant="outline"
+              size="icon"
+              aria-label={`Ver sessões de ${schedule.service.name}`}
+              onClick={() => onViewSessions(schedule.id)}
+            >
+              <ListChecks aria-hidden="true" />
+            </Button>
+          </li>
         ))}
-      </tbody>
-    </table>
+      </ul>
+
+      <table className="hidden w-full text-left text-sm md:table">
+        <thead>
+          <tr>
+            {["Serviço", "Profissional", "Dias e horários", "Ações"].map(
+              (title) => (
+                <th key={title} scope="col" className={headerClass}>
+                  {/* A última coluna só tem botões: o título fica para leitor de tela. */}
+                  {title === "Ações" ? (
+                    <span className="sr-only">{title}</span>
+                  ) : (
+                    title
+                  )}
+                </th>
+              ),
+            )}
+          </tr>
+        </thead>
+        <tbody className="divide-y divide-border">
+          {item.schedules.map((schedule) => (
+            <tr key={schedule.id}>
+              <td className="px-4 py-3 font-medium">{schedule.service.name}</td>
+              <td className="px-4 py-3">{schedule.professional.name}</td>
+              <td className="px-4 py-3">{describeDays(schedule.days)}</td>
+              <td className="px-4 py-2 text-right">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => onViewSessions(schedule.id)}
+                >
+                  <ListChecks aria-hidden="true" />
+                  Ver sessões
+                </Button>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </>
   );
 }
 
@@ -142,34 +169,60 @@ export function ClientPlanPayments({ payments }: { payments: PaymentItem[] }) {
     );
   }
   return (
-    <table className="w-full text-left text-sm">
-      <thead>
-        <tr>
-          {["Parcela", "Vencimento", "Valor", "Situação"].map((title) => (
-            <th key={title} scope="col" className={headerClass}>
-              {title}
-            </th>
-          ))}
-        </tr>
-      </thead>
-      <tbody className="divide-y divide-border">
+    <>
+      {/* Celular: um cartão por parcela, sem rolagem lateral; a tabela vem do md. */}
+      <ul className="divide-y divide-border md:hidden">
         {payments.map((payment, index) => (
-          <tr key={payment.id} className="tabular-nums">
-            <td className="px-4 py-3">
-              {index + 1} de {payments.length}
-            </td>
-            <td className="px-4 py-3">
-              <EmptyValue>
-                {payment.dueDate && formatDateOnly(payment.dueDate)}
-              </EmptyValue>
-            </td>
-            <td className="px-4 py-3">{formatPrice(payment.amount)}</td>
-            <td className="px-4 py-3">
-              <PaymentBadge payment={payment} />
-            </td>
-          </tr>
+          <li
+            key={payment.id}
+            className="flex items-center justify-between gap-2 p-4"
+          >
+            <div className="space-y-0.5 text-sm tabular-nums">
+              <p className="font-medium">
+                Parcela {index + 1} de {payments.length}
+              </p>
+              <p className="text-muted-foreground">
+                Vence em{" "}
+                <EmptyValue>
+                  {payment.dueDate && formatDateOnly(payment.dueDate)}
+                </EmptyValue>{" "}
+                · {formatPrice(payment.amount)}
+              </p>
+            </div>
+            <PaymentBadge payment={payment} />
+          </li>
         ))}
-      </tbody>
-    </table>
+      </ul>
+
+      <table className="hidden w-full text-left text-sm md:table">
+        <thead>
+          <tr>
+            {["Parcela", "Vencimento", "Valor", "Situação"].map((title) => (
+              <th key={title} scope="col" className={headerClass}>
+                {title}
+              </th>
+            ))}
+          </tr>
+        </thead>
+        <tbody className="divide-y divide-border">
+          {payments.map((payment, index) => (
+            <tr key={payment.id} className="tabular-nums">
+              <td className="px-4 py-3">
+                {index + 1} de {payments.length}
+              </td>
+              <td className="px-4 py-3">
+                <EmptyValue>
+                  {payment.dueDate && formatDateOnly(payment.dueDate)}
+                </EmptyValue>
+              </td>
+              <td className="px-4 py-3">{formatPrice(payment.amount)}</td>
+              <td className="px-4 py-3">
+                <PaymentBadge payment={payment} />
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </>
   );
 }

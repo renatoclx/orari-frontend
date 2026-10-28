@@ -68,7 +68,7 @@ export function ColorField({ id, name, initialValue }: ColorFieldProps) {
       <input type="hidden" name={name} value={color} />
 
       {color ? (
-        <Button type="button" variant="ghost" onClick={() => setColor("")}>
+        <Button type="button" variant="outline" onClick={() => setColor("")}>
           <Trash2 aria-hidden="true" />
           Remover cor
         </Button>

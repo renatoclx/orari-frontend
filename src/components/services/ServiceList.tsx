@@ -147,14 +147,12 @@ function ServiceDetails({ service }: { service: ServiceItem }) {
     [
       "Cor",
       service.color && (
-        <span className="inline-flex items-center gap-2">
-          <span
-            className="size-4 rounded-full border border-border"
-            style={{ backgroundColor: service.color }}
-            aria-hidden="true"
-          />
-          <span className="uppercase">{service.color}</span>
-        </span>
+        <span
+          role="img"
+          aria-label="Cor do serviço"
+          className="inline-block size-4 rounded-full border border-border align-middle"
+          style={{ backgroundColor: service.color }}
+        />
       ),
     ],
   ];

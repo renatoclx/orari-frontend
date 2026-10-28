@@ -28,7 +28,7 @@ export function ScrollableTabList({
   }, [activeKey]);
 
   return (
-    <ul ref={listRef} className={className}>
+    <ul ref={listRef} data-scroll-x className={className}>
       {children}
     </ul>
   );

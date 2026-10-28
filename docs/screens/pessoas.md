@@ -227,6 +227,11 @@
    - Colunas: vencimento, descrição (atendimento: data e serviço; parcela: nome do plano), valor e situação (Pendente, Atrasado, Pago, Cancelado).
    - Só leitura por enquanto; a baixa entra com o Financeiro e passa a valer aqui também.
 
+### No celular
+
+- O resumo (cartões) fica oculto, para as abas aparecerem logo; a aba aberta rola até ficar à vista (`ScrollableTabList`).
+- As quatro tabelas (e a de Anamnese) viram **cartões**, sem rolagem lateral, pelo `ListCard` (cartões abaixo de `md`, tabela a partir de `md`). A ação da linha (ver sessões, ver contratação, detalhes) vira só o ícone, e "Nova ficha" ocupa a largura toda.
+
 ### Regras específicas
 
 - Cada aba busca os próprios dados ao ser aberta, com paginação.

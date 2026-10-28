@@ -130,12 +130,16 @@ Não atualize arquivos de documentação sem confirmação do usuário.
 
 ## Documentação e registro
 
-- A documentação do projeto (`docs/`, `CLAUDE.md`) e as notas do Obsidian
-  (roadmap, decisões e implementações) são atualizadas **ao terminar um módulo
-  inteiro** (ex.: autenticação, clientes), em uma revisão completa — não a cada
-  passo.
-- Exceção: a skill `orari-ui` é atualizada quando uma decisão de interface é aprovada.
-- Notas do Obsidian: `/home/renato/Documentos/Obsidian Vault/Orari-Frontend-*.md`.
+- A documentação da **tela** que mudou (`docs/screens/<tela>.md`) é atualizada
+  **no mesmo PR** da mudança, em poucas linhas. Ao finalizar a tarefa, informe
+  qual documento precisa mudar e proponha o texto; aplique após a confirmação.
+- A skill `orari-ui` é atualizada quando uma decisão de interface é aprovada.
+- A passada completa nos documentos transversais (`frontend-architecture.md`,
+  `decisions.md`, `frontend-technical-debt.md`, `docs/screens/README.md`) é feita
+  **ao terminar um módulo inteiro** (ex.: autenticação, clientes).
+- O que o PR deve conferir está em `docs/frontend-rules.md` ("Definição de pronto").
+- Notas do Obsidian (`/home/renato/Documentos/Obsidian Vault/Orari-Frontend-*.md`):
+  material pessoal de estudo; só são atualizadas quando o usuário pedir.
 
 <!-- BEGIN:nextjs-agent-rules -->
 

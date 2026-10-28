@@ -48,9 +48,25 @@ O que o `vi.mock` usa precisa nascer com `vi.hoisted` (ele sobe para o topo do a
 
 - **Componentes** (`.tsx`) e telas: a verificação é manual, com a API real, e a **auditoria de acessibilidade** com `axe-core` (ver `docs/decisions.md`).
 - **Server Actions e services** além dos listados: são finos (validam e chamam a API) e o servidor é quem decide.
-- **Ponta a ponta** (Playwright): não adotado. Se um dia compensar, entra como uma camada à parte.
+- **Fluxos completos** (cadastrar, agendar, receber): não há teste ponta a ponta. Só existe o teste de fumaça de layout, descrito abaixo.
 
 A cobertura de linhas dos arquivos `.ts` está em torno de 36%, baixa porque conta as actions e os services; nas funções puras listadas acima, os testes cobrem as regras e as bordas. Não há meta mínima de cobertura: ela não trava o PR.
+
+## Testes de fumaça (Playwright)
+
+Camada à parte dos testes de função: abre as telas num navegador de verdade (o Chrome do computador, sem baixar nada) e confere o que o Vitest não enxerga. Fica em `e2e/*.e2e.ts` (o sufixo evita que o Vitest os pegue).
+
+```bash
+# app e API no ar (npm run dev), com uma empresa de demonstração
+E2E_EMAIL=admin@empresa.demo E2E_PASSWORD=... npm run test:e2e
+```
+
+- **O que confere**, no celular (390 x 664, a área útil do Safari do iPhone) e no computador (1440 x 900): cada tela sem rolagem lateral; os diálogos inteiros dentro da tela e sem dica aberta ao abrir; o menu do celular sem dica. É a classe de defeito que mais apareceu nos ajustes de celular.
+- **Login:** o `auth.setup.ts` entra uma vez e guarda a sessão em `.auth/user.json` (fora do git). O login do backend tem limite de tentativas, por isso um processo só.
+- **Telas novas:** inclua a rota em `ROUTES` e, se abre diálogo, o botão em `DIALOGS` (`e2e/smoke.e2e.ts`).
+- **Como saber que protege:** desfaça de propósito a correção (por exemplo, o `max-h` do `DialogContent`) e veja o teste falhar. Foi feito ao criar: os três modais altos falham, os curtos não.
+- **Fora do CI por enquanto:** precisa da API e de um banco com dados. Entrar no CI pede subir o PostgreSQL, o backend e um seed (decisão pendente).
+- **Limite:** só telas sem parâmetro na URL. As de detalhe (`/clientes/[id]`, `/recorrencias/[id]`) dependem dos dados e ainda ficam na verificação manual.
 
 ## Como acrescentar um teste
 

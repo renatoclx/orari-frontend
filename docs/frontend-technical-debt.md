@@ -67,9 +67,9 @@ Pontos conhecidos e aceitos por enquanto. Revisar quando o contexto mudar.
 - **Limites de 100.** Nova ficha lê até 100 modelos ativos e 100 fichas do cliente; o acompanhamento oferece os 100 agendamentos mais recentes do cliente; a auditoria lista até 100 usuários.
 - **Endpoint sem uso no backend.** `GET /anamnesis/appointments-with-entry` ficou depois que o aviso "Sem acompanhamento" da agenda foi removido; usar numa futura marcação ou remover.
 - **Corretor ortográfico do navegador no campo "Evolução".** Alguns navegadores enviam o texto a um serviço externo para corrigir. Desligar (`spellCheck={false}`) perde a correção; decisão pendente.
-- **CSP e o PDF.** Quando entrar a política de segurança de conteúdo (ver "Cabeçalhos de segurança", em Deploy), o iframe do PDF precisa de `frame-src blob:`.
+- **CSP e o PDF.** Resolvido na política de base (`next.config.ts`): `frame-src 'self' blob:`; o PDF no iframe foi conferido sem violação.
 - **Acesso por contexto.** O `AnamnesisAccessProvider` leva um boolean a um único dialog; uma prop também serviria (mantido por o dialog aparecer em três telas).
-- **Listagens parecidas.** `TemplateList`, `HistoryAnamnesis`, `AnamnesisClientsList` e `AuditList` repetem o esqueleto card + tabela + lista de celular (padrão do projeto); extrair só se aparecer mais uma.
+- **Listagens ainda fora do `ListCard`.** A casca comum (`shared/ListCard.tsx`) já serve `PaymentMethodList` e `UserList` (conferido: capturas idênticas, pixel a pixel, antes e depois). Faltam, entre outras, `PersonList`, `ServiceList`, `CompanyList`, `PlanList`, `PaymentList`, `RecurrenceList`, `ClientPlanList`, `CheckoutList`, `TemplateList`, `HistoryAnamnesis`, `AnamnesisClientsList` e `AuditList`. Regra: migrar **uma de cada vez, quando a tela for mexida**, conferindo com captura antes/depois; nada de migração em massa. As que têm duas tabelas na mesma tela (histórico do cliente, contratação) ou tabela fixa sem cartões entram depois, porque pedem um desenho próprio.
 - **Sem teste das Server Actions da anamnese.** Só o Route Handler do PDF e a lógica pura têm teste; as actions só conferem acesso e ids e delegam à API.
 - **Não verificado no celular** (editor de modelos, nova ficha, acompanhamento, PDF e auditoria) nem o conteúdo do PDF no visualizador do navegador automatizado.
 
@@ -82,8 +82,8 @@ Pontos conhecidos e aceitos por enquanto. Revisar quando o contexto mudar.
 - **Fotos e logos passam pelo Next.** `/uploads` é uma reescrita servida pelo processo Node; o Caddy poderia servir esses arquivos direto da API.
 - **O healthcheck não testa a API.** `/login` é renderizada sem chamar a API, então o contêiner fica "saudável" mesmo com a API fora do ar (as telas autenticadas mostram o erro de conexão).
 - **Sem otimização de imagem.** Sem `sharp` na imagem: `next/image` só com SVG e `unoptimized`. Imagens raster otimizadas exigiriam instalá-lo.
-- **Cabeçalhos de segurança do site (melhoria pendente, 2026-10-23).** Em produção o site devolve só `X-Powered-By: Next.js`: faltam `Strict-Transport-Security`, `X-Content-Type-Options: nosniff`, `X-Frame-Options` (ou `frame-ancestors`) e `Referrer-Policy`. Plano: os quatro no bloco do frontend do `Caddyfile` (repositório do backend) e `poweredByHeader: false` no `next.config.ts`; ensaiar com a pilha local antes de publicar. Depende dos dois repositórios.
-- **Testes de integração contínua do frontend** (lint, tipos, testes e build) ainda não rodam em um workflow (previsto na Etapa 10).
+- **Cabeçalhos de segurança do site.** O `next.config.ts` envia `X-Content-Type-Options: nosniff`, `X-Frame-Options: DENY`, `Referrer-Policy`, `Permissions-Policy` (câmera só do próprio site) e uma CSP de base, e desliga o `X-Powered-By`. A CSP **bloqueia em produção** e só **avisa (Report-Only) em desenvolvimento**; `e2e/csp.e2e.ts` falha se uma tela ou diálogo a violar. Fica pendente: (1) `Strict-Transport-Security`, que é do Caddy (`Caddyfile`, repositório do backend); (2) trocar `'unsafe-inline'` por **nonce** (guia "Content Security Policy" do Next, gerado no `proxy`): exige renderização dinâmica e tirar os estilos em linha (cores de serviço), então é uma etapa própria; (3) conferir em produção, após o primeiro deploy, que nada quebrou (câmera da foto, PDF, logo).
+- **Teste de fumaça (e2e) fora do CI.** O CI roda lint, tipos, testes e build; o `npm run test:e2e` (Playwright) precisa da API, de um banco e de dados, então roda só na sua máquina. Entrar no CI pede subir PostgreSQL e backend no workflow e semear uma empresa de demonstração.
 
 ## Empresas
 

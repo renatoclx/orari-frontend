@@ -10,6 +10,7 @@ import {
 import { PaymentMethodFormDialog } from "@/components/payment-methods/PaymentMethodFormDialog";
 import { ConfirmDialog } from "@/components/shared/ConfirmDialog";
 import { Hint } from "@/components/shared/Hint";
+import { ListCard } from "@/components/shared/ListCard";
 import { StatusBadge } from "@/components/shared/StatusBadge";
 import { Button } from "@/components/ui/button";
 import type { PaymentMethodItem } from "@/types/payment-method";
@@ -133,78 +134,53 @@ export function PaymentMethodList({
     });
   }
 
-  const headerClass =
-    "sticky top-0 z-10 border-b border-border bg-card px-4 py-3 font-medium text-muted-foreground";
-
   return (
-    <div className="flex min-h-0 flex-1 flex-col rounded-card border border-border bg-card">
-      <div className="min-h-0 flex-1 overflow-auto">
-        {methods.length === 0 ? (
-          <p className="flex h-full items-center justify-center p-8 text-center text-sm text-muted-foreground">
-            {search
-              ? `Nenhum método de pagamento encontrado para “${search}”.`
-              : "Nenhum método de pagamento cadastrado. Cadastre o primeiro!"}
-          </p>
-        ) : (
-          <>
-            {/* Celular: lista empilhada. A partir do md, tabela. */}
-            <ul className="divide-y divide-border md:hidden">
-              {methods.map((method) => (
-                <li
-                  key={method.id}
-                  className="flex items-center justify-between gap-2 p-4"
-                >
-                  <div className="space-y-1">
-                    <p className="font-medium">{method.name}</p>
-                    <StatusBadge active={method.deletedAt === null} />
-                  </div>
-                  <Actions
-                    method={method}
-                    onEdit={edit}
-                    onDeactivate={setDeactivating}
-                    onRestore={restore}
-                    busy={restoring}
-                  />
-                </li>
-              ))}
-            </ul>
-
-            <table className="hidden w-full text-left text-sm md:table">
-              <thead>
-                <tr>
-                  {["Nome", "Status", "Ações"].map((title) => (
-                    <th key={title} scope="col" className={headerClass}>
-                      {title}
-                    </th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-border">
-                {methods.map((method) => (
-                  <tr key={method.id} className="hover:bg-background">
-                    <td className="px-4 py-3 font-medium">{method.name}</td>
-                    <td className="px-4 py-3">
-                      <StatusBadge active={method.deletedAt === null} />
-                    </td>
-                    <td className="px-4 py-2">
-                      <Actions
-                        method={method}
-                        onEdit={edit}
-                        onDeactivate={setDeactivating}
-                        onRestore={restore}
-                        busy={restoring}
-                      />
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </>
-        )}
-      </div>
-
-      {footer}
-
+    <ListCard
+      columns={["Nome", "Status", "Ações"]}
+      emptyMessage={
+        methods.length === 0
+          ? search
+            ? `Nenhum método de pagamento encontrado para “${search}”.`
+            : "Nenhum método de pagamento cadastrado. Cadastre o primeiro!"
+          : undefined
+      }
+      cards={methods.map((method) => (
+        <li
+          key={method.id}
+          className="flex items-center justify-between gap-2 p-4"
+        >
+          <div className="space-y-1">
+            <p className="font-medium">{method.name}</p>
+            <StatusBadge active={method.deletedAt === null} />
+          </div>
+          <Actions
+            method={method}
+            onEdit={edit}
+            onDeactivate={setDeactivating}
+            onRestore={restore}
+            busy={restoring}
+          />
+        </li>
+      ))}
+      rows={methods.map((method) => (
+        <tr key={method.id} className="hover:bg-background">
+          <td className="px-4 py-3 font-medium">{method.name}</td>
+          <td className="px-4 py-3">
+            <StatusBadge active={method.deletedAt === null} />
+          </td>
+          <td className="px-4 py-2">
+            <Actions
+              method={method}
+              onEdit={edit}
+              onDeactivate={setDeactivating}
+              onRestore={restore}
+              busy={restoring}
+            />
+          </td>
+        </tr>
+      ))}
+      footer={footer}
+    >
       <PaymentMethodFormDialog
         open={editOpen}
         onOpenChange={setEditOpen}
@@ -222,6 +198,6 @@ export function PaymentMethodList({
         pending={pending}
         onConfirm={confirmDeactivate}
       />
-    </div>
+    </ListCard>
   );
 }

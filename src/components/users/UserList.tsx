@@ -24,6 +24,7 @@ import { FunctionBadge } from "@/components/users/FunctionBadge";
 import { UserTypeBadge } from "@/components/users/UserTypeBadge";
 import { ConfirmDialog } from "@/components/shared/ConfirmDialog";
 import { Hint } from "@/components/shared/Hint";
+import { ListCard } from "@/components/shared/ListCard";
 import { StatusBadge } from "@/components/shared/StatusBadge";
 import { Button } from "@/components/ui/button";
 import {
@@ -198,99 +199,72 @@ export function UserList({
     busy: restoring,
     currentUserId,
   };
-  const headerClass =
-    "sticky top-0 z-10 border-b border-border bg-card px-4 py-3 font-medium text-muted-foreground";
-
   return (
-    <div className="flex min-h-0 flex-1 flex-col rounded-card border border-border bg-card">
-      <div className="min-h-0 flex-1 overflow-auto">
-        {users.length === 0 ? (
-          <p className="flex h-full items-center justify-center p-8 text-center text-sm text-muted-foreground">
-            {search
-              ? `Nenhum usuário encontrado para “${search}”.`
-              : "Nenhum usuário cadastrado. Cadastre o primeiro!"}
-          </p>
-        ) : (
-          <>
-            {/* Celular: lista empilhada. A partir do md, tabela. */}
-            <ul className="divide-y divide-border md:hidden">
-              {users.map((user) => (
-                <li key={user.id} className="space-y-1 p-4">
-                  <div className="flex items-center justify-between gap-2">
-                    <p className="font-medium">{user.name}</p>
-                    <UserActions user={user} {...handlers} />
-                  </div>
-                  <dl className="grid grid-cols-[auto_1fr] gap-x-3 gap-y-0.5 text-sm">
-                    <dt className="text-muted-foreground">E-mail</dt>
-                    <dd className="truncate">{user.email}</dd>
-                    <dt className="text-muted-foreground">Tipo</dt>
-                    <dd>
-                      <UserTypeBadge type={user.type} />
-                    </dd>
-                    <dt className="text-muted-foreground">Função</dt>
-                    <dd>
-                      <FunctionBadge person={user.people} />
-                    </dd>
-                    <dt className="text-muted-foreground">Status</dt>
-                    <dd>
-                      <StatusBadge active={user.deletedAt === null} />
-                    </dd>
-                  </dl>
-                </li>
-              ))}
-            </ul>
-
-            <table className="hidden w-full text-left text-sm md:table">
-              <thead>
-                <tr>
-                  {[
-                    "Nome",
-                    "E-mail",
-                    "Tipo de usuário",
-                    "Função",
-                    "Status",
-                    "Ações",
-                  ].map((title) => (
-                    <th key={title} scope="col" className={headerClass}>
-                      {title}
-                    </th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-border">
-                {users.map((user) => (
-                  <tr key={user.id} className="hover:bg-background">
-                    <td className="px-4 py-3 font-medium">
-                      {user.name}
-                      {user.id === currentUserId && (
-                        <span className="ml-2 text-xs text-muted-foreground">
-                          (você)
-                        </span>
-                      )}
-                    </td>
-                    <td className="px-4 py-3">{user.email}</td>
-                    <td className="px-4 py-3">
-                      <UserTypeBadge type={user.type} />
-                    </td>
-                    <td className="px-4 py-3">
-                      <FunctionBadge person={user.people} />
-                    </td>
-                    <td className="px-4 py-3">
-                      <StatusBadge active={user.deletedAt === null} />
-                    </td>
-                    <td className="px-4 py-2">
-                      <UserActions user={user} {...handlers} />
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </>
-        )}
-      </div>
-
-      {footer}
-
+    <ListCard
+      columns={[
+        "Nome",
+        "E-mail",
+        "Tipo de usuário",
+        "Função",
+        "Status",
+        "Ações",
+      ]}
+      emptyMessage={
+        users.length === 0
+          ? search
+            ? `Nenhum usuário encontrado para “${search}”.`
+            : "Nenhum usuário cadastrado. Cadastre o primeiro!"
+          : undefined
+      }
+      cards={users.map((user) => (
+        <li key={user.id} className="space-y-1 p-4">
+          <div className="flex items-center justify-between gap-2">
+            <p className="font-medium">{user.name}</p>
+            <UserActions user={user} {...handlers} />
+          </div>
+          <dl className="grid grid-cols-[auto_1fr] gap-x-3 gap-y-0.5 text-sm">
+            <dt className="text-muted-foreground">E-mail</dt>
+            <dd className="truncate">{user.email}</dd>
+            <dt className="text-muted-foreground">Tipo</dt>
+            <dd>
+              <UserTypeBadge type={user.type} />
+            </dd>
+            <dt className="text-muted-foreground">Função</dt>
+            <dd>
+              <FunctionBadge person={user.people} />
+            </dd>
+            <dt className="text-muted-foreground">Status</dt>
+            <dd>
+              <StatusBadge active={user.deletedAt === null} />
+            </dd>
+          </dl>
+        </li>
+      ))}
+      rows={users.map((user) => (
+        <tr key={user.id} className="hover:bg-background">
+          <td className="px-4 py-3 font-medium">
+            {user.name}
+            {user.id === currentUserId && (
+              <span className="ml-2 text-xs text-muted-foreground">(você)</span>
+            )}
+          </td>
+          <td className="px-4 py-3">{user.email}</td>
+          <td className="px-4 py-3">
+            <UserTypeBadge type={user.type} />
+          </td>
+          <td className="px-4 py-3">
+            <FunctionBadge person={user.people} />
+          </td>
+          <td className="px-4 py-3">
+            <StatusBadge active={user.deletedAt === null} />
+          </td>
+          <td className="px-4 py-2">
+            <UserActions user={user} {...handlers} />
+          </td>
+        </tr>
+      ))}
+      footer={footer}
+    >
       <UserFormDialog
         open={editOpen}
         onOpenChange={setEditOpen}
@@ -355,6 +329,6 @@ export function UserList({
         destructive
         onConfirm={confirmDeactivate}
       />
-    </div>
+    </ListCard>
   );
 }

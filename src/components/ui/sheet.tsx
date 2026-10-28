@@ -75,7 +75,9 @@ function SheetContent({
         {children}
         {showCloseButton && (
           <Tooltip>
-            <TooltipTrigger asChild>
+            {/* O Radix foca o X ao abrir; sem isso a dica "Fechar" nasceria
+                visível. O preventDefault no foco deixa a dica só para o mouse. */}
+            <TooltipTrigger asChild onFocus={(event) => event.preventDefault()}>
               <SheetPrimitive.Close data-slot="sheet-close" asChild>
                 <Button
                   variant="ghost"

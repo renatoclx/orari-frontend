@@ -66,7 +66,8 @@ E2E_EMAIL=admin@empresa.demo E2E_PASSWORD=... npm run test:e2e
 - **Telas novas:** inclua a rota em `ROUTES` e, se abre diálogo, o botão em `DIALOGS` (`e2e/smoke.e2e.ts`).
 - **Como saber que protege:** desfaça de propósito a correção (por exemplo, o `max-h` do `DialogContent`) e veja o teste falhar. Foi feito ao criar: os três modais altos falham, os curtos não.
 - **Fora do CI por enquanto:** precisa da API e de um banco com dados. Entrar no CI pede subir o PostgreSQL, o backend e um seed (decisão pendente).
-- **Limite:** só telas sem parâmetro na URL. As de detalhe (`/clientes/[id]`, `/recorrencias/[id]`) dependem dos dados e ainda ficam na verificação manual.
+- **Histórico do cliente:** o teste descobre os clientes pela lista (até 3 páginas) e confere as 5 abas de cada um, parando quando cada aba foi vista **com dados**. Uma aba que nenhum cliente preenche aparece como anotação "cobertura parcial" no relatório (uma aba vazia só mostra a mensagem e não prova nada). A barra de abas rola de propósito: o que rola de propósito leva `data-scroll-x` e o teste o ignora.
+- **Limite:** só as telas sem parâmetro e o histórico do cliente. As demais de detalhe (`/recorrencias/[id]`, `/pacotes/contratacoes/[id]`, a ficha de anamnese) dependem dos dados e ainda ficam na verificação manual.
 
 ## Como acrescentar um teste
 

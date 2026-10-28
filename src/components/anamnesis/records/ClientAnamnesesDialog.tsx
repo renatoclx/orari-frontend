@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { FilePlus2 } from "lucide-react";
+import { FileHeart, FilePlus2 } from "lucide-react";
 import { listClientAnamnesesAction } from "@/app/(admin)/anamnesis-actions";
 import { Button } from "@/components/ui/button";
 import {
@@ -100,8 +100,15 @@ function ClientAnamneses({ client }: { client: AnamnesisClientItem }) {
                   {formatDateOnly(item.lastConsultationDate)}
                 </p>
               </div>
-              <Button asChild variant="outline" size="sm">
+              {/* No celular, o botão ocupa a largura toda (desce para a própria linha). */}
+              <Button
+                asChild
+                variant="outline"
+                size="sm"
+                className="max-sm:w-full"
+              >
                 <Link href={`/clientes/${client.clientId}/anamnese/${item.id}`}>
+                  <FileHeart aria-hidden="true" />
                   Abrir
                 </Link>
               </Button>

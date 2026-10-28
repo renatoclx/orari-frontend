@@ -65,7 +65,11 @@ export function ClientPlanDetails({
             <ClientPlanStatusBadge status={status} />
           </div>
           {status === "active" && (
-            <Button variant="destructive" onClick={() => setCancelling(true)}>
+            <Button
+              variant="destructive"
+              onClick={() => setCancelling(true)}
+              className="max-sm:w-full"
+            >
               <Ban aria-hidden="true" />
               Cancelar contratação
             </Button>

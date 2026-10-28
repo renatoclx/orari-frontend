@@ -109,7 +109,7 @@ export function RecurrenceDetails({
             <RecurrenceStatusBadge active={recurrence.isActive} />
           </div>
           {recurrence.isActive && (
-            <div className="flex flex-wrap gap-2">
+            <div className="flex w-full flex-col gap-2 sm:w-auto sm:flex-row sm:flex-wrap">
               <Button
                 variant="outline"
                 onClick={() => {

@@ -313,7 +313,8 @@ export async function ClientHistoryPage({
         </div>
       </div>
 
-      <div className="grid gap-3 sm:grid-cols-3 xl:grid-cols-5">
+      {/* Os cartões de resumo só aparecem a partir de sm: no celular, atrapalham as abas. */}
+      <div className="hidden gap-3 sm:grid sm:grid-cols-3 xl:grid-cols-5">
         {cards.map(({ icon: Icon, label, value, detail }) => (
           <div
             key={label}

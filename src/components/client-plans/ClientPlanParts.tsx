@@ -95,9 +95,11 @@ export function ClientPlanSchedules({
                 type="button"
                 variant="outline"
                 onClick={() => onViewSessions(schedule.id)}
+                // No celular, só o ícone (o texto fica para leitor de tela).
+                className="max-sm:size-10 max-sm:p-0"
               >
                 <ListChecks aria-hidden="true" />
-                Ver sessões
+                <span className="max-sm:sr-only">Ver sessões</span>
               </Button>
             </td>
           </tr>

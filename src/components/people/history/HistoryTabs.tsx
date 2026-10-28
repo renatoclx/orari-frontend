@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { cn } from "cn";
+import { ScrollableTabList } from "@/components/people/history/ScrollableTabList";
 
 export const HISTORY_TABS = [
   { id: "agendamentos", label: "Agendamentos" },
@@ -24,7 +25,10 @@ export function HistoryTabs({
 }) {
   return (
     <nav aria-label="Histórico do cliente" className="border-b border-border">
-      <ul className="-mb-px flex gap-1 overflow-x-auto">
+      <ScrollableTabList
+        activeKey={current}
+        className="-mb-px flex gap-1 overflow-x-auto"
+      >
         {HISTORY_TABS.filter(
           (tab) => showAnamnesis || tab.id !== "anamnese",
         ).map((tab) => {
@@ -46,7 +50,7 @@ export function HistoryTabs({
             </li>
           );
         })}
-      </ul>
+      </ScrollableTabList>
     </nav>
   );
 }

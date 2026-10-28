@@ -43,7 +43,7 @@ export async function AnamnesisClientsPage({
           search={search}
           label="Buscar cliente por nome"
         />
-        <Button asChild className="sm:ml-auto">
+        <Button asChild className="w-full sm:ml-auto sm:w-auto">
           <Link href={`${BASE_PATH}/nova`}>
             <FilePlus2 aria-hidden="true" />
             Nova ficha

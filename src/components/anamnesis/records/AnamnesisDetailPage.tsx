@@ -94,11 +94,14 @@ export async function AnamnesisDetailPage({
               ` · registro inicial em ${formatDateOnly(detail.entries[0].consultationDate)}`}
           </p>
         </div>
-        <div className="flex flex-wrap items-center gap-2">
-          <AnamnesisPdfDialog clientId={clientId} anamnesisId={id} />
+        <div className="flex flex-wrap items-center gap-2 max-sm:w-full">
+          {/* Imprimir (PDF) só no computador. */}
+          <div className="max-sm:hidden">
+            <AnamnesisPdfDialog clientId={clientId} anamnesisId={id} />
+          </div>
           {/* Cliente inativo: a ficha só se consulta (a API recusa o acompanhamento). */}
           {client.deletedAt === null && (
-            <Button asChild>
+            <Button asChild className="max-sm:w-full">
               <Link
                 href={`/clientes/${clientId}/anamnese/${id}/acompanhamento`}
               >

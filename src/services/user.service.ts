@@ -13,6 +13,8 @@ import type {
 type ListUsersParams = {
   page: number;
   limit: number;
+  /** Busca parcial pelo nome. */
+  name?: string;
 };
 
 // Usuários da empresa, do mais recente para o mais antigo, com paginação.
@@ -23,6 +25,7 @@ export function listUsers(
     page: String(params.page),
     limit: String(params.limit),
   });
+  if (params.name) query.set("name", params.name);
 
   return apiFetch<Paginated<UserListItem>>(`/users?${query}`);
 }

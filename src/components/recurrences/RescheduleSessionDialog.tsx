@@ -41,6 +41,8 @@ type RescheduleSessionDialogProps = {
   /** Sessão de recorrência: só se remaneja dentro do período ("aaaa-mm-dd"). */
   period?: { start: string; end: string };
   today: string;
+  /** Reposição de sessão de pacote após falta: só muda os textos (o fluxo é o mesmo). */
+  replacement?: boolean;
   /** Grava o novo dia e horário (a recorrência e o agendamento comum usam rotas diferentes). */
   onSubmit: (
     date: string,
@@ -75,6 +77,7 @@ function RescheduleForm({
   duration,
   period,
   today,
+  replacement,
   onSubmit,
   onOpenChange,
 }: RescheduleSessionDialogProps & { session: ReschedulableSession }) {
@@ -138,15 +141,24 @@ function RescheduleForm({
       const result = await onSubmit(day, currentTime);
       if (result.ok) {
         toast.success(
-          period ? "Sessão remanejada." : "Agendamento remanejado.",
+          replacement
+            ? "Sessão reposta."
+            : period
+              ? "Sessão remanejada."
+              : "Agendamento remanejado.",
         );
         onOpenChange(false);
         return;
       }
       setError(result.message);
-      toast.error("Não foi possível remanejar.", {
-        description: result.message,
-      });
+      toast.error(
+        replacement
+          ? "Não foi possível repor a sessão."
+          : "Não foi possível remanejar.",
+        {
+          description: result.message,
+        },
+      );
     });
   }
 
@@ -160,12 +172,16 @@ function RescheduleForm({
     <form noValidate onSubmit={submit} className="space-y-4">
       <DialogHeader>
         <DialogTitle>
-          {period ? "Remanejar sessão" : "Remanejar agendamento"}
+          {replacement
+            ? "Repor sessão"
+            : period
+              ? "Remanejar sessão"
+              : "Remanejar agendamento"}
         </DialogTitle>
         <DialogDescription>
-          Escolha a nova data e o horário de {clientName} com{" "}
-          {professional.name}
-          {period ? ", dentro do período da recorrência." : "."}
+          {replacement
+            ? `Escolha o novo dia e horário da sessão que ${clientName} perdeu, com ${professional.name}, dentro do período da contratação. A sessão volta a Agendado.`
+            : `Escolha a nova data e o horário de ${clientName} com ${professional.name}${period ? ", dentro do período da recorrência." : "."}`}
         </DialogDescription>
       </DialogHeader>
 
@@ -219,7 +235,7 @@ function RescheduleForm({
         </Button>
         <Button type="submit" disabled={pending || unchanged}>
           <CalendarSync aria-hidden="true" />
-          {pending ? "Salvando…" : "Remanejar"}
+          {pending ? "Salvando…" : replacement ? "Repor" : "Remanejar"}
         </Button>
       </DialogFooter>
     </form>

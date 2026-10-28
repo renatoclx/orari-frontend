@@ -154,6 +154,18 @@
 </ol>
 <div class="box warn"><b class="t">Atenção</b><p>Só é possível remanejar ou cancelar atendimentos que ainda não começaram. Um atendimento cancelado não pode ser reaberto: se for preciso, faça um novo agendamento.</p></div>
 
+<h2>Marcar que o cliente faltou</h2>
+<p>O sistema parte do princípio de que o cliente veio: ao fim do horário, ele conclui o atendimento sozinho e gera a cobrança. Quando o cliente <b>não aparece</b>, é você quem avisa.</p>
+<ol class="steps">
+  <li>Depois do horário de início, abra o atendimento e clique em <span class="ui">Marcar falta</span>.</li>
+  <li>Confirme em <span class="ui">Marcar falta</span>. O atendimento passa a <b>Não compareceu</b>.</li>
+</ol>
+<ul>
+  <li>A falta <b>não é cobrada</b>: o pagamento pendente do atendimento é cancelado.</li>
+  <li>O botão aparece também para atendimentos que o sistema já concluiu, desde que o cliente <b>ainda não tenha pago</b>. Se já pagou, o botão não aparece.</li>
+</ul>
+<div class="box warn"><b class="t">Atenção</b><p>A falta é <b>definitiva</b>: não dá para desfazer nem cancelar o atendimento depois. Nos pacotes, a sessão em que o cliente faltou pode ser reposta em outra data (veja <b>Pacotes</b>).</p></div>
+
 <!-- ===== 3 ===== -->
 <h1 class="chapter" data-toc="Clientes e profissionais"><span class="num"></span>Clientes e profissionais</h1>
 <p class="lead">Cadastro de pessoas: quem é atendido e quem atende.</p>
@@ -283,6 +295,8 @@
 <h3>Acompanhar uma contratação</h3>
 <p>Ao abrir uma contratação, você vê os valores, as agendas de cada serviço e as parcelas, com a situação de cada uma.</p>
 <figure><img src="images/24-contratacao-detalhe.png" alt=""><figcaption>Detalhe da contratação.</figcaption></figure>
+<h3>Repor uma sessão em que o cliente faltou</h3>
+<p>Se o cliente faltou a uma sessão do pacote (veja <b>Agenda</b> &rarr; <b>Marcar que o cliente faltou</b>), a sessão pode ser reposta: abra <span class="ui">Ver sessões</span>, e na sessão <b>Não compareceu</b> clique no ícone <span class="ui">Repor sessão</span>. Escolha o novo dia e horário, dentro do período da contratação, e clique em <span class="ui">Repor</span>. A sessão volta a <b>Agendado</b> na nova data, e o total de sessões do pacote não muda.</p>
 <div class="box tip"><b class="t">Dica</b><p>Os atendimentos do pacote aparecem na agenda com o ícone de pacote. Eles não geram cobrança avulsa: o valor já está nas parcelas do pacote. As parcelas são recebidas em <span class="ui">Financeiro</span> &rarr; <span class="ui">Pagamentos</span>.</p></div>
 
 <!-- ===== 7 ===== -->
@@ -413,6 +427,7 @@
   <dt>Contratação</dt><dd>Plano vendido a um cliente, com a agenda e as parcelas.</dd>
   <dt>Comanda</dt><dd>Visão do dia de um cliente, com o que ele deve na visita, para receber de uma vez.</dd>
   <dt>Baixa</dt><dd>Registro de que um pagamento foi recebido, com o método e a data.</dd>
+  <dt>Falta</dt><dd>Atendimento em que o cliente não compareceu. Não é cobrada e não se desfaz; em pacote, a sessão pode ser reposta.</dd>
   <dt>Inativar</dt><dd>Tirar da lista de uso sem apagar. O histórico fica preservado e dá para reativar.</dd>
 </dl>
 

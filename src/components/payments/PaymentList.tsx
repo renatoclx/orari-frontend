@@ -321,6 +321,7 @@ export function PaymentList({
       <AppointmentDetailsDialog
         appointment={viewing?.appointment ?? null}
         canCancel={() => false}
+        canMarkNoShow={() => false}
         onEdit={() => {}}
         onReschedule={() => {}}
         onViewSessions={(recurrenceId) => {

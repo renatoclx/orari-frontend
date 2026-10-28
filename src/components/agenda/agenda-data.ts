@@ -40,5 +40,6 @@ export function toAgendaAppointment(
     overbooking: item.overBooking,
     status: item.status,
     recurrence: item.recurringAppointment,
+    paid: item.payment?.status === "PAID" && item.payment.deletedAt === null,
   };
 }

@@ -157,8 +157,13 @@ Página própria (`/pacotes/contratacoes/nova`), em blocos na mesma tela.
 
 ---
 
+## Falta e reposição de sessão
+
+- A sessão de pacote pode ter a falta marcada como qualquer agendamento (ver `agendamentos.md`, "Marcar falta"). Como a sessão não tem pagamento próprio, nada é cancelado; o pagamento da contratação (parcela) não muda.
+- **Repor sessão:** na lista de sessões (tela da recorrência do pacote e dialog "Ver sessões"), a sessão marcada como "Não compareceu" ganha a ação **Repor sessão** (no lugar de remanejar e cancelar). Abre o mesmo seletor de data e horário do remanejamento, com os textos de reposição ("Repor sessão", "A sessão volta a Agendado.", botão "Repor"), dentro do período da contratação. A sessão volta a Agendado na nova data e a quantidade de sessões do plano se mantém; o registro da falta deixa de existir, porque é a mesma sessão que muda de data.
+- Só sessão de **pacote** pode ser reposta (regra do backend); a de recorrência avulsa que faltou não tem reposição.
+
 ## Pendências
 
-- Reposição por falta (sessão de pacote marcada como "Não compareceu" remanejada dentro do período): depois do MVP, junto com a ação de marcar a falta.
 - Renovação: é uma nova contratação (não há tela própria).
 - Troca de serviço durante a contratação: fora do MVP (o plano fecha o contrato).

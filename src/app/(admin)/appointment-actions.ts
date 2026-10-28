@@ -3,8 +3,10 @@
 import { revalidatePath } from "next/cache";
 import { toAgendaAppointment } from "@/components/agenda/agenda-data";
 import { failureFrom, type ActionFailure } from "@/lib/action-result";
+import { isUuid } from "@/lib/uuid";
 import {
   cancelAppointment,
+  markAppointmentNoShow,
   createAppointment,
   getAppointment,
   listAppointments,
@@ -301,6 +303,25 @@ export async function cancelAppointmentAction(
   }
 
   revalidatePath("/");
+  return { ok: true };
+}
+
+export type MarkNoShowResult = { ok: true } | ActionFailure;
+
+/** Marca a falta do atendimento; o backend cancela o pagamento pendente dele. */
+export async function markNoShowAction(id: string): Promise<MarkNoShowResult> {
+  // O id vem do navegador: fora do formato, nem chega à API.
+  if (!isUuid(id)) return { ok: false, message: "Pedido inválido." };
+  try {
+    await markAppointmentNoShow(id);
+  } catch (error) {
+    return failureFrom(error);
+  }
+
+  // Muda a agenda e o financeiro (o pagamento pendente é cancelado).
+  revalidatePath("/");
+  revalidatePath("/financeiro");
+  revalidatePath("/financeiro/comandas");
   return { ok: true };
 }
 

@@ -46,7 +46,8 @@ regras de cada tela, em `docs/screens/`.
 - **2026-10-19 — Comparativo com o avulso na contratação** (sessões × preço × economia), só informativo.
 - **2026-10-19 — Data de início da contratação começa vazia;** os horários consideram também as sessões dos outros serviços da mesma contratação.
 - **2026-10-19 — Formulários de plano e contratação em página;** parcelas só leitura (a baixa é do Financeiro).
-- **2026-10-19 — Reposição por falta (NO_SHOW) fica para depois do MVP.**
+- **2026-10-19 — Reposição por falta (NO_SHOW) fica para depois do MVP.** _Revista em 2026-10-28: entrou (abaixo)._
+- **2026-10-28 — A falta (NO_SHOW) não cobra e é definitiva; a reposição de sessão de pacote entra.** Premissa mantida: o sistema supõe que o cliente veio (os jobs concluem o atendimento e geram a cobrança), e a falta é a exceção que a recepção anota. Marcar a falta cancela o pagamento pendente, vale também depois de concluído, é recusada se o pagamento já foi recebido e não se desfaz; a sessão de pacote tem a reposição. Backend: `business-rules.md` (Agendamentos > Falta). Tela: botão "Marcar falta" e ação "Repor sessão".
 
 ## Usuários, métodos de pagamento e histórico do cliente
 

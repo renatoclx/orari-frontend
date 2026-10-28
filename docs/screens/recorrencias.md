@@ -69,6 +69,7 @@ Página própria (`/recorrencias/nova`), não dialog.
   - **Editar observações** (dialog). Limpar o campo remove a observação.
   - **Cancelar recorrência:** pede confirmação; cancela as sessões futuras ainda não iniciadas, sem gerar novas, e os pagamentos pendentes delas. Não há reembolso e a recorrência cancelada não é reativada. Não aparece nas de pacote.
   - **Cancelar sessão:** pede confirmação; só antes de iniciar; o horário fica livre e o pagamento pendente da sessão é cancelado.
+  - **Repor sessão** (só em pacote, na sessão marcada como "Não compareceu"): ver `pacotes.md`, "Falta e reposição de sessão".
   - **Remanejar sessão:** nova data e horário (mesmo seletor de horários do novo agendamento), apenas dentro do período da recorrência e antes de iniciar; mantém o pagamento (o vencimento acompanha a nova data) e a quantidade de sessões.
 - Os dados da recorrência (cliente, profissional, serviço, dias e período) não são alterados: para mudá-los, cancela-se a recorrência e cria-se outra.
 - O pagamento integral (baixa em lote dos pagamentos pendentes) será feito no Financeiro.

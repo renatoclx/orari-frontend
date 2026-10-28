@@ -153,6 +153,7 @@ export function RecurrenceDetails({
             recurrenceId={recurrence.id}
             sessions={sessions}
             active={recurrence.isActive}
+            isPackage={Boolean(recurrence.clientPlanId)}
             timeZone={timeZone}
             today={today}
             nowTime={nowTime}

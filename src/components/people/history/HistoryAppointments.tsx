@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useCallback, useState } from "react";
 import { Eye } from "lucide-react";
+import { canMarkNoShow } from "@/components/agenda/appointment-rules";
 import { APPOINTMENT_STATUS } from "@/components/agenda/appointment-status";
 import { AppointmentDetailsDialog } from "@/components/agenda/AppointmentDetailsDialog";
 import {
@@ -222,6 +223,15 @@ export function HistoryAppointments({
       <AppointmentDetailsDialog
         appointment={viewing}
         canCancel={canCancel}
+        canMarkNoShow={(appointment) =>
+          !readOnly &&
+          canMarkNoShow(
+            appointment,
+            byId.get(appointment.id)?.date ?? "",
+            today,
+            timeToMinutes(nowTime),
+          )
+        }
         onEdit={(appointment) => {
           setViewing(null);
           setEditing(byId.get(appointment.id) ?? null);

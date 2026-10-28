@@ -21,6 +21,8 @@ type RecurrenceSessionsProps = {
   sessions: RecurrenceSession[];
   /** Recorrência (ou contratação) ativa: só assim as sessões mudam. */
   active: boolean;
+  /** Sessões de pacote: a que o cliente perdeu (falta) pode ser reposta em outra data. */
+  isPackage?: boolean;
   timeZone: string;
   /** Relógio da tela (useAgendaClock): o que já começou não muda. */
   today: string;
@@ -42,6 +44,7 @@ export function RecurrenceSessions({
   recurrenceId,
   sessions,
   active,
+  isPackage = false,
   timeZone,
   today,
   nowTime,
@@ -73,6 +76,12 @@ export function RecurrenceSessions({
     return (
       date > today || (date === today && timeOf(session.startAt) > nowTime)
     );
+  }
+
+  // Reposição: sessão de pacote em que o cliente faltou volta a ser agendada em
+  // outra data (o backend aceita só em pacote).
+  function replaceable(session: RecurrenceSession): boolean {
+    return isPackage && active && session.status === "NO_SHOW";
   }
 
   function cancelSession() {
@@ -126,6 +135,24 @@ export function RecurrenceSessions({
     </div>
   );
 
+  // Quem faltou só tem a reposição (não há o que cancelar ou remanejar).
+  const replaceAction = (session: RecurrenceSession) => (
+    <Hint label="Repor sessão">
+      <Button
+        variant="ghost"
+        size="icon"
+        aria-label={`Repor a sessão de ${dateLabel(session)}`}
+        onClick={() => setRescheduling(session)}
+      >
+        <CalendarClock aria-hidden="true" />
+      </Button>
+    </Hint>
+  );
+  const rowActions = (session: RecurrenceSession) =>
+    editable(session)
+      ? sessionActions(session)
+      : replaceable(session) && replaceAction(session);
+
   return (
     <>
       {/* Celular: um cartão por sessão, sem rolagem lateral. A partir do md, tabela. */}
@@ -148,7 +175,7 @@ export function RecurrenceSessions({
                   {label}
                 </p>
               </div>
-              {editable(session) && sessionActions(session)}
+              {rowActions(session)}
             </li>
           );
         })}
@@ -185,9 +212,7 @@ export function RecurrenceSessions({
                     {label}
                   </span>
                 </td>
-                <td className="px-4 py-2">
-                  {editable(session) && sessionActions(session)}
-                </td>
+                <td className="px-4 py-2">{rowActions(session)}</td>
               </tr>
             );
           })}
@@ -217,6 +242,7 @@ export function RecurrenceSessions({
           }
         }
         today={today}
+        replacement={rescheduling?.status === "NO_SHOW"}
         onOpenChange={(open) => !open && setRescheduling(null)}
       />
 

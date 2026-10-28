@@ -5,7 +5,6 @@ import Link from "next/link";
 import {
   EllipsisVertical,
   Eye,
-  History,
   Pencil,
   RotateCcw,
   Trash2,
@@ -336,13 +335,13 @@ function PersonActions({
       {/* Histórico do cliente (screens/pessoas.md): também para o inativo,
           só para consulta. */}
       {withHistory && (
-        <Hint label={`Histórico de ${person.name}`}>
+        <Hint label={`Visualizar histórico de ${person.name}`}>
           <Button variant="ghost" size="icon" asChild>
             <Link
               href={`${basePath}/${person.id}`}
-              aria-label={`Histórico de ${person.name}`}
+              aria-label={`Visualizar histórico de ${person.name}`}
             >
-              <History aria-hidden="true" />
+              <Eye aria-hidden="true" />
             </Link>
           </Button>
         </Hint>

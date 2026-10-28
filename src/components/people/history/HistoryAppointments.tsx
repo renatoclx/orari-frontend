@@ -20,6 +20,7 @@ import { ClientPlanDialog } from "@/components/client-plans/ClientPlanDialog";
 import { RecurrenceSessionsDialog } from "@/components/recurrences/RecurrenceSessionsDialog";
 import { EmptyValue } from "@/components/shared/EmptyValue";
 import { Hint } from "@/components/shared/Hint";
+import { ListCard } from "@/components/shared/ListCard";
 import { Button } from "@/components/ui/button";
 import type { AgendaAppointment, AgendaProfessional } from "@/types/agenda";
 import { formatDateOnly } from "@/utils/format";
@@ -93,110 +94,132 @@ export function HistoryAppointments({
     return timeToMinutes(appointment.start) > timeToMinutes(nowTime);
   }
 
-  const headerClass =
-    "sticky top-0 z-10 border-b border-border bg-card px-4 py-3 font-medium text-muted-foreground";
+  // Botão de detalhes, igual no cartão do celular e na tabela.
+  const detailsButton = (item: HistoryAppointment) => (
+    <Hint label="Detalhes do agendamento">
+      <Button
+        variant="ghost"
+        size="icon"
+        aria-label={`Detalhes do agendamento de ${formatDateOnly(`${item.date}T00:00:00Z`)}`}
+        onClick={() => setViewing(item)}
+      >
+        <Eye aria-hidden="true" />
+      </Button>
+    </Hint>
+  );
 
   return (
-    <div className="flex min-h-0 flex-1 flex-col rounded-card border border-border bg-card">
-      <div className="flex flex-wrap gap-1 border-b border-border p-2">
-        {HISTORY_FILTERS.map((filter) => (
-          <Link
-            key={filter.id}
-            href={`${basePath}?aba=agendamentos&quando=${filter.id}`}
-            aria-current={when === filter.id ? "page" : undefined}
-            className={cn(
-              "rounded-control px-3 py-1.5 text-sm",
-              when === filter.id
-                ? "bg-muted font-medium text-foreground"
-                : "text-muted-foreground hover:text-foreground",
-            )}
+    <ListCard
+      toolbar={
+        <div className="flex flex-wrap gap-1 border-b border-border p-2">
+          {HISTORY_FILTERS.map((filter) => (
+            <Link
+              key={filter.id}
+              href={`${basePath}?aba=agendamentos&quando=${filter.id}`}
+              aria-current={when === filter.id ? "page" : undefined}
+              className={cn(
+                "rounded-control px-3 py-1.5 text-sm",
+                when === filter.id
+                  ? "bg-muted font-medium text-foreground"
+                  : "text-muted-foreground hover:text-foreground",
+              )}
+            >
+              {filter.label}
+            </Link>
+          ))}
+        </div>
+      }
+      columns={[
+        "Data",
+        "Horário",
+        "Serviço",
+        "Profissional",
+        "Status",
+        "Origem",
+        "Ações",
+      ]}
+      emptyMessage={
+        appointments.length === 0
+          ? HISTORY_FILTERS.find((filter) => filter.id === when)?.empty
+          : undefined
+      }
+      cards={appointments.map((item) => {
+        const { label, icon: StatusIcon } = APPOINTMENT_STATUS[item.status];
+        return (
+          <li
+            key={item.id}
+            className="flex items-center justify-between gap-2 p-4"
           >
-            {filter.label}
-          </Link>
-        ))}
-      </div>
-      <div className="min-h-0 flex-1 overflow-auto">
-        {appointments.length === 0 ? (
-          <p className="flex h-full items-center justify-center p-8 text-center text-sm text-muted-foreground">
-            {HISTORY_FILTERS.find((filter) => filter.id === when)?.empty}
-          </p>
-        ) : (
-          <table className="w-full text-left text-sm">
-            <thead>
-              <tr>
-                {[
-                  "Data",
-                  "Horário",
-                  "Serviço",
-                  "Profissional",
-                  "Status",
-                  "Origem",
-                  "Ações",
-                ].map((title) => (
-                  <th key={title} scope="col" className={headerClass}>
-                    {title}
-                  </th>
-                ))}
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-border">
-              {appointments.map((item) => {
-                const { label, icon: StatusIcon } =
-                  APPOINTMENT_STATUS[item.status];
-                return (
-                  <tr key={item.id} className="hover:bg-background">
-                    <td className="px-4 py-3 whitespace-nowrap tabular-nums">
-                      {formatDateOnly(`${item.date}T00:00:00Z`)}
-                    </td>
-                    <td className="px-4 py-3 whitespace-nowrap tabular-nums">
-                      {item.start} às {item.end}
-                    </td>
-                    <td className="px-4 py-3">{item.serviceName}</td>
-                    <td className="px-4 py-3">{item.professionalName}</td>
-                    <td className="px-4 py-3">
-                      <span className="inline-flex items-center gap-1.5">
-                        <StatusIcon
-                          className="size-4 text-muted-foreground"
-                          aria-hidden="true"
-                        />
-                        {label}
-                      </span>
-                    </td>
-                    <td className="px-4 py-3">
-                      {item.recurrence ? (
-                        <span className="inline-flex items-center gap-1.5">
-                          <RecurrenceOriginIcon
-                            recurrence={item.recurrence}
-                            className="size-4 text-muted-foreground"
-                          />
-                          {recurrenceLabel(item.recurrence)}
-                        </span>
-                      ) : (
-                        <EmptyValue />
-                      )}
-                    </td>
-                    <td className="px-4 py-2">
-                      <Hint label="Detalhes do agendamento">
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          aria-label={`Detalhes do agendamento de ${formatDateOnly(`${item.date}T00:00:00Z`)}`}
-                          onClick={() => setViewing(item)}
-                        >
-                          <Eye aria-hidden="true" />
-                        </Button>
-                      </Hint>
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
-        )}
-      </div>
-
-      {footer}
-
+            <div className="min-w-0 space-y-0.5 text-sm">
+              <p className="font-medium tabular-nums">
+                {formatDateOnly(`${item.date}T00:00:00Z`)}, {item.start} às{" "}
+                {item.end}
+              </p>
+              <p>
+                {item.serviceName}
+                <span className="text-muted-foreground">
+                  {" "}
+                  · com {item.professionalName}
+                </span>
+              </p>
+              <p className="inline-flex items-center gap-1.5 text-muted-foreground">
+                <StatusIcon className="size-4" aria-hidden="true" />
+                {label}
+              </p>
+              {item.recurrence && (
+                <p className="flex items-center gap-1.5 text-muted-foreground">
+                  <RecurrenceOriginIcon
+                    recurrence={item.recurrence}
+                    className="size-4"
+                  />
+                  {recurrenceLabel(item.recurrence)}
+                </p>
+              )}
+            </div>
+            {detailsButton(item)}
+          </li>
+        );
+      })}
+      rows={appointments.map((item) => {
+        const { label, icon: StatusIcon } = APPOINTMENT_STATUS[item.status];
+        return (
+          <tr key={item.id} className="hover:bg-background">
+            <td className="px-4 py-3 whitespace-nowrap tabular-nums">
+              {formatDateOnly(`${item.date}T00:00:00Z`)}
+            </td>
+            <td className="px-4 py-3 whitespace-nowrap tabular-nums">
+              {item.start} às {item.end}
+            </td>
+            <td className="px-4 py-3">{item.serviceName}</td>
+            <td className="px-4 py-3">{item.professionalName}</td>
+            <td className="px-4 py-3">
+              <span className="inline-flex items-center gap-1.5">
+                <StatusIcon
+                  className="size-4 text-muted-foreground"
+                  aria-hidden="true"
+                />
+                {label}
+              </span>
+            </td>
+            <td className="px-4 py-3">
+              {item.recurrence ? (
+                <span className="inline-flex items-center gap-1.5">
+                  <RecurrenceOriginIcon
+                    recurrence={item.recurrence}
+                    className="size-4 text-muted-foreground"
+                  />
+                  {recurrenceLabel(item.recurrence)}
+                </span>
+              ) : (
+                <EmptyValue />
+              )}
+            </td>
+            <td className="px-4 py-2">{detailsButton(item)}</td>
+          </tr>
+        );
+      })}
+      footer={footer}
+    >
       <AppointmentDetailsDialog
         appointment={viewing}
         canCancel={canCancel}
@@ -267,6 +290,6 @@ export function HistoryAppointments({
         }}
         onOpenChange={(open) => !open && setClientPlanOf(null)}
       />
-    </div>
+    </ListCard>
   );
 }

@@ -12,6 +12,7 @@ import { ClientPlanStatusBadge } from "@/components/client-plans/ClientPlanStatu
 import { describeDays } from "@/components/recurrences/recurrence-schedule";
 import { RecurrenceSessionsDialog } from "@/components/recurrences/RecurrenceSessionsDialog";
 import { RecurrenceStatusBadge } from "@/components/recurrences/RecurrenceStatusBadge";
+import { ListCard } from "@/components/shared/ListCard";
 import { Button } from "@/components/ui/button";
 import type { ClientPlanItem } from "@/types/client-plan";
 import type { RecurrenceItem } from "@/types/recurrence";
@@ -25,9 +26,6 @@ type Props = {
   serverNow: number;
   footer: React.ReactNode;
 };
-
-const headerClass =
-  "sticky top-0 z-10 border-b border-border bg-card px-4 py-3 font-medium text-muted-foreground";
 
 /**
  * Abas de recorrências e de pacotes do cliente: as linhas abrem as sessões ou a
@@ -45,116 +43,163 @@ export function HistoryRecurrencesAndPlans({
   const [clientPlanOf, setClientPlanOf] = useState<string | null>(null);
   const empty = (recurrences ?? clientPlans ?? []).length === 0;
 
+  // Ação da linha: só o ícone no celular (o cartão é estreito); com texto na tabela.
+  const sessionsButton = (item: RecurrenceItem, icon: boolean) => (
+    <Button
+      variant="outline"
+      size={icon ? "icon" : "default"}
+      aria-label={icon ? `Ver sessões de ${item.service.name}` : undefined}
+      onClick={() => setSessionsOf(item.id)}
+    >
+      <ListChecks aria-hidden="true" />
+      {!icon && "Ver sessões"}
+    </Button>
+  );
+  const planButton = (item: ClientPlanItem, icon: boolean) => (
+    <Button
+      variant="outline"
+      size={icon ? "icon" : "default"}
+      aria-label={icon ? `Ver contratação de ${item.plan.name}` : undefined}
+      onClick={() => setClientPlanOf(item.id)}
+    >
+      <Package aria-hidden="true" />
+      {!icon && "Ver contratação"}
+    </Button>
+  );
+  const period = (item: { startDate: string; endDate: string }) =>
+    `${formatDateOnly(item.startDate)} a ${formatDateOnly(item.endDate)}`;
+
   return (
-    <div className="flex min-h-0 flex-1 flex-col rounded-card border border-border bg-card">
-      <div className="min-h-0 flex-1 overflow-auto">
-        {empty ? (
-          <p className="flex h-full items-center justify-center p-8 text-center text-sm text-muted-foreground">
-            {recurrences
-              ? "Nenhuma recorrência deste cliente."
-              : "Nenhum pacote contratado por este cliente."}
-          </p>
-        ) : recurrences ? (
-          <table className="w-full text-left text-sm">
-            <thead>
-              <tr>
-                {[
-                  "Serviço",
-                  "Profissional",
-                  "Dias",
-                  "Período",
-                  "Status",
-                  "",
-                ].map((title) => (
-                  <th key={title} scope="col" className={headerClass}>
-                    {title}
-                  </th>
-                ))}
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-border">
-              {recurrences.map((item) => (
-                <tr key={item.id} className="hover:bg-background">
-                  <td className="px-4 py-3 font-medium">
+    <ListCard
+      columns={
+        recurrences
+          ? [
+              "Serviço",
+              "Profissional",
+              "Dias",
+              "Período",
+              "Status",
+              // Só botões: o título fica para leitor de tela.
+              { key: "acoes", header: <span className="sr-only">Ações</span> },
+            ]
+          : [
+              "Plano",
+              "Período",
+              "Modalidade",
+              "Total",
+              "Status",
+              { key: "acoes", header: <span className="sr-only">Ações</span> },
+            ]
+      }
+      emptyMessage={
+        empty
+          ? recurrences
+            ? "Nenhuma recorrência deste cliente."
+            : "Nenhum pacote contratado por este cliente."
+          : undefined
+      }
+      cards={
+        recurrences
+          ? recurrences.map((item) => (
+              <li
+                key={item.id}
+                className="flex items-center justify-between gap-2 p-4"
+              >
+                <div className="min-w-0 space-y-0.5 text-sm">
+                  <p className="font-medium">
                     {item.service.name}
                     {item.clientPlanId && (
-                      <span className="ml-2 text-xs text-muted-foreground">
+                      <span className="ml-2 text-xs font-normal text-muted-foreground">
                         (pacote)
                       </span>
                     )}
-                  </td>
-                  <td className="px-4 py-3">{item.professional.name}</td>
-                  <td className="px-4 py-3">{describeDays(item.days)}</td>
-                  <td className="px-4 py-3 whitespace-nowrap tabular-nums">
-                    {formatDateOnly(item.startDate)} a{" "}
-                    {formatDateOnly(item.endDate)}
-                  </td>
-                  <td className="px-4 py-3">
+                  </p>
+                  <p className="text-muted-foreground">
+                    com {item.professional.name}
+                  </p>
+                  <p>{describeDays(item.days)}</p>
+                  <p className="text-muted-foreground tabular-nums">
+                    {period(item)}
+                  </p>
+                  <div className="pt-1">
                     <RecurrenceStatusBadge active={item.isActive} />
-                  </td>
-                  <td className="px-4 py-2 text-right">
-                    <Button
-                      variant="outline"
-                      onClick={() => setSessionsOf(item.id)}
-                    >
-                      <ListChecks aria-hidden="true" />
-                      Ver sessões
-                    </Button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        ) : (
-          <table className="w-full text-left text-sm">
-            <thead>
-              <tr>
-                {["Plano", "Período", "Modalidade", "Total", "Status", ""].map(
-                  (title) => (
-                    <th key={title} scope="col" className={headerClass}>
-                      {title}
-                    </th>
-                  ),
-                )}
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-border">
-              {clientPlans?.map((item) => (
-                <tr key={item.id} className="hover:bg-background">
-                  <td className="px-4 py-3 font-medium">{item.plan.name}</td>
-                  <td className="px-4 py-3 whitespace-nowrap tabular-nums">
-                    {formatDateOnly(item.startDate)} a{" "}
-                    {formatDateOnly(item.endDate)}
-                  </td>
-                  <td className="px-4 py-3">
-                    {BILLING_LABEL[item.billingType]}
-                  </td>
-                  <td className="px-4 py-3 whitespace-nowrap tabular-nums">
+                  </div>
+                </div>
+                {sessionsButton(item, true)}
+              </li>
+            ))
+          : clientPlans?.map((item) => (
+              <li
+                key={item.id}
+                className="flex items-center justify-between gap-2 p-4"
+              >
+                <div className="min-w-0 space-y-0.5 text-sm">
+                  <p className="font-medium">{item.plan.name}</p>
+                  <p className="text-muted-foreground tabular-nums">
+                    {period(item)}
+                  </p>
+                  <p className="tabular-nums">
+                    {BILLING_LABEL[item.billingType]} ·{" "}
                     {formatPrice(item.totalAmount)}
-                  </td>
-                  <td className="px-4 py-3">
+                  </p>
+                  <div className="pt-1">
                     <ClientPlanStatusBadge
                       status={clientPlanStatus(item, today)}
                     />
-                  </td>
-                  <td className="px-4 py-2 text-right">
-                    <Button
-                      variant="outline"
-                      onClick={() => setClientPlanOf(item.id)}
-                    >
-                      <Package aria-hidden="true" />
-                      Ver contratação
-                    </Button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        )}
-      </div>
-
-      {footer}
-
+                  </div>
+                </div>
+                {planButton(item, true)}
+              </li>
+            ))
+      }
+      rows={
+        recurrences
+          ? recurrences.map((item) => (
+              <tr key={item.id} className="hover:bg-background">
+                <td className="px-4 py-3 font-medium">
+                  {item.service.name}
+                  {item.clientPlanId && (
+                    <span className="ml-2 text-xs text-muted-foreground">
+                      (pacote)
+                    </span>
+                  )}
+                </td>
+                <td className="px-4 py-3">{item.professional.name}</td>
+                <td className="px-4 py-3">{describeDays(item.days)}</td>
+                <td className="px-4 py-3 whitespace-nowrap tabular-nums">
+                  {period(item)}
+                </td>
+                <td className="px-4 py-3">
+                  <RecurrenceStatusBadge active={item.isActive} />
+                </td>
+                <td className="px-4 py-2 text-right">
+                  {sessionsButton(item, false)}
+                </td>
+              </tr>
+            ))
+          : clientPlans?.map((item) => (
+              <tr key={item.id} className="hover:bg-background">
+                <td className="px-4 py-3 font-medium">{item.plan.name}</td>
+                <td className="px-4 py-3 whitespace-nowrap tabular-nums">
+                  {period(item)}
+                </td>
+                <td className="px-4 py-3">{BILLING_LABEL[item.billingType]}</td>
+                <td className="px-4 py-3 whitespace-nowrap tabular-nums">
+                  {formatPrice(item.totalAmount)}
+                </td>
+                <td className="px-4 py-3">
+                  <ClientPlanStatusBadge
+                    status={clientPlanStatus(item, today)}
+                  />
+                </td>
+                <td className="px-4 py-2 text-right">
+                  {planButton(item, false)}
+                </td>
+              </tr>
+            ))
+      }
+      footer={footer}
+    >
       <RecurrenceSessionsDialog
         recurrenceId={sessionsOf}
         timeZone={timeZone}
@@ -171,6 +216,6 @@ export function HistoryRecurrencesAndPlans({
         }}
         onOpenChange={(open) => !open && setClientPlanOf(null)}
       />
-    </div>
+    </ListCard>
   );
 }

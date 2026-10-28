@@ -259,9 +259,10 @@ export function EntryForm({
           {pending ? (
             "Salvando…"
           ) : (
-            <>
+            // Um só elemento: dois filhos soltos ganhariam o gap do botão entre eles.
+            <span>
               Registrar<span className="max-sm:hidden"> acompanhamento</span>
-            </>
+            </span>
           )}
         </Button>
       </FormFooter>

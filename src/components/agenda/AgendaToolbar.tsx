@@ -63,7 +63,8 @@ export function AgendaToolbar({
 }: AgendaToolbarProps) {
   return (
     <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
-      <div className="flex items-center gap-1">
+      {/* Só a partir de sm: no celular, o calendário do cabeçalho já troca o dia. */}
+      <div className="hidden items-center gap-1 sm:flex">
         <Hint label={`Ir para ${dayName(shiftDateString(date, -1))}`}>
           <Button variant="outline" size="icon" asChild>
             <Link
@@ -99,7 +100,8 @@ export function AgendaToolbar({
         {dateLabel}
       </h2>
 
-      <div className="ml-auto flex flex-wrap items-center gap-2">
+      {/* No celular, as ações ficam empilhadas na largura toda, a principal em cima. */}
+      <div className="ml-auto flex flex-wrap items-center gap-2 max-sm:w-full max-sm:flex-col-reverse">
         {/* Filtro por profissional: só no computador (no celular, a troca é no
             cabeçalho da coluna). */}
         {onFilterChange && professionals.length > 0 && (
@@ -146,13 +148,17 @@ export function AgendaToolbar({
         )}
 
         <Hint label="Agendar fora do horário de funcionamento (encaixe)">
-          <Button variant="outline" onClick={onOverbooking}>
+          <Button
+            variant="outline"
+            onClick={onOverbooking}
+            className="max-sm:w-full"
+          >
             <CalendarClock aria-hidden="true" />
             Encaixar horário
           </Button>
         </Hint>
 
-        <Button onClick={onNewAppointment}>
+        <Button onClick={onNewAppointment} className="max-sm:w-full">
           <Plus aria-hidden="true" />
           Novo Agendamento
         </Button>

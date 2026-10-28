@@ -68,7 +68,7 @@ export function PaymentsSummary({
   filters: PaymentFiltersState;
 }) {
   return (
-    <div className="grid gap-3 sm:grid-cols-3">
+    <div className="hidden gap-3 sm:grid sm:grid-cols-3">
       {CARDS.map((card) => {
         const { total, count } = summary[card.key];
         const active = filters.status === card.filter;

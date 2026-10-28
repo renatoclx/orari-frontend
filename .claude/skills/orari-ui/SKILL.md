@@ -64,6 +64,13 @@ Use `Button` de `@/components/ui/button`:
 - O `ConfirmDialog` recebe o ícone do botão de confirmação (`icon`); o botão de desistir usa `X` (ou `ArrowLeft` quando o texto é "Voltar").
 - **Tamanhos: botões e campos têm 40 px** (`h-10`; ícones `size-10`). Valem para `Button`, `Input`, `Select` (gatilho), `DatePicker`, `Combobox` e o campo de busca dentro das caixas de seleção. Variações: `sm` 36 px, `lg` 44 px, `icon-sm` 32 px. Não use `h-8` ou `h-9` à mão; ajuste o componente em `components/ui/` se precisar mudar.
 - Login: botão e campos com `h-14 text-base` (56 px, texto 16 px), só nessa tela.
+- **Botões no celular (abaixo de `sm`)**:
+  - **Ação principal sozinha** (Novo X, Nova ficha, Novo acompanhamento, Cancelar contratação, Abrir): ocupa a largura do bloco (`w-full sm:w-auto` ou `max-sm:w-full`).
+  - **Duas ou mais ações no mesmo bloco** (agenda, dados da recorrência): empilhadas, cada uma na largura toda, a principal em cima (`max-sm:flex-col-reverse` quando ela vem por último no código).
+  - **Rodapé de formulário em página** (`FormFooter`): lado a lado, em partes iguais (já é assim; a legenda fica na linha de cima). Rótulo longo encurta no celular (`Registrar<span className="max-sm:hidden"> acompanhamento</span>`) para caber. O rodapé do diálogo (`DialogFooter`) é empilhado.
+  - **Ação secundária numa linha de tabela ou cartão** (Ver sessões): só o ícone no celular (`max-sm:size-10 max-sm:p-0`, texto em `max-sm:sr-only`).
+  - **Ação só de computador** (Imprimir/PDF) e atalhos que o celular já tem em outro lugar (setas e "Hoje" da agenda, no lugar do calendário do cabeçalho) somem no celular (`max-sm:hidden`).
+  - Nunca deixar um botão estourar a largura da tela: sem rolagem lateral na página nem no diálogo.
 
 ## Badges
 

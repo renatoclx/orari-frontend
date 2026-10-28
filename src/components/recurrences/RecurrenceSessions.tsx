@@ -100,9 +100,61 @@ export function RecurrenceSessions({
   const headerClass =
     "sticky top-0 z-10 border-b border-border bg-card px-4 py-3 font-medium text-muted-foreground";
 
+  // Remanejar e cancelar a sessão: os mesmos botões na tabela e no cartão.
+  const sessionActions = (session: RecurrenceSession) => (
+    <div className="flex items-center gap-1">
+      <Hint label="Remanejar sessão">
+        <Button
+          variant="ghost"
+          size="icon"
+          aria-label={`Remanejar a sessão de ${dateLabel(session)}`}
+          onClick={() => setRescheduling(session)}
+        >
+          <CalendarClock aria-hidden="true" />
+        </Button>
+      </Hint>
+      <Hint label="Cancelar sessão">
+        <Button
+          variant="ghost"
+          size="icon"
+          aria-label={`Cancelar a sessão de ${dateLabel(session)}`}
+          onClick={() => setCancelling(session)}
+        >
+          <Ban aria-hidden="true" />
+        </Button>
+      </Hint>
+    </div>
+  );
+
   return (
     <>
-      <table className="w-full text-left text-sm">
+      {/* Celular: um cartão por sessão, sem rolagem lateral. A partir do md, tabela. */}
+      <ul className="divide-y divide-border md:hidden">
+        {sessions.map((session) => {
+          const { label, icon: StatusIcon } =
+            APPOINTMENT_STATUS[session.status];
+          return (
+            <li
+              key={session.id}
+              className="flex items-center justify-between gap-2 p-4"
+            >
+              <div className="space-y-0.5 text-sm">
+                <p className="font-medium tabular-nums">
+                  {dateLabel(session)}, {timeOf(session.startAt)} às{" "}
+                  {timeOf(session.endAt)}
+                </p>
+                <p className="inline-flex items-center gap-1.5 text-muted-foreground">
+                  <StatusIcon className="size-4" aria-hidden="true" />
+                  {label}
+                </p>
+              </div>
+              {editable(session) && sessionActions(session)}
+            </li>
+          );
+        })}
+      </ul>
+
+      <table className="hidden w-full text-left text-sm md:table">
         <thead>
           <tr>
             {["Data", "Horário", "Status", "Ações"].map((title) => (
@@ -134,30 +186,7 @@ export function RecurrenceSessions({
                   </span>
                 </td>
                 <td className="px-4 py-2">
-                  {editable(session) && (
-                    <div className="flex items-center gap-1">
-                      <Hint label="Remanejar sessão">
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          aria-label={`Remanejar a sessão de ${dateLabel(session)}`}
-                          onClick={() => setRescheduling(session)}
-                        >
-                          <CalendarClock aria-hidden="true" />
-                        </Button>
-                      </Hint>
-                      <Hint label="Cancelar sessão">
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          aria-label={`Cancelar a sessão de ${dateLabel(session)}`}
-                          onClick={() => setCancelling(session)}
-                        >
-                          <Ban aria-hidden="true" />
-                        </Button>
-                      </Hint>
-                    </div>
-                  )}
+                  {editable(session) && sessionActions(session)}
                 </td>
               </tr>
             );

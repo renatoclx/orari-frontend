@@ -224,7 +224,10 @@ function CheckoutForm({
                     `Receber ${appointment.service.name} às ${toTimeString(appointment.startAt, timeZone)}`,
                   )
                 ) : (
-                  <span className="size-4 shrink-0" aria-hidden="true" />
+                  <span
+                    className="size-4 shrink-0 max-sm:hidden"
+                    aria-hidden="true"
+                  />
                 )}
                 <span className="min-w-40 flex-1">
                   <span className="inline-flex items-center gap-1.5">

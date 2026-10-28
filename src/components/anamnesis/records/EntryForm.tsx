@@ -256,7 +256,13 @@ export function EntryForm({
         </Button>
         <Button type="submit" disabled={pending}>
           <Save aria-hidden="true" />
-          {pending ? "Salvando…" : "Registrar acompanhamento"}
+          {pending ? (
+            "Salvando…"
+          ) : (
+            <>
+              Registrar<span className="max-sm:hidden"> acompanhamento</span>
+            </>
+          )}
         </Button>
       </FormFooter>
     </form>

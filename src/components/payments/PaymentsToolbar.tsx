@@ -63,13 +63,18 @@ export function PaymentsToolbar({
     filters.client !== ALL ||
     filters.method !== ALL;
 
+  // Sem os cartões no celular, só o filtro de situação fica à mostra; os demais,
+  // no computador.
   return (
-    <div className="hidden flex-wrap items-center gap-3 sm:flex">
+    <div className="flex flex-wrap items-center gap-3">
       <Select
         value={filters.status}
         onValueChange={(next) => change({ status: next as PaymentFilterId })}
       >
-        <SelectTrigger className="w-40" aria-label="Filtrar por situação">
+        <SelectTrigger
+          className="w-full sm:w-40"
+          aria-label="Filtrar por situação"
+        >
           <SelectValue />
         </SelectTrigger>
         <SelectContent>
@@ -81,7 +86,7 @@ export function PaymentsToolbar({
         </SelectContent>
       </Select>
 
-      <div className="w-44">
+      <div className="w-44 max-sm:hidden">
         <DatePicker
           key={`from-${filters.from}`}
           id="filter-from"
@@ -92,7 +97,7 @@ export function PaymentsToolbar({
           onValueChange={(from) => change({ from })}
         />
       </div>
-      <div className="w-44">
+      <div className="w-44 max-sm:hidden">
         <DatePicker
           key={`to-${filters.to}`}
           id="filter-to"
@@ -104,7 +109,7 @@ export function PaymentsToolbar({
         />
       </div>
 
-      <div className="w-60">
+      <div className="w-60 max-sm:hidden">
         <Combobox
           id="filter-client"
           ariaLabel="Filtrar por cliente"
@@ -133,7 +138,7 @@ export function PaymentsToolbar({
         onValueChange={(next) => change({ method: next })}
       >
         <SelectTrigger
-          className="w-52"
+          className="w-52 max-sm:hidden"
           aria-label="Filtrar por método de pagamento"
         >
           <SelectValue />

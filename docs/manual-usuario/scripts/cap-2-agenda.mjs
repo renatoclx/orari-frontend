@@ -28,8 +28,16 @@ await clickText("button", "Encaixar horário"); await sleep(900);
 await shotDialog("08-encaixe");
 await closeDialogs();
 
-// detalhes e remanejar
-await click(`[...document.querySelectorAll("div[role=button]")].find((d) => d.getAttribute("aria-label")?.includes("Vanessa Teixeira"))`); await sleep(1000);
+// detalhes e remanejar: um atendimento FUTURO e agendado (só ele tem Cancelar e
+// Remanejar), buscado pela API para o script não depender de uma data fixa.
+const API = process.env.API_URL ?? "http://localhost:3333";
+const login_ = await (await fetch(`${API}/auth/login`, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ email: DEMO.email, password: DEMO.password }) })).json();
+const upcoming = (await (await fetch(`${API}/appointments?limit=50&order=asc&from=${new Date(Date.now() + 86_400_000).toISOString()}`, { headers: { authorization: `Bearer ${login_.accessToken}` } })).json()).items
+  .find((a) => a.status === "SCHEDULED" && !a.recurringAppointmentId && !a.overBooking);
+// dia no fuso da empresa (UTC-3)
+const upcomingDay = new Date(new Date(upcoming.startAt).getTime() - 3 * 3_600_000).toISOString().slice(0, 10);
+await go(`/?date=${upcomingDay}`, 3500);
+await click(`[...document.querySelectorAll("div[role=button]")].find((d) => d.getAttribute("aria-label")?.includes(${JSON.stringify(upcoming.client.name)}))`); await sleep(1000);
 await shotDialog("09-detalhes-agendamento");
 await clickText("[role=dialog] button", "Remanejar"); await sleep(1200);
 await shotDialog("10-remanejar");

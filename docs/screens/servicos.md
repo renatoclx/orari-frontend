@@ -39,7 +39,7 @@
 - Preço opcional.
   - Utilizar máscara para R$ padrão BRL
 - Cor opcional.
-  - Utilizar campo colorPicker
+  - Simplificar a escolha da cor com cores pré-definidas, com circulos, sem bordas.
 - A duração do serviço é informada em minutos.
 - O serviço será cadastrado sempre como ativo.
 

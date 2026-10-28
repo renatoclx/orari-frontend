@@ -13,17 +13,19 @@ const BASE_PATH = "/usuarios";
 const LINK_LIMIT = 100;
 
 type UsersListPageProps = {
-  /** searchParams da rota (?page=). */
+  /** searchParams da rota (?q= e ?page=). */
   searchParams: Record<string, string | string[] | undefined>;
 };
 
-// Listagem de usuários: renderizada no servidor, com a página pela URL. A API
-// não tem busca por nome; a ordem é do mais recente para o mais antigo.
+// Listagem de usuários: renderizada no servidor, com a busca por nome e a
+// página pela URL; a ordem é do mais recente para o mais antigo.
 export async function UsersListPage({ searchParams }: UsersListPageProps) {
+  const search =
+    typeof searchParams.q === "string" ? searchParams.q.trim() : "";
   const page = Math.max(1, Number(searchParams.page) || 1);
   const [currentUser, result, professionals, employees] = await Promise.all([
     getCurrentUser(),
-    listUsers({ page, limit: PAGE_SIZE }),
+    listUsers({ page, limit: PAGE_SIZE, name: search || undefined }),
     listPeople({
       type: "PROFESSIONAL",
       isActive: true,
@@ -56,12 +58,14 @@ export async function UsersListPage({ searchParams }: UsersListPageProps) {
     <div className="flex min-h-0 flex-1 flex-col gap-4">
       <h1 className="text-2xl font-semibold">Usuários</h1>
       <UsersToolbar
+        search={search}
         typeOptions={typeOptions}
         currentUserId={currentUser.id}
         linkOptions={linkOptions}
       />
       <UserList
         users={result.items}
+        search={search}
         typeOptions={typeOptions}
         currentUserId={currentUser.id}
         linkOptions={linkOptions}
@@ -71,6 +75,7 @@ export async function UsersListPage({ searchParams }: UsersListPageProps) {
             limit={PAGE_SIZE}
             total={result.total}
             basePath={BASE_PATH}
+            query={{ q: search || undefined }}
           />
         }
       />

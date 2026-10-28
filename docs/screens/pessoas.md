@@ -198,7 +198,7 @@
 ### Acesso
 
 - Página própria: `/clientes/[id]` (não é dialog: o histórico cresce e precisa de abas e paginação).
-- Na listagem de clientes, botão **Histórico** à vista na coluna Ações, ao lado de "Alterar" (ícone de histórico). O "Visualizar" (dialog com os dados cadastrais) sai do menu de clientes, porque o cabeçalho do histórico já mostra esses dados. Funcionários e profissionais continuam como estão.
+- Na listagem de clientes, botão **Histórico** à vista na coluna Ações, ao lado de "Alterar", com ícone de olho (o mesmo do "Visualizar") e dica "Visualizar histórico de {nome}". O "Visualizar" (dialog com os dados cadastrais) sai do menu de clientes, porque o cabeçalho do histórico já mostra esses dados. Funcionários e profissionais continuam como estão.
 - Os atalhos dentro do histórico (sessões e contratação) abrem em dialog.
 
 ### Cabeçalho

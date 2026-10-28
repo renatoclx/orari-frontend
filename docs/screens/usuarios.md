@@ -18,7 +18,8 @@
 
 ### Regras específicas
 
-- O status é controlado pelo deletedAt. A listagem traz ativos e inativos, do mais recente para o mais antigo, com paginação (a API não tem busca por nome).
+- O status é controlado pelo deletedAt. A listagem traz ativos e inativos, do mais recente para o mais antigo, com paginação.
+- Busca por nome acima da lista (mesmo componente das outras listagens): o termo vai para a URL (`?q=`), a lista atualiza ao digitar e volta para a primeira página. A busca é parcial e não diferencia maiúsculas, mas **acentos contam** ("joao" não acha "João"). Sem resultado, a lista mostra "Nenhum usuário encontrado para “termo”."; o termo se mantém ao paginar. Não há filtro por status.
 - Tipo de usuário deve ser exibido como Badge (Super administrador, Administrador, Usuário).
 - "Alterar" em destaque; as demais ações no menu de três pontos.
 - Usuário inativo só tem Visualizar e Reativar (a API não altera usuário inativo).

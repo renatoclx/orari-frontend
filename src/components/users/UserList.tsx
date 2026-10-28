@@ -45,6 +45,8 @@ import type { UserListItem } from "@/types/user";
 
 type UserListProps = {
   users: UserListItem[];
+  /** Termo da busca, só para a mensagem de lista vazia. */
+  search: string;
   /** Tipos que quem está logado pode atribuir. */
   typeOptions: UserType[];
   /** Usuário logado: não pode inativar a si mesmo nem mudar o próprio tipo. */
@@ -139,6 +141,7 @@ function UserActions({
 /** Card da listagem: tabela (computador) ou lista empilhada (celular). */
 export function UserList({
   users,
+  search,
   typeOptions,
   currentUserId,
   linkOptions,
@@ -203,7 +206,9 @@ export function UserList({
       <div className="min-h-0 flex-1 overflow-auto">
         {users.length === 0 ? (
           <p className="flex h-full items-center justify-center p-8 text-center text-sm text-muted-foreground">
-            Nenhum usuário cadastrado. Cadastre o primeiro!
+            {search
+              ? `Nenhum usuário encontrado para “${search}”.`
+              : "Nenhum usuário cadastrado. Cadastre o primeiro!"}
           </p>
         ) : (
           <>

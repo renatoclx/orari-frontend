@@ -132,6 +132,6 @@ figcaption { margin-top: 2mm; font-size: 8.5pt; color: var(--muted); }
 table.ref { width: 100%; border-collapse: collapse; margin: 3mm 0 5mm; font-size: 9.5pt; break-inside: avoid; }
 table.ref th { text-align: left; background: #f0f1f3; padding: 2mm 3mm; }
 table.ref td { padding: 2mm 3mm; border-bottom: 0.3mm solid var(--line); vertical-align: top; }
-dl.gloss dt { font-weight: 700; margin-top: 3mm; color: var(--cyan-dark); }
+dl.gloss dt { break-after: avoid; font-weight: 700; margin-top: 3mm; color: var(--cyan-dark); }
 dl.gloss dd { margin: 0 0 1mm; }
 .side figure img { max-height: 85mm; }

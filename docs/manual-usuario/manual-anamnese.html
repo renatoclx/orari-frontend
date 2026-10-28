@@ -1,0 +1,267 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<title>Manual da Anamnese — Orari</title>
+<link rel="stylesheet" href="manual.css">
+<style>
+  /* Cabeçalho das páginas: o manual.css traz o do manual do administrador. */
+  @page { @top-left { content: "Orari · Manual da Anamnese"; } }
+</style>
+</head>
+<body>
+
+<!-- ===== Capa ===== -->
+<section class="cover">
+  <img class="logo" src="assets/logo-white.svg" alt="Orari">
+  <div class="spacer"></div>
+  <div class="bar"></div>
+  <div class="kicker">Manual da Anamnese</div>
+  <h1>Registre e acompanhe a ficha de saúde dos seus clientes</h1>
+  <p>Guia passo a passo para administradores e profissionais: modelos de ficha, primeira ficha, acompanhamentos, impressão e auditoria.</p>
+  <div class="foot">As telas deste manual usam dados fictícios da “Clínica Bem-Estar”.</div>
+</section>
+
+<!-- ===== Sumário (os números de página são preenchidos pelo build) ===== -->
+<section class="toc">
+  <h2>Sumário</h2>
+  <ol id="toc"></ol>
+  <div class="intro">
+    <b>Como usar este manual.</b> Cada capítulo explica uma parte da anamnese, com os passos na ordem em que você os executa. Os quadros azuis trazem dicas; os amarelos, avisos importantes. Os nomes de botões e campos aparecem <span class="ui">assim</span>, como na tela. Se você ainda não conhece o Orari, comece pelo <b>Manual do administrador</b>.
+  </div>
+</section>
+
+<!-- ===== 1 ===== -->
+<h1 class="chapter" data-toc="O que é a anamnese e quem acessa"><span class="num"></span>O que é a anamnese e quem acessa</h1>
+<p class="lead">A ficha de saúde do cliente, guardada com segurança.</p>
+
+<p>A <b>anamnese</b> é a ficha em que o profissional registra o histórico de saúde do cliente: queixas, hábitos, alergias, cuidados em casa. No Orari ela tem três partes:</p>
+<ul>
+  <li><b>Modelo de ficha</b>: o conjunto de perguntas que a clínica quer fazer. Cada tipo de atendimento pode ter o seu modelo.</li>
+  <li><b>Ficha</b>: o modelo respondido para um cliente, na primeira consulta.</li>
+  <li><b>Acompanhamento</b>: a anotação de cada atendimento seguinte, com a evolução do cliente e, se for o caso, respostas atualizadas.</li>
+</ul>
+
+<h2>Quem pode ver e usar</h2>
+<p>A anamnese é um dado <b>sensível</b>, por isso o acesso é restrito.</p>
+<ul>
+  <li><b>Administrador</b>: vê todas as fichas e é o único que cria os modelos e consulta a auditoria.</li>
+  <li><b>Profissional</b>: o usuário que está <b>vinculado a um profissional</b> da clínica vê e preenche as fichas, mas não mexe nos modelos nem na auditoria.</li>
+  <li><b>Recepção e outros usuários</b>: não veem as fichas. O menu Anamnese nem aparece para eles.</li>
+</ul>
+<div class="box tip"><b class="t">Dica</b><p>O vínculo é feito pelo administrador em <span class="ui">Pessoas</span> &rarr; <span class="ui">Usuários</span>, no campo <b>Função</b>: escolha o profissional que aquele usuário representa.</p></div>
+
+<h2>O menu Anamnese</h2>
+<p>O administrador encontra, na barra lateral, o grupo <span class="ui">Anamnese</span>, com três itens: <span class="ui">Fichas preenchidas</span>, <span class="ui">Modelos de ficha</span> e <span class="ui">Auditoria</span>. O profissional vinculado vê só <span class="ui">Fichas preenchidas</span>, direto no menu.</p>
+<div class="row">
+  <figure><img src="images/51-menu-admin.png" alt=""><figcaption>Menu do administrador.</figcaption></figure>
+  <figure><img src="images/52-menu-profissional.png" alt=""><figcaption>Menu do profissional vinculado.</figcaption></figure>
+</div>
+<p>As fichas de um cliente também ficam na aba <span class="ui">Anamnese</span> da página dele, e o detalhe de um agendamento tem o atalho <span class="ui">Anamnese</span>. Os dois são mostrados mais adiante.</p>
+
+<!-- ===== 2 ===== -->
+<h1 class="chapter" data-toc="Modelos de ficha"><span class="num"></span>Modelos de ficha</h1>
+<p class="lead">Monte as perguntas uma vez e use em todos os clientes. Só o administrador.</p>
+
+<p>Abra <span class="ui">Anamnese</span> &rarr; <span class="ui">Modelos de ficha</span>. A lista mostra o nome (com a descrição embaixo), a quantidade de perguntas, a versão em uso e a situação. Há busca por nome e filtro por situação.</p>
+<figure><img src="images/53-modelos-lista.png" alt=""><figcaption>Lista de modelos de ficha.</figcaption></figure>
+
+<h2>Criar um modelo</h2>
+<ol class="steps">
+  <li>Clique em <span class="ui">Novo modelo</span>.</li>
+  <li>Preencha o <b>Nome</b> (não pode repetir o de outro modelo) e, se quiser, a <b>Descrição</b>.</li>
+  <li>Em cada pergunta, escreva o texto em <b>Pergunta</b> e escolha o <b>Tipo de resposta</b>. Use <span class="ui">Adicionar pergunta</span> para incluir mais.</li>
+  <li>Marque <b>Obrigatória</b> nas perguntas que não podem ficar sem resposta. Se ajudar quem vai preencher, escreva um <b>Texto de ajuda</b>.</li>
+  <li>Arraste a pergunta pela alça (os pontinhos, à esquerda) para mudar a ordem. A numeração se ajusta sozinha.</li>
+  <li>Clique em <span class="ui">Cadastrar</span>.</li>
+</ol>
+<figure class="w70"><img src="images/54-modelo-novo.png" alt=""><figcaption>Cadastro de um modelo de ficha.</figcaption></figure>
+
+<h2>Tipos de pergunta</h2>
+<dl class="gloss">
+  <dt>Texto curto</dt><dd>Uma resposta de uma linha (por exemplo, a queixa principal).</dd>
+  <dt>Texto longo</dt><dd>Um texto maior, para observações e histórico.</dd>
+  <dt>Sim ou não</dt><dd>Duas opções. Você pode pedir um detalhe quando a resposta for “sim” (por exemplo, “A que?”).</dd>
+  <dt>Escolha única</dt><dd>O cliente escolhe uma entre várias opções (de 2 a 50).</dd>
+  <dt>Escolha múltipla</dt><dd>O cliente marca várias opções (de 2 a 50).</dd>
+  <dt>Número</dt><dd>Um valor numérico, como peso ou quantidade de sessões anteriores.</dd>
+  <dt>Data</dt><dd>Uma data, como a da última cirurgia.</dd>
+  <dt>Escala de 0 a 10</dt><dd>Uma nota, útil para dor ou sensibilidade.</dd>
+</dl>
+<figure class="w70"><img src="images/55-modelo-opcoes.png" alt=""><figcaption>Pergunta de escolha múltipla, com a lista de opções.</figcaption></figure>
+
+<h2>Muitas perguntas: recolher e expandir</h2>
+<p>Cada pergunta é um bloco que pode ser <b>recolhido</b> em uma linha com o número, o texto e um resumo (tipo, obrigatória, quantas opções). Vários blocos podem ficar abertos ao mesmo tempo. Com mais de uma pergunta, o botão <span class="ui">Recolher todas</span> (ou <span class="ui">Expandir todas</span>) ajuda a reordenar uma lista longa. O que você digitou não se perde ao recolher.</p>
+<figure class="w70"><img src="images/56-modelo-recolhido.png" alt=""><figcaption>Perguntas recolhidas, prontas para reordenar.</figcaption></figure>
+
+<h2>Alterar um modelo e as versões</h2>
+<p>Use o lápis na linha do modelo. Tudo funciona como no cadastro, com uma diferença importante: o modelo tem <b>versões</b>.</p>
+<ul>
+  <li><b>Mudar as perguntas</b> (texto, tipo, opções, ordem, incluir ou remover) cria uma <b>nova versão</b>. Ela vale para as <b>próximas</b> fichas.</li>
+  <li>As fichas que já foram preenchidas <b>continuam na versão em que nasceram</b>, exatamente como foram respondidas.</li>
+  <li><b>Renomear</b> o modelo, mudar a descrição ou inativar <b>não</b> cria versão.</li>
+</ul>
+<figure class="w70"><img src="images/57-modelo-versao.png" alt=""><figcaption>A tela avisa o número da versão que será criada.</figcaption></figure>
+<div class="box warn"><b class="t">Atenção</b><p>A <b>descrição</b>, depois de preenchida, não pode ser apagada: só trocada por outro texto.</p></div>
+
+<h2>Visualizar, inativar e ativar</h2>
+<p>No menu de três pontos da linha, <span class="ui">Visualizar</span> mostra as perguntas da versão em uso. <span class="ui">Inativar</span> impede que o modelo seja usado em <b>novas</b> fichas; as fichas existentes continuam abertas e recebendo acompanhamentos. <span class="ui">Ativar</span> desfaz. Modelos não são excluídos.</p>
+<figure class="w55"><img src="images/58-modelo-visualizar.png" alt=""><figcaption>Perguntas da versão em uso.</figcaption></figure>
+
+<!-- ===== 3 ===== -->
+<h1 class="chapter" data-toc="Criar a primeira ficha"><span class="num"></span>Criar a primeira ficha</h1>
+<p class="lead">O modelo respondido para um cliente, na primeira consulta.</p>
+
+<h2>Fichas preenchidas</h2>
+<p>Em <span class="ui">Anamnese</span> &rarr; <span class="ui">Fichas preenchidas</span> ficam os clientes que já têm ficha, com a quantidade de fichas de cada um e a situação (ativo ou inativo). Há busca por nome. O ícone da linha abre as fichas daquele cliente.</p>
+<figure class="w70"><img src="images/59-fichas-lista.png" alt=""><figcaption>Clientes com ficha.</figcaption></figure>
+<figure class="w55"><img src="images/60-fichas-dialog.png" alt=""><figcaption>Fichas de um cliente: <span class="ui">Abrir</span> leva à ficha completa.</figcaption></figure>
+
+<h2>Criar uma ficha</h2>
+<p>Há duas entradas para a mesma tela: o botão <span class="ui">Nova ficha</span> da lista <b>Fichas preenchidas</b> (em que você escolhe o cliente) e o botão <span class="ui">Nova ficha</span> da aba <span class="ui">Anamnese</span> do cliente (o cliente já vem escolhido).</p>
+<ol class="steps">
+  <li>Escolha o <b>Cliente</b>: comece a digitar o nome e selecione na lista. Só clientes ativos recebem ficha.</li>
+  <li>Escolha o <b>Modelo</b>. Só aparecem os modelos ativos que o cliente ainda não usou. Se houver apenas um, ele já vem escolhido.</li>
+  <li>Confira a <b>Data da consulta</b>. Ela começa em hoje; pode ser uma data passada, mas nunca futura.</li>
+  <li>Responda as perguntas. As marcadas com <b>*</b> são obrigatórias.</li>
+  <li>Clique em <span class="ui">Criar ficha</span>. A ficha completa abre em seguida.</li>
+</ol>
+<figure><img src="images/61-nova-ficha-cliente.png" alt=""><figcaption>Primeiro passo: escolher o cliente.</figcaption></figure>
+<figure class="w70"><img src="images/62-nova-ficha-form.png" alt=""><figcaption>Modelo escolhido, com as perguntas para responder.</figcaption></figure>
+<div class="box warn"><b class="t">Atenção</b>
+  <ul>
+    <li>Cada cliente tem <b>uma ficha por modelo</b>. Se ele já tem ficha de todos os modelos ativos, a tela explica e leva às fichas dele: para registrar a evolução, use <span class="ui">Novo acompanhamento</span>.</li>
+    <li><b>Trocar de modelo apaga as respostas digitadas</b>, porque as perguntas mudam.</li>
+    <li>Respostas opcionais deixadas em branco simplesmente não são gravadas.</li>
+  </ul>
+</div>
+
+<!-- ===== 4 ===== -->
+<h1 class="chapter" data-toc="Acompanhar o cliente"><span class="num"></span>Acompanhar o cliente</h1>
+<p class="lead">A ficha completa, a evolução e o registro de cada atendimento.</p>
+
+<h2>A ficha completa</h2>
+<p>Abra a ficha pelo botão <span class="ui">Abrir</span> (em Fichas preenchidas) ou pelo nome do modelo na aba <span class="ui">Anamnese</span> do cliente. A tela tem duas colunas (no celular, uma embaixo da outra):</p>
+<ul>
+  <li><b>Situação atual</b>: a resposta mais recente de cada pergunta. Sem resposta aparece “--”. Quando a resposta foi atualizada depois, aparece “atualizada em” com a data.</li>
+  <li><b>Evolução</b>: a história da ficha, do registro mais recente para o mais antigo. Cada registro mostra o selo <b>Inicial</b> ou <b>Acompanhamento</b>, a data, quem registrou, o texto da evolução e as respostas daquele dia. Quando o acompanhamento foi ligado a um atendimento, o serviço e a data dele aparecem.</li>
+</ul>
+<figure><img src="images/63-ficha-completa.png" alt=""><figcaption>Ficha completa: situação atual e evolução.</figcaption></figure>
+<div class="box tip"><b class="t">Dica</b><p>A ficha é sempre mostrada com as perguntas da <b>versão em que nasceu</b>. Se o administrador mudar o modelo depois, as fichas antigas não se alteram.</p></div>
+
+<h2>Registrar um acompanhamento</h2>
+<ol class="steps">
+  <li>Na ficha, clique em <span class="ui">Novo acompanhamento</span>.</li>
+  <li>Em <b>Evolução do atendimento</b>, escreva a anotação do dia. É obrigatória e aceita textos longos (até 10.000 caracteres, com contador).</li>
+  <li>Confira a <b>Data da consulta</b> (hoje, por padrão). Ela não pode ser futura nem anterior ao registro inicial.</li>
+  <li>Se quiser, escolha o <b>Agendamento relacionado</b>, entre os atendimentos do cliente.</li>
+  <li>Se algo mudou na saúde do cliente, abra <b>Atualizar respostas da ficha</b>: as respostas atuais já vêm preenchidas, e você altera só o que mudou.</li>
+  <li>Clique em <span class="ui">Registrar acompanhamento</span>.</li>
+</ol>
+<figure class="w70"><img src="images/64-acompanhamento.png" alt=""><figcaption>Novo acompanhamento: a evolução do atendimento.</figcaption></figure>
+<figure class="w70"><img src="images/65-acompanhamento-respostas.png" alt=""><figcaption>Atualizando só as respostas que mudaram.</figcaption></figure>
+<div class="box warn"><b class="t">Atenção</b>
+  <ul>
+    <li><b>Fichas e acompanhamentos não são editados nem apagados.</b> Eles são um registro histórico. Para corrigir um erro, faça um <b>novo acompanhamento</b> com a resposta atualizada.</li>
+    <li>Uma resposta já dada pode ser <b>atualizada</b>, mas não removida.</li>
+    <li>Cliente <b>inativo</b> não recebe novos acompanhamentos; a ficha continua disponível para consulta.</li>
+  </ul>
+</div>
+
+<h2>A aba Anamnese do cliente e o atalho no agendamento</h2>
+<p>Na página do cliente, a aba <span class="ui">Anamnese</span> lista as fichas dele, com o modelo, a versão, a quantidade de acompanhamentos e a data da última consulta. E, no detalhe de qualquer agendamento (na agenda, no histórico ou no financeiro), o botão <span class="ui">Anamnese</span> abre essa aba direto, sem procurar o cliente. Os dois só aparecem para quem tem acesso às fichas.</p>
+<figure class="w70"><img src="images/66-aba-anamnese-cliente.png" alt=""><figcaption>Aba Anamnese na página do cliente.</figcaption></figure>
+<figure class="w55"><img src="images/67-atalho-agendamento.png" alt=""><figcaption>Atalho para a anamnese no detalhe do agendamento.</figcaption></figure>
+
+<h2>No celular</h2>
+<p>A anamnese também funciona no navegador do celular. A lista de fichas vira cartões, a ficha mostra a <b>Situação atual</b> e a <b>Evolução</b> uma abaixo da outra, e os botões ocupam a largura da tela. Só o botão <span class="ui">Imprimir</span> fica de fora.</p>
+<div class="row">
+  <figure><img src="images/71-m-fichas.png" alt=""><figcaption>Fichas preenchidas no celular.</figcaption></figure>
+  <figure><img src="images/70-m-ficha.png" alt=""><figcaption>Ficha completa no celular.</figcaption></figure>
+</div>
+
+<!-- ===== 5 ===== -->
+<h1 class="chapter" data-toc="Imprimir a ficha"><span class="num"></span>Imprimir a ficha</h1>
+<p class="lead">Gere um PDF da ficha para assinar ou entregar ao cliente.</p>
+
+<ol class="steps">
+  <li>Na ficha completa, clique em <span class="ui">Imprimir</span>.</li>
+  <li>Decida sobre <b>Incluir histórico de acompanhamento</b>. Ela vem marcada. Desmarque para uma <b>via do cliente</b>, só com a ficha e o espaço para assinatura.</li>
+  <li>Clique em <span class="ui">Gerar PDF</span>. O arquivo aparece na própria janela.</li>
+  <li>Use o botão de impressão do visualizador, ou <span class="ui">Abrir em nova aba</span> para baixar ou imprimir de lá.</li>
+</ol>
+<figure class="w70"><img src="images/68-pdf-dialog.png" alt=""><figcaption>A ficha em PDF, pronta para imprimir.</figcaption></figure>
+<div class="box tip"><b class="t">Dica</b><p>Se você mudar a opção do histórico depois de gerar, o PDF anterior some e é preciso gerar de novo.</p></div>
+<div class="box warn"><b class="t">Atenção</b><p>O botão <span class="ui">Imprimir</span> só aparece no <b>computador</b>. No celular, a ficha pode ser lida, mas o PDF é gerado no computador.</p></div>
+
+<!-- ===== 6 ===== -->
+<h1 class="chapter" data-toc="Auditoria"><span class="num"></span>Auditoria</h1>
+<p class="lead">Quem consultou ou alterou os dados da anamnese. Só o administrador.</p>
+
+<p>Em <span class="ui">Anamnese</span> &rarr; <span class="ui">Auditoria</span>, o sistema lista tudo o que foi feito com as fichas, do mais recente para o mais antigo. A tela é <b>somente leitura</b>: nada pode ser editado ou apagado ali.</p>
+<figure class="w70"><img src="images/69-auditoria.png" alt=""><figcaption>Registro de auditoria da anamnese.</figcaption></figure>
+<ul>
+  <li><b>Data e hora</b> da ação, no horário da clínica.</li>
+  <li><b>Usuário</b> que fez a ação.</li>
+  <li><b>Ação</b>, em português: ficha visualizada, fichas consultadas, ficha ou acompanhamento registrado, PDF gerado, modelo criado ou alterado, vínculo ou tipo de usuário alterado, usuário reativado.</li>
+  <li><b>Cliente</b> envolvido e, nas ações sobre usuários, o <b>Alvo</b> (quem foi alterado).</li>
+  <li><b>IP</b> de onde veio a ação.</li>
+</ul>
+
+<h2>Filtrar</h2>
+<p>Use os filtros acima da lista: <span class="ui">Cliente</span>, <span class="ui">Todos os usuários</span>, <span class="ui">Todas as ações</span> e o período (<span class="ui">Data inicial</span> e <span class="ui">Data final</span>, os dois dias incluídos). Os filtros ficam no endereço da página, então você pode guardar ou compartilhar uma busca.</p>
+<div class="box tip"><b class="t">Dica</b><p>Para saber quem abriu a ficha de um cliente, filtre por <b>Cliente</b> e pela ação <b>Ficha visualizada</b>.</p></div>
+
+<!-- ===== 7 ===== -->
+<h1 class="chapter" data-toc="Privacidade e boas práticas"><span class="num"></span>Privacidade e boas práticas</h1>
+<p class="lead">O que o sistema faz por você e o que depende de cada pessoa.</p>
+
+<h2>O que o Orari faz</h2>
+<ul>
+  <li>O acesso às fichas é <b>restrito</b> a administradores e profissionais vinculados.</li>
+  <li>As respostas ficam <b>criptografadas</b> no servidor.</li>
+  <li>Toda consulta, registro e geração de PDF fica na <b>auditoria</b>.</li>
+  <li>O navegador <b>não guarda</b> dado de saúde: o que você digita fica só na memória da página, e o PDF some ao fechar a janela. Ao sair da tela sem salvar, o texto digitado se perde.</li>
+</ul>
+
+<h2>O que depende de você</h2>
+<ul>
+  <li>Não compartilhe a sua senha. Cada pessoa deve ter o <b>seu usuário</b>, para a auditoria dizer quem fez o quê.</li>
+  <li>Em computador de uso comum, saia da conta no fim do dia, pelo menu do seu usuário (canto superior direito).</li>
+  <li>Não deixe a ficha aberta na tela com o cliente ao lado.</li>
+  <li>Imprima só quando necessário e, para a via do cliente, <b>sem o histórico</b>.</li>
+</ul>
+
+<!-- ===== 8 ===== -->
+<h1 class="chapter" data-toc="Dúvidas comuns"><span class="num"></span>Dúvidas comuns</h1>
+<p class="lead">Respostas rápidas para as situações mais frequentes.</p>
+
+<h3>Não vejo o menu Anamnese.</h3>
+<p>O seu usuário não é administrador nem está vinculado a um profissional. Peça ao administrador para vincular, em <span class="ui">Pessoas</span> &rarr; <span class="ui">Usuários</span>, no campo <b>Função</b>.</p>
+<h3>O modelo que eu quero não aparece ao criar a ficha.</h3>
+<p>Ou ele está <b>inativo</b> (peça ao administrador para ativar), ou o cliente <b>já tem ficha</b> dele. Cada cliente tem uma ficha por modelo; para registrar a evolução, use <span class="ui">Novo acompanhamento</span>.</p>
+<h3>Mudei o modelo, mas a ficha de um cliente continua igual.</h3>
+<p>É o esperado. A ficha fica na versão em que foi criada. A mudança vale para as próximas fichas.</p>
+<h3>Errei uma resposta. Como corrijo?</h3>
+<p>Fichas e acompanhamentos não são editados. Abra a ficha e faça um <span class="ui">Novo acompanhamento</span>, atualizando a resposta em <b>Atualizar respostas da ficha</b>. A resposta nova passa a ser a situação atual, e o histórico continua preservado.</p>
+<h3>Não consigo registrar um acompanhamento para um cliente.</h3>
+<p>Se o cliente está <b>inativo</b>, o botão não aparece. Reative o cliente em <span class="ui">Pessoas</span> &rarr; <span class="ui">Clientes</span>. Confira também a data: ela não pode ser futura.</p>
+<h3>O PDF não abre ou não aparece no celular.</h3>
+<p>A geração do PDF é feita no computador. Se ele não aparecer dentro da janela, use <span class="ui">Abrir em nova aba</span>.</p>
+<h3>Quem consultou a ficha do meu cliente?</h3>
+<p>O administrador vê em <span class="ui">Anamnese</span> &rarr; <span class="ui">Auditoria</span>, filtrando pelo cliente.</p>
+
+<h2>Glossário</h2>
+<dl class="gloss">
+  <dt>Anamnese</dt><dd>Ficha com o histórico de saúde do cliente.</dd>
+  <dt>Modelo de ficha</dt><dd>Conjunto de perguntas criado pelo administrador.</dd>
+  <dt>Versão</dt><dd>Estado do modelo em um momento. Mudar as perguntas cria uma versão nova.</dd>
+  <dt>Ficha</dt><dd>Modelo respondido para um cliente. Uma por cliente e por modelo.</dd>
+  <dt>Registro inicial</dt><dd>As respostas da primeira consulta.</dd>
+  <dt>Acompanhamento</dt><dd>Anotação de um atendimento seguinte, com a evolução e, se for o caso, respostas atualizadas.</dd>
+  <dt>Situação atual</dt><dd>A resposta mais recente de cada pergunta da ficha.</dd>
+  <dt>Auditoria</dt><dd>Registro de quem consultou ou alterou os dados da anamnese.</dd>
+</dl>
+
+</body>
+</html>

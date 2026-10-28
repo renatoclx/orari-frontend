@@ -1,15 +1,20 @@
 // Gera manual-usuario.pdf: numera os capítulos, monta o sumário e imprime pelo
 // Chrome. Duas passadas: a primeira descobre em que página cada capítulo cai
 // (pdftotext), a segunda grava os números no sumário.
+//
+// Uso: `node build.mjs` gera o manual do administrador (manual.html →
+// manual-usuario.pdf); `node build.mjs manual-anamnese` gera manual-anamnese.pdf
+// a partir de manual-anamnese.html (o PDF leva o nome do HTML).
 import { execFileSync } from "node:child_process";
 import { readFileSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 
 const dir = dirname(fileURLToPath(import.meta.url));
-const src = readFileSync(join(dir, "manual.html"), "utf8");
-const tmp = join(dir, ".manual-build.html");
-const pdf = join(dir, "manual-usuario.pdf");
+const name = process.argv[2] ?? "manual";
+const src = readFileSync(join(dir, `${name}.html`), "utf8");
+const tmp = join(dir, name === "manual" ? ".manual-build.html" : `.manual-build-${name}.html`);
+const pdf = join(dir, name === "manual" ? "manual-usuario.pdf" : `${name}.pdf`);
 const chrome = process.env.CHROME ?? "google-chrome";
 
 // Capítulos: <h1 class="chapter" data-toc="Título"><span class="num"></span>
@@ -55,4 +60,4 @@ function chapterPages() {
 render();
 const { found, total } = chapterPages();
 render(found);
-console.log(`manual-usuario.pdf: ${total} páginas`, found);
+console.log(`${pdf.split("/").pop()}: ${total} páginas`, found);

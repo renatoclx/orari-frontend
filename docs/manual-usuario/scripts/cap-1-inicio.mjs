@@ -24,9 +24,8 @@ await click(`document.querySelector('button[aria-label="Abrir calendário"]')`);
 await shotEl("04-calendario", "[data-slot=popover-content]", 30);
 await closeDialogs();
 
-// recortes: menu lateral, atalhos da direita e legenda da agenda
+// recortes: menu lateral e atalhos da direita
 await go(`/?date=${DEMO.today}`, 3500);
 await shotEl("33-menu-lateral", "aside", 0);
 await shotEl("34-atalhos", 'aside[aria-label="Atalhos rápidos"]', 16);
-await shotEl("35-legenda", 'ul[aria-label="Legenda dos status"]', 14);
 done();

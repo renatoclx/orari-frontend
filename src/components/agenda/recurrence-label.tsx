@@ -8,6 +8,11 @@ export function recurrenceLabel(recurrence: Recurrence): string {
   return recurrence.clientPlanId ? "Sessão de pacote" : "Recorrente";
 }
 
+/** Nome curto da origem, para o bloco da agenda (que é estreito): "Pacote" ou "Recorrente". */
+export function recurrenceShortLabel(recurrence: Recurrence): string {
+  return recurrence.clientPlanId ? "Pacote" : "Recorrente";
+}
+
 /** Ícone da origem: pacote (o mesmo do menu "Pacotes") ou recorrência. */
 export function RecurrenceOriginIcon({
   recurrence,

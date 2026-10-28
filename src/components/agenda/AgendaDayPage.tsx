@@ -1,5 +1,4 @@
 import Link from "next/link";
-import { AgendaLegend } from "@/components/agenda/AgendaLegend";
 import { AgendaToolbar } from "@/components/agenda/AgendaToolbar";
 import { AgendaDayView } from "@/components/agenda/AgendaDayView";
 import { toAgendaAppointment } from "@/components/agenda/agenda-data";
@@ -120,8 +119,6 @@ export async function AgendaDayPage({ searchParams }: AgendaDayPageProps) {
             .map((client) => ({ id: client.id, name: client.name }))}
         />
       )}
-
-      <AgendaLegend />
     </div>
   );
 }

@@ -78,7 +78,7 @@ Página própria (`/recorrencias/nova`), não dialog.
 
 ## Impacto na tela de Agendamentos
 
-- Sessões de recorrência aparecem na agenda como os demais agendamentos, com um ícone no bloco, no cartão e nos detalhes: repetir para "Recorrente" e pacote para "Sessão de pacote". A legenda da agenda inclui os itens "Recorrente" e "Pacote".
+- Sessões de recorrência aparecem na agenda como os demais agendamentos, com um ícone no bloco, no cartão e nos detalhes: repetir para "Recorrente" e pacote para "Sessão de pacote". O bloco mostra o nome ("Recorrente" ou "Pacote") ao lado do ícone; o cartão do mouse e o detalhe também descrevem a origem por escrito.
 - No dialog de detalhes:
   - **Cancelar:** cancela a sessão pela rota da recorrência, com as mesmas condições (antes de iniciar).
   - **Remanejar:** abre o remanejamento da sessão (dentro do período da recorrência).

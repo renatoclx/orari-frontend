@@ -1,6 +1,7 @@
 import {
   RecurrenceOriginIcon,
   recurrenceLabel,
+  recurrenceShortLabel,
 } from "@/components/agenda/recurrence-label";
 import { CalendarClock, Clock, StickyNote, UserRound } from "lucide-react";
 import { APPOINTMENT_STATUS } from "@/components/agenda/appointment-status";
@@ -54,7 +55,7 @@ export function AppointmentBlock({
             }
           }}
           aria-label={`${appointment.start} ${appointment.clientName} ${appointment.serviceName}. Das ${appointment.start} às ${appointment.end}, com ${appointment.professionalName}. ${statusLabel}${appointment.overbooking ? ". Encaixe fora do horário de funcionamento" : ""}${appointment.recurrence ? `. ${recurrenceLabel(appointment.recurrence)}` : ""}`}
-          className={`absolute inset-x-1 z-[1] cursor-pointer overflow-hidden rounded-control border-l-[3px] px-2 py-1 ${
+          className={`absolute inset-x-1 z-[1] cursor-pointer overflow-hidden rounded-control border-l-[3px] py-1 pr-3 pl-2 ${
             faded ? "text-muted-foreground" : ""
           }`}
           style={{
@@ -82,26 +83,47 @@ export function AppointmentBlock({
               {appointment.clientName}
             </h3>
 
-            <StatusIcon
-              className={`ml-auto size-4 shrink-0 ${
-                status === "IN_PROGRESS" ? "motion-safe:animate-pulse" : ""
-              }`}
-              style={
-                status === "IN_PROGRESS" ? { color: serviceColor } : undefined
-              }
-              aria-hidden="true"
-            />
-          </div>
-          <p className="flex items-center gap-1 truncate text-xs text-muted-foreground">
-            {appointment.overbooking && (
-              <CalendarClock className="size-4 shrink-0" aria-hidden="true" />
-            )}
-            {/* Pacote ou recorrência: cada origem tem o seu ícone (ver a legenda). */}
-            {appointment.recurrence && (
-              <RecurrenceOriginIcon
-                recurrence={appointment.recurrence}
-                className="size-4 shrink-0"
+            {/* A situação por escrito (ícone e nome), sem depender de legenda: o
+                celular não tem espaço para ela. */}
+            <span className="ml-auto flex shrink-0 items-center gap-1 text-xs text-muted-foreground">
+              <StatusIcon
+                className={`size-4 shrink-0 ${
+                  status === "IN_PROGRESS" ? "motion-safe:animate-pulse" : ""
+                }`}
+                style={
+                  status === "IN_PROGRESS" ? { color: serviceColor } : undefined
+                }
+                aria-hidden="true"
               />
+              {statusLabel}
+            </span>
+          </div>
+          {/* Encaixe, recorrência e pacote: ícone e nome (um pouco mais encorpado),
+              um hífen e o serviço, que é quem encurta quando falta espaço. */}
+          <p className="flex items-center gap-x-1.5 text-xs text-muted-foreground">
+            {appointment.overbooking && (
+              <span className="flex shrink-0 items-center gap-1.5">
+                <span className="flex items-center gap-1 font-medium">
+                  <CalendarClock
+                    className="size-4 shrink-0"
+                    aria-hidden="true"
+                  />
+                  Encaixe
+                </span>
+                <span aria-hidden="true">-</span>
+              </span>
+            )}
+            {appointment.recurrence && (
+              <span className="flex shrink-0 items-center gap-1.5">
+                <span className="flex items-center gap-1 font-medium">
+                  <RecurrenceOriginIcon
+                    recurrence={appointment.recurrence}
+                    className="size-4 shrink-0"
+                  />
+                  {recurrenceShortLabel(appointment.recurrence)}
+                </span>
+                <span aria-hidden="true">-</span>
+              </span>
             )}
             <span className="truncate">{appointment.serviceName}</span>
           </p>

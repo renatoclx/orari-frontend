@@ -76,7 +76,7 @@ src/
                              (uma implementação, parametrizada por tipo);
                              history/ tem o histórico do cliente
     services/                tela de Serviços (listagem e dialog de formulário)
-    agenda/                  agenda do dia (grade, blocos, legenda, faixa)
+    agenda/                  agenda do dia (grade, blocos, faixa)
     recurrences/             recorrências (lista, cadastro, detalhes, sessões,
                              remanejar)
     plans/                   planos (lista, formulário, preços e validação)

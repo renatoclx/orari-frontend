@@ -19,7 +19,7 @@
   - Linha do horário atual, somente quando o dia exibido é hoje.
   - Áreas fora das janelas de atendimento (antes da abertura e depois do fechamento) sombreadas, com hachura.
   - O intervalo entre duas janelas de atendimento (almoço, por exemplo) em cinza, com a indicação "Intervalo". É apenas indicação visual: não tem regra própria.
-- Legenda dos ícones de status, do encaixe, da recorrência e do pacote no rodapé da página, alinhada à direita. Só do tablet em diante: no celular ela não aparece (truncava).
+- Sem legenda: a situação de cada agendamento vem **por escrito** no próprio bloco (ícone e nome, no canto direito). A legenda do rodapé saiu: no celular não havia espaço para ela, e o texto dispensa a consulta.
 
 ### Profissionais exibidos
 
@@ -42,8 +42,8 @@
 
 - Posicionado pelo horário de início e pela duração do serviço.
 - Cor do serviço na borda esquerda e como fundo suave. O encaixe usa o cinza exclusivo.
-- Exibe horário de início, nome do cliente e nome do serviço.
-- Cada status tem um ícone no canto do bloco:
+- Exibe horário de início, nome do cliente e nome do serviço. Antes do nome do serviço, quando houver, vêm o ícone e o nome da origem, em peso médio e separados do serviço por um hífen: **Encaixe**, **Recorrente** ou **Pacote** (ex.: "Pacote - Limpeza de Pele"). O serviço é quem encurta quando falta espaço; o cartão do mouse e o detalhe também descrevem a origem por escrito.
+- Cada status aparece no canto direito do bloco como **ícone e nome** (Agendado, Confirmado, Em andamento, Concluído, Cancelado, Não compareceu), no celular e no computador:
   - Agendado: relógio.
   - Confirmado: check em círculo.
   - Em andamento: play em círculo, pulsando, na cor do serviço.

@@ -152,7 +152,7 @@ Página própria (`/pacotes/contratacoes/nova`), em blocos na mesma tela.
 
 ## Impacto em outras telas
 
-- **Agendamentos:** a sessão de pacote tem o ícone de pacote (o mesmo do menu "Pacotes") no bloco, no cartão e no detalhe; a legenda tem o item "Pacote". No detalhe, **Ver sessões** (dialog de sessões) e **Ver contratação** (dialog com os dados, as agendas e as parcelas; de lá, "Ver sessões" troca para o dialog de sessões). O cancelamento da contratação fica só na página da contratação.
+- **Agendamentos:** a sessão de pacote tem o ícone de pacote (o mesmo do menu "Pacotes") no bloco (com o nome "Pacote"), no cartão e no detalhe ("Sessão de pacote"). No detalhe, **Ver sessões** (dialog de sessões) e **Ver contratação** (dialog com os dados, as agendas e as parcelas; de lá, "Ver sessões" troca para o dialog de sessões). O cancelamento da contratação fica só na página da contratação.
 - **Recorrências:** as recorrências de pacote aparecem na lista, sem "Cancelar recorrência"; os detalhes mostram a origem "Pacote" (encerrada pelo cancelamento da contratação).
 
 ---

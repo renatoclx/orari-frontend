@@ -55,7 +55,7 @@ export function AppointmentBlock({
             }
           }}
           aria-label={`${appointment.start} ${appointment.clientName} ${appointment.serviceName}. Das ${appointment.start} às ${appointment.end}, com ${appointment.professionalName}. ${statusLabel}${appointment.overbooking ? ". Encaixe fora do horário de funcionamento" : ""}${appointment.recurrence ? `. ${recurrenceLabel(appointment.recurrence)}` : ""}`}
-          className={`absolute inset-x-1 z-[1] cursor-pointer overflow-hidden rounded-control border-l-[3px] py-1 pr-3 pl-2 ${
+          className={`absolute inset-x-1 z-1 cursor-pointer overflow-hidden rounded-control border-l-[3px] py-1 pr-3 pl-2 ${
             faded ? "text-muted-foreground" : ""
           }`}
           style={{

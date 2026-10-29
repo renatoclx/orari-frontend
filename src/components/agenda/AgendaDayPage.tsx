@@ -113,6 +113,7 @@ export async function AgendaDayPage({ searchParams }: AgendaDayPageProps) {
               id: service.id,
               name: service.name,
               duration: service.duration,
+              allowsClasses: service.allowsClasses,
             }))}
           clients={clients.items
             .filter((client) => client.deletedAt === null)

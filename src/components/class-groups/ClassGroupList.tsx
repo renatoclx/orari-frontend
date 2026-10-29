@@ -7,11 +7,14 @@ import {
   EllipsisVertical,
   Eye,
   Pencil,
+  UserPlus,
   X,
 } from "lucide-react";
 import { toast } from "sonner";
 import { setClassGroupActiveAction } from "@/app/(admin)/class-group-actions";
+import type { ClientOption } from "@/app/(admin)/appointment-actions";
 import { ClassGroupEditDialog } from "@/components/class-groups/ClassGroupEditDialog";
+import { EnrollClassGroupDialog } from "@/components/class-groups/EnrollClassGroupDialog";
 import {
   classGroupLabel,
   describeClassDays,
@@ -47,6 +50,11 @@ type ClassGroupListProps = {
   filtered: boolean;
   /** Rodapé fixo do card (paginação). */
   footer: React.ReactNode;
+  /** Primeiros clientes, para o "Adicionar alunos". */
+  clients: ClientOption[];
+  /** Hoje e agora no fuso da empresa: o encaixe só vale para sessões futuras. */
+  today: string;
+  nowMinutes: number;
 };
 
 // Serviço com a bolinha da cor dele (a mesma do agendamento).
@@ -70,18 +78,21 @@ type RowHandlers = {
   onEdit: (classGroup: ClassGroupItem) => void;
   onDeactivate: (classGroup: ClassGroupItem) => void;
   onActivate: (classGroup: ClassGroupItem) => void;
+  onEnroll: (classGroup: ClassGroupItem) => void;
   /** Há uma ativação em andamento. */
   busy: boolean;
 };
 
-// Coluna Ações (screen-patterns.md): "Alterar" em destaque; Visualizar e
-// Inativar/Ativar no menu de três pontos. Sem Excluir: a turma é inativada.
+// Coluna Ações (screen-patterns.md): "Alterar" em destaque; Visualizar,
+// Adicionar alunos e Inativar/Ativar no menu de três pontos. Sem Excluir: a
+// turma é inativada.
 function ClassGroupActions({
   classGroup,
   onView,
   onEdit,
   onDeactivate,
   onActivate,
+  onEnroll,
   busy,
 }: { classGroup: ClassGroupItem } & RowHandlers) {
   const label = classGroupLabel(classGroup);
@@ -116,6 +127,13 @@ function ClassGroupActions({
             <Eye aria-hidden="true" />
             Visualizar
           </DropdownMenuItem>
+          {/* Turma inativa não recebe novos encaixes. */}
+          {classGroup.isActive && (
+            <DropdownMenuItem onSelect={() => onEnroll(classGroup)}>
+              <UserPlus aria-hidden="true" />
+              Adicionar alunos
+            </DropdownMenuItem>
+          )}
           {classGroup.isActive ? (
             <DropdownMenuItem onSelect={() => onDeactivate(classGroup)}>
               <Ban aria-hidden="true" />
@@ -183,6 +201,9 @@ export function ClassGroupList({
   classGroups,
   filtered,
   footer,
+  clients,
+  today,
+  nowMinutes,
 }: ClassGroupListProps) {
   // A turma fica guardada ao fechar, para o dialog não trocar de título durante
   // a animação de saída.
@@ -190,6 +211,7 @@ export function ClassGroupList({
   const [editOpen, setEditOpen] = useState(false);
   const [viewing, setViewing] = useState<ClassGroupItem | null>(null);
   const [deactivating, setDeactivating] = useState<ClassGroupItem | null>(null);
+  const [enrolling, setEnrolling] = useState<ClassGroupItem | null>(null);
   const [pending, startTransition] = useTransition();
   const [activating, startActivate] = useTransition();
 
@@ -238,6 +260,7 @@ export function ClassGroupList({
     onEdit: edit,
     onDeactivate: setDeactivating,
     onActivate: activate,
+    onEnroll: setEnrolling,
     busy: activating,
   };
 
@@ -308,6 +331,14 @@ export function ClassGroupList({
       ))}
       footer={footer}
     >
+      <EnrollClassGroupDialog
+        classGroup={enrolling}
+        clients={clients}
+        today={today}
+        nowMinutes={nowMinutes}
+        onClose={() => setEnrolling(null)}
+      />
+
       <ClassGroupEditDialog
         open={editOpen}
         onOpenChange={setEditOpen}

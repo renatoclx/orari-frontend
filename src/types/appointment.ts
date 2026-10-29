@@ -50,4 +50,14 @@ export type AppointmentItem = {
     status: "PENDING" | "PAID" | "CANCELLED";
     deletedAt: string | null;
   } | null;
+  /** Sessão de turma a que o agendamento pertence (nulo fora de turma). */
+  classSession: AppointmentClassSession | null;
+};
+
+/** A sessão de turma, como vem no agendamento. */
+export type AppointmentClassSession = {
+  id: string;
+  /** Turma fixa de origem (nulo na sessão avulsa, de agendamento que virou turma). */
+  classGroupId: string | null;
+  capacity: number;
 };

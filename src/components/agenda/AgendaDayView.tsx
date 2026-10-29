@@ -10,6 +10,9 @@ import { ClientPlanDialog } from "@/components/client-plans/ClientPlanDialog";
 import { canMarkNoShow } from "@/components/agenda/appointment-rules";
 import { AppointmentDetailsDialog } from "@/components/agenda/AppointmentDetailsDialog";
 import { AgendaToolbar } from "@/components/agenda/AgendaToolbar";
+import type { AgendaClassSession } from "@/components/agenda/class-session-blocks";
+import { ClassSessionDialog } from "@/components/agenda/ClassSessionDialog";
+import { ConvertToClassDialog } from "@/components/agenda/ConvertToClassDialog";
 import { DayGrid } from "@/components/agenda/DayGrid";
 import {
   NewAppointmentDialog,
@@ -89,6 +92,12 @@ export function AgendaDayView({
   );
   // Estável: o diálogo de remanejar o usa como dependência de um efeito.
   const closeReschedule = useCallback(() => setRescheduling(null), []);
+  // Sessão de turma aberta em diálogo (vagas e alunos).
+  const [classSession, setClassSession] = useState<AgendaClassSession | null>(
+    null,
+  );
+  // Agendamento que está virando turma (o diálogo pede as vagas).
+  const [converting, setConverting] = useState<AgendaAppointment | null>(null);
   const [editOpen, setEditOpen] = useState(false);
 
   // Padrão: todos os profissionais ativos; o filtro mostra só um.
@@ -155,6 +164,37 @@ export function AgendaDayView({
     return timeToMinutes(appointment.start) > nowMinutes;
   }
 
+  // Já começou (ou é de dia passado): não recebe alunos nem muda vagas.
+  function hasStarted(start: string): boolean {
+    if (date !== today) return date < today;
+    return timeToMinutes(start) <= nowMinutes;
+  }
+
+  // Vira turma: ainda não começou, serviço que aceita turma e fora de turma.
+  function canConvertToClass(appointment: AgendaAppointment): boolean {
+    return (
+      canCancel(appointment) &&
+      appointment.classSession === null &&
+      services.some(
+        (service) =>
+          service.id === appointment.serviceId && service.allowsClasses,
+      )
+    );
+  }
+
+  // O aluno da sessão abre o diálogo do agendamento dele (falta, cancelar).
+  function openParticipant(appointmentId: string) {
+    const appointment = grid.appointments.find(
+      (item) => item.id === appointmentId,
+    );
+    if (!appointment) {
+      toast.info("Atualize a agenda para ver este agendamento.");
+      return;
+    }
+    setClassSession(null);
+    setViewing(appointment);
+  }
+
   return (
     <>
       <AgendaToolbar
@@ -195,6 +235,7 @@ export function AgendaDayView({
           setCreating({ professionalId, time, overbooking: true })
         }
         onAppointmentSelect={setViewing}
+        onClassSessionSelect={setClassSession}
         now={date === today ? nowTime : null}
         pastMinutes={pastMinutes}
         {...grid}
@@ -235,6 +276,11 @@ export function AgendaDayView({
         canMarkNoShow={(appointment) =>
           canMarkNoShow(appointment, date, today, nowMinutes)
         }
+        canConvertToClass={canConvertToClass}
+        onConvertToClass={(appointment) => {
+          setViewing(null);
+          setConverting(appointment);
+        }}
         onEdit={(appointment) => {
           setViewing(null);
           setEditing(appointment);
@@ -253,6 +299,37 @@ export function AgendaDayView({
           setRescheduling(appointment);
         }}
         onOpenChange={(open) => !open && setViewing(null)}
+      />
+
+      <ClassSessionDialog
+        session={classSession}
+        started={classSession !== null && hasStarted(classSession.start)}
+        clients={clients}
+        onOpenAppointment={openParticipant}
+        onOpenChange={(open) => !open && setClassSession(null)}
+      />
+
+      <ConvertToClassDialog
+        appointment={converting}
+        onClose={() => setConverting(null)}
+        onConverted={(appointment, session) => {
+          setConverting(null);
+          // Abre a turma recém-criada, com o cliente do agendamento como aluno.
+          setClassSession({
+            id: session.id,
+            professionalId: appointment.professionalId,
+            classGroupId: null,
+            start: appointment.start,
+            end: appointment.end,
+            serviceName: appointment.serviceName,
+            serviceColor: appointment.serviceColor,
+            durationMinutes: appointment.durationMinutes,
+            professionalName: appointment.professionalName,
+            capacity: session.capacity,
+            occupied: session.occupied,
+            members: [appointment],
+          });
+        }}
       />
 
       <ClientPlanDialog

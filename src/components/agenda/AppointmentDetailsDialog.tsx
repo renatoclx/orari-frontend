@@ -11,6 +11,7 @@ import {
   StickyNote,
   UserRound,
   UserX,
+  UsersRound,
   Ban,
 } from "lucide-react";
 import Link from "next/link";
@@ -47,6 +48,13 @@ type AppointmentDetailsDialogProps = {
   canCancel: (appointment: AgendaAppointment) => boolean;
   /** Pode ter a falta marcada: já iniciou (ver `canMarkNoShow`). */
   canMarkNoShow: (appointment: AgendaAppointment) => boolean;
+  /**
+   * Pode virar turma: ainda não começou, é de serviço que aceita turma e não é
+   * de turma. Só a agenda oferece; nas outras telas fica de fora.
+   */
+  canConvertToClass?: (appointment: AgendaAppointment) => boolean;
+  /** Abre o "Transformar em turma" (pede as vagas). */
+  onConvertToClass?: (appointment: AgendaAppointment) => void;
   /** Abre o dialog de alteração do agendamento. */
   onEdit: (appointment: AgendaAppointment) => void;
   /** Abre o remanejamento (agendamento comum ou sessão de recorrência). */
@@ -66,6 +74,8 @@ export function AppointmentDetailsDialog({
   appointment,
   canCancel,
   canMarkNoShow,
+  canConvertToClass,
+  onConvertToClass,
   onEdit,
   onReschedule,
   onViewSessions,
@@ -94,6 +104,8 @@ export function AppointmentDetailsDialog({
             appointment={appointment}
             cancellable={canCancel(appointment)}
             markable={canMarkNoShow(appointment)}
+            convertible={canConvertToClass?.(appointment) ?? false}
+            onConvertToClass={() => onConvertToClass?.(appointment)}
             onEdit={() => onEdit(appointment)}
             onReschedule={() => onReschedule(appointment)}
             onViewSessions={() =>
@@ -116,6 +128,8 @@ function Details({
   appointment,
   cancellable,
   markable,
+  convertible,
+  onConvertToClass,
   onEdit,
   onReschedule,
   onViewSessions,
@@ -125,6 +139,8 @@ function Details({
   appointment: AgendaAppointment;
   cancellable: boolean;
   markable: boolean;
+  convertible: boolean;
+  onConvertToClass: () => void;
   onEdit: () => void;
   onReschedule: () => void;
   onViewSessions: () => void;
@@ -272,13 +288,29 @@ function Details({
             Cancelar
           </Button>
           {/* O cliente pode pedir outro dia em vez de cancelar. O encaixe tem
-              regras próprias de horário: é remanejado pelo "Alterar". */}
-          {!appointment.overbooking && (
+              regras próprias de horário: é remanejado pelo "Alterar". O aluno de
+              turma segue o horário da sessão: a API não o remaneja. */}
+          {!appointment.overbooking && !appointment.classSession && (
             <Button type="button" onClick={onReschedule}>
               <CalendarSync aria-hidden="true" />
               Remanejar
             </Button>
           )}
+        </div>
+      )}
+
+      {/* Serviço que aceita turma: o atendimento pode receber outros clientes. */}
+      {convertible && (
+        <div className="flex justify-center border-t border-border pt-4">
+          <Button
+            type="button"
+            variant="outline"
+            className="max-sm:w-full"
+            onClick={onConvertToClass}
+          >
+            <UsersRound aria-hidden="true" />
+            Transformar em turma
+          </Button>
         </div>
       )}
 

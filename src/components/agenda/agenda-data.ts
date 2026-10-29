@@ -41,5 +41,6 @@ export function toAgendaAppointment(
     status: item.status,
     recurrence: item.recurringAppointment,
     paid: item.payment?.status === "PAID" && item.payment.deletedAt === null,
+    classSession: item.classSession,
   };
 }

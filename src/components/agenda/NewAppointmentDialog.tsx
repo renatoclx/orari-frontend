@@ -46,6 +46,8 @@ export type AgendaServiceOption = {
   name: string;
   /** Em minutos. */
   duration: number;
+  /** Aceita turma: o agendamento pode virar turma (só a agenda usa). */
+  allowsClasses?: boolean;
 };
 
 /** Cliente como o formulário o oferece. */

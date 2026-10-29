@@ -1,6 +1,11 @@
 import { CalendarClock, ChevronsUpDown, Plus } from "lucide-react";
 import { Hint } from "@/components/shared/Hint";
 import { AppointmentBlock } from "@/components/agenda/AppointmentBlock";
+import { ClassSessionBlock } from "@/components/agenda/ClassSessionBlock";
+import {
+  splitClassSessions,
+  type AgendaClassSession,
+} from "@/components/agenda/class-session-blocks";
 import type { GridRange } from "@/components/agenda/agenda-range";
 import type {
   AgendaAppointment,
@@ -62,6 +67,8 @@ type DayGridProps = {
   onSlotOverbooking?: (professionalId: string, time: string) => void;
   /** Clique em um agendamento. */
   onAppointmentSelect?: (appointment: AgendaAppointment) => void;
+  /** Clique em uma sessão de turma (o bloco que junta os alunos). */
+  onClassSessionSelect?: (session: AgendaClassSession) => void;
 };
 
 /** Grade do dia: uma coluna por profissional, com expediente e agendamentos. */
@@ -80,6 +87,7 @@ export function DayGrid({
   onSlotPast,
   onSlotOverbooking,
   onAppointmentSelect,
+  onClassSessionSelect,
 }: DayGridProps) {
   // Colunas dos outros profissionais somem no celular, quando há um escolhido.
   const mobileHidden = (professionalId: string) =>
@@ -123,21 +131,29 @@ export function DayGrid({
   // aparecem. Um cancelado só aparece (esmaecido) se não ficar sobreposto a nada:
   // nem a um agendamento ativo que ocupou o horário liberado, nem a outro
   // cancelado já exibido (o horário pode ser liberado e reaproveitado várias vezes).
+  // Os alunos de uma turma viram um bloco só, por sessão (class-session-blocks).
+  const { singles, sessions } = splitClassSessions(appointments);
+
   function visibleAppointments(professionalId: string): AgendaAppointment[] {
-    const mine = appointments
+    const mine = singles
       .filter((appointment) => appointment.professionalId === professionalId)
       .sort((a, b) => timeToMinutes(a.start) - timeToMinutes(b.start));
 
-    const overlaps = (a: AgendaAppointment, b: AgendaAppointment) =>
+    const overlaps = (a: TimeRange, b: TimeRange) =>
       timeToMinutes(a.start) < timeToMinutes(b.end) &&
       timeToMinutes(a.end) > timeToMinutes(b.start);
 
+    // Uma sessão com aluno ocupando vaga também esconde o cancelado por baixo dela.
+    const busy: TimeRange[] = sessions.filter(
+      (session) =>
+        session.professionalId === professionalId && session.occupied > 0,
+    );
     const shown = mine.filter(
       (appointment) => appointment.status !== "CANCELLED",
     );
     for (const appointment of mine) {
       if (appointment.status !== "CANCELLED") continue;
-      if (!shown.some((other) => overlaps(other, appointment))) {
+      if (![...shown, ...busy].some((other) => overlaps(other, appointment))) {
         shown.push(appointment);
       }
     }
@@ -365,6 +381,18 @@ export function DayGrid({
                 height={toPixels(appointment.end) - toPixels(appointment.start)}
               />
             ))}
+
+            {sessions
+              .filter((session) => session.professionalId === professional.id)
+              .map((session) => (
+                <ClassSessionBlock
+                  key={session.id}
+                  session={session}
+                  onSelect={onClassSessionSelect}
+                  top={toPixels(session.start)}
+                  height={toPixels(session.end) - toPixels(session.start)}
+                />
+              ))}
 
             {showNow && (
               <div

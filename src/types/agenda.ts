@@ -1,4 +1,7 @@
-import type { AppointmentStatus } from "@/types/appointment";
+import type {
+  AppointmentClassSession,
+  AppointmentStatus,
+} from "@/types/appointment";
 
 /** Intervalo do dia, em "HH:mm". */
 export type TimeRange = {
@@ -40,4 +43,6 @@ export type AgendaAppointment = {
   recurrence: { id: string; clientPlanId: string | null } | null;
   /** O pagamento já foi recebido: a falta não se marca (não há reembolso). */
   paid: boolean;
+  /** Sessão de turma: os agendamentos dela aparecem num bloco só. */
+  classSession: AppointmentClassSession | null;
 };

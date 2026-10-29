@@ -11,6 +11,8 @@ export const ROUTES = [
   "/profissionais",
   "/usuarios",
   "/servicos",
+  "/turmas",
+  "/turmas/nova",
   "/pacotes/planos",
   "/pacotes/planos/novo",
   "/pacotes/contratacoes",

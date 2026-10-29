@@ -30,6 +30,7 @@
 - Preço
 - Duração
 - Cor (que será exibida no agendamento)
+- Aceita turma
 
 ### Regras específicas
 
@@ -42,6 +43,9 @@
   - Simplificar a escolha da cor com cores pré-definidas, com circulos, sem bordas.
 - A duração do serviço é informada em minutos.
 - O serviço será cadastrado sempre como ativo.
+- Aceita turma é opcional (desligado por padrão) e libera o serviço no cadastro de
+  turmas (`turmas.md`). Desmarcar com turma ativa é recusado pela API (a mensagem
+  aparece no toast).
 
 ---
 
@@ -66,6 +70,7 @@
   Descrição;
   Duração - Preço;
   Cor;
+  Aceita turma;
 
 ---
 

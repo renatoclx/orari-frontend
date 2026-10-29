@@ -10,6 +10,8 @@ export type ServiceItem = {
   duration: number;
   /** Cor hexadecimal exibida no agendamento (ex.: "#3BB2F6"). */
   color: string | null;
+  /** Aceita atendimento em turma (ver /turmas). */
+  allowsClasses: boolean;
   isActive: boolean;
   createdAt: string;
   updatedAt: string | null;
@@ -23,4 +25,5 @@ export type ServiceInput = {
   price: number | null;
   duration: number;
   color: string | null;
+  allowsClasses: boolean;
 };

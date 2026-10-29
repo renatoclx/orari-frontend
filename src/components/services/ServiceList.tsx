@@ -144,6 +144,7 @@ function ServiceDetails({ service }: { service: ServiceItem }) {
     ["Descrição", service.description],
     ["Preço", service.price && formatPrice(service.price)],
     ["Duração", formatDuration(service.duration)],
+    ["Aceita turma", service.allowsClasses ? "Sim" : "Não"],
     [
       "Cor",
       service.color && (

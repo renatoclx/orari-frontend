@@ -56,6 +56,8 @@ function parseForm(
       price: values.price ? Number(values.price) / 100 : null,
       duration: Number(values.duration),
       color: HEX_COLOR.test(color) ? color : null,
+      // O Switch só envia o campo quando está ligado ("on").
+      allowsClasses: data.get("allowsClasses") === "on",
     },
   };
 }
@@ -89,7 +91,15 @@ export async function updateServiceAction(
   try {
     await updateService(id, parsed.input);
   } catch (error) {
-    // O 409 é nome duplicado: aparece no campo.
+    // O 409 é nome duplicado (no campo) ou desmarcar "Aceita turma" com turma
+    // ativa (só no aviso): a mensagem da API diz qual.
+    if (
+      error instanceof ApiError &&
+      error.status === 409 &&
+      /turma/i.test(error.message)
+    ) {
+      return failureFrom(error);
+    }
     return failureFrom(error, "name" as const);
   }
 

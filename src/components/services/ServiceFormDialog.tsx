@@ -25,6 +25,8 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
 import type { ServiceItem } from "@/types/service";
 import { maskCurrency, maskMinutes } from "@/utils/masks";
@@ -218,6 +220,16 @@ function ServiceForm({
           initialValue={service?.color}
         />
       </FormField>
+
+      {/* Liga o serviço ao cadastro de turmas (vários clientes no mesmo horário). */}
+      <div className="flex items-center gap-2">
+        <Switch
+          id="service-allows-classes"
+          name="allowsClasses"
+          defaultChecked={service?.allowsClasses ?? false}
+        />
+        <Label htmlFor="service-allows-classes">Aceita turma</Label>
+      </div>
 
       <DialogFooter>
         <Button

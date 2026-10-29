@@ -13,6 +13,7 @@ import {
   PanelLeftOpen,
   Repeat,
   Users,
+  UsersRound,
   Wallet,
   X,
   type LucideIcon,
@@ -108,6 +109,13 @@ const anamnesisGroup: NavGroup = {
   ],
 };
 const clientRecordsLink: NavLink = { ...clientRecordsChild, icon: FileHeart };
+
+// Turmas (screens/turmas.md): só o ADMIN cadastra; o item entra logo depois de Serviços.
+const classGroupsLink: NavLink = {
+  href: "/turmas",
+  label: "Turmas",
+  icon: UsersRound,
+};
 
 // Só o SUPER_ADMIN gerencia empresas (screens/empresas.md): o item entra no fim do
 // menu e some para os demais perfis.
@@ -265,8 +273,13 @@ function SidebarNav({
   onNavigate,
 }: SidebarNavProps) {
   const pathname = usePathname();
+  const services = navItems.findIndex(
+    (entry) => "href" in entry && entry.href === "/servicos",
+  );
   const items = [
-    ...navItems,
+    ...navItems.slice(0, services + 1),
+    ...(isAdmin ? [classGroupsLink] : []),
+    ...navItems.slice(services + 1),
     ...(isAdmin
       ? [anamnesisGroup]
       : canAccessAnamnesis

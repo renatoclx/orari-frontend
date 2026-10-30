@@ -1,52 +1,26 @@
 import { describe, expect, it } from "vitest";
 import {
   capacityShortage,
-  enrollInOrder,
   studentsLabel,
+  withRefusals,
 } from "@/components/class-groups/enroll-students";
-import type { ClassSessionItem } from "@/types/class-group";
 
-const students = [
-  { id: "a", name: "Ana" },
-  { id: "b", name: "Bruno" },
-  { id: "c", name: "Carla" },
-];
-
-// Só o que o teste confere: as vagas ocupadas.
-const session = (occupied: number) => ({ occupied }) as ClassSessionItem;
-
-describe("enrollInOrder", () => {
-  it("encaixa na ordem da lista, um de cada vez", async () => {
-    const calls: string[] = [];
-    const outcome = await enrollInOrder(students, async (clientId) => {
-      calls.push(clientId);
-      return { ok: true, session: session(calls.length) };
-    });
-    expect(calls).toEqual(["a", "b", "c"]);
-    expect(outcome).toEqual({ added: 3, failed: [], session: session(3) });
-  });
-
-  it("segue depois de uma recusa e guarda o motivo de quem não entrou", async () => {
-    const outcome = await enrollInOrder(students, async (clientId) =>
-      clientId === "b"
-        ? { ok: false, message: "Já está na sessão." }
-        : { ok: true, session: session(clientId === "a" ? 1 : 2) },
-    );
-    expect(outcome.added).toBe(2);
-    expect(outcome.failed).toEqual([
-      { id: "b", name: "Bruno", error: "Já está na sessão." },
+describe("withRefusals", () => {
+  it("põe o motivo em quem foi recusado e limpa os demais", () => {
+    const listed = [
+      { id: "a", name: "Ana", error: "motivo antigo" },
+      { id: "b", name: "Bruno" },
+      { id: "c", name: "Carla" },
+    ];
+    expect(
+      withRefusals(listed, [
+        { clientId: "b", message: "O cliente já está nesta sessão" },
+      ]),
+    ).toEqual([
+      { id: "a", name: "Ana", error: undefined },
+      { id: "b", name: "Bruno", error: "O cliente já está nesta sessão" },
+      { id: "c", name: "Carla", error: undefined },
     ]);
-    expect(outcome.session).toEqual(session(2));
-  });
-
-  it("sem nenhum encaixe, não há sessão", async () => {
-    const outcome = await enrollInOrder(students, async () => ({
-      ok: false,
-      message: "A sessão está cheia.",
-    }));
-    expect(outcome.added).toBe(0);
-    expect(outcome.failed).toHaveLength(3);
-    expect(outcome.session).toBeUndefined();
   });
 });
 

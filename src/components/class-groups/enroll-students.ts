@@ -1,36 +1,19 @@
-import type { ClassSessionResult } from "@/app/(admin)/class-session-actions";
+import type { EnrollRefusal } from "@/app/(admin)/class-session-actions";
 import type { PickedStudent } from "@/components/class-groups/StudentPicker";
-import type { ClassSessionItem } from "@/types/class-group";
-
-export type EnrollOutcome = {
-  /** Quantos entraram. */
-  added: number;
-  /** Quem não entrou, cada um com o motivo. */
-  failed: PickedStudent[];
-  /** A sessão depois do último encaixe que deu certo. */
-  session?: ClassSessionItem;
-};
 
 /**
- * Encaixa os alunos um de cada vez, na ordem da lista. Em sequência (e não em
- * paralelo) porque cada encaixe pega a trava de vagas da sessão: com pouca
- * vaga, os primeiros da lista é que entram, de forma previsível.
+ * Encaixe em lote recusado (tudo ou nada): cada aluno da lista recebe o motivo
+ * da recusa dele, ou fica sem motivo se não foi ele o recusado. A lista se
+ * mantém, para o usuário tirar quem foi recusado e tentar de novo.
  */
-export async function enrollInOrder(
+export function withRefusals(
   students: PickedStudent[],
-  enroll: (clientId: string) => Promise<ClassSessionResult>,
-): Promise<EnrollOutcome> {
-  const outcome: EnrollOutcome = { added: 0, failed: [] };
-  for (const student of students) {
-    const result = await enroll(student.id);
-    if (result.ok) {
-      outcome.added += 1;
-      outcome.session = result.session;
-    } else {
-      outcome.failed.push({ ...student, error: result.message });
-    }
-  }
-  return outcome;
+  refusals: EnrollRefusal[],
+): PickedStudent[] {
+  return students.map((student) => ({
+    ...student,
+    error: refusals.find((refusal) => refusal.clientId === student.id)?.message,
+  }));
 }
 
 /** "1 aluno" ou "3 alunos". */

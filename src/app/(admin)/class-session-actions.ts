@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { capacityError } from "@/components/class-groups/class-group-rules";
 import { failureFrom, type ActionFailure } from "@/lib/action-result";
+import type { ApiError } from "@/services/api";
 import { isUuid } from "@/lib/uuid";
 import { getCurrentUser } from "@/services/auth.service";
 import {
@@ -80,44 +81,61 @@ export async function updateClassSessionCapacityAction(
   return run([id], () => updateClassSessionCapacity(id, capacity));
 }
 
-/** Encaixe do cliente numa sessão que já existe; devolve a sessão atualizada. */
+/** Recusa de um cliente no encaixe em lote, com o motivo. */
+export type EnrollRefusal = { clientId: string; message: string };
+
+export type EnrollResult =
+  | { ok: true; session: ClassSessionItem }
+  | (ActionFailure & { refusals?: EnrollRefusal[] });
+
+// Encaixe em lote: ou todos entram, ou a falha traz o motivo de cada recusado.
+async function enroll(
+  ids: string[],
+  call: () => Promise<ClassSessionItem>,
+): Promise<EnrollResult> {
+  if (!ids.every(isUuid)) return { ok: false, message: "Dados inválidos." };
+  try {
+    const session = await call();
+    revalidateClassScreens();
+    return { ok: true, session };
+  } catch (error) {
+    const failure = failureFrom(error);
+    const errors = (error as ApiError).body as { errors?: unknown } | undefined;
+    return Array.isArray(errors?.errors)
+      ? { ...failure, refusals: errors.errors as EnrollRefusal[] }
+      : failure;
+  }
+}
+
+/** Encaixe dos clientes numa sessão que já existe (tudo ou nada). */
 export async function enrollInClassSessionAction(
   id: string,
-  clientId: string,
-): Promise<ClassSessionResult> {
-  return run([id, clientId], async () => {
-    await enrollInClassSession(id, clientId);
-    return getClassSession(id);
-  });
+  clientIds: string[],
+): Promise<EnrollResult> {
+  return enroll([id, ...clientIds], () => enrollInClassSession(id, clientIds));
 }
 
 /**
  * Encaixe na turma fixa, num dia ("aaaa-mm-dd") e horário ("HH:mm") da turma,
- * no fuso da empresa. A API confere se o horário é mesmo da turma.
+ * no fuso da empresa (tudo ou nada). A API confere se o horário é da turma.
  */
 export async function enrollInClassGroupAction(
   classGroupId: string,
-  clientId: string,
+  clientIds: string[],
   date: string,
   time: string,
-): Promise<ClassSessionResult> {
+): Promise<EnrollResult> {
   if (!isDateString(date) || !/^\d{2}:\d{2}$/.test(time)) {
     return { ok: false, message: "Escolha a data da sessão." };
   }
-  return run([classGroupId, clientId], async () => {
+  return enroll([classGroupId, ...clientIds], async () => {
     const { company } = await getCurrentUser();
     // Meia-noite do dia no fuso da empresa + o horário da turma.
     const startAt = new Date(
       dayBounds(date, company.timezone).from.getTime() +
         timeToMinutes(time) * 60_000,
     );
-    // A API devolve o agendamento do aluno; a tela mostra as vagas da sessão.
-    const appointment = await enrollInClassGroup(
-      classGroupId,
-      clientId,
-      startAt.toISOString(),
-    );
-    return getClassSession(appointment.classSession!.id);
+    return enrollInClassGroup(classGroupId, clientIds, startAt.toISOString());
   });
 }
 

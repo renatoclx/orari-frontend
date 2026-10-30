@@ -66,6 +66,8 @@ Página, e não dialog: a lista de horários cresce (até 21).
 
 - Dialog com serviço, duração, profissional, vagas por sessão, os horários com
   início e fim ("Terça-feira, 17:00–17:50") e o status.
+- **Alunos fixos:** quem tem recorrência ou plano ativo na turma, com a origem
+  (Recorrência ou o plano) e os dias; o aluno avulso aparece só nas sessões.
 - **Próximas sessões** (4 semanas): data, "X de Y vagas" (ou "Cancelada") e os
   alunos de cada uma ("Sem alunos" no horário ainda sem sessão), com rolagem
   própria.
@@ -80,12 +82,12 @@ Página, e não dialog: a lista de horários cresce (até 21).
 - Antes de encaixar, a lista é conferida com as vagas livres da data: sem vaga para
   todos, ninguém entra e o aviso pede para tirar alunos.
 - Cada aluno ganha um agendamento avulso. A sessão do dia é criada no primeiro
-  encaixe. Os encaixes são feitos um a um; quem a API recusar fica na lista com o
-  motivo. O mesmo encaixe pode ser feito pela agenda, no bloco da turma.
+  encaixe. O encaixe é tudo ou nada: se a API recusar algum aluno (já está na
+  sessão, agenda ocupada), ninguém entra e cada recusado mostra o motivo no nome.
+  O mesmo encaixe pode ser feito pela agenda, no bloco da turma.
 
 ---
 
 ## Pendências
 
-- Encaixe em lote, tudo ou nada (depende do backend).
-- Alunos fixos (recorrência e plano) na Visualização (depende do backend).
+- Nenhuma.

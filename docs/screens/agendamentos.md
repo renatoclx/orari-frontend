@@ -124,7 +124,7 @@ Regras em `../../backend/docs/turmas.md`. Cada aluno tem o próprio agendamento;
 - **Sessão cancelada:** esmaecida, com o serviço riscado e "Sessão cancelada" na segunda linha; o cartão e o dialog mostram o motivo.
 - **Dialog da sessão** (clique no bloco): horário, profissional, "X de Y vagas ocupadas" com **Alterar vagas** (`Pencil`; só com a sessão criada, nunca abaixo do número de alunos) e a lista de alunos; cada aluno abre o detalhe do agendamento dele (cancelar, falta).
 - **Adicionar alunos:** busca de clientes com lista dos escolhidos (cada um com X para tirar); quem já está na sessão não aparece. Antes de encaixar, a lista é conferida com as vagas livres: sem vaga para todos, ninguém entra e o aviso pede para tirar alunos ou aumentar as vagas. No horário sem sessão, o primeiro encaixe cria a sessão.
-- Os encaixes são feitos um a um; se a API recusar algum (ex.: cliente já tem outro horário), ele fica na lista com o motivo e os demais entram.
+- O encaixe é tudo ou nada: se a API recusar algum aluno (já está na sessão, agenda ocupada), ninguém entra e cada recusado mostra o motivo no nome.
 - Sessão já iniciada ou cancelada não recebe alunos nem muda vagas; sessão lotada pede para aumentar as vagas.
 - **Cancelar sessão** (`Ban`, só com a sessão criada e antes do início; ex.: feriado): confirmação com motivo opcional. As aulas de todos os alunos são canceladas, com os pagamentos pendentes; a sessão de plano poderá ser reposta. Não se desfaz.
 

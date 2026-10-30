@@ -14,6 +14,7 @@ import { toast } from "sonner";
 import { setClassGroupActiveAction } from "@/app/(admin)/class-group-actions";
 import type { ClientOption } from "@/app/(admin)/appointment-actions";
 import { ClassGroupEditDialog } from "@/components/class-groups/ClassGroupEditDialog";
+import { ClassGroupMembersList } from "@/components/class-groups/ClassGroupMembersList";
 import { EnrollClassGroupDialog } from "@/components/class-groups/EnrollClassGroupDialog";
 import { UpcomingSessionsList } from "@/components/class-groups/UpcomingSessionsList";
 import {
@@ -166,7 +167,7 @@ function ClassGroupDetails({ classGroup }: { classGroup: ClassGroupItem }) {
       <DialogHeader>
         <DialogTitle>{classGroupLabel(classGroup)}</DialogTitle>
         <DialogDescription>
-          Dados da turma e as próximas sessões.
+          Dados da turma, alunos fixos e próximas sessões.
         </DialogDescription>
       </DialogHeader>
 
@@ -193,7 +194,13 @@ function ClassGroupDetails({ classGroup }: { classGroup: ClassGroupItem }) {
         </dd>
       </dl>
 
-      <section className="space-y-2 border-t border-border pt-4">
+      {/* min-w-0: no grid do diálogo, o nome longo (truncate) não alarga a coluna. */}
+      <section className="min-w-0 space-y-2 border-t border-border pt-4">
+        <h3 className="text-sm font-medium">Alunos fixos</h3>
+        <ClassGroupMembersList classGroupId={classGroup.id} />
+      </section>
+
+      <section className="min-w-0 space-y-2 border-t border-border pt-4">
         <h3 className="text-sm font-medium">Próximas sessões</h3>
         <UpcomingSessionsList classGroupId={classGroup.id} />
       </section>
@@ -350,7 +357,8 @@ export function ClassGroupList({
         open={viewing !== null}
         onOpenChange={(open) => !open && setViewing(null)}
       >
-        <DialogContent>
+        {/* Dados, alunos fixos e sessões: em tela baixa, o diálogo rola. */}
+        <DialogContent className="max-h-[90dvh] overflow-y-auto">
           {viewing && <ClassGroupDetails classGroup={viewing} />}
           <DialogFooter>
             <Button variant="outline" onClick={() => setViewing(null)}>

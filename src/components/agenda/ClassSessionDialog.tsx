@@ -35,8 +35,8 @@ import {
 } from "@/components/class-groups/class-group-rules";
 import {
   capacityShortage,
-  enrollInOrder,
   studentsLabel,
+  withRefusals,
 } from "@/components/class-groups/enroll-students";
 import {
   StudentPicker,
@@ -195,41 +195,35 @@ function SessionDetails({
     const shortage = capacityShortage(view.available, students.length);
     setStudentsMessage(shortage);
     if (shortage) return;
-    // Com sessão, encaixa nela; sem sessão, pela turma (a API cria a sessão no
-    // primeiro encaixe e usa a mesma nos seguintes).
+    // Com sessão, encaixa nela; sem sessão, pela turma (a API cria a sessão).
     const sessionId = data?.id ?? session.id;
-    const classGroupId = session.classGroupId;
-    const enrollOne = (clientId: string) =>
-      sessionId
-        ? enrollInClassSessionAction(sessionId, clientId)
-        : enrollInClassGroupAction(
-            classGroupId!,
-            clientId,
+    const clientIds = students.map((student) => student.id);
+    startTransition(async () => {
+      const result = sessionId
+        ? await enrollInClassSessionAction(sessionId, clientIds)
+        : await enrollInClassGroupAction(
+            session.classGroupId!,
+            clientIds,
             date,
             session.start,
           );
-    startTransition(async () => {
-      const {
-        added,
-        failed,
-        session: updated,
-      } = await enrollInOrder(students, enrollOne);
-      if (added > 0 && updated) {
-        setData(updated);
+      if (result.ok) {
+        setData(result.session);
+        setStudents([]);
         toast.success(
-          added === 1
+          students.length === 1
             ? "Aluno adicionado à turma."
-            : `${studentsLabel(added)} adicionados à turma.`,
+            : `${studentsLabel(students.length)} adicionados à turma.`,
         );
+        return;
       }
-      // Ficam na lista só os que não entraram, com o motivo (ex.: sessão lotada).
-      setStudents(failed);
-      if (failed.length > 0) {
-        toast.error(
-          `Não foi possível adicionar ${studentsLabel(failed.length)}.`,
-          { description: "O motivo está ao lado de cada nome." },
-        );
-      }
+      // Tudo ou nada: ninguém entrou. Cada recusado mostra o motivo no nome.
+      if (result.refusals) setStudents(withRefusals(students, result.refusals));
+      toast.error("Nenhum aluno foi adicionado.", {
+        description: result.refusals
+          ? "Tire ou troque quem foi recusado e tente de novo."
+          : result.message,
+      });
     });
   }
 

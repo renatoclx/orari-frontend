@@ -1,7 +1,6 @@
 import "server-only";
 
 import { apiFetch } from "@/services/api";
-import type { AppointmentItem } from "@/types/appointment";
 import type {
   ClassSessionAgendaItem,
   ClassSessionItem,
@@ -39,31 +38,34 @@ export function updateClassSessionCapacity(
   });
 }
 
-/** Encaixa o cliente numa sessão existente; devolve o agendamento criado para ele. */
+/**
+ * Encaixa os clientes numa sessão existente, tudo ou nada: se algum for
+ * recusado ou faltar vaga, ninguém entra (409). Devolve a sessão atualizada.
+ */
 export function enrollInClassSession(
   id: string,
-  clientId: string,
-): Promise<AppointmentItem> {
-  return apiFetch<AppointmentItem>(`/class-sessions/${id}/participants`, {
+  clientIds: string[],
+): Promise<ClassSessionItem> {
+  return apiFetch<ClassSessionItem>(`/class-sessions/${id}/participants`, {
     method: "POST",
-    body: JSON.stringify({ clientId }),
+    body: JSON.stringify({ clientIds }),
   });
 }
 
 /**
- * Encaixe na turma fixa: o início escolhe a sessão, criada no primeiro
- * encaixe daquele dia e horário. Devolve o agendamento criado para o aluno.
+ * Encaixe na turma fixa, tudo ou nada: o início escolhe a sessão, criada no
+ * primeiro encaixe daquele dia e horário. Devolve a sessão atualizada.
  */
 export function enrollInClassGroup(
   classGroupId: string,
-  clientId: string,
+  clientIds: string[],
   startAt: string,
-): Promise<AppointmentItem> {
-  return apiFetch<AppointmentItem>(
+): Promise<ClassSessionItem> {
+  return apiFetch<ClassSessionItem>(
     `/class-groups/${classGroupId}/participants`,
     {
       method: "POST",
-      body: JSON.stringify({ clientId, startAt }),
+      body: JSON.stringify({ clientIds, startAt }),
     },
   );
 }

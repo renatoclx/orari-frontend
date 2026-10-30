@@ -12,8 +12,8 @@ import { classGroupLabel } from "@/components/class-groups/class-group-rules";
 import { shortDayLabel } from "@/components/recurrences/recurrence-schedule";
 import {
   capacityShortage,
-  enrollInOrder,
   studentsLabel,
+  withRefusals,
 } from "@/components/class-groups/enroll-students";
 import {
   StudentPicker,
@@ -137,47 +137,31 @@ function EnrollForm({
 
     const { date, time } = selected;
     startTransition(async () => {
-      const { added, failed, session } = await enrollInOrder(
-        students,
-        (clientId) =>
-          enrollInClassGroupAction(classGroup.id, clientId, date, time),
+      const result = await enrollInClassGroupAction(
+        classGroup.id,
+        students.map((student) => student.id),
+        date,
+        time,
       );
-      if (added > 0 && session) {
+      if (result.ok) {
         toast.success(
-          added === 1
+          students.length === 1
             ? "Aluno adicionado à turma."
-            : `${studentsLabel(added)} adicionados à turma.`,
+            : `${studentsLabel(students.length)} adicionados à turma.`,
           {
-            description: `${shortDayLabel(date)} às ${time} (${session.occupied} de ${session.capacity} vagas)`,
+            description: `${shortDayLabel(date)} às ${time} (${result.session.occupied} de ${result.session.capacity} vagas)`,
           },
         );
-      }
-      if (failed.length === 0) {
         onClose();
         return;
       }
-      // Ficam na lista só os que não entraram, com o motivo; as vagas da data
-      // são atualizadas com o que entrou.
-      setStudents(failed);
-      if (session) {
-        setSessions((current) =>
-          (current ?? []).map((item) =>
-            slotKey(item) === slot
-              ? {
-                  ...item,
-                  occupied: session.occupied,
-                  available: session.available,
-                }
-              : item,
-          ),
-        );
-      }
-      toast.error(
-        `Não foi possível adicionar ${studentsLabel(failed.length)}.`,
-        {
-          description: "O motivo está ao lado de cada nome.",
-        },
-      );
+      // Tudo ou nada: ninguém entrou. Cada recusado mostra o motivo no nome.
+      if (result.refusals) setStudents(withRefusals(students, result.refusals));
+      toast.error("Nenhum aluno foi adicionado.", {
+        description: result.refusals
+          ? "Tire ou troque quem foi recusado e tente de novo."
+          : result.message,
+      });
     });
   }
 

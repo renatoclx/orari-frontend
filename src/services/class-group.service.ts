@@ -4,6 +4,7 @@ import { apiFetch } from "@/services/api";
 import type { Paginated } from "@/types/api";
 import type {
   ClassGroupInput,
+  ClassGroupMember,
   ClassGroupItem,
   ClassGroupUpdate,
 } from "@/types/class-group";
@@ -58,4 +59,9 @@ export function updateClassGroup(
     method: "PATCH",
     body: JSON.stringify(input),
   });
+}
+
+/** Alunos fixos da turma: recorrências e planos ativos nela, sem saída. */
+export function listClassGroupMembers(id: string): Promise<ClassGroupMember[]> {
+  return apiFetch<ClassGroupMember[]>(`/class-groups/${id}/members`);
 }

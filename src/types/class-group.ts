@@ -105,3 +105,18 @@ export type UpcomingClassSession = {
   /** Nome dos alunos que ocupam vaga, em ordem alfabética. */
   students: string[];
 };
+
+/**
+ * Aluno fixo da turma (GET /class-groups/:id/members): uma recorrência ativa,
+ * avulsa ou de plano, encaixada na turma e sem saída. Um cliente pode aparecer
+ * duas vezes (ex.: recorrência e plano em dias diferentes).
+ */
+export type ClassGroupMember = {
+  recurringAppointmentId: string;
+  client: { id: string; name: string; photoUrl: string | null };
+  origin: "RECURRENCE" | "PLAN";
+  /** A contratação, quando a vaga fixa é de um plano. */
+  clientPlan: { id: string; planName: string } | null;
+  /** Os horários da turma em que o aluno está. */
+  days: { weekDay: WeekDay; startTime: string }[];
+};

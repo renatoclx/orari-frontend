@@ -13,10 +13,15 @@ import { isUuid } from "@/lib/uuid";
 import { getCurrentUser } from "@/services/auth.service";
 import {
   createClassGroup,
+  listClassGroupMembers,
   listClassGroups,
   updateClassGroup,
 } from "@/services/class-group.service";
-import type { ClassGroupInput, ClassGroupItem } from "@/types/class-group";
+import type {
+  ClassGroupInput,
+  ClassGroupItem,
+  ClassGroupMember,
+} from "@/types/class-group";
 
 export type ClassGroupActionResult = { ok: true } | ActionFailure;
 
@@ -128,6 +133,21 @@ export async function listServiceClassGroupsAction(
       limit: 100,
     });
     return { ok: true, canManage: true, classGroups: result.items };
+  } catch (error) {
+    return failureFrom(error);
+  }
+}
+
+export type ClassGroupMembersResult =
+  { ok: true; members: ClassGroupMember[] } | ActionFailure;
+
+/** Alunos fixos da turma, para a Visualização. */
+export async function listClassGroupMembersAction(
+  id: string,
+): Promise<ClassGroupMembersResult> {
+  if (!isUuid(id)) return { ok: false, message: "Dados inválidos." };
+  try {
+    return { ok: true, members: await listClassGroupMembers(id) };
   } catch (error) {
     return failureFrom(error);
   }

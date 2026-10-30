@@ -11,6 +11,8 @@ export class ApiError extends Error {
   constructor(
     public readonly status: number,
     message: string,
+    /** Corpo da resposta de erro, para quem precisa de mais que a mensagem (ex.: recusas por cliente). */
+    public readonly body?: unknown,
   ) {
     super(message);
     this.name = "ApiError";
@@ -93,7 +95,7 @@ export async function apiFetch<T>(
   }
 
   if (!response.ok) {
-    throw new ApiError(response.status, errorMessage(body));
+    throw new ApiError(response.status, errorMessage(body), body);
   }
 
   return body as T;

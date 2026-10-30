@@ -31,6 +31,7 @@ diferente. Em caso de conflito, prevalece o arquivo da tela.
 | [empresas.md](empresas.md)                   | Empresas (só SUPER_ADMIN)                               |
 | [anamnese.md](anamnese.md)                   | Anamnese: modelos, fichas, PDF e auditoria              |
 | [turmas.md](turmas.md)                       | Turmas fixas (só ADMIN)                                 |
+| [ajuda.md](ajuda.md)                         | Ajuda: manuais em PDF (só ADMIN)                        |
 
 ## Convenções
 

@@ -6,6 +6,7 @@ import {
   Building2,
   CalendarDays,
   ChevronDown,
+  CircleHelp,
   ClipboardList,
   FileHeart,
   Package,
@@ -115,6 +116,14 @@ const classGroupsLink: NavLink = {
   href: "/turmas",
   label: "Turmas",
   icon: UsersRound,
+};
+
+// Ajuda (screens/ajuda.md): os manuais em PDF. Por enquanto só para o ADMIN;
+// o item fica no fim do menu.
+const helpLink: NavLink = {
+  href: "/ajuda",
+  label: "Ajuda",
+  icon: CircleHelp,
 };
 
 // Só o SUPER_ADMIN gerencia empresas (screens/empresas.md): o item entra no fim do
@@ -285,6 +294,7 @@ function SidebarNav({
       : canAccessAnamnesis
         ? [clientRecordsLink]
         : []),
+    ...(isAdmin ? [helpLink] : []),
     ...(isSuperAdmin ? superAdminItems : []),
   ];
 

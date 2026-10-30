@@ -26,6 +26,7 @@ export const ROUTES = [
   "/anamnese/modelos/novo",
   "/anamnese/auditoria",
   "/configuracoes",
+  "/ajuda",
 ];
 
 // Botões que abrem um diálogo, por tela.

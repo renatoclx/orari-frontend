@@ -44,6 +44,20 @@ const securityHeaders = [
   },
 ];
 
+const manualHeaders = securityHeaders.map((header) =>
+  header.key === "X-Frame-Options"
+    ? { key: header.key, value: "SAMEORIGIN" }
+    : header.key.startsWith("Content-Security-Policy")
+      ? {
+          key: header.key,
+          value: header.value.replace(
+            "frame-ancestors 'none'",
+            "frame-ancestors 'self'",
+          ),
+        }
+      : header,
+);
+
 const nextConfig: NextConfig = {
   // Gera .next/standalone: só os arquivos que o servidor usa, sem o
   // node_modules inteiro. É o que a imagem Docker copia (ver Dockerfile).
@@ -57,7 +71,12 @@ const nextConfig: NextConfig = {
     },
   },
   async headers() {
-    return [{ source: "/:path*", headers: securityHeaders }];
+    return [
+      { source: "/((?!manuais/).*)", headers: securityHeaders },
+      // Os manuais em PDF (tela Ajuda) aparecem num iframe do próprio site: só
+      // eles podem ser embutidos, e só pelo mesmo endereço.
+      { source: "/manuais/:path*", headers: manualHeaders },
+    ];
   },
   async rewrites() {
     // Lido na construção (`next build`) e gravado no resultado: mudar a API_URL

@@ -12,5 +12,8 @@ com capturas de tela de uma clínica fictícia ("Clínica Bem-Estar").
 3. Chrome com depuração remota: `google-chrome --headless=new --remote-debugging-port=9333`.
 4. Capturas: `node scripts/cap-1-inicio.mjs` … `cap-5-financeiro.mjs` (gravam em `images/`).
 5. PDF: `node build.mjs` (precisa de `google-chrome`, `pdftotext` e `pdfinfo`).
+6. Manual de Turmas (`manual-turmas.pdf`): usa o "Studio Aurora" (login em
+   `scripts/demo-config.mjs`, `AURORA`). Capturas com `node scripts/cap-7-turmas.mjs`
+   (só abre telas; não grava nada) e PDF com `node build.mjs manual-turmas`.
 
 O sumário é numerado pelo `build.mjs` em duas passadas. Textos: `manual.html`.

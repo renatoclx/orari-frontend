@@ -1,0 +1,247 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<title>Manual de Turmas — Orari</title>
+<link rel="stylesheet" href="manual.css">
+<style>
+  /* Cabeçalho das páginas: o manual.css traz o do manual do administrador. */
+  @page { @top-left { content: "Orari · Manual de Turmas"; } }
+</style>
+</head>
+<body>
+
+<!-- ===== Capa ===== -->
+<section class="cover">
+  <img class="logo" src="assets/logo-white.svg" alt="Orari">
+  <div class="spacer"></div>
+  <div class="bar"></div>
+  <div class="kicker">Manual de Turmas</div>
+  <h1>Atenda vários clientes no mesmo horário, com controle de vagas</h1>
+  <p>Guia passo a passo para o administrador: cadastrar turmas, encaixar alunos, acompanhar as vagas na agenda, cancelar aulas e cuidar das reposições.</p>
+  <div class="foot">As telas deste manual usam dados fictícios do “Studio Aurora”.</div>
+</section>
+
+<!-- ===== Sumário (os números de página são preenchidos pelo build) ===== -->
+<section class="toc">
+  <h2>Sumário</h2>
+  <ol id="toc"></ol>
+  <div class="intro">
+    <b>Como usar este manual.</b> Cada capítulo explica uma parte das turmas, na ordem em que você costuma usá-las: primeiro o cadastro, depois os alunos, por fim as exceções (cancelamentos e reposições). Os quadros azuis trazem dicas; os amarelos, avisos importantes. Os nomes de botões e campos aparecem <span class="ui">assim</span>, como na tela. Se você ainda não conhece o Orari, comece pelo <b>Manual do administrador</b>.
+  </div>
+</section>
+
+<!-- ===== 1 ===== -->
+<h1 class="chapter" data-toc="O que é uma turma"><span class="num"></span>O que é uma turma</h1>
+<p class="lead">Vários clientes, o mesmo serviço, o mesmo profissional, o mesmo horário.</p>
+
+<p>Alguns serviços são feitos em grupo, como o Pilates das 9h com quatro alunos. No Orari, isso envolve três ideias. Vale entendê-las antes de começar:</p>
+<dl class="gloss">
+  <dt>Turma</dt><dd>O <b>cadastro</b> do horário fixo da semana: serviço, profissional, quantidade de vagas e os dias e horários. Exemplo: “Turma de Pilates 9h”, com Camila, às segundas e quartas, às 09:00, com 4 vagas.</dd>
+  <dt>Sessão</dt><dd>Uma <b>aula de verdade</b>, num dia: por exemplo, a de quarta, 11/11, às 09:00. É a sessão que tem as vagas ocupadas e a lista de alunos.</dd>
+  <dt>Aluno</dt><dd>Cada aluno tem o <b>próprio agendamento</b> dentro da sessão. Por isso falta, pagamento, plano e comanda continuam funcionando como em qualquer agendamento.</dd>
+</dl>
+<div class="box tip"><b class="t">Dica</b><p>A sessão de um dia só passa a existir quando o primeiro aluno é encaixado nela. Até lá, a agenda já mostra o horário da turma, vazio, pronto para receber alunos.</p></div>
+
+<h2>Quem pode usar</h2>
+<p>Só o <b>administrador</b> cadastra turmas, encaixa alunos, muda vagas e cancela sessões. Para os demais usuários, o menu Turmas não aparece. Na agenda, eles veem as turmas que já têm alunos, mas não fazem alterações nelas.</p>
+<figure class="w55"><img src="images/81-menu-turmas.png" alt=""><figcaption>O menu <span class="ui">Turmas</span>, logo abaixo de Serviços.</figcaption></figure>
+
+<!-- ===== 2 ===== -->
+<h1 class="chapter" data-toc="Preparar o serviço"><span class="num"></span>Preparar o serviço</h1>
+<p class="lead">Só um serviço que aceita turma pode ter turma.</p>
+
+<ol class="steps">
+  <li>Abra <span class="ui">Serviços</span> e clique no lápis do serviço (por exemplo, Pilates).</li>
+  <li>Ligue <span class="ui">Aceita turma</span>.</li>
+  <li>Clique em <span class="ui">Salvar alterações</span>.</li>
+</ol>
+<figure class="w55"><img src="images/82-servico-aceita-turma.png" alt=""><figcaption>O serviço passa a aceitar atendimento em turma.</figcaption></figure>
+<div class="box warn"><b class="t">Atenção</b><p>Enquanto o serviço tiver uma turma ativa, não é possível desligar <span class="ui">Aceita turma</span>. Inative a turma antes.</p></div>
+
+<!-- ===== 3 ===== -->
+<h1 class="chapter" data-toc="Cadastrar a turma"><span class="num"></span>Cadastrar a turma</h1>
+<p class="lead">O horário fixo da semana, com as vagas.</p>
+
+<p>Em <span class="ui">Turmas</span>, a lista mostra o nome, o serviço, o profissional, os dias e horários, as vagas e a situação de cada turma. Há busca por nome e filtro por situação.</p>
+<figure><img src="images/83-turmas-lista.png" alt=""><figcaption>Lista de turmas.</figcaption></figure>
+
+<h2>Criar uma turma</h2>
+<ol class="steps">
+  <li>Clique em <span class="ui">Nova turma</span>.</li>
+  <li>Dê um <b>Nome</b>, se quiser (por exemplo, “Pilates fim de tarde”). Sem nome, a turma é chamada pelo nome do serviço.</li>
+  <li>Escolha o <b>Serviço</b> (só aparecem os que aceitam turma) e o <b>Profissional</b>.</li>
+  <li>Informe as <b>Vagas por sessão</b>, de 2 a 100.</li>
+  <li>Em <b>Dias e horários</b>, clique em <span class="ui">Adicionar horário</span> no dia desejado e informe o início. O fim aparece sozinho, pela duração do serviço (“até 18:00”). Um mesmo dia pode ter mais de um horário.</li>
+  <li>Clique em <span class="ui">Cadastrar</span>.</li>
+</ol>
+<figure class="w70"><img src="images/84-turma-nova.png" alt=""><figcaption>Cadastro de uma turma, com o horário de segunda às 17:00.</figcaption></figure>
+<div class="box warn"><b class="t">Atenção</b><p>Cada horário precisa caber no funcionamento da empresa, e o profissional não pode ter outra turma ativa no mesmo horário. Se houver conflito, o Orari avisa e não cadastra.</p></div>
+
+<h2>Alterar, inativar e visualizar</h2>
+<ul>
+  <li><span class="ui">Alterar</span> (o lápis) muda só o <b>nome</b> e as <b>vagas</b>. Serviço, profissional e horários não mudam: para trocá-los, inative a turma e cadastre outra.</li>
+  <li><span class="ui">Inativar</span> (no menu de três pontos) faz a turma parar de receber alunos. As aulas já marcadas continuam. Para desfazer, use <span class="ui">Ativar</span>. Turmas não são excluídas.</li>
+  <li><span class="ui">Visualizar</span> mostra os dados da turma, os <b>alunos fixos</b> (quem está nela por recorrência ou plano, com os dias) e as <b>próximas sessões</b> das quatro semanas seguintes, com as vagas e os alunos de cada uma.</li>
+</ul>
+<figure class="w55"><img src="images/85-turma-visualizar.png" alt=""><figcaption>Visualização: alunos fixos e próximas sessões.</figcaption></figure>
+
+<!-- ===== 4 ===== -->
+<h1 class="chapter" data-toc="A turma na agenda"><span class="num"></span>A turma na agenda</h1>
+<p class="lead">Um bloco por aula, com as vagas à vista.</p>
+
+<p>Na agenda, a turma aparece como <b>um único bloco</b> na coluna do profissional, e não como um bloco por aluno. O bloco mostra o horário, o serviço, as vagas ocupadas (por exemplo, <b>3/4</b>) e o primeiro nome dos alunos. Passando o mouse, um cartão mostra a lista completa, com a situação de cada aluno.</p>
+<div class="row">
+  <figure><img src="images/86-agenda-bloco.png" alt=""><figcaption>O bloco da turma.</figcaption></figure>
+  <figure><img src="images/87-agenda-cartao.png" alt=""><figcaption>O cartão com os alunos.</figcaption></figure>
+</div>
+
+<h2>Horário sem alunos</h2>
+<p>Os horários das turmas aparecem na agenda <b>mesmo antes do primeiro aluno</b>, mais claros, com “0/4” e “Sem alunos”. Assim você pode encaixar alunos direto pela agenda. O horário vazio não aparece se o profissional já tiver outro atendimento naquele momento.</p>
+<figure class="w70"><img src="images/88-agenda-horario-vazio.png" alt=""><figcaption>Horário da turma ainda sem alunos.</figcaption></figure>
+
+<h2>Abrir a sessão</h2>
+<p>Clique no bloco para abrir a sessão. Nela você vê:</p>
+<ul>
+  <li>o horário, o profissional e as <b>vagas ocupadas</b>;</li>
+  <li><span class="ui">Alterar vagas</span>, que muda as vagas <b>só desta aula</b> (por exemplo, para abrir uma vaga extra num dia). O número nunca fica abaixo da quantidade de alunos;</li>
+  <li>a lista de <b>Alunos</b>. Clique num aluno para abrir o agendamento dele e, por exemplo, marcar a falta ou cancelar só a aula dele;</li>
+  <li><span class="ui">Adicionar alunos</span> e <span class="ui">Cancelar sessão</span>, explicados nos próximos capítulos.</li>
+</ul>
+<figure class="w55"><img src="images/89-sessao-dialog.png" alt=""><figcaption>A sessão: vagas, alunos e ações.</figcaption></figure>
+<div class="box tip"><b class="t">Dica</b><p>Para tirar um aluno de uma aula, abra o agendamento dele pela lista e cancele. A vaga fica livre na hora.</p></div>
+
+<h2>Transformar um atendimento em turma</h2>
+<p>Um agendamento comum, de um serviço que aceita turma, também pode virar turma. Isso vale para o atendimento ainda não iniciado. Abra o agendamento, clique em <span class="ui">Transformar em turma</span> e informe as vagas, contando o próprio cliente. A partir daí ele vira uma sessão como as outras, e você pode adicionar alunos.</p>
+
+<!-- ===== 5 ===== -->
+<h1 class="chapter" data-toc="Adicionar alunos"><span class="num"></span>Adicionar alunos</h1>
+<p class="lead">Vários alunos de uma vez, sem passar das vagas.</p>
+
+<p>Há dois caminhos, e os dois funcionam do mesmo jeito.</p>
+
+<h2>Pela agenda</h2>
+<ol class="steps">
+  <li>Clique no bloco da turma, mesmo que ainda esteja sem alunos.</li>
+  <li>Em <b>Adicionar alunos</b>, busque e escolha os clientes. Cada um entra numa lista logo abaixo. O <b>X</b> tira um cliente da lista. Quem já está na aula não aparece para escolher.</li>
+  <li>Clique em <span class="ui">Adicionar 2 alunos</span> (o número acompanha a lista).</li>
+</ol>
+<figure class="w55"><img src="images/90-sessao-alunos-escolhidos.png" alt=""><figcaption>Dois alunos escolhidos, prontos para entrar.</figcaption></figure>
+
+<h2>Pelo menu Turmas</h2>
+<ol class="steps">
+  <li>Em <span class="ui">Turmas</span>, abra o menu de três pontos da turma e escolha <span class="ui">Adicionar alunos</span>.</li>
+  <li>Escolha a <b>Sessão</b>. A lista traz as datas das próximas quatro semanas, cada uma com as vagas (“2 de 4 vagas”). Datas lotadas ou canceladas aparecem, mas não podem ser escolhidas.</li>
+  <li>Escolha os alunos e clique em <span class="ui">Adicionar</span>.</li>
+</ol>
+<figure class="w55"><img src="images/92-adicionar-alunos-datas.png" alt=""><figcaption>As próximas datas da turma, com as vagas.</figcaption></figure>
+
+<h2>Ou entram todos, ou ninguém</h2>
+<p>O encaixe é <b>tudo ou nada</b>. Se não houver vaga para a lista inteira, ou se algum aluno não puder entrar, <b>ninguém é encaixado</b>. Você corrige a lista e tenta de novo.</p>
+<ul>
+  <li><b>Falta vaga:</b> o aviso aparece embaixo da lista e diz quantos alunos tirar (ou aumente as vagas da aula).</li>
+  <li><b>Algum aluno foi recusado:</b> o motivo aparece embaixo do nome dele (por exemplo, “O cliente já está nesta sessão” ou “O cliente já possui um agendamento neste horário”). Tire esse aluno e clique de novo.</li>
+</ul>
+<div class="row">
+  <figure><img src="images/91-sessao-aviso-vagas.png" alt=""><figcaption>Uma vaga livre e dois alunos na lista.</figcaption></figure>
+  <figure><img src="images/93-adicionar-alunos-recusa.png" alt=""><figcaption>Um aluno recusado: ninguém entrou.</figcaption></figure>
+</div>
+<div class="box tip"><b class="t">Dica</b><p>Cada aluno encaixado assim ganha um agendamento <b>avulso</b>, cobrado como qualquer outro. Para quem vem toda semana, use a recorrência ou o plano, explicados a seguir.</p></div>
+
+<!-- ===== 6 ===== -->
+<h1 class="chapter" data-toc="Aluno fixo: recorrência e plano"><span class="num"></span>Aluno fixo: recorrência e plano</h1>
+<p class="lead">Quem vem toda semana entra na turma de uma vez, para o período inteiro.</p>
+
+<h2>Recorrência na turma</h2>
+<ol class="steps">
+  <li>Abra <span class="ui">Recorrências</span> &rarr; <span class="ui">Nova recorrência</span>.</li>
+  <li>No campo <b>Turma</b>, escolha a turma. O serviço e o profissional são preenchidos com os dela e não podem ser trocados.</li>
+  <li>Escolha o cliente e o período.</li>
+  <li>Em <b>Dias da semana</b>, ligue os horários da turma em que o cliente vai estar. Só aparecem os horários da turma.</li>
+  <li>Clique em <span class="ui">Cadastrar</span>.</li>
+</ol>
+<figure class="w70"><img src="images/94-recorrencia-em-turma.png" alt=""><figcaption>Recorrência na turma, às quartas.</figcaption></figure>
+
+<h2>Plano na turma</h2>
+<p>Na contratação de um plano (<span class="ui">Pacotes</span> &rarr; <span class="ui">Contratações</span> &rarr; <span class="ui">Nova contratação</span>), cada serviço do plano que tenha turma ganha o campo <b>Turma</b>. Escolhida a turma, o profissional é o dela, e os dias são escolhidos entre os horários da turma, até a quantidade de vezes por semana do plano. Num mesmo plano, um serviço pode ficar na turma e outro, em horário individual.</p>
+<figure class="w70"><img src="images/95-contratacao-em-turma.png" alt=""><figcaption>Serviço do plano na turma: uma vez por semana, às segundas.</figcaption></figure>
+<div class="box warn"><b class="t">Atenção</b><p>As vagas são conferidas para <b>todas</b> as datas do período. Se faltar vaga em alguma delas, nada é gravado, e o aviso informa a data, por exemplo, “Sem vaga na turma em 02/11/2026 às 08:00”. Aumente as vagas daquela aula ou escolha outro horário.</p></div>
+
+<!-- ===== 7 ===== -->
+<h1 class="chapter" data-toc="Cancelar uma aula da turma"><span class="num"></span>Cancelar uma aula da turma</h1>
+<p class="lead">Feriado ou profissional ausente: cancele a sessão inteira de uma vez.</p>
+
+<ol class="steps">
+  <li>Na agenda, clique no bloco da turma.</li>
+  <li>Clique em <span class="ui">Cancelar sessão</span>.</li>
+  <li>Se quiser, escreva o <b>motivo</b> (por exemplo, “Feriado”) e confirme.</li>
+</ol>
+<figure class="w55"><img src="images/96-cancelar-sessao.png" alt=""><figcaption>Confirmação, com o motivo.</figcaption></figure>
+<p>As aulas de todos os alunos daquela sessão são canceladas, com os pagamentos pendentes delas. No detalhe de cada aluno aparece <b>“Cancelado · Sessão da turma cancelada”</b>. Na agenda, o bloco fica riscado, com “Sessão cancelada”.</p>
+<figure class="w70"><img src="images/97-sessao-cancelada.png" alt=""><figcaption>Sessão cancelada na agenda.</figcaption></figure>
+<div class="box warn"><b class="t">Atenção</b><p>O cancelamento só pode ser feito <b>antes do início</b> da aula e não pode ser desfeito. Para cancelar a aula de um único aluno, abra o agendamento dele, e não a sessão.</p></div>
+<div class="box tip"><b class="t">Dica</b><p>A aula de um aluno de <b>plano</b> cancelada pela clínica pode ser reposta. Veja o próximo capítulo.</p></div>
+
+<!-- ===== 8 ===== -->
+<h1 class="chapter" data-toc="Saída da turma e reposição"><span class="num"></span>Saída da turma e reposição</h1>
+<p class="lead">Quando o aluno deixa a turma, ou precisa de outra aula nela.</p>
+
+<p>Esses cuidados ficam nas <b>sessões da recorrência</b>: na página da recorrência, ou em <span class="ui">Ver sessões</span>, na agenda e na contratação. Quando a recorrência está numa turma, uma faixa acima das aulas mostra <b>“Em turma”</b>, e cada aula na turma aparece como <b>“Agendado · Turma”</b>.</p>
+<figure><img src="images/98-recorrencia-em-turma-sessoes.png" alt=""><figcaption>Recorrência na turma, com as ações de cada aula.</figcaption></figure>
+
+<h2>Sair da turma</h2>
+<ol class="steps">
+  <li>Clique em <span class="ui">Sair da turma</span>, na faixa “Em turma”.</li>
+  <li>Se quiser, escreva o motivo e confirme.</li>
+</ol>
+<figure class="w55"><img src="images/99-sair-da-turma.png" alt=""><figcaption>Saída da turma de uma recorrência avulsa.</figcaption></figure>
+<p>As aulas futuras do aluno na turma são canceladas, com o motivo <b>“Saiu da turma”</b>. O que acontece depois depende de como ele estava na turma:</p>
+<ul>
+  <li><b>Recorrência avulsa:</b> a recorrência é encerrada. Para colocar o aluno em outra turma, crie uma recorrência nova.</li>
+  <li><b>Plano:</b> o plano continua, e as aulas canceladas ficam disponíveis para reposição.</li>
+</ul>
+
+<h2>Repor em turma</h2>
+<p>Use o ícone de pessoas (<span class="ui">Repor em turma</span>) na linha da aula para levá-la a outra sessão de turma do mesmo serviço, dentro do período. Escolha a turma e uma sessão com vaga. A aula passa a ser com o profissional daquela turma.</p>
+<figure class="w70"><img src="images/100-repor-em-turma.png" alt=""><figcaption>Escolha da sessão, com as vagas livres.</figcaption></figure>
+
+<h2>Reposição no plano</h2>
+<p>No plano, a aula cancelada <b>pela clínica</b> (sessão cancelada ou saída da turma) e a aula com falta podem ser repostas. Há duas opções: <span class="ui">Repor sessão</span>, para um horário livre em outro dia, ou <span class="ui">Repor em turma</span>. A aula cancelada <b>pelo cliente</b> não é reposta.</p>
+<figure class="w70"><img src="images/101-plano-reposicao.png" alt=""><figcaption>Aulas de plano depois da saída: uma já foi reposta na turma.</figcaption></figure>
+
+<h2>Remanejar uma aula da turma</h2>
+<p><span class="ui">Remanejar</span> uma aula de recorrência ou de plano que está na turma a leva para outro dia e horário, como <b>atendimento individual</b>. Ela sai da turma, e a vaga fica livre. O aviso aparece na própria tela de remanejar. O aluno <b>avulso</b> da turma não é remanejado: cancele a aula dele e encaixe-o em outra sessão.</p>
+
+<!-- ===== 9 ===== -->
+<h1 class="chapter" data-toc="Dúvidas comuns"><span class="num"></span>Dúvidas comuns</h1>
+<p class="lead">Respostas rápidas para as situações mais frequentes.</p>
+
+<h3>Não vejo o menu Turmas.</h3>
+<p>O menu é só do administrador.</p>
+<h3>O serviço não aparece na Nova turma.</h3>
+<p>Ele precisa estar ativo e com <span class="ui">Aceita turma</span> ligado, em <span class="ui">Serviços</span>.</p>
+<h3>O horário da turma não aparece na agenda.</h3>
+<p>Confira se a turma está ativa e se o profissional não tem outro atendimento naquele horário. Horários que já passaram e ainda não têm alunos também não aparecem.</p>
+<h3>Cliquei em Adicionar e ninguém entrou.</h3>
+<p>O encaixe é tudo ou nada. Veja o aviso embaixo da lista (falta de vaga) ou o motivo embaixo do nome de cada aluno recusado. Corrija e tente de novo.</p>
+<h3>Preciso de uma vaga a mais só num dia.</h3>
+<p>Abra a sessão daquele dia na agenda e use <span class="ui">Alterar vagas</span>. Para mudar todas as aulas seguintes, altere as vagas da turma em <span class="ui">Turmas</span>.</p>
+<h3>Como tiro um aluno de uma aula?</h3>
+<p>Abra a sessão, clique no nome do aluno e cancele o agendamento dele. Para tirá-lo de todas as aulas seguintes (aluno de recorrência ou plano), use <span class="ui">Sair da turma</span>.</p>
+<h3>Cancelei a sessão por engano.</h3>
+<p>O cancelamento não pode ser desfeito. Encaixe os alunos de novo em outra sessão, ou reponha as aulas dos alunos de plano.</p>
+
+<h2>Glossário</h2>
+<dl class="gloss">
+  <dt>Turma</dt><dd>Cadastro de um horário fixo da semana com vagas: serviço, profissional, dias e horários.</dd>
+  <dt>Sessão</dt><dd>Uma aula da turma num dia, com as vagas e os alunos.</dd>
+  <dt>Sessão avulsa</dt><dd>Sessão criada a partir de um agendamento comum, pelo <span class="ui">Transformar em turma</span>.</dd>
+  <dt>Vaga ocupada</dt><dd>Aluno da sessão que não foi cancelado. A falta também ocupa vaga.</dd>
+  <dt>Aluno avulso</dt><dd>Aluno encaixado numa sessão específica, com um agendamento avulso.</dd>
+  <dt>Aluno fixo</dt><dd>Aluno que está na turma por uma recorrência ou por um plano.</dd>
+  <dt>Saída da turma</dt><dd>Registro de que um aluno fixo deixou a turma. As aulas futuras dele nela são canceladas.</dd>
+  <dt>Reposição</dt><dd>Nova data para uma aula de plano com falta ou cancelada pela clínica.</dd>
+</dl>
+
+</body>
+</html>

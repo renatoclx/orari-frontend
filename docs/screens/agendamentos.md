@@ -97,6 +97,8 @@
 - O botão "Alterar" abre o dialog de alteração (ver "Alterar agendamento"). Aparece apenas enquanto o agendamento ainda não iniciou, como o cancelamento: nada no passado é alterado.
 - Em sessão de recorrência, o "Alterar" dá lugar a **Ver sessões**, que abre as sessões da recorrência em dialog (sem sair da agenda), com remanejar e cancelar sessão.
 - Em sessão de pacote, há também **Ver contratação**: dialog com os dados, os valores, as agendas e as parcelas da contratação; dali, "Ver sessões" troca para o dialog de sessões. O cancelamento da contratação fica na página da contratação.
+- **Transformar em turma** (`UsersRound`): no agendamento de serviço que aceita turma, ainda não iniciado e fora de turma. Pede as vagas (contando o próprio cliente, de 2 a 100), cria a sessão e abre o dialog da turma.
+- Agendamento que é de uma sessão de turma não tem **Remanejar** (a regra de tirar o aluno da sessão ao remanejar ainda não está na tela).
 - Informação de outra tela abre em dialog, e não em outra página: o usuário não perde o dia nem o filtro da agenda.
 
 ---
@@ -108,6 +110,19 @@
 - Agendamento comum: grava pela alteração (`PATCH /appointments/:id`). Sessão de recorrência: grava pela rota da recorrência e só aceita datas dentro do período dela.
 - O próprio horário conta como livre para ele mesmo. Não pode ser remarcado para o passado.
 - O encaixe não tem "Remanejar": tem regras próprias de horário e é remarcado pelo "Alterar".
+
+---
+
+## Turma na agenda
+
+Regras em `../../backend/docs/turmas.md`. Cada aluno tem o próprio agendamento; a agenda junta os da mesma sessão em um bloco só.
+
+- **Bloco da sessão:** horário, serviço, `UsersRound` com as vagas ocupadas ("3/5") e, na segunda linha, "Turma - " com o primeiro nome dos alunos. O cartão ao passar o mouse lista os alunos com a situação. Ocupa vaga quem não está cancelado (a falta ocupa).
+- **Horário sem alunos:** os horários das turmas fixas ativas aparecem no dia mesmo antes do primeiro encaixe, esmaecidos ("0/4", "Sem alunos"). Somem quando a turma já tem sessão no horário ou o profissional já atende ali. Só para o ADMIN.
+- **Dialog da sessão** (clique no bloco): horário, profissional, "X de Y vagas ocupadas" com **Alterar vagas** (`Pencil`; só com a sessão criada, nunca abaixo do número de alunos) e a lista de alunos; cada aluno abre o detalhe do agendamento dele (cancelar, falta).
+- **Adicionar alunos:** busca de clientes com lista dos escolhidos (cada um com X para tirar); quem já está na sessão não aparece. Antes de encaixar, a lista é conferida com as vagas livres: sem vaga para todos, ninguém entra e o aviso pede para tirar alunos ou aumentar as vagas. No horário sem sessão, o primeiro encaixe cria a sessão.
+- Os encaixes são feitos um a um; se a API recusar algum (ex.: cliente já tem outro horário), ele fica na lista com o motivo e os demais entram.
+- Sessão já iniciada ou cancelada não recebe alunos nem muda vagas; sessão lotada pede para aumentar as vagas.
 
 ---
 

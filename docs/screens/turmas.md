@@ -17,7 +17,7 @@ demais perfis a tela responde 404 (e a API, 403).
 - Status (isActive)
 - Ações
   - Alterar (em destaque).
-  - Visualizar e Inativar/Ativar (no menu de três pontos).
+  - Visualizar, Adicionar alunos (só turma ativa) e Inativar/Ativar (no menu de três pontos).
 
 ### Regras específicas
 
@@ -69,7 +69,22 @@ Página, e não dialog: a lista de horários cresce (até 21).
 
 ---
 
+## Adicionar alunos
+
+- Dialog com a Sessão (as próximas 8 datas da turma que ainda não começaram,
+  "segunda, 02/11 às 08:00") e a lista de alunos, como na agenda.
+- Cada aluno ganha um agendamento avulso. A sessão do dia é criada no primeiro
+  encaixe.
+- Sem a consulta de vagas por data na API, os encaixes são feitos um a um: quem não
+  couber fica na lista com o motivo. O mesmo encaixe pode ser feito pela agenda, no
+  bloco da turma, que confere as vagas antes.
+
+---
+
 ## Pendências
 
-- Sessões, encaixe de alunos e vagas ocupadas (etapa 2), recorrência e plano em
-  turma (etapa 3), cancelamento de sessão e saída da turma (etapa 4).
+- Vagas da data no "Adicionar alunos" e encaixe em lote, tudo ou nada (dependem do
+  backend).
+- Alunos e próximas sessões na Visualização.
+- Recorrência e plano em turma (etapa 3) e cancelamento de sessão e saída da turma
+  (etapa 4).

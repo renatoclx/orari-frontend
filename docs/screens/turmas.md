@@ -66,25 +66,26 @@ Página, e não dialog: a lista de horários cresce (até 21).
 
 - Dialog com serviço, duração, profissional, vagas por sessão, os horários com
   início e fim ("Terça-feira, 17:00–17:50") e o status.
+- **Próximas sessões** (4 semanas): data, "X de Y vagas" (ou "Cancelada") e os
+  alunos de cada uma ("Sem alunos" no horário ainda sem sessão), com rolagem
+  própria.
 
 ---
 
 ## Adicionar alunos
 
-- Dialog com a Sessão (as próximas 8 datas da turma que ainda não começaram,
-  "segunda, 02/11 às 08:00") e a lista de alunos, como na agenda.
+- Dialog com a Sessão (as datas das próximas 4 semanas, com as vagas: "segunda,
+  02/11 às 09:00 · 2 de 4 vagas") e a lista de alunos, como na agenda. Datas
+  lotadas ou canceladas aparecem, mas não se escolhem.
+- Antes de encaixar, a lista é conferida com as vagas livres da data: sem vaga para
+  todos, ninguém entra e o aviso pede para tirar alunos.
 - Cada aluno ganha um agendamento avulso. A sessão do dia é criada no primeiro
-  encaixe.
-- Sem a consulta de vagas por data na API, os encaixes são feitos um a um: quem não
-  couber fica na lista com o motivo. O mesmo encaixe pode ser feito pela agenda, no
-  bloco da turma, que confere as vagas antes.
+  encaixe. Os encaixes são feitos um a um; quem a API recusar fica na lista com o
+  motivo. O mesmo encaixe pode ser feito pela agenda, no bloco da turma.
 
 ---
 
 ## Pendências
 
-- Vagas da data no "Adicionar alunos" e encaixe em lote, tudo ou nada (dependem do
-  backend).
-- Alunos e próximas sessões na Visualização.
-- Recorrência e plano em turma (etapa 3) e cancelamento de sessão e saída da turma
-  (etapa 4).
+- Encaixe em lote, tudo ou nada (depende do backend).
+- Alunos fixos (recorrência e plano) na Visualização (depende do backend).

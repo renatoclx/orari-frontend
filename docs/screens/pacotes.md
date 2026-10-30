@@ -118,6 +118,7 @@ Página própria (`/pacotes/contratacoes/nova`), em blocos na mesma tela.
 ### 3. Agenda de cada serviço
 
 - Um bloco por serviço do plano (exatamente os serviços do plano, nem mais nem menos), com:
+  - Turma (opcional, só para o ADMIN e só quando há turma ativa do serviço): com turma, o profissional é o dela e os dias são escolhidos entre os horários dela, até a quantidade por semana do plano;
   - Profissional;
   - Dias da semana: **exatamente** a quantidade de atendimentos por semana do plano. Ao atingir a quantidade, os outros dias ficam desabilitados; desmarcar um libera os demais. A tela não salva com dias a menos, e o servidor também recusa;
   - Os dias usam o mesmo campo das recorrências: ao marcar o dia, a linha mostra o período e os horários livres; o fim de cada sessão é o início mais a duração do serviço.
@@ -161,6 +162,7 @@ Página própria (`/pacotes/contratacoes/nova`), em blocos na mesma tela.
 
 - A sessão de pacote pode ter a falta marcada como qualquer agendamento (ver `agendamentos.md`, "Marcar falta"). Como a sessão não tem pagamento próprio, nada é cancelado; o pagamento da contratação (parcela) não muda.
 - **Repor sessão:** na lista de sessões (tela da recorrência do pacote e dialog "Ver sessões"), a sessão marcada como "Não compareceu" ganha a ação **Repor sessão** (no lugar de remanejar e cancelar). Abre o mesmo seletor de data e horário do remanejamento, com os textos de reposição ("Repor sessão", "A sessão volta a Agendado.", botão "Repor"), dentro do período da contratação. A sessão volta a Agendado na nova data e a quantidade de sessões do plano se mantém; o registro da falta deixa de existir, porque é a mesma sessão que muda de data.
+- A aula cancelada pela clínica na turma (sessão cancelada ou saída da turma) também pode ser reposta, com a mesma ação ou com **Repor em turma** (ver `recorrencias.md`).
 - Só sessão de **pacote** pode ser reposta (regra do backend); a de recorrência avulsa que faltou não tem reposição.
 
 ## Pendências

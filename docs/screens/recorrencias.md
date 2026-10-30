@@ -39,6 +39,7 @@ Página própria (`/recorrencias/nova`), não dialog.
 
 ### Campos
 
+- Turma (opcional, só para o ADMIN e só quando há turma ativa de serviço com preço): "Sem turma (horário livre)" ou uma turma fixa. Com turma, serviço e profissional ficam fixos nos dela, e os dias passam a ser escolhidos entre os horários dela (um por dia da semana), sem a busca de horários livres. As vagas são conferidas pela API ao salvar: sem vaga em alguma data, nada é gravado e a mensagem informa a data.
 - Cliente (seleção com busca no servidor).
 - Serviço (seleção com busca; apenas serviços ativos e com preço).
 - Profissional.
@@ -70,7 +71,10 @@ Página própria (`/recorrencias/nova`), não dialog.
   - **Cancelar recorrência:** pede confirmação; cancela as sessões futuras ainda não iniciadas, sem gerar novas, e os pagamentos pendentes delas. Não há reembolso e a recorrência cancelada não é reativada. Não aparece nas de pacote.
   - **Cancelar sessão:** pede confirmação; só antes de iniciar; o horário fica livre e o pagamento pendente da sessão é cancelado.
   - **Repor sessão** (só em pacote, na sessão marcada como "Não compareceu"): ver `pacotes.md`, "Falta e reposição de sessão".
-  - **Remanejar sessão:** nova data e horário (mesmo seletor de horários do novo agendamento), apenas dentro do período da recorrência e antes de iniciar; mantém o pagamento (o vencimento acompanha a nova data) e a quantidade de sessões.
+  - **Remanejar sessão:** nova data e horário (mesmo seletor de horários do novo agendamento), apenas dentro do período da recorrência e antes de iniciar; mantém o pagamento (o vencimento acompanha a nova data) e a quantidade de sessões. Na aula de turma, o dialog avisa que ela sai da turma.
+  - **Repor em turma** (`UsersRound`, só ADMIN, quando há turma ativa do mesmo serviço): leva a aula (futura ou, no pacote, a que pode ser reposta) para uma sessão de turma com vaga dentro do período, com o profissional da turma.
+- **Recorrência em turma:** uma faixa acima das sessões mostra "Em turma" (ou "Saiu da turma em dd/mm/aaaa: motivo"). As aulas na sessão aparecem como "Agendado · Turma"; as canceladas pela clínica, com o motivo ("Sessão da turma cancelada", "Saiu da turma").
+  - **Sair da turma** (`LogOut`, só ADMIN, recorrência ativa): confirmação com motivo opcional. Cancela as aulas futuras na turma; a recorrência avulsa é encerrada, a de pacote continua e as aulas ficam para reposição.
 - Os dados da recorrência (cliente, profissional, serviço, dias e período) não são alterados: para mudá-los, cancela-se a recorrência e cria-se outra.
 - O pagamento integral (baixa em lote dos pagamentos pendentes) será feito no Financeiro.
 

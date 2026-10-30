@@ -121,28 +121,31 @@ export function ClassSessionBlock({
           </li>
         </ul>
 
-        <ul className="mt-3 space-y-1 border-t border-border pt-3">
-          {session.members.map((member) => {
-            const { label, icon: StatusIcon } =
-              APPOINTMENT_STATUS[member.status];
-            return (
-              <li
-                key={member.id}
-                className="flex items-center justify-between gap-3"
-              >
-                <span
-                  className={`truncate ${member.status === "CANCELLED" ? "text-muted-foreground line-through" : ""}`}
+        {/* Horário ainda sem alunos: sem a lista vazia no cartão. */}
+        {session.members.length > 0 && (
+          <ul className="mt-3 space-y-1 border-t border-border pt-3">
+            {session.members.map((member) => {
+              const { label, icon: StatusIcon } =
+                APPOINTMENT_STATUS[member.status];
+              return (
+                <li
+                  key={member.id}
+                  className="flex items-center justify-between gap-3"
                 >
-                  {member.clientName}
-                </span>
-                <span className="flex shrink-0 items-center gap-1 text-xs text-muted-foreground">
-                  <StatusIcon className="size-4" aria-hidden="true" />
-                  {label}
-                </span>
-              </li>
-            );
-          })}
-        </ul>
+                  <span
+                    className={`truncate ${member.status === "CANCELLED" ? "text-muted-foreground line-through" : ""}`}
+                  >
+                    {member.clientName}
+                  </span>
+                  <span className="flex shrink-0 items-center gap-1 text-xs text-muted-foreground">
+                    <StatusIcon className="size-4" aria-hidden="true" />
+                    {label}
+                  </span>
+                </li>
+              );
+            })}
+          </ul>
+        )}
       </HoverCardContent>
     </HoverCard>
   );

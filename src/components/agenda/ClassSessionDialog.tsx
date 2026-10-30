@@ -13,12 +13,16 @@ import { useEffect, useState, useTransition } from "react";
 import { toast } from "sonner";
 import type { ClientOption } from "@/app/(admin)/appointment-actions";
 import {
+  enrollInClassGroupAction,
   enrollInClassSessionAction,
   getClassSessionAction,
   updateClassSessionCapacityAction,
 } from "@/app/(admin)/class-session-actions";
 import { APPOINTMENT_STATUS } from "@/components/agenda/appointment-status";
-import type { AgendaClassSession } from "@/components/agenda/class-session-blocks";
+import {
+  classSessionKey,
+  type AgendaClassSession,
+} from "@/components/agenda/class-session-blocks";
 import {
   CAPACITY_MAX,
   CAPACITY_MIN,
@@ -51,6 +55,8 @@ import type { ClassSessionItem } from "@/types/class-group";
 type ClassSessionDialogProps = {
   /** Sessão clicada na grade; nula com o diálogo fechado. */
   session: AgendaClassSession | null;
+  /** Dia da agenda ("aaaa-mm-dd"): o encaixe no horário ainda sem sessão usa a data. */
+  date: string;
   /** A sessão já começou: não recebe alunos nem muda vagas. */
   started: boolean;
   /** Primeiros clientes, para a busca do "Adicionar alunos". */
@@ -67,6 +73,7 @@ type ClassSessionDialogProps = {
  */
 export function ClassSessionDialog({
   session,
+  date,
   started,
   clients,
   onOpenAppointment,
@@ -78,8 +85,9 @@ export function ClassSessionDialog({
         {session && (
           // A chave recomeça o estado (dados, campos) a cada sessão aberta.
           <SessionDetails
-            key={session.id}
+            key={classSessionKey(session)}
             session={session}
+            date={date}
             started={started}
             clients={clients}
             onOpenAppointment={onOpenAppointment}
@@ -91,14 +99,29 @@ export function ClassSessionDialog({
   );
 }
 
+// O que o diálogo mostra da sessão: a resposta da API ou, no horário ainda sem
+// sessão, os mesmos campos montados a partir da turma.
+type SessionView = Pick<
+  ClassSessionItem,
+  | "classGroupId"
+  | "classGroup"
+  | "capacity"
+  | "cancelledAt"
+  | "appointments"
+  | "occupied"
+  | "available"
+>;
+
 function SessionDetails({
   session,
+  date,
   started,
   clients,
   onOpenAppointment,
   onClose,
 }: {
   session: AgendaClassSession;
+  date: string;
   started: boolean;
   clients: ClientOption[];
   onOpenAppointment: (appointmentId: string) => void;
@@ -114,6 +137,8 @@ function SessionDetails({
   const [pending, startTransition] = useTransition();
 
   useEffect(() => {
+    // Horário sem sessão: não há o que buscar (a sessão nasce no primeiro encaixe).
+    if (session.id === null) return;
     let current = true;
     getClassSessionAction(session.id).then((result) => {
       if (!current) return;
@@ -130,26 +155,53 @@ function SessionDetails({
     };
   }, [session.id]);
 
-  const open = data !== null && !started && data.cancelledAt === null;
+  // Sem sessão ainda: ninguém encaixado e as vagas da turma.
+  const view: SessionView | null =
+    data ??
+    (session.id === null
+      ? {
+          classGroupId: session.classGroupId,
+          classGroup: session.classGroupId
+            ? { id: session.classGroupId, name: session.classGroupName ?? null }
+            : null,
+          capacity: session.capacity,
+          cancelledAt: null,
+          appointments: [],
+          occupied: 0,
+          available: session.capacity,
+        }
+      : null);
+  const open = view !== null && !started && view.cancelledAt === null;
 
   function enroll() {
-    if (!data) return;
+    if (!view) return;
     if (students.length === 0) {
       toast.error("Selecione ao menos um cliente.");
       return;
     }
     // Sem vaga para todos, ninguém entra: o usuário ajusta a lista ou as vagas.
-    const shortage = capacityShortage(data.available, students.length);
+    const shortage = capacityShortage(view.available, students.length);
     setStudentsMessage(shortage);
     if (shortage) return;
+    // Com sessão, encaixa nela; sem sessão, pela turma (a API cria a sessão no
+    // primeiro encaixe e usa a mesma nos seguintes).
+    const sessionId = data?.id ?? session.id;
+    const classGroupId = session.classGroupId;
+    const enrollOne = (clientId: string) =>
+      sessionId
+        ? enrollInClassSessionAction(sessionId, clientId)
+        : enrollInClassGroupAction(
+            classGroupId!,
+            clientId,
+            date,
+            session.start,
+          );
     startTransition(async () => {
       const {
         added,
         failed,
         session: updated,
-      } = await enrollInOrder(students, (clientId) =>
-        enrollInClassSessionAction(session.id, clientId),
-      );
+      } = await enrollInOrder(students, enrollOne);
       if (added > 0 && updated) {
         setData(updated);
         toast.success(
@@ -170,13 +222,14 @@ function SessionDetails({
   }
 
   function saveCapacity() {
-    if (capacity === null) return;
+    // "Alterar vagas" só aparece com a sessão criada.
+    if (capacity === null || !data) return;
     const message = capacityError(capacity);
     setCapacityMessage(message);
     if (message) return;
     startTransition(async () => {
       const result = await updateClassSessionCapacityAction(
-        session.id,
+        data.id,
         Number(capacity),
       );
       if (result.ok) {
@@ -206,9 +259,9 @@ function SessionDetails({
           Turma de {session.serviceName}
         </DialogTitle>
         <DialogDescription>
-          {data
-            ? (data.classGroup?.name ??
-              (data.classGroupId ? "Turma fixa" : "Turma avulsa"))
+          {view
+            ? (view.classGroup?.name ??
+              (view.classGroupId ? "Turma fixa" : "Turma avulsa"))
             : "Carregando…"}
         </DialogDescription>
       </DialogHeader>
@@ -238,11 +291,11 @@ function SessionDetails({
           {capacity === null ? (
             <>
               <span className="tabular-nums">
-                {data
-                  ? `${data.occupied} de ${data.capacity} vagas ocupadas`
+                {view
+                  ? `${view.occupied} de ${view.capacity} vagas ocupadas`
                   : `${session.occupied} de ${session.capacity} vagas ocupadas`}
               </span>
-              {open && (
+              {open && data && (
                 <Button
                   type="button"
                   variant="ghost"
@@ -309,9 +362,12 @@ function SessionDetails({
 
       <section className="space-y-2 border-t border-border pt-4">
         <h3 className="text-sm font-medium">Alunos</h3>
-        {data ? (
+        {view && view.appointments.length === 0 ? (
+          // Horário da turma ainda sem ninguém encaixado.
+          <p className="text-sm text-muted-foreground">Nenhum aluno ainda.</p>
+        ) : view ? (
           <ul className="divide-y divide-border rounded-control border border-border">
-            {data.appointments.map((participant) => {
+            {view.appointments.map((participant) => {
               const { label, icon: StatusIcon } =
                 APPOINTMENT_STATUS[participant.status];
               return (
@@ -353,9 +409,9 @@ function SessionDetails({
         )}
       </section>
 
-      {data &&
+      {view &&
         (open ? (
-          data.available > 0 ? (
+          view.available > 0 ? (
             <FormField
               id="class-session-client"
               label="Adicionar alunos"
@@ -370,7 +426,7 @@ function SessionDetails({
                   setStudentsMessage(undefined);
                 }}
                 // Quem já está na sessão não aparece de novo.
-                excludeIds={data.appointments
+                excludeIds={view.appointments
                   .filter((p) => p.status !== "CANCELLED")
                   .map((p) => p.client.id)}
                 disabled={pending}
@@ -396,7 +452,7 @@ function SessionDetails({
           )
         ) : (
           <p className="text-sm text-muted-foreground">
-            {data.cancelledAt
+            {view.cancelledAt
               ? "Sessão cancelada."
               : "A sessão já começou: não recebe novos alunos."}
           </p>

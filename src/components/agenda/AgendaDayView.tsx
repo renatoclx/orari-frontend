@@ -35,6 +35,8 @@ type AgendaDayViewProps = {
   /** Todos os profissionais ativos (a exibição padrão filtra daqui). */
   professionals: AgendaProfessional[];
   appointments: AgendaAppointment[];
+  /** Horários de turma fixa do dia, ainda sem sessão (sem alunos). */
+  emptyClassSessions: AgendaClassSession[];
   range: GridRange;
   /** Trechos fora do expediente, hachurados. */
   unavailable: TimeRange[];
@@ -303,6 +305,7 @@ export function AgendaDayView({
 
       <ClassSessionDialog
         session={classSession}
+        date={date}
         started={classSession !== null && hasStarted(classSession.start)}
         clients={clients}
         onOpenAppointment={openParticipant}

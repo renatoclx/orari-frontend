@@ -1,11 +1,18 @@
 import type { AgendaAppointment } from "@/types/agenda";
+import { timeToMinutes } from "@/utils/time";
 
 /** Sessão de turma como a grade a desenha: um bloco com os alunos dela. */
 export type AgendaClassSession = {
-  id: string;
+  /**
+   * Nulo no horário de turma fixa que ainda não tem sessão: a API só cria a
+   * sessão no primeiro encaixe, mas a agenda já mostra o horário, vazio.
+   */
+  id: string | null;
   professionalId: string;
   /** Turma fixa de origem (nulo na sessão avulsa). */
   classGroupId: string | null;
+  /** Nome da turma, conhecido só no horário ainda sem sessão (vem do cadastro). */
+  classGroupName?: string | null;
   start: string;
   end: string;
   serviceName: string;
@@ -62,4 +69,46 @@ export function splitClassSessions(appointments: AgendaAppointment[]): {
   });
 
   return { singles, sessions };
+}
+
+/** Chave do bloco: o id da sessão ou, sem sessão, a turma e o horário. */
+export function classSessionKey(session: AgendaClassSession): string {
+  return session.id ?? `${session.classGroupId}-${session.start}`;
+}
+
+/**
+ * Junta às sessões do dia os horários de turma fixa ainda sem sessão. Um
+ * horário fica de fora se a turma já tem sessão nele, ou se o profissional
+ * está ocupado ali (agendamento ativo ou outra sessão com alunos): o bloco
+ * vazio não cobre um atendimento de verdade.
+ */
+export function withEmptyClassSessions(
+  sessions: AgendaClassSession[],
+  empty: AgendaClassSession[],
+  singles: AgendaAppointment[],
+): AgendaClassSession[] {
+  const overlaps = (
+    a: { start: string; end: string },
+    b: { start: string; end: string },
+  ) =>
+    timeToMinutes(a.start) < timeToMinutes(b.end) &&
+    timeToMinutes(a.end) > timeToMinutes(b.start);
+
+  const busy = [
+    ...singles.filter((appointment) => appointment.status !== "CANCELLED"),
+    ...sessions.filter((session) => session.occupied > 0),
+  ];
+  const free = empty.filter(
+    (slot) =>
+      !sessions.some(
+        (session) =>
+          session.classGroupId === slot.classGroupId &&
+          session.start === slot.start,
+      ) &&
+      !busy.some(
+        (other) =>
+          other.professionalId === slot.professionalId && overlaps(other, slot),
+      ),
+  );
+  return [...sessions, ...free];
 }

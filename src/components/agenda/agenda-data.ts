@@ -1,5 +1,8 @@
+import type { AgendaClassSession } from "@/components/agenda/class-session-blocks";
 import type { AgendaAppointment } from "@/types/agenda";
 import type { AppointmentItem } from "@/types/appointment";
+import type { ClassGroupItem } from "@/types/class-group";
+import type { WeekDay } from "@/types/business-hour";
 import { toTimeString } from "@/utils/time";
 
 // Serviço sem cor cadastrada: cinza neutro, para o bloco continuar legível.
@@ -43,4 +46,33 @@ export function toAgendaAppointment(
     paid: item.payment?.status === "PAID" && item.payment.deletedAt === null,
     classSession: item.classSession,
   };
+}
+
+/**
+ * Horários das turmas fixas no dia da semana → blocos vazios da grade (sem
+ * sessão ainda). A grade descarta os que já têm sessão (withEmptyClassSessions).
+ */
+export function toEmptyClassSessions(
+  groups: ClassGroupItem[],
+  weekDay: WeekDay,
+): AgendaClassSession[] {
+  return groups.flatMap((group) =>
+    group.days
+      .filter((day) => day.weekDay === weekDay)
+      .map((day) => ({
+        id: null,
+        professionalId: group.professionalId,
+        classGroupId: group.id,
+        classGroupName: group.name,
+        start: day.startTime,
+        end: day.endTime,
+        serviceName: group.service.name,
+        serviceColor: group.service.color ?? DEFAULT_SERVICE_COLOR,
+        durationMinutes: group.service.duration,
+        professionalName: group.professional.name,
+        capacity: group.capacity,
+        occupied: 0,
+        members: [],
+      })),
+  );
 }

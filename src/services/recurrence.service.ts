@@ -86,7 +86,14 @@ export async function listRecurrenceSessions(
   }
 
   return items
-    .map(({ id, startAt, endAt, status }) => ({ id, startAt, endAt, status }))
+    .map(({ id, startAt, endAt, status, classSession, cancelReason }) => ({
+      id,
+      startAt,
+      endAt,
+      status,
+      classSessionId: classSession?.id ?? null,
+      cancelReason,
+    }))
     .sort((a, b) => a.startAt.localeCompare(b.startAt));
 }
 
@@ -146,5 +153,36 @@ export async function rescheduleRecurrenceSession(
   await apiFetch(
     `/recurring-appointments/${id}/appointments/${sessionId}/reschedule`,
     { method: "PATCH", body: JSON.stringify({ startAt }) },
+  );
+}
+
+/**
+ * Saída da turma: grava a data e o motivo e cancela as aulas futuras na turma.
+ * A recorrência avulsa é encerrada; a de plano continua (as aulas ficam para
+ * reposição).
+ */
+export async function leaveClassGroup(
+  id: string,
+  note?: string,
+): Promise<void> {
+  await apiFetch(`/recurring-appointments/${id}/leave-class`, {
+    method: "PATCH",
+    body: JSON.stringify(note ? { note } : {}),
+  });
+}
+
+/**
+ * Reposição (ou remanejamento) numa sessão de turma do mesmo serviço: a aula
+ * entra na sessão com o profissional da turma. A API confere a vaga.
+ */
+export async function replaceInClassGroup(
+  id: string,
+  sessionId: string,
+  classGroupId: string,
+  startAt: string,
+): Promise<void> {
+  await apiFetch(
+    `/recurring-appointments/${id}/appointments/${sessionId}/replace-in-class`,
+    { method: "PATCH", body: JSON.stringify({ classGroupId, startAt }) },
   );
 }

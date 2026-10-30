@@ -1,5 +1,8 @@
 // Espelha a resposta de /class-groups do backend (turma fixa, docs/turmas.md).
-import type { AppointmentStatus } from "@/types/appointment";
+import type {
+  AppointmentCancelReason,
+  AppointmentStatus,
+} from "@/types/appointment";
 import type { WeekDay } from "@/types/business-hour";
 
 /** Dia e horário da turma; "HH:MM". O fim é o início mais a duração do serviço. */
@@ -30,6 +33,8 @@ export type ClassSessionParticipant = {
   /** Id do agendamento do aluno. */
   id: string;
   status: AppointmentStatus;
+  /** Aula cancelada pela clínica na turma (sessão cancelada ou saída). */
+  cancelReason: AppointmentCancelReason | null;
   client: { id: string; name: string; photoUrl: string | null };
 };
 
@@ -46,11 +51,26 @@ export type ClassSessionItem = {
   endAt: string;
   capacity: number;
   cancelledAt: string | null;
+  /** Motivo do cancelamento da sessão (ex.: "Feriado"). */
+  cancellationNote: string | null;
   /** Alunos em ordem alfabética, inclusive os cancelados. */
   appointments: ClassSessionParticipant[];
   /** Alunos que ocupam vaga (não cancelados; a falta ocupa) e vagas livres. */
   occupied: number;
+  /** A sessão cancelada não tem vaga livre. */
   available: number;
+};
+
+/**
+ * Item de GET /class-sessions (agenda por sessão): as sessões do período e os
+ * horários futuros das turmas fixas ainda sem sessão (`id` nulo, sem alunos).
+ */
+export type ClassSessionAgendaItem = Omit<
+  ClassSessionItem,
+  "id" | "classGroupId"
+> & {
+  id: string | null;
+  overBooking: boolean;
 };
 
 /** Corpo de POST /class-groups (só o início de cada horário). */
@@ -67,4 +87,21 @@ export type ClassGroupUpdate = {
   name?: string | null;
   capacity?: number;
   isActive?: boolean;
+};
+
+/**
+ * Próxima sessão de uma turma fixa, no fuso da empresa (montada pela action a
+ * partir de GET /class-sessions). `id` nulo: o horário ainda não tem sessão.
+ */
+export type UpcomingClassSession = {
+  id: string | null;
+  /** "aaaa-mm-dd" e "HH:mm". */
+  date: string;
+  time: string;
+  capacity: number;
+  occupied: number;
+  available: number;
+  cancelledAt: string | null;
+  /** Nome dos alunos que ocupam vaga, em ordem alfabética. */
+  students: string[];
 };

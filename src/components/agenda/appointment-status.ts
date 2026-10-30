@@ -7,7 +7,10 @@ import {
   UserX,
   type LucideIcon,
 } from "lucide-react";
-import type { AppointmentStatus } from "@/types/appointment";
+import type {
+  AppointmentCancelReason,
+  AppointmentStatus,
+} from "@/types/appointment";
 
 /** Rótulo e ícone de cada status: o bloco da agenda mostra os dois, lado a lado. */
 export const APPOINTMENT_STATUS: Record<
@@ -20,4 +23,10 @@ export const APPOINTMENT_STATUS: Record<
   COMPLETED: { label: "Concluído", icon: CheckCheck },
   CANCELLED: { label: "Cancelado", icon: CircleX },
   NO_SHOW: { label: "Não compareceu", icon: UserX },
+};
+
+/** Por que a clínica cancelou a aula de turma, por escrito ao lado do "Cancelado". */
+export const CANCEL_REASON_LABEL: Record<AppointmentCancelReason, string> = {
+  CLASS_SESSION_CANCELLED: "Sessão da turma cancelada",
+  CLASS_LEFT: "Saiu da turma",
 };

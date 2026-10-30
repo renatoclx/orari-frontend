@@ -161,6 +161,10 @@ export function RecurrenceDetails({
             clientName={recurrence.client.name}
             duration={recurrence.service.duration}
             period={{ start: recurrence.startDate, end: recurrence.endDate }}
+            serviceId={recurrence.service.id}
+            classGroupId={recurrence.classGroupId}
+            classLeftAt={recurrence.classLeftAt}
+            classLeaveNote={recurrence.classLeaveNote}
           />
         </div>
       </section>

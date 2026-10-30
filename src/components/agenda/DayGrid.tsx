@@ -4,8 +4,6 @@ import { AppointmentBlock } from "@/components/agenda/AppointmentBlock";
 import { ClassSessionBlock } from "@/components/agenda/ClassSessionBlock";
 import {
   classSessionKey,
-  splitClassSessions,
-  withEmptyClassSessions,
   type AgendaClassSession,
 } from "@/components/agenda/class-session-blocks";
 import type { GridRange } from "@/components/agenda/agenda-range";
@@ -69,8 +67,8 @@ type DayGridProps = {
   onSlotOverbooking?: (professionalId: string, time: string) => void;
   /** Clique em um agendamento. */
   onAppointmentSelect?: (appointment: AgendaAppointment) => void;
-  /** Horários de turma fixa ainda sem sessão: aparecem vazios na grade. */
-  emptyClassSessions?: AgendaClassSession[];
+  /** Sessões de turma: um bloco cada (os alunos não aparecem um a um). */
+  classSessions: AgendaClassSession[];
   /** Clique em uma sessão de turma (o bloco que junta os alunos). */
   onClassSessionSelect?: (session: AgendaClassSession) => void;
 };
@@ -91,7 +89,7 @@ export function DayGrid({
   onSlotPast,
   onSlotOverbooking,
   onAppointmentSelect,
-  emptyClassSessions = [],
+  classSessions: sessions,
   onClassSessionSelect,
 }: DayGridProps) {
   // Colunas dos outros profissionais somem no celular, quando há um escolhido.
@@ -137,13 +135,8 @@ export function DayGrid({
   // nem a um agendamento ativo que ocupou o horário liberado, nem a outro
   // cancelado já exibido (o horário pode ser liberado e reaproveitado várias vezes).
   // Os alunos de uma turma viram um bloco só, por sessão (class-session-blocks).
-  // Os horários de turma sem sessão entram vazios, para o encaixe começar por eles.
-  const split = splitClassSessions(appointments);
-  const { singles } = split;
-  const sessions = withEmptyClassSessions(
-    split.sessions,
-    emptyClassSessions,
-    singles,
+  const singles = appointments.filter(
+    (appointment) => appointment.classSession === null,
   );
 
   function visibleAppointments(professionalId: string): AgendaAppointment[] {

@@ -1,5 +1,8 @@
 import { Clock, UserRound, UsersRound } from "lucide-react";
-import { APPOINTMENT_STATUS } from "@/components/agenda/appointment-status";
+import {
+  APPOINTMENT_STATUS,
+  CANCEL_REASON_LABEL,
+} from "@/components/agenda/appointment-status";
 import type { AgendaClassSession } from "@/components/agenda/class-session-blocks";
 import {
   HoverCard,
@@ -28,8 +31,9 @@ export function ClassSessionBlock({
   onSelect,
 }: ClassSessionBlockProps) {
   const { serviceColor } = session;
-  // Sem aluno ocupando vaga (todos cancelados): esmaecida, como o cancelado.
-  const faded = session.occupied === 0;
+  const cancelled = session.cancelledAt !== null;
+  // Cancelada ou sem aluno ocupando vaga: esmaecida, como o cancelado.
+  const faded = cancelled || session.occupied === 0;
   const active = session.members.filter((m) => m.status !== "CANCELLED");
   const spots = `${session.occupied}/${session.capacity}`;
 
@@ -48,7 +52,7 @@ export function ClassSessionBlock({
               onSelect?.(session);
             }
           }}
-          aria-label={`${session.start} turma de ${session.serviceName}, das ${session.start} às ${session.end}, com ${session.professionalName}. ${session.occupied} de ${session.capacity} vagas ocupadas.`}
+          aria-label={`${session.start} turma de ${session.serviceName}, das ${session.start} às ${session.end}, com ${session.professionalName}. ${cancelled ? "Sessão cancelada." : `${session.occupied} de ${session.capacity} vagas ocupadas.`}`}
           className={`absolute inset-x-1 z-1 cursor-pointer overflow-hidden rounded-control border-l-[3px] py-1 pr-3 pl-2 ${
             faded ? "text-muted-foreground" : ""
           }`}
@@ -65,7 +69,9 @@ export function ClassSessionBlock({
             <time className="text-xs text-muted-foreground tabular-nums">
               {session.start}
             </time>
-            <h3 className="truncate text-sm font-medium">
+            <h3
+              className={`truncate text-sm font-medium ${cancelled ? "line-through" : ""}`}
+            >
               {session.serviceName}
             </h3>
             {/* Vagas ocupadas por escrito, no lugar da situação do agendamento. */}
@@ -81,9 +87,11 @@ export function ClassSessionBlock({
               <span aria-hidden="true">-</span>
             </span>
             <span className="truncate">
-              {active.length > 0
-                ? active.map((m) => m.clientName.split(" ")[0]).join(", ")
-                : "Sem alunos"}
+              {cancelled
+                ? "Sessão cancelada"
+                : active.length > 0
+                  ? active.map((m) => m.clientName.split(" ")[0]).join(", ")
+                  : "Sem alunos"}
             </span>
           </p>
         </div>
@@ -116,7 +124,9 @@ export function ClassSessionBlock({
           <li className="flex items-center gap-2">
             <UsersRound className="size-4 shrink-0" aria-hidden="true" />
             <span className="tabular-nums">
-              {session.occupied} de {session.capacity} vagas ocupadas
+              {cancelled
+                ? `Sessão cancelada${session.cancellationNote ? `: ${session.cancellationNote}` : ""}`
+                : `${session.occupied} de ${session.capacity} vagas ocupadas`}
             </span>
           </li>
         </ul>
@@ -125,8 +135,12 @@ export function ClassSessionBlock({
         {session.members.length > 0 && (
           <ul className="mt-3 space-y-1 border-t border-border pt-3">
             {session.members.map((member) => {
-              const { label, icon: StatusIcon } =
+              const { label: statusLabel, icon: StatusIcon } =
                 APPOINTMENT_STATUS[member.status];
+              // Aula cancelada pela clínica: o motivo no lugar do "Cancelado".
+              const label = member.cancelReason
+                ? CANCEL_REASON_LABEL[member.cancelReason]
+                : statusLabel;
               return (
                 <li
                   key={member.id}

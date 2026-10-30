@@ -23,7 +23,10 @@ import {
   markNoShowAction,
 } from "@/app/(admin)/appointment-actions";
 import { cancelRecurrenceSessionAction } from "@/app/(admin)/recurrence-actions";
-import { APPOINTMENT_STATUS } from "@/components/agenda/appointment-status";
+import {
+  APPOINTMENT_STATUS,
+  CANCEL_REASON_LABEL,
+} from "@/components/agenda/appointment-status";
 import {
   RecurrenceOriginIcon,
   recurrenceLabel,
@@ -247,6 +250,9 @@ function Details({
             aria-hidden="true"
           />
           {statusLabel}
+          {/* Aula de turma cancelada pela clínica: o porquê, ao lado. */}
+          {appointment.cancelReason &&
+            ` · ${CANCEL_REASON_LABEL[appointment.cancelReason]}`}
         </li>
         {appointment.overbooking && (
           <li className="flex items-center gap-2 font-medium">
@@ -288,14 +294,16 @@ function Details({
             Cancelar
           </Button>
           {/* O cliente pode pedir outro dia em vez de cancelar. O encaixe tem
-              regras próprias de horário: é remanejado pelo "Alterar". O aluno de
-              turma segue o horário da sessão: a API não o remaneja. */}
-          {!appointment.overbooking && !appointment.classSession && (
-            <Button type="button" onClick={onReschedule}>
-              <CalendarSync aria-hidden="true" />
-              Remanejar
-            </Button>
-          )}
+              regras próprias de horário: é remanejado pelo "Alterar". O aluno
+              avulso de turma segue o horário da sessão (a API não o remaneja);
+              a aula de recorrência ou plano em turma, sim: sai da sessão. */}
+          {!appointment.overbooking &&
+            (!appointment.classSession || appointment.recurrence) && (
+              <Button type="button" onClick={onReschedule}>
+                <CalendarSync aria-hidden="true" />
+                Remanejar
+              </Button>
+            )}
         </div>
       )}
 

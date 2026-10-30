@@ -1,4 +1,5 @@
 import type {
+  AppointmentCancelReason,
   AppointmentClassSession,
   AppointmentStatus,
 } from "@/types/appointment";
@@ -45,4 +46,6 @@ export type AgendaAppointment = {
   paid: boolean;
   /** Sessão de turma: os agendamentos dela aparecem num bloco só. */
   classSession: AppointmentClassSession | null;
+  /** Aula cancelada pela clínica na turma (sessão cancelada ou saída). */
+  cancelReason: AppointmentCancelReason | null;
 };

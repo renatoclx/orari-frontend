@@ -33,6 +33,7 @@ import {
 } from "@/components/ui/select";
 import type { TimeRange } from "@/types/agenda";
 import type { WeekDay } from "@/types/business-hour";
+import type { ClassGroupItem } from "@/types/class-group";
 import type { BillingType } from "@/types/client-plan";
 import type { PlanItem } from "@/types/plan";
 import type { RecurrenceDay } from "@/types/recurrence";
@@ -48,6 +49,8 @@ type ClientPlanFormProps = {
   professionals: { id: string; name: string }[];
   /** Duração e preço avulso de cada serviço, pelo id. */
   services: Record<string, ServiceInfo>;
+  /** Turmas ativas (vazia para quem não é ADMIN): cada serviço pode entrar numa. */
+  classGroups: ClassGroupItem[];
   /** Hoje e agora no fuso da empresa. */
   today: string;
   nowMinutes: number;
@@ -75,6 +78,7 @@ export function ClientPlanForm({
   plans,
   professionals,
   services,
+  classGroups,
   today,
   nowMinutes,
 }: ClientPlanFormProps) {
@@ -181,12 +185,15 @@ export function ClientPlanForm({
       Object.fromEntries(
         Object.entries(current).map(([serviceId, draft]) => [
           serviceId,
-          {
-            ...draft,
-            dayTimes: Object.fromEntries(
-              Object.keys(draft.dayTimes).map((day) => [day, ""]),
-            ),
-          },
+          // Na turma, os horários são os dela: não dependem do cliente nem do período.
+          draft.classGroupId
+            ? draft
+            : {
+                ...draft,
+                dayTimes: Object.fromEntries(
+                  Object.keys(draft.dayTimes).map((day) => [day, ""]),
+                ),
+              },
         ]),
       ),
     );
@@ -258,6 +265,7 @@ export function ClientPlanForm({
           serviceId: service.id,
           professionalId: schedules[service.id].professionalId,
           days: daysOf(service.id),
+          classGroupId: schedules[service.id].classGroupId || undefined,
         })),
       });
 
@@ -480,6 +488,9 @@ export function ClientPlanForm({
                   sessionsPerWeek: service.sessionsPerWeek,
                 }}
                 professionals={professionals}
+                classGroups={classGroups.filter(
+                  (group) => group.serviceId === service.id,
+                )}
                 value={schedules[service.id] ?? EMPTY_SCHEDULE}
                 onChange={(next) => {
                   setSchedules((current) => ({

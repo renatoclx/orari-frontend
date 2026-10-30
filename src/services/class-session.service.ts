@@ -2,7 +2,10 @@ import "server-only";
 
 import { apiFetch } from "@/services/api";
 import type { AppointmentItem } from "@/types/appointment";
-import type { ClassSessionItem } from "@/types/class-group";
+import type {
+  ClassSessionAgendaItem,
+  ClassSessionItem,
+} from "@/types/class-group";
 
 // Sessões de turma (só ADMIN): cada aluno tem o próprio agendamento, ligado à sessão.
 
@@ -63,4 +66,33 @@ export function enrollInClassGroup(
       body: JSON.stringify({ clientId, startAt }),
     },
   );
+}
+
+/**
+ * Agenda por sessão (from <= início < to, no máximo 31 dias): as sessões,
+ * inclusive as canceladas, e os horários futuros das turmas fixas ainda sem
+ * sessão. A API já tira os horários em que o profissional está ocupado.
+ */
+export function listClassSessions(params: {
+  from: Date;
+  to: Date;
+  classGroupId?: string;
+}): Promise<ClassSessionAgendaItem[]> {
+  const query = new URLSearchParams({
+    from: params.from.toISOString(),
+    to: params.to.toISOString(),
+  });
+  if (params.classGroupId) query.set("classGroupId", params.classGroupId);
+  return apiFetch<ClassSessionAgendaItem[]>(`/class-sessions?${query}`);
+}
+
+/** Cancela a sessão inteira (antes do início): os alunos têm a aula cancelada. */
+export function cancelClassSession(
+  id: string,
+  note?: string,
+): Promise<ClassSessionItem> {
+  return apiFetch<ClassSessionItem>(`/class-sessions/${id}/cancel`, {
+    method: "PATCH",
+    body: JSON.stringify(note ? { note } : {}),
+  });
 }

@@ -5,7 +5,6 @@ import { TablePagination } from "@/components/shared/TablePagination";
 import { getCurrentUser } from "@/services/auth.service";
 import { listClassGroups } from "@/services/class-group.service";
 import { listPeople } from "@/services/people.service";
-import { timeToMinutes, toDateString, toTimeString } from "@/utils/time";
 
 // Itens por página da listagem (a API aceita até 100).
 const PAGE_SIZE = 10;
@@ -32,8 +31,6 @@ export async function ClassGroupsListPage({
       : undefined;
   const page = Math.max(1, Number(searchParams.page) || 1);
 
-  const now = new Date();
-  const timeZone = currentUser.company.timezone;
   const [result, clients] = await Promise.all([
     listClassGroups({
       name: search || undefined,
@@ -55,8 +52,6 @@ export async function ClassGroupsListPage({
         clients={clients.items
           .filter((item) => item.deletedAt === null)
           .map((item) => ({ id: item.id, name: item.name }))}
-        today={toDateString(now, timeZone)}
-        nowMinutes={timeToMinutes(toTimeString(now.toISOString(), timeZone))}
         footer={
           <TablePagination
             page={page}

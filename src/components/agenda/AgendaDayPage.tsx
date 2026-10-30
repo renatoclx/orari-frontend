@@ -3,13 +3,14 @@ import { AgendaToolbar } from "@/components/agenda/AgendaToolbar";
 import { AgendaDayView } from "@/components/agenda/AgendaDayView";
 import {
   toAgendaAppointment,
-  toEmptyClassSessions,
+  toAgendaClassSessions,
 } from "@/components/agenda/agenda-data";
+import { splitClassSessions } from "@/components/agenda/class-session-blocks";
 import { computeGridRange, gridAreas } from "@/components/agenda/agenda-range";
 import { listAppointments } from "@/services/appointment.service";
 import { getCurrentUser } from "@/services/auth.service";
 import { listBusinessHours } from "@/services/business-hour.service";
-import { listClassGroups } from "@/services/class-group.service";
+import { listClassSessions } from "@/services/class-session.service";
 import { listPeople } from "@/services/people.service";
 import { listServices } from "@/services/service.service";
 import type { TimeRange } from "@/types/agenda";
@@ -44,20 +45,24 @@ export async function AgendaDayPage({ searchParams }: AgendaDayPageProps) {
       : today;
   const bounds = dayBounds(date, timeZone);
 
-  const [people, appointments, businessHours, clients, services, classGroups] =
-    await Promise.all([
-      listPeople({ type: "PROFESSIONAL", page: 1, limit: 100 }),
-      listAppointments(bounds),
-      listBusinessHours(weekDayOf(date)),
-      // RASCUNHO: opções do formulário de novo agendamento (primeiros 100).
-      listPeople({ type: "CLIENT", page: 1, limit: 100 }),
-      listServices({ page: 1, limit: 100 }),
-      // Turmas ativas (só o ADMIN as consulta): os horários delas aparecem na
-      // grade mesmo sem alunos, para o encaixe começar pela agenda.
-      currentUser.type === "ADMIN"
-        ? listClassGroups({ isActive: true, page: 1, limit: 100 })
-        : null,
-    ]);
+  const [
+    people,
+    appointments,
+    businessHours,
+    clients,
+    services,
+    classSessions,
+  ] = await Promise.all([
+    listPeople({ type: "PROFESSIONAL", page: 1, limit: 100 }),
+    listAppointments(bounds),
+    listBusinessHours(weekDayOf(date)),
+    // RASCUNHO: opções do formulário de novo agendamento (primeiros 100).
+    listPeople({ type: "CLIENT", page: 1, limit: 100 }),
+    listServices({ page: 1, limit: 100 }),
+    // Agenda por sessão (só o ADMIN consulta): traz as vagas, as sessões
+    // canceladas e os horários das turmas ainda sem alunos.
+    currentUser.type === "ADMIN" ? listClassSessions(bounds) : null,
+  ]);
 
   // Profissional inativo fica fora da grade (a agenda dele será remanejada).
   const professionals = people.items
@@ -79,12 +84,15 @@ export async function AgendaDayPage({ searchParams }: AgendaDayPageProps) {
     .filter((item) => visible.has(item.professionalId))
     .map((item) => toAgendaAppointment(item, timeZone, bounds.to));
 
-  const emptyClassSessions = toEmptyClassSessions(
-    (classGroups?.items ?? []).filter((group) =>
-      visible.has(group.professionalId),
-    ),
-    weekDayOf(date),
-  );
+  // Sem a consulta por sessão (outros perfis), as sessões saem dos agendamentos.
+  const agendaClassSessions = classSessions
+    ? toAgendaClassSessions(
+        classSessions.filter((item) => visible.has(item.professional.id)),
+        agendaAppointments,
+        timeZone,
+        bounds.to,
+      )
+    : splitClassSessions(agendaAppointments).sessions;
 
   const windows: TimeRange[] = businessHours.map((hours) => ({
     start: hours.openAt,
@@ -119,7 +127,7 @@ export async function AgendaDayPage({ searchParams }: AgendaDayPageProps) {
           initialFilterId={initialFilterId}
           professionals={professionals}
           appointments={agendaAppointments}
-          emptyClassSessions={emptyClassSessions}
+          classSessions={agendaClassSessions}
           range={range}
           unavailable={areas.outside}
           breaks={areas.breaks}

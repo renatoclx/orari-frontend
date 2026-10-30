@@ -1,6 +1,7 @@
 "use client";
 
 import {
+  Ban,
   Clock,
   Pencil,
   Plus,
@@ -13,12 +14,16 @@ import { useEffect, useState, useTransition } from "react";
 import { toast } from "sonner";
 import type { ClientOption } from "@/app/(admin)/appointment-actions";
 import {
+  cancelClassSessionAction,
   enrollInClassGroupAction,
   enrollInClassSessionAction,
   getClassSessionAction,
   updateClassSessionCapacityAction,
 } from "@/app/(admin)/class-session-actions";
-import { APPOINTMENT_STATUS } from "@/components/agenda/appointment-status";
+import {
+  APPOINTMENT_STATUS,
+  CANCEL_REASON_LABEL,
+} from "@/components/agenda/appointment-status";
 import {
   classSessionKey,
   type AgendaClassSession,
@@ -37,6 +42,7 @@ import {
   StudentPicker,
   type PickedStudent,
 } from "@/components/class-groups/StudentPicker";
+import { ConfirmDialog } from "@/components/shared/ConfirmDialog";
 import { FormField } from "@/components/shared/FormField";
 import { PersonAvatar } from "@/components/shared/PersonAvatar";
 import { Button } from "@/components/ui/button";
@@ -50,6 +56,7 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Textarea } from "@/components/ui/textarea";
 import type { ClassSessionItem } from "@/types/class-group";
 
 type ClassSessionDialogProps = {
@@ -107,6 +114,7 @@ type SessionView = Pick<
   | "classGroup"
   | "capacity"
   | "cancelledAt"
+  | "cancellationNote"
   | "appointments"
   | "occupied"
   | "available"
@@ -134,6 +142,9 @@ function SessionDetails({
   const [studentsMessage, setStudentsMessage] = useState<string>();
   const [capacity, setCapacity] = useState<string | null>(null);
   const [capacityMessage, setCapacityMessage] = useState<string>();
+  // Cancelamento da sessão inteira: confirmação com o motivo (opcional).
+  const [cancelOpen, setCancelOpen] = useState(false);
+  const [cancelNote, setCancelNote] = useState("");
   const [pending, startTransition] = useTransition();
 
   useEffect(() => {
@@ -166,6 +177,7 @@ function SessionDetails({
             : null,
           capacity: session.capacity,
           cancelledAt: null,
+          cancellationNote: null,
           appointments: [],
           occupied: 0,
           available: session.capacity,
@@ -218,6 +230,24 @@ function SessionDetails({
           { description: "O motivo está ao lado de cada nome." },
         );
       }
+    });
+  }
+
+  function cancelSession() {
+    if (!data) return;
+    startTransition(async () => {
+      const result = await cancelClassSessionAction(data.id, cancelNote);
+      if (result.ok) {
+        toast.success("Sessão cancelada.", {
+          description: "As aulas dos alunos foram canceladas.",
+        });
+        setData(result.session);
+        setCancelOpen(false);
+        return;
+      }
+      toast.error("Não foi possível cancelar a sessão.", {
+        description: result.message,
+      });
     });
   }
 
@@ -368,8 +398,12 @@ function SessionDetails({
         ) : view ? (
           <ul className="divide-y divide-border rounded-control border border-border">
             {view.appointments.map((participant) => {
-              const { label, icon: StatusIcon } =
+              const { label: statusLabel, icon: StatusIcon } =
                 APPOINTMENT_STATUS[participant.status];
+              // Aula cancelada pela clínica: o motivo no lugar do "Cancelado".
+              const label = participant.cancelReason
+                ? CANCEL_REASON_LABEL[participant.cancelReason]
+                : statusLabel;
               return (
                 <li key={participant.id}>
                   {/* O agendamento do aluno: situação, falta e cancelamento. */}
@@ -453,17 +487,54 @@ function SessionDetails({
         ) : (
           <p className="text-sm text-muted-foreground">
             {view.cancelledAt
-              ? "Sessão cancelada."
+              ? `Sessão cancelada${view.cancellationNote ? `: ${view.cancellationNote}` : "."}`
               : "A sessão já começou: não recebe novos alunos."}
           </p>
         ))}
 
       <DialogFooter>
+        {/* Só a sessão criada, antes do início, é cancelada (ex.: feriado). */}
+        {open && data && (
+          <Button
+            type="button"
+            variant="outline"
+            className="text-destructive hover:text-destructive sm:mr-auto"
+            disabled={pending}
+            onClick={() => setCancelOpen(true)}
+          >
+            <Ban aria-hidden="true" />
+            Cancelar sessão
+          </Button>
+        )}
         <Button type="button" variant="outline" onClick={onClose}>
           <X aria-hidden="true" />
           Fechar
         </Button>
       </DialogFooter>
+
+      <ConfirmDialog
+        open={cancelOpen}
+        onOpenChange={setCancelOpen}
+        title="Cancelar sessão?"
+        description={`As aulas de ${studentsLabel(view?.occupied ?? 0)} serão canceladas, com os pagamentos pendentes. A sessão de plano poderá ser reposta em outra data. Não é possível desfazer.`}
+        confirmLabel="Cancelar sessão"
+        pendingLabel="Cancelando…"
+        cancelLabel="Voltar"
+        icon={Ban}
+        destructive
+        pending={pending}
+        onConfirm={cancelSession}
+      >
+        <FormField id="cancel-session-note" label="Motivo (opcional)">
+          <Textarea
+            id="cancel-session-note"
+            value={cancelNote}
+            maxLength={500}
+            placeholder="Ex.: feriado, professora ausente"
+            onChange={(event) => setCancelNote(event.target.value)}
+          />
+        </FormField>
+      </ConfirmDialog>
     </>
   );
 }

@@ -43,6 +43,8 @@ type RescheduleSessionDialogProps = {
   today: string;
   /** Reposição de sessão de pacote após falta: só muda os textos (o fluxo é o mesmo). */
   replacement?: boolean;
+  /** A aula está numa sessão de turma: remanejar a tira de lá (atendimento individual). */
+  inClass?: boolean;
   /** Grava o novo dia e horário (a recorrência e o agendamento comum usam rotas diferentes). */
   onSubmit: (
     date: string,
@@ -78,6 +80,7 @@ function RescheduleForm({
   period,
   today,
   replacement,
+  inClass,
   onSubmit,
   onOpenChange,
 }: RescheduleSessionDialogProps & { session: ReschedulableSession }) {
@@ -182,6 +185,9 @@ function RescheduleForm({
           {replacement
             ? `Escolha o novo dia e horário da sessão que ${clientName} perdeu, com ${professional.name}, dentro do período da contratação. A sessão volta a Agendado.`
             : `Escolha a nova data e o horário de ${clientName} com ${professional.name}${period ? ", dentro do período da recorrência." : "."}`}
+          {/* Regra de turmas: remanejar tira o aluno da sessão e libera a vaga. */}
+          {inClass &&
+            " A aula sai da turma e vira atendimento individual (a vaga fica livre)."}
         </DialogDescription>
       </DialogHeader>
 

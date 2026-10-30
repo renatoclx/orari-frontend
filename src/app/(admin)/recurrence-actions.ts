@@ -6,13 +6,16 @@ import {
   MAX_RECURRENCE_MONTHS,
 } from "@/components/recurrences/recurrence-schedule";
 import { failureFrom, type ActionFailure } from "@/lib/action-result";
+import { isUuid } from "@/lib/uuid";
 import { getCurrentUser } from "@/services/auth.service";
 import {
   cancelRecurrence,
   cancelRecurrenceSession,
   createRecurrence,
   getRecurrence,
+  leaveClassGroup,
   listRecurrenceSessions,
+  replaceInClassGroup,
   rescheduleRecurrenceSession,
   updateRecurrenceNote,
 } from "@/services/recurrence.service";
@@ -146,4 +149,30 @@ export async function rescheduleRecurrenceSessionAction(
 
 export async function updateRecurrenceNoteAction(id: string, note: string) {
   return run(id, () => updateRecurrenceNote(id, note.trim() || null));
+}
+
+/** Saída da turma, com o motivo (opcional). */
+export async function leaveClassGroupAction(id: string, note: string) {
+  return run(id, () => leaveClassGroup(id, note.trim() || undefined));
+}
+
+/** Reposição numa sessão de turma: dia ("aaaa-mm-dd") e horário dela, no fuso da empresa. */
+export async function replaceInClassGroupAction(
+  id: string,
+  sessionId: string,
+  classGroupId: string,
+  date: string,
+  time: string,
+) {
+  if (![id, sessionId, classGroupId].every(isUuid) || !isDateString(date)) {
+    return { ok: false as const, message: "Dados inválidos." };
+  }
+  const { company } = await getCurrentUser();
+  const start = new Date(
+    dayBounds(date, company.timezone).from.getTime() +
+      timeToMinutes(time) * 60_000,
+  );
+  return run(id, () =>
+    replaceInClassGroup(id, sessionId, classGroupId, start.toISOString()),
+  );
 }

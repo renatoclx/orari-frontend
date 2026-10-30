@@ -15,6 +15,7 @@ import { setClassGroupActiveAction } from "@/app/(admin)/class-group-actions";
 import type { ClientOption } from "@/app/(admin)/appointment-actions";
 import { ClassGroupEditDialog } from "@/components/class-groups/ClassGroupEditDialog";
 import { EnrollClassGroupDialog } from "@/components/class-groups/EnrollClassGroupDialog";
+import { UpcomingSessionsList } from "@/components/class-groups/UpcomingSessionsList";
 import {
   classGroupLabel,
   describeClassDays,
@@ -52,9 +53,6 @@ type ClassGroupListProps = {
   footer: React.ReactNode;
   /** Primeiros clientes, para o "Adicionar alunos". */
   clients: ClientOption[];
-  /** Hoje e agora no fuso da empresa: o encaixe só vale para sessões futuras. */
-  today: string;
-  nowMinutes: number;
 };
 
 // Serviço com a bolinha da cor dele (a mesma do agendamento).
@@ -167,7 +165,9 @@ function ClassGroupDetails({ classGroup }: { classGroup: ClassGroupItem }) {
     <>
       <DialogHeader>
         <DialogTitle>{classGroupLabel(classGroup)}</DialogTitle>
-        <DialogDescription>Dados da turma.</DialogDescription>
+        <DialogDescription>
+          Dados da turma e as próximas sessões.
+        </DialogDescription>
       </DialogHeader>
 
       <dl className="grid grid-cols-[auto_1fr] gap-x-4 gap-y-2 text-sm">
@@ -192,6 +192,11 @@ function ClassGroupDetails({ classGroup }: { classGroup: ClassGroupItem }) {
           <StatusBadge active={classGroup.isActive} />
         </dd>
       </dl>
+
+      <section className="space-y-2 border-t border-border pt-4">
+        <h3 className="text-sm font-medium">Próximas sessões</h3>
+        <UpcomingSessionsList classGroupId={classGroup.id} />
+      </section>
     </>
   );
 }
@@ -202,8 +207,6 @@ export function ClassGroupList({
   filtered,
   footer,
   clients,
-  today,
-  nowMinutes,
 }: ClassGroupListProps) {
   // A turma fica guardada ao fechar, para o dialog não trocar de título durante
   // a animação de saída.
@@ -334,8 +337,6 @@ export function ClassGroupList({
       <EnrollClassGroupDialog
         classGroup={enrolling}
         clients={clients}
-        today={today}
-        nowMinutes={nowMinutes}
         onClose={() => setEnrolling(null)}
       />
 

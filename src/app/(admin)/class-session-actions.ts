@@ -6,14 +6,25 @@ import { failureFrom, type ActionFailure } from "@/lib/action-result";
 import { isUuid } from "@/lib/uuid";
 import { getCurrentUser } from "@/services/auth.service";
 import {
+  cancelClassSession,
   createClassSession,
   enrollInClassGroup,
   enrollInClassSession,
   getClassSession,
+  listClassSessions,
   updateClassSessionCapacity,
 } from "@/services/class-session.service";
-import type { ClassSessionItem } from "@/types/class-group";
-import { dayBounds, isDateString, timeToMinutes } from "@/utils/time";
+import type {
+  ClassSessionItem,
+  UpcomingClassSession,
+} from "@/types/class-group";
+import {
+  dayBounds,
+  isDateString,
+  timeToMinutes,
+  toDateString,
+  toTimeString,
+} from "@/utils/time";
 
 export type ClassSessionResult =
   { ok: true; session: ClassSessionItem } | ActionFailure;
@@ -108,4 +119,51 @@ export async function enrollInClassGroupAction(
     );
     return getClassSession(appointment.classSession!.id);
   });
+}
+
+// Quantos dias à frente as próximas sessões cobrem (a API aceita até 31).
+const UPCOMING_DAYS = 28;
+
+export type UpcomingSessionsResult =
+  { ok: true; sessions: UpcomingClassSession[] } | ActionFailure;
+
+/**
+ * Próximas sessões da turma fixa (4 semanas), com as vagas de cada uma,
+ * inclusive os horários ainda sem sessão e as sessões canceladas.
+ */
+export async function listUpcomingSessionsAction(
+  classGroupId: string,
+): Promise<UpcomingSessionsResult> {
+  if (!isUuid(classGroupId)) return { ok: false, message: "Dados inválidos." };
+  try {
+    const { company } = await getCurrentUser();
+    const from = new Date();
+    const to = new Date(from.getTime() + UPCOMING_DAYS * 24 * 60 * 60_000);
+    const items = await listClassSessions({ from, to, classGroupId });
+    return {
+      ok: true,
+      sessions: items.map((item) => ({
+        id: item.id,
+        date: toDateString(new Date(item.startAt), company.timezone),
+        time: toTimeString(item.startAt, company.timezone),
+        capacity: item.capacity,
+        occupied: item.occupied,
+        available: item.available,
+        cancelledAt: item.cancelledAt,
+        students: item.appointments
+          .filter((student) => student.status !== "CANCELLED")
+          .map((student) => student.client.name),
+      })),
+    };
+  } catch (error) {
+    return failureFrom(error);
+  }
+}
+
+/** Cancela a sessão inteira; o motivo (opcional) fica registrado. */
+export async function cancelClassSessionAction(
+  id: string,
+  note: string,
+): Promise<ClassSessionResult> {
+  return run([id], () => cancelClassSession(id, note.trim() || undefined));
 }

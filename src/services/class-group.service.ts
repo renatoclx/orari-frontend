@@ -13,6 +13,8 @@ type ListClassGroupsParams = {
   name?: string;
   /** Sem ele, vêm ativas e inativas. */
   isActive?: boolean;
+  /** Só as turmas deste serviço. */
+  serviceId?: string;
   page: number;
   limit: number;
 };
@@ -29,6 +31,7 @@ export function listClassGroups(
   if (name) query.set("name", name);
   if (params.isActive !== undefined)
     query.set("isActive", String(params.isActive));
+  if (params.serviceId) query.set("serviceId", params.serviceId);
 
   return apiFetch<Paginated<ClassGroupItem>>(`/class-groups?${query}`);
 }

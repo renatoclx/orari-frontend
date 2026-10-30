@@ -7,6 +7,8 @@ import { useState, useTransition } from "react";
 import { toast } from "sonner";
 import type { ClientOption } from "@/app/(admin)/appointment-actions";
 import { createRecurrenceAction } from "@/app/(admin)/recurrence-actions";
+import { ClassDaysField } from "@/components/class-groups/ClassDaysField";
+import { ClassGroupSelect } from "@/components/class-groups/ClassGroupSelect";
 import {
   RecurrenceDaysField,
   type DayTimes,
@@ -33,6 +35,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
+import type { ClassGroupItem } from "@/types/class-group";
 import type { RecurrenceDay } from "@/types/recurrence";
 import { formatDateOnly, formatDuration } from "@/utils/format";
 import { minutesToTime, timeToMinutes } from "@/utils/time";
@@ -47,6 +50,8 @@ type RecurrenceFormProps = {
     duration: number;
     color: string | null;
   }[];
+  /** Turmas ativas (vazia para quem não é ADMIN): a recorrência pode entrar numa. */
+  classGroups: ClassGroupItem[];
   /** Hoje e agora no fuso da empresa: o que já passou não gera sessão. */
   today: string;
   nowMinutes: number;
@@ -70,6 +75,7 @@ export function RecurrenceForm({
   clients,
   professionals,
   services,
+  classGroups,
   today,
   nowMinutes,
 }: RecurrenceFormProps) {
@@ -77,6 +83,8 @@ export function RecurrenceForm({
   const [clientId, setClientId] = useState("");
   const [serviceId, setServiceId] = useState("");
   const [professionalId, setProfessionalId] = useState("");
+  // Turma fixa (opcional): fixa serviço e profissional e limita os dias aos dela.
+  const [classGroupId, setClassGroupId] = useState("");
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
   const [dayTimes, setDayTimes] = useState<DayTimes>({});
@@ -86,6 +94,11 @@ export function RecurrenceForm({
   const clientSearch = useClientSearch(clients, clientId);
 
   const service = services.find((item) => item.id === serviceId);
+  // Só as turmas cujo serviço pode ter recorrência (ativo e com preço).
+  const classOptions = classGroups.filter((group) =>
+    services.some((item) => item.id === group.serviceId),
+  );
+  const classGroup = classOptions.find((group) => group.id === classGroupId);
   const maxEnd = startDate ? addMonths(startDate, MAX_RECURRENCE_MONTHS) : "";
 
   // Dias completos (com horário) e o horário final de cada um (início + duração).
@@ -113,6 +126,8 @@ export function RecurrenceForm({
   // Cliente, profissional, serviço e período mudam os horários livres: os horários
   // já escolhidos deixam de valer (os dias marcados continuam).
   function resetTimes() {
+    // Na turma, os horários são os dela: não dependem de quem nem do período.
+    if (classGroupId) return;
     setDayTimes((current) =>
       Object.fromEntries(Object.keys(current).map((day) => [day, ""])),
     );
@@ -171,6 +186,7 @@ export function RecurrenceForm({
         startDate,
         endDate,
         note: note.trim() || undefined,
+        classGroupId: classGroup?.id,
         days,
       });
 
@@ -196,6 +212,33 @@ export function RecurrenceForm({
       {/* relative: os inputs escondidos do Radix (Switch e Select num form) são
           absolutos; presos aqui, não aumentam a altura da página. */}
       <div className="relative min-h-0 flex-1 space-y-4 overflow-auto p-4 md:p-6">
+        {classOptions.length > 0 && (
+          <div className="max-w-md">
+            <FormField id="recurrence-class" label="Turma">
+              <ClassGroupSelect
+                id="recurrence-class"
+                classGroups={classOptions}
+                value={classGroupId}
+                showService
+                onChange={(next) => {
+                  setClassGroupId(next);
+                  const group = classOptions.find((item) => item.id === next);
+                  // Com turma, serviço e profissional são os dela.
+                  if (group) {
+                    setServiceId(group.serviceId);
+                    setProfessionalId(group.professionalId);
+                    clear("service");
+                    clear("professional");
+                  }
+                  // Os dias mudam de natureza (livres ou da turma): recomeçam.
+                  setDayTimes({});
+                  clear("days");
+                }}
+              />
+            </FormField>
+          </div>
+        )}
+
         <div className="grid gap-4 md:grid-cols-2">
           <FormField
             id="recurrence-client"
@@ -245,6 +288,7 @@ export function RecurrenceForm({
               placeholder="Selecione o serviço…"
               searchPlaceholder="Buscar serviço…"
               emptyMessage="Nenhum serviço encontrado."
+              disabled={Boolean(classGroup)}
             />
           </FormField>
 
@@ -256,6 +300,7 @@ export function RecurrenceForm({
           >
             <Select
               value={professionalId || undefined}
+              disabled={Boolean(classGroup)}
               onValueChange={(next) => {
                 setProfessionalId(next);
                 resetTimes();
@@ -323,20 +368,34 @@ export function RecurrenceForm({
           required
           error={errors.days}
         >
-          <RecurrenceDaysField
-            value={dayTimes}
-            onChange={(next) => {
-              setDayTimes(next);
-              clear("days");
-            }}
-            id="recurrence-days"
-            invalid={Boolean(errors.days)}
-            clientId={clientId}
-            professionalId={professionalId}
-            duration={service?.duration ?? 0}
-            startDate={startDate}
-            endDate={endDate}
-          />
+          {/* Na turma, os dias são os horários dela; fora, os horários livres. */}
+          {classGroup ? (
+            <ClassDaysField
+              id="recurrence-days"
+              slots={classGroup.days}
+              value={dayTimes}
+              onChange={(next) => {
+                setDayTimes(next);
+                clear("days");
+              }}
+              invalid={Boolean(errors.days)}
+            />
+          ) : (
+            <RecurrenceDaysField
+              value={dayTimes}
+              onChange={(next) => {
+                setDayTimes(next);
+                clear("days");
+              }}
+              id="recurrence-days"
+              invalid={Boolean(errors.days)}
+              clientId={clientId}
+              professionalId={professionalId}
+              duration={service?.duration ?? 0}
+              startDate={startDate}
+              endDate={endDate}
+            />
+          )}
         </FormField>
 
         {service && days.length > 0 && (

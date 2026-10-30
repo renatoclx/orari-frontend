@@ -28,6 +28,8 @@ type ConfirmDialogProps = {
   /** Ícone do botão de confirmação (ex.: lixeira para "Excluir"). */
   icon: LucideIcon;
   onConfirm: () => void;
+  /** Campos entre a descrição e os botões (ex.: o motivo do cancelamento). */
+  children?: React.ReactNode;
 };
 
 // Diálogo de confirmação padrão (screen-patterns.md): mostra o que vai
@@ -45,6 +47,7 @@ export function ConfirmDialog({
   cancelLabel = "Cancelar",
   icon: Icon,
   onConfirm,
+  children,
 }: ConfirmDialogProps) {
   return (
     <AlertDialog
@@ -56,6 +59,7 @@ export function ConfirmDialog({
           <AlertDialogTitle>{title}</AlertDialogTitle>
           <AlertDialogDescription>{description}</AlertDialogDescription>
         </AlertDialogHeader>
+        {children}
         <AlertDialogFooter>
           <AlertDialogCancel disabled={pending}>
             {cancelLabel === "Voltar" ? (

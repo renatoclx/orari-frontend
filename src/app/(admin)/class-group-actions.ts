@@ -10,11 +10,13 @@ import {
 import { WEEK_DAYS } from "@/components/recurrences/recurrence-schedule";
 import { failureFrom, type ActionFailure } from "@/lib/action-result";
 import { isUuid } from "@/lib/uuid";
+import { getCurrentUser } from "@/services/auth.service";
 import {
   createClassGroup,
+  listClassGroups,
   updateClassGroup,
 } from "@/services/class-group.service";
-import type { ClassGroupInput } from "@/types/class-group";
+import type { ClassGroupInput, ClassGroupItem } from "@/types/class-group";
 
 export type ClassGroupActionResult = { ok: true } | ActionFailure;
 
@@ -99,4 +101,34 @@ export async function setClassGroupActiveAction(
 
   revalidatePath(BASE_PATH);
   return { ok: true };
+}
+
+export type ServiceClassGroupsResult =
+  | { ok: true; canManage: boolean; classGroups: ClassGroupItem[] }
+  | ActionFailure;
+
+/**
+ * Turmas ativas de um serviço, para repor uma aula em turma. Só o ADMIN mexe
+ * em turma: para os demais, `canManage` é falso e a lista vem vazia (a tela
+ * nem mostra as ações de turma).
+ */
+export async function listServiceClassGroupsAction(
+  serviceId: string,
+): Promise<ServiceClassGroupsResult> {
+  if (!isUuid(serviceId)) return { ok: false, message: "Dados inválidos." };
+  try {
+    const user = await getCurrentUser();
+    if (user.type !== "ADMIN") {
+      return { ok: true, canManage: false, classGroups: [] };
+    }
+    const result = await listClassGroups({
+      isActive: true,
+      serviceId,
+      page: 1,
+      limit: 100,
+    });
+    return { ok: true, canManage: true, classGroups: result.items };
+  } catch (error) {
+    return failureFrom(error);
+  }
 }

@@ -1,5 +1,4 @@
 import type { AgendaAppointment } from "@/types/agenda";
-import { timeToMinutes } from "@/utils/time";
 
 /** Sessão de turma como a grade a desenha: um bloco com os alunos dela. */
 export type AgendaClassSession = {
@@ -11,8 +10,8 @@ export type AgendaClassSession = {
   professionalId: string;
   /** Turma fixa de origem (nulo na sessão avulsa). */
   classGroupId: string | null;
-  /** Nome da turma, conhecido só no horário ainda sem sessão (vem do cadastro). */
-  classGroupName?: string | null;
+  /** Nome da turma fixa (nulo sem nome, na sessão avulsa ou quando não se sabe). */
+  classGroupName: string | null;
   start: string;
   end: string;
   serviceName: string;
@@ -24,6 +23,9 @@ export type AgendaClassSession = {
   occupied: number;
   /** Agendamentos dos alunos, em ordem alfabética, inclusive os cancelados. */
   members: AgendaAppointment[];
+  /** Sessão cancelada pela clínica (nulo enquanto vale) e o motivo. */
+  cancelledAt: string | null;
+  cancellationNote: string | null;
 };
 
 /**
@@ -54,6 +56,8 @@ export function splitClassSessions(appointments: AgendaAppointment[]): {
       id: session.id,
       professionalId: first.professionalId,
       classGroupId: session.classGroupId,
+      // O agendamento não traz o nome da turma (a consulta por sessão traz).
+      classGroupName: null,
       start: first.start,
       end: first.end,
       serviceName: first.serviceName,
@@ -62,9 +66,9 @@ export function splitClassSessions(appointments: AgendaAppointment[]): {
       professionalName: first.professionalName,
       capacity: session.capacity,
       occupied: members.filter((m) => m.status !== "CANCELLED").length,
-      members: [...members].sort((a, b) =>
-        a.clientName.localeCompare(b.clientName, "pt-BR"),
-      ),
+      members: sortByName(members),
+      cancelledAt: session.cancelledAt,
+      cancellationNote: null,
     };
   });
 
@@ -76,39 +80,9 @@ export function classSessionKey(session: AgendaClassSession): string {
   return session.id ?? `${session.classGroupId}-${session.start}`;
 }
 
-/**
- * Junta às sessões do dia os horários de turma fixa ainda sem sessão. Um
- * horário fica de fora se a turma já tem sessão nele, ou se o profissional
- * está ocupado ali (agendamento ativo ou outra sessão com alunos): o bloco
- * vazio não cobre um atendimento de verdade.
- */
-export function withEmptyClassSessions(
-  sessions: AgendaClassSession[],
-  empty: AgendaClassSession[],
-  singles: AgendaAppointment[],
-): AgendaClassSession[] {
-  const overlaps = (
-    a: { start: string; end: string },
-    b: { start: string; end: string },
-  ) =>
-    timeToMinutes(a.start) < timeToMinutes(b.end) &&
-    timeToMinutes(a.end) > timeToMinutes(b.start);
-
-  const busy = [
-    ...singles.filter((appointment) => appointment.status !== "CANCELLED"),
-    ...sessions.filter((session) => session.occupied > 0),
-  ];
-  const free = empty.filter(
-    (slot) =>
-      !sessions.some(
-        (session) =>
-          session.classGroupId === slot.classGroupId &&
-          session.start === slot.start,
-      ) &&
-      !busy.some(
-        (other) =>
-          other.professionalId === slot.professionalId && overlaps(other, slot),
-      ),
+/** Alunos em ordem alfabética (pt-BR), como a API devolve os da sessão. */
+export function sortByName(members: AgendaAppointment[]): AgendaAppointment[] {
+  return [...members].sort((a, b) =>
+    a.clientName.localeCompare(b.clientName, "pt-BR"),
   );
-  return [...sessions, ...free];
 }

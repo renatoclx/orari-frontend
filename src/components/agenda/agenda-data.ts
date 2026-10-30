@@ -1,8 +1,10 @@
-import type { AgendaClassSession } from "@/components/agenda/class-session-blocks";
+import {
+  sortByName,
+  type AgendaClassSession,
+} from "@/components/agenda/class-session-blocks";
 import type { AgendaAppointment } from "@/types/agenda";
 import type { AppointmentItem } from "@/types/appointment";
-import type { ClassGroupItem } from "@/types/class-group";
-import type { WeekDay } from "@/types/business-hour";
+import type { ClassSessionAgendaItem } from "@/types/class-group";
 import { toTimeString } from "@/utils/time";
 
 // Serviço sem cor cadastrada: cinza neutro, para o bloco continuar legível.
@@ -45,34 +47,47 @@ export function toAgendaAppointment(
     recurrence: item.recurringAppointment,
     paid: item.payment?.status === "PAID" && item.payment.deletedAt === null,
     classSession: item.classSession,
+    cancelReason: item.cancelReason,
   };
 }
 
 /**
- * Horários das turmas fixas no dia da semana → blocos vazios da grade (sem
- * sessão ainda). A grade descarta os que já têm sessão (withEmptyClassSessions).
+ * Sessões da consulta por sessão (GET /class-sessions) → blocos da grade. Os
+ * alunos são os agendamentos do dia ligados a cada sessão; o horário ainda sem
+ * sessão (`id` nulo) vem vazio.
  */
-export function toEmptyClassSessions(
-  groups: ClassGroupItem[],
-  weekDay: WeekDay,
+export function toAgendaClassSessions(
+  items: ClassSessionAgendaItem[],
+  appointments: AgendaAppointment[],
+  timeZone: string,
+  dayEnd: Date,
 ): AgendaClassSession[] {
-  return groups.flatMap((group) =>
-    group.days
-      .filter((day) => day.weekDay === weekDay)
-      .map((day) => ({
-        id: null,
-        professionalId: group.professionalId,
-        classGroupId: group.id,
-        classGroupName: group.name,
-        start: day.startTime,
-        end: day.endTime,
-        serviceName: group.service.name,
-        serviceColor: group.service.color ?? DEFAULT_SERVICE_COLOR,
-        durationMinutes: group.service.duration,
-        professionalName: group.professional.name,
-        capacity: group.capacity,
-        occupied: 0,
-        members: [],
-      })),
-  );
+  return items.map((item) => {
+    const endsAfterDay = new Date(item.endAt).getTime() >= dayEnd.getTime();
+    return {
+      id: item.id,
+      professionalId: item.professional.id,
+      classGroupId: item.classGroup?.id ?? null,
+      classGroupName: item.classGroup?.name ?? null,
+      start: toTimeString(item.startAt, timeZone),
+      end: endsAfterDay ? "24:00" : toTimeString(item.endAt, timeZone),
+      serviceName: item.service.name,
+      // Como no agendamento: a sessão de encaixe tem a cor do encaixe.
+      serviceColor: item.overBooking
+        ? OVERBOOKING_COLOR
+        : (item.service.color ?? DEFAULT_SERVICE_COLOR),
+      durationMinutes: item.service.duration,
+      professionalName: item.professional.name,
+      capacity: item.capacity,
+      occupied: item.occupied,
+      members: sortByName(
+        appointments.filter(
+          (appointment) =>
+            item.id !== null && appointment.classSession?.id === item.id,
+        ),
+      ),
+      cancelledAt: item.cancelledAt,
+      cancellationNote: item.cancellationNote,
+    };
+  });
 }

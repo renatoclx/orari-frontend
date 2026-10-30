@@ -1,13 +1,19 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import { Ban, CalendarClock } from "lucide-react";
+import { Ban, CalendarClock, UsersRound } from "lucide-react";
 import { toast } from "sonner";
 import {
   cancelRecurrenceSessionAction,
   rescheduleRecurrenceSessionAction,
 } from "@/app/(admin)/recurrence-actions";
-import { APPOINTMENT_STATUS } from "@/components/agenda/appointment-status";
+import {
+  APPOINTMENT_STATUS,
+  CANCEL_REASON_LABEL,
+} from "@/components/agenda/appointment-status";
+import { useServiceClassGroups } from "@/components/class-groups/useServiceClassGroups";
+import { LeaveClassButton } from "@/components/recurrences/LeaveClassButton";
+import { ReplaceInClassDialog } from "@/components/recurrences/ReplaceInClassDialog";
 import { RescheduleSessionDialog } from "@/components/recurrences/RescheduleSessionDialog";
 import { ConfirmDialog } from "@/components/shared/ConfirmDialog";
 import { Hint } from "@/components/shared/Hint";
@@ -32,6 +38,12 @@ type RecurrenceSessionsProps = {
   clientName: string;
   duration: number;
   period: { start: string; end: string };
+  /** Serviço da recorrência: as turmas dele recebem a reposição em turma. */
+  serviceId: string;
+  /** Turma da recorrência (nula fora de turma), a saída dela e o motivo. */
+  classGroupId: string | null;
+  classLeftAt: string | null;
+  classLeaveNote: string | null;
   /** Chamado depois de cancelar ou remanejar (ex.: buscar as sessões de novo). */
   onChanged?: () => void;
 };
@@ -52,8 +64,16 @@ export function RecurrenceSessions({
   clientName,
   duration,
   period,
+  serviceId,
+  classGroupId,
+  classLeftAt,
+  classLeaveNote,
   onChanged,
 }: RecurrenceSessionsProps) {
+  // Turmas do serviço (só o ADMIN as vê): reposição em turma e saída da turma.
+  const { canManage, classGroups } = useServiceClassGroups(serviceId);
+  const [replacingInClass, setReplacingInClass] =
+    useState<RecurrenceSession | null>(null);
   const [cancelling, setCancelling] = useState<RecurrenceSession | null>(null);
   const [rescheduling, setRescheduling] = useState<RecurrenceSession | null>(
     null,
@@ -78,11 +98,45 @@ export function RecurrenceSessions({
     );
   }
 
-  // Reposição: sessão de pacote em que o cliente faltou volta a ser agendada em
+  // Reposição: sessão de pacote em que o cliente faltou, ou que a clínica
+  // cancelou na turma (sessão cancelada ou saída), volta a ser agendada em
   // outra data (o backend aceita só em pacote).
   function replaceable(session: RecurrenceSession): boolean {
-    return isPackage && active && session.status === "NO_SHOW";
+    return (
+      isPackage &&
+      active &&
+      (session.status === "NO_SHOW" ||
+        (session.status === "CANCELLED" && session.cancelReason !== null))
+    );
   }
+
+  // Situação por escrito: o motivo da clínica no lugar do "Cancelado" e a
+  // marca de turma na aula que está numa sessão.
+  function statusText(session: RecurrenceSession): string {
+    const label = session.cancelReason
+      ? CANCEL_REASON_LABEL[session.cancelReason]
+      : APPOINTMENT_STATUS[session.status].label;
+    return session.classSessionId && session.status !== "CANCELLED"
+      ? `${label} · Turma`
+      : label;
+  }
+
+  // Levar a aula para uma sessão de turma: com turma do serviço e aula que
+  // ainda pode mudar (futura ou reposição).
+  const classAction = (session: RecurrenceSession) =>
+    canManage &&
+    classGroups.length > 0 && (
+      <Hint label="Repor em turma">
+        <Button
+          variant="ghost"
+          size="icon"
+          aria-label={`Repor em turma a sessão de ${dateLabel(session)}`}
+          onClick={() => setReplacingInClass(session)}
+        >
+          <UsersRound aria-hidden="true" />
+        </Button>
+      </Hint>
+    );
 
   function cancelSession() {
     if (!cancelling) return;
@@ -149,17 +203,48 @@ export function RecurrenceSessions({
     </Hint>
   );
   const rowActions = (session: RecurrenceSession) =>
-    editable(session)
-      ? sessionActions(session)
-      : replaceable(session) && replaceAction(session);
+    editable(session) ? (
+      <div className="flex items-center gap-1">
+        {sessionActions(session)}
+        {classAction(session)}
+      </div>
+    ) : (
+      replaceable(session) && (
+        <div className="flex items-center gap-1">
+          {replaceAction(session)}
+          {classAction(session)}
+        </div>
+      )
+    );
 
   return (
     <>
+      {/* Recorrência em turma: a situação na turma e, para o ADMIN, a saída. */}
+      {classGroupId && (
+        <div className="flex flex-wrap items-center justify-between gap-2 border-b border-border px-4 py-2 text-sm">
+          <p className="flex items-center gap-2 text-muted-foreground">
+            <UsersRound className="size-4 shrink-0" aria-hidden="true" />
+            {classLeftAt
+              ? // A saída é um instante: o dia é o do fuso da empresa.
+                `Saiu da turma em ${formatDateOnly(`${toDateString(new Date(classLeftAt), timeZone)}T00:00:00Z`)}${classLeaveNote ? `: ${classLeaveNote}` : ""}`
+              : "Em turma"}
+          </p>
+          {canManage && active && !classLeftAt && (
+            <LeaveClassButton
+              recurrenceId={recurrenceId}
+              clientName={clientName}
+              isPackage={isPackage}
+              onLeft={onChanged}
+            />
+          )}
+        </div>
+      )}
+
       {/* Celular: um cartão por sessão, sem rolagem lateral. A partir do md, tabela. */}
       <ul className="divide-y divide-border md:hidden">
         {sessions.map((session) => {
-          const { label, icon: StatusIcon } =
-            APPOINTMENT_STATUS[session.status];
+          const { icon: StatusIcon } = APPOINTMENT_STATUS[session.status];
+          const label = statusText(session);
           return (
             <li
               key={session.id}
@@ -193,8 +278,8 @@ export function RecurrenceSessions({
         </thead>
         <tbody className="divide-y divide-border">
           {sessions.map((session) => {
-            const { label, icon: StatusIcon } =
-              APPOINTMENT_STATUS[session.status];
+            const { icon: StatusIcon } = APPOINTMENT_STATUS[session.status];
+            const label = statusText(session);
             return (
               <tr key={session.id} className="hover:bg-background">
                 <td className="px-4 py-3 whitespace-nowrap tabular-nums">
@@ -242,8 +327,25 @@ export function RecurrenceSessions({
           }
         }
         today={today}
-        replacement={rescheduling?.status === "NO_SHOW"}
+        replacement={rescheduling !== null && replaceable(rescheduling)}
+        inClass={Boolean(rescheduling?.classSessionId)}
         onOpenChange={(open) => !open && setRescheduling(null)}
+      />
+
+      <ReplaceInClassDialog
+        recurrenceId={recurrenceId}
+        session={
+          replacingInClass && {
+            id: replacingInClass.id,
+            label: `${dateLabel(replacingInClass)}, ${timeOf(replacingInClass.startAt)}`,
+          }
+        }
+        classGroups={classGroups}
+        defaultClassGroupId={classGroupId}
+        period={period}
+        clientName={clientName}
+        onDone={() => onChanged?.()}
+        onOpenChange={(open) => !open && setReplacingInClass(null)}
       />
 
       <ConfirmDialog

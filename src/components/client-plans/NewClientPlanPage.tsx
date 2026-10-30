@@ -1,6 +1,7 @@
 import { ClientPlanForm } from "@/components/client-plans/ClientPlanForm";
 import { toCents } from "@/components/plans/plan-pricing";
 import { getCurrentUser } from "@/services/auth.service";
+import { listClassGroups } from "@/services/class-group.service";
 import { listPeople } from "@/services/people.service";
 import { listPlans } from "@/services/plan.service";
 import { listServices } from "@/services/service.service";
@@ -8,16 +9,22 @@ import { timeToMinutes, toDateString, toTimeString } from "@/utils/time";
 
 // Tela de nova contratação: carrega as opções no servidor.
 export async function NewClientPlanPage() {
-  const { company } = await getCurrentUser();
+  const currentUser = await getCurrentUser();
+  const { company } = currentUser;
   const now = new Date();
 
-  const [clients, professionals, plans, services] = await Promise.all([
-    // RASCUNHO: primeiros 100 clientes; o campo busca o restante pelo nome.
-    listPeople({ type: "CLIENT", page: 1, limit: 100 }),
-    listPeople({ type: "PROFESSIONAL", page: 1, limit: 100 }),
-    listPlans({ isActive: true, page: 1, limit: 100 }),
-    listServices({ page: 1, limit: 100 }),
-  ]);
+  const [clients, professionals, plans, services, classGroups] =
+    await Promise.all([
+      // RASCUNHO: primeiros 100 clientes; o campo busca o restante pelo nome.
+      listPeople({ type: "CLIENT", page: 1, limit: 100 }),
+      listPeople({ type: "PROFESSIONAL", page: 1, limit: 100 }),
+      listPlans({ isActive: true, page: 1, limit: 100 }),
+      listServices({ page: 1, limit: 100 }),
+      // Turmas ativas: cada serviço do plano pode entrar numa (só o ADMIN as consulta).
+      currentUser.type === "ADMIN"
+        ? listClassGroups({ isActive: true, page: 1, limit: 100 })
+        : null,
+    ]);
 
   return (
     <div className="flex min-h-0 flex-1 flex-col gap-4">
@@ -53,6 +60,7 @@ export async function NewClientPlanPage() {
             },
           ]),
         )}
+        classGroups={classGroups?.items ?? []}
         today={toDateString(now, company.timezone)}
         nowMinutes={timeToMinutes(
           toTimeString(now.toISOString(), company.timezone),

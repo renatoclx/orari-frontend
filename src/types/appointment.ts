@@ -9,6 +9,12 @@ export type AppointmentStatus =
   | "CANCELLED"
   | "NO_SHOW";
 
+/**
+ * Mesmos valores do enum AppointmentCancelReason: cancelamento pela clínica na
+ * turma (sessão cancelada ou saída do aluno). Nulo no cancelamento comum.
+ */
+export type AppointmentCancelReason = "CLASS_SESSION_CANCELLED" | "CLASS_LEFT";
+
 /** Pessoa ligada ao agendamento (cliente ou profissional), só o que a agenda usa. */
 export type AppointmentPerson = {
   id: string;
@@ -34,6 +40,8 @@ export type AppointmentItem = {
   startAt: string;
   endAt: string;
   status: AppointmentStatus;
+  /** Por que a clínica cancelou a aula de turma (nulo nos demais casos). */
+  cancelReason: AppointmentCancelReason | null;
   /** Encaixe: marcado fora do horário de funcionamento (retrato do momento). */
   overBooking: boolean;
   note: string | null;
@@ -60,4 +68,6 @@ export type AppointmentClassSession = {
   /** Turma fixa de origem (nulo na sessão avulsa, de agendamento que virou turma). */
   classGroupId: string | null;
   capacity: number;
+  /** Sessão cancelada pela clínica (nulo enquanto vale). */
+  cancelledAt: string | null;
 };

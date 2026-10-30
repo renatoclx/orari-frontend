@@ -35,8 +35,8 @@ type AgendaDayViewProps = {
   /** Todos os profissionais ativos (a exibição padrão filtra daqui). */
   professionals: AgendaProfessional[];
   appointments: AgendaAppointment[];
-  /** Horários de turma fixa do dia, ainda sem sessão (sem alunos). */
-  emptyClassSessions: AgendaClassSession[];
+  /** Sessões de turma do dia, inclusive as canceladas e os horários sem alunos. */
+  classSessions: AgendaClassSession[];
   range: GridRange;
   /** Trechos fora do expediente, hachurados. */
   unavailable: TimeRange[];
@@ -322,6 +322,7 @@ export function AgendaDayView({
             id: session.id,
             professionalId: appointment.professionalId,
             classGroupId: null,
+            classGroupName: null,
             start: appointment.start,
             end: appointment.end,
             serviceName: appointment.serviceName,
@@ -331,6 +332,8 @@ export function AgendaDayView({
             capacity: session.capacity,
             occupied: session.occupied,
             members: [appointment],
+            cancelledAt: null,
+            cancellationNote: null,
           });
         }}
       />

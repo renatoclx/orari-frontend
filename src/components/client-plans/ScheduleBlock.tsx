@@ -5,6 +5,8 @@ import {
   RecurrenceDaysField,
   type DayTimes,
 } from "@/components/recurrences/RecurrenceDaysField";
+import { ClassDaysField } from "@/components/class-groups/ClassDaysField";
+import { ClassGroupSelect } from "@/components/class-groups/ClassGroupSelect";
 import { FormField } from "@/components/shared/FormField";
 import {
   Select,
@@ -15,11 +17,16 @@ import {
 } from "@/components/ui/select";
 import type { TimeRange } from "@/types/agenda";
 import type { WeekDay } from "@/types/business-hour";
+import type { ClassGroupItem } from "@/types/class-group";
 import { formatDuration } from "@/utils/format";
 import { cn } from "cn";
 
-/** Agenda de um serviço como o formulário a edita. */
-export type ScheduleDraft = { professionalId: string; dayTimes: DayTimes };
+/** Agenda de um serviço como o formulário a edita ("" ou ausente = sem turma). */
+export type ScheduleDraft = {
+  professionalId: string;
+  dayTimes: DayTimes;
+  classGroupId?: string;
+};
 
 type ScheduleBlockProps = {
   service: {
@@ -29,6 +36,8 @@ type ScheduleBlockProps = {
     sessionsPerWeek: number;
   };
   professionals: { id: string; name: string }[];
+  /** Turmas ativas deste serviço: a agenda pode entrar numa delas. */
+  classGroups: ClassGroupItem[];
   value: ScheduleDraft;
   onChange: (value: ScheduleDraft) => void;
   /** Dados do período (sem eles, os horários pedem que sejam escolhidos). */
@@ -51,6 +60,7 @@ type ScheduleBlockProps = {
 export function ScheduleBlock({
   service,
   professionals,
+  classGroups,
   value,
   onChange,
   clientId,
@@ -64,9 +74,13 @@ export function ScheduleBlock({
   const marked = Object.keys(value.dayTimes).length;
   const needed = service.sessionsPerWeek;
   const ids = {
+    classGroup: `schedule-${service.id}-class`,
     professional: `schedule-${service.id}-professional`,
     days: `schedule-${service.id}-days`,
   };
+  const classGroup = classGroups.find(
+    (group) => group.id === value.classGroupId,
+  );
 
   return (
     <div className="space-y-4 rounded-control border border-border p-4">
@@ -90,7 +104,25 @@ export function ScheduleBlock({
         </p>
       </div>
 
-      <div className="max-w-sm">
+      <div className="grid max-w-2xl gap-4 md:grid-cols-2">
+        {classGroups.length > 0 && (
+          <FormField id={ids.classGroup} label="Turma">
+            <ClassGroupSelect
+              id={ids.classGroup}
+              classGroups={classGroups}
+              value={value.classGroupId ?? ""}
+              // Com turma, o profissional é o dela; os dias recomeçam.
+              onChange={(next) => {
+                const group = classGroups.find((item) => item.id === next);
+                onChange({
+                  classGroupId: next,
+                  professionalId: group?.professionalId ?? value.professionalId,
+                  dayTimes: {},
+                });
+              }}
+            />
+          </FormField>
+        )}
         <FormField
           id={ids.professional}
           label="Profissional"
@@ -99,9 +131,11 @@ export function ScheduleBlock({
         >
           <Select
             value={value.professionalId || undefined}
+            disabled={Boolean(classGroup)}
             onValueChange={(professionalId) =>
               // Outro profissional, outros horários livres: os dias continuam.
               onChange({
+                ...value,
                 professionalId,
                 dayTimes: Object.fromEntries(
                   Object.keys(value.dayTimes).map((day) => [day, ""]),
@@ -129,19 +163,31 @@ export function ScheduleBlock({
         required
         error={error.days}
       >
-        <RecurrenceDaysField
-          id={ids.days}
-          value={value.dayTimes}
-          onChange={(dayTimes) => onChange({ ...value, dayTimes })}
-          invalid={Boolean(error.days)}
-          clientId={clientId}
-          professionalId={value.professionalId}
-          duration={service.duration}
-          startDate={startDate}
-          endDate={endDate}
-          extraBusy={extraBusy}
-          maxDays={needed}
-        />
+        {/* Na turma, os dias são os horários dela; fora, os horários livres. */}
+        {classGroup ? (
+          <ClassDaysField
+            id={ids.days}
+            slots={classGroup.days}
+            value={value.dayTimes}
+            onChange={(dayTimes) => onChange({ ...value, dayTimes })}
+            invalid={Boolean(error.days)}
+            maxDays={needed}
+          />
+        ) : (
+          <RecurrenceDaysField
+            id={ids.days}
+            value={value.dayTimes}
+            onChange={(dayTimes) => onChange({ ...value, dayTimes })}
+            invalid={Boolean(error.days)}
+            clientId={clientId}
+            professionalId={value.professionalId}
+            duration={service.duration}
+            startDate={startDate}
+            endDate={endDate}
+            extraBusy={extraBusy}
+            maxDays={needed}
+          />
+        )}
       </FormField>
     </div>
   );

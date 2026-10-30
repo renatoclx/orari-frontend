@@ -76,6 +76,7 @@ export function RescheduleAppointmentDialog({
           : undefined
       }
       today={today}
+      inClass={appointment.classSession !== null}
       onSubmit={(newDate, time) =>
         recurrence
           ? rescheduleRecurrenceSessionAction(

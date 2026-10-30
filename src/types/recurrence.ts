@@ -1,6 +1,9 @@
 // Espelha a resposta de /recurring-appointments do backend (com os dados
 // relacionados que o frontend pediu: cliente, profissional e serviço).
-import type { AppointmentStatus } from "@/types/appointment";
+import type {
+  AppointmentCancelReason,
+  AppointmentStatus,
+} from "@/types/appointment";
 import type { WeekDay } from "@/types/business-hour";
 
 /** Dia reservado pela recorrência; horários "HH:MM". */
@@ -28,6 +31,11 @@ export type RecurrenceItem = {
   isActive: boolean;
   /** Preenchido quando a recorrência é a agenda de um serviço de um pacote. */
   clientPlanId: string | null;
+  /** Turma fixa em que a recorrência está encaixada (nulo fora de turma). */
+  classGroupId: string | null;
+  /** Saída da turma: quando o aluno saiu (nulo enquanto está nela) e o motivo. */
+  classLeftAt: string | null;
+  classLeaveNote: string | null;
   days: RecurrenceDay[];
 };
 
@@ -38,6 +46,10 @@ export type RecurrenceSession = {
   startAt: string;
   endAt: string;
   status: AppointmentStatus;
+  /** Sessão de turma em que a aula está (nulo fora de turma). */
+  classSessionId: string | null;
+  /** Aula cancelada pela clínica na turma: no plano, pode ser reposta. */
+  cancelReason: AppointmentCancelReason | null;
 };
 
 /** Dados para criar uma recorrência. */
@@ -48,5 +60,7 @@ export type NewRecurrenceInput = {
   startDate: string;
   endDate: string;
   note?: string;
+  /** Turma fixa em que a recorrência entra (os dias são horários dela). */
+  classGroupId?: string;
   days: RecurrenceDay[];
 };

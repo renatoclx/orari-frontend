@@ -48,5 +48,7 @@ export type NewClientPlanInput = {
     serviceId: string;
     professionalId: string;
     days: RecurrenceDay[];
+    /** Turma fixa em que este serviço entra (os dias são horários dela). */
+    classGroupId?: string;
   }[];
 };

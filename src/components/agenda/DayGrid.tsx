@@ -6,6 +6,7 @@ import {
   classSessionKey,
   type AgendaClassSession,
 } from "@/components/agenda/class-session-blocks";
+import { visibleAppointments } from "@/components/agenda/visible-appointments";
 import type { GridRange } from "@/components/agenda/agenda-range";
 import type {
   AgendaAppointment,
@@ -130,40 +131,10 @@ export function DayGrid({
     return occupied ? "occupied" : "free";
   }
 
-  // Agendamentos de um profissional que aparecem na grade. Os ativos sempre
-  // aparecem. Um cancelado só aparece (esmaecido) se não ficar sobreposto a nada:
-  // nem a um agendamento ativo que ocupou o horário liberado, nem a outro
-  // cancelado já exibido (o horário pode ser liberado e reaproveitado várias vezes).
   // Os alunos de uma turma viram um bloco só, por sessão (class-session-blocks).
   const singles = appointments.filter(
     (appointment) => appointment.classSession === null,
   );
-
-  function visibleAppointments(professionalId: string): AgendaAppointment[] {
-    const mine = singles
-      .filter((appointment) => appointment.professionalId === professionalId)
-      .sort((a, b) => timeToMinutes(a.start) - timeToMinutes(b.start));
-
-    const overlaps = (a: TimeRange, b: TimeRange) =>
-      timeToMinutes(a.start) < timeToMinutes(b.end) &&
-      timeToMinutes(a.end) > timeToMinutes(b.start);
-
-    // Uma sessão com aluno ocupando vaga também esconde o cancelado por baixo dela.
-    const busy: TimeRange[] = sessions.filter(
-      (session) =>
-        session.professionalId === professionalId && session.occupied > 0,
-    );
-    const shown = mine.filter(
-      (appointment) => appointment.status !== "CANCELLED",
-    );
-    for (const appointment of mine) {
-      if (appointment.status !== "CANCELLED") continue;
-      if (![...shown, ...busy].some((other) => overlaps(other, appointment))) {
-        shown.push(appointment);
-      }
-    }
-    return shown;
-  }
 
   // Posição vertical de um horário na grade.
   function toPixels(time: string): number {
@@ -377,7 +348,7 @@ export function DayGrid({
               </div>
             ))}
 
-            {visibleAppointments(professional.id).map((appointment) => (
+            {visibleAppointments(singles, sessions, professional.id).map((appointment) => (
               <AppointmentBlock
                 key={appointment.id}
                 appointment={appointment}

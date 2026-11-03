@@ -56,7 +56,7 @@
 ### Regras específicas
 
 - O dia é calculado no fuso da empresa (a API trabalha em UTC).
-- Agendamentos cancelados permanecem na grade, esmaecidos, para os profissionais exibidos. Quando outro agendamento passa a ocupar o mesmo horário (o horário liberado foi reaproveitado), o cancelado deixa de ser exibido para não ficar sobreposto. Vários cancelados no mesmo horário aparecem como um só.
+- Agendamentos cancelados permanecem na grade, esmaecidos, para os profissionais exibidos. Quando outro agendamento passa a ocupar o mesmo horário (o horário liberado foi reaproveitado), o cancelado deixa de ser exibido para não ficar sobreposto. O mesmo vale quando o horário cai sobre uma sessão de turma, mesmo vazia (`agenda/visible-appointments.ts`, com testes). Vários cancelados no mesmo horário aparecem como um só.
 - O intervalo exibido vai da abertura mais cedo do dia, menos 2 horas, ao fechamento mais tarde, mais 2 horas. Agendamentos fora desse intervalo ampliam a grade. Sem horário de funcionamento no dia, a grade exibe das 07:00 às 20:00.
 - Não há pausas por profissional nesta versão (previsão futura: o administrador poderá lançar pausas).
 - Sem profissionais cadastrados: mensagem orientando o cadastro.

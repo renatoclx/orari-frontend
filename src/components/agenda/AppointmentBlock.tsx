@@ -11,6 +11,7 @@ import {
   HoverCardContent,
   HoverCardTrigger,
 } from "@/components/ui/hover-card";
+import { laneStyle, type Lane } from "@/components/agenda/block-lanes";
 import type { AgendaAppointment } from "@/types/agenda";
 import { formatDuration } from "@/utils/format";
 
@@ -19,6 +20,8 @@ const FADED_STATUSES = ["COMPLETED", "CANCELLED", "NO_SHOW"];
 
 type AppointmentBlockProps = {
   appointment: AgendaAppointment;
+  /** Faixa na coluna quando o bloco divide o horário com outro. */
+  lane?: Lane;
   top: number;
   height: number;
   /** Clique (ou Enter) no bloco: abre os detalhes do agendamento. */
@@ -33,6 +36,7 @@ export function AppointmentBlock({
   appointment,
   top,
   height,
+  lane = { lane: 0, lanes: 1 },
   onSelect,
 }: AppointmentBlockProps) {
   const { status, serviceColor } = appointment;
@@ -55,12 +59,13 @@ export function AppointmentBlock({
             }
           }}
           aria-label={`${appointment.start} ${appointment.clientName} ${appointment.serviceName}. Das ${appointment.start} às ${appointment.end}, com ${appointment.professionalName}. ${statusLabel}${appointment.overbooking ? ". Encaixe fora do horário de funcionamento" : ""}${appointment.recurrence ? `. ${recurrenceLabel(appointment.recurrence)}` : ""}`}
-          className={`absolute inset-x-1 z-1 cursor-pointer overflow-hidden rounded-control border-l-[3px] py-1 pr-3 pl-2 ${
+          className={`absolute z-1 cursor-pointer overflow-hidden rounded-control border-l-[3px] py-1 pr-3 pl-2 ${
             faded ? "text-muted-foreground" : ""
           }`}
           style={{
             top,
             height,
+            ...laneStyle(lane),
             // Esmaecido (concluído, cancelado, falta): só o fundo e a faixa
             // clareiam. O texto fica legível (opacity no bloco todo o deixava
             // abaixo do contraste mínimo).
@@ -95,7 +100,7 @@ export function AppointmentBlock({
                 }
                 aria-hidden="true"
               />
-              {statusLabel}
+              {lane.lanes === 1 && statusLabel}
             </span>
           </div>
           {/* Encaixe, recorrência e pacote: ícone e nome (um pouco mais encorpado),

@@ -57,6 +57,7 @@
 
 - O dia é calculado no fuso da empresa (a API trabalha em UTC).
 - Agendamentos cancelados permanecem na grade, esmaecidos, para os profissionais exibidos. Quando outro agendamento passa a ocupar o mesmo horário (o horário liberado foi reaproveitado), o cancelado deixa de ser exibido para não ficar sobreposto. O mesmo vale quando o horário cai sobre uma sessão de turma, mesmo vazia (`agenda/visible-appointments.ts`, com testes). Vários cancelados no mesmo horário aparecem como um só.
+- Blocos que se sobrepõem na coluna do profissional (por exemplo, um avulso e uma turma com sessão) dividem a largura, cada um com o seu clique (`agenda/block-lanes.ts`, com testes); nesse caso o agendamento mostra só o ícone da situação. O horário vazio de uma turma (sem sessão) não vem da API quando o profissional já tem outro agendamento nele; por isso, nesse caso, só o agendamento aparece.
 - O intervalo exibido vai da abertura mais cedo do dia, menos 2 horas, ao fechamento mais tarde, mais 2 horas. Agendamentos fora desse intervalo ampliam a grade. Sem horário de funcionamento no dia, a grade exibe das 07:00 às 20:00.
 - Não há pausas por profissional nesta versão (previsão futura: o administrador poderá lançar pausas).
 - Sem profissionais cadastrados: mensagem orientando o cadastro.

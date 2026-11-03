@@ -6,6 +6,7 @@ import {
   classSessionKey,
   type AgendaClassSession,
 } from "@/components/agenda/class-session-blocks";
+import { layoutLanes } from "@/components/agenda/block-lanes";
 import { visibleAppointments } from "@/components/agenda/visible-appointments";
 import type { GridRange } from "@/components/agenda/agenda-range";
 import type {
@@ -139,6 +140,51 @@ export function DayGrid({
   // Posição vertical de um horário na grade.
   function toPixels(time: string): number {
     return (timeToMinutes(time) - range.start) * PX_PER_MINUTE;
+  }
+
+  // Blocos de um profissional (agendamentos e sessões de turma). Os que se
+  // sobrepõem dividem a largura da coluna, cada um com o seu clique.
+  function blocksOf(professionalId: string) {
+    const shownAppointments = visibleAppointments(
+      singles,
+      sessions,
+      professionalId,
+    );
+    const shownSessions = sessions.filter(
+      (session) => session.professionalId === professionalId,
+    );
+    const lanes = layoutLanes([
+      ...shownAppointments.map((a) => ({ key: `a-${a.id}`, range: a })),
+      ...shownSessions.map((s) => ({
+        key: `s-${classSessionKey(s)}`,
+        range: s,
+      })),
+    ]);
+
+    return (
+      <>
+        {shownAppointments.map((appointment) => (
+          <AppointmentBlock
+            key={appointment.id}
+            appointment={appointment}
+            onSelect={onAppointmentSelect}
+            lane={lanes.get(`a-${appointment.id}`)}
+            top={toPixels(appointment.start)}
+            height={toPixels(appointment.end) - toPixels(appointment.start)}
+          />
+        ))}
+        {shownSessions.map((session) => (
+          <ClassSessionBlock
+            key={classSessionKey(session)}
+            session={session}
+            onSelect={onClassSessionSelect}
+            lane={lanes.get(`s-${classSessionKey(session)}`)}
+            top={toPixels(session.start)}
+            height={toPixels(session.end) - toPixels(session.start)}
+          />
+        ))}
+      </>
+    );
   }
 
   const nowMinutes = now === null ? null : timeToMinutes(now);
@@ -348,27 +394,7 @@ export function DayGrid({
               </div>
             ))}
 
-            {visibleAppointments(singles, sessions, professional.id).map((appointment) => (
-              <AppointmentBlock
-                key={appointment.id}
-                appointment={appointment}
-                onSelect={onAppointmentSelect}
-                top={toPixels(appointment.start)}
-                height={toPixels(appointment.end) - toPixels(appointment.start)}
-              />
-            ))}
-
-            {sessions
-              .filter((session) => session.professionalId === professional.id)
-              .map((session) => (
-                <ClassSessionBlock
-                  key={classSessionKey(session)}
-                  session={session}
-                  onSelect={onClassSessionSelect}
-                  top={toPixels(session.start)}
-                  height={toPixels(session.end) - toPixels(session.start)}
-                />
-              ))}
+            {blocksOf(professional.id)}
 
             {showNow && (
               <div

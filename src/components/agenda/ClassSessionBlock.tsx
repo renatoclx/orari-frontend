@@ -3,6 +3,7 @@ import {
   APPOINTMENT_STATUS,
   CANCEL_REASON_LABEL,
 } from "@/components/agenda/appointment-status";
+import { laneStyle, type Lane } from "@/components/agenda/block-lanes";
 import type { AgendaClassSession } from "@/components/agenda/class-session-blocks";
 import {
   HoverCard,
@@ -13,6 +14,8 @@ import { formatDuration } from "@/utils/format";
 
 type ClassSessionBlockProps = {
   session: AgendaClassSession;
+  /** Faixa na coluna quando o bloco divide o horário com outro. */
+  lane?: Lane;
   top: number;
   height: number;
   /** Clique (ou Enter) no bloco: abre a sessão (vagas e alunos). */
@@ -28,6 +31,7 @@ export function ClassSessionBlock({
   session,
   top,
   height,
+  lane = { lane: 0, lanes: 1 },
   onSelect,
 }: ClassSessionBlockProps) {
   const { serviceColor } = session;
@@ -53,12 +57,13 @@ export function ClassSessionBlock({
             }
           }}
           aria-label={`${session.start} turma de ${session.serviceName}, das ${session.start} às ${session.end}, com ${session.professionalName}. ${cancelled ? "Sessão cancelada." : `${session.occupied} de ${session.capacity} vagas ocupadas.`}`}
-          className={`absolute inset-x-1 z-1 cursor-pointer overflow-hidden rounded-control border-l-[3px] py-1 pr-3 pl-2 ${
+          className={`absolute z-1 cursor-pointer overflow-hidden rounded-control border-l-[3px] py-1 pr-3 pl-2 ${
             faded ? "text-muted-foreground" : ""
           }`}
           style={{
             top,
             height,
+            ...laneStyle(lane),
             borderLeftColor: faded
               ? `color-mix(in srgb, ${serviceColor} 55%, transparent)`
               : serviceColor,

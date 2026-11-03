@@ -35,6 +35,7 @@
 - Acionado de duas formas: pelo botão "Encaixar horário" ou clicando em uma área sombreada (fora das janelas de atendimento, inclusive o intervalo entre janelas) da grade. Os dois abrem o dialog de "Encaixar agendamento" (ver a seção própria).
 - O expediente do dia são as janelas de atendimento cadastradas. Fora do expediente é tudo que não está dentro de uma janela: antes da abertura, depois do fechamento, dias sem janela e o intervalo entre duas janelas.
 - Ao clicar em uma área sombreada, o profissional e o horário clicados já vêm preenchidos.
+- O encaixe também pode ser no **horário de uma turma** do profissional: com profissional e data escolhidos, o campo "Horários de turma" lista as sessões do dia (sem canceladas nem horários passados, só para o ADMIN), com turma e vagas. Ao escolher uma, um aviso diz que o horário pertence à turma e que o atendimento é marcado à parte, dividindo o horário, sem ocupar vaga. Na agenda, o avulso fica ao lado do bloco da turma (coluna dividida).
 - O encaixe é exibido com uma cor cinza exclusiva e identificado como encaixe (o backend guarda o agendamento como `overBooking`).
 - Horário que já passou, na área livre ou sombreada, não aceita agendamento: o clique exibe um aviso.
 

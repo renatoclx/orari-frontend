@@ -14,7 +14,7 @@ com capturas de tela de uma clínica fictícia ("Clínica Bem-Estar").
 5. PDF: `node build.mjs` (precisa de `google-chrome`, `pdftotext` e `pdfinfo`).
 6. Manual de Turmas (`manual-turmas.pdf`): usa o "Studio Aurora" (login em
    `scripts/demo-config.mjs`, `AURORA`). Capturas com `node scripts/cap-7-turmas.mjs`
-   (só abre telas; não grava nada) e PDF com `node build.mjs manual-turmas`.
+   (só abre telas; não grava nada), `scripts/cap-8-encaixe-turma.mjs` (imagem 103, também sem gravar) e PDF com `node build.mjs manual-turmas`.
 7. Tela **Ajuda** do sistema: depois de regerar um PDF, copie-o para
    `public/manuais/` (`manual-usuario.pdf` vai como `manual-administrador.pdf`;
    os outros com o mesmo nome) e faça o commit. A lista da tela fica em

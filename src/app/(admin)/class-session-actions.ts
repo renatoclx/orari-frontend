@@ -17,6 +17,7 @@ import {
 } from "@/services/class-session.service";
 import type {
   ClassSessionItem,
+  ProfessionalClassSession,
   UpcomingClassSession,
 } from "@/types/class-group";
 import {
@@ -223,6 +224,42 @@ export async function listUpcomingSessionsAction(
           .filter((student) => student.status !== "CANCELLED")
           .map((student) => student.client.name),
       })),
+    };
+  } catch (error) {
+    return failureFrom(error);
+  }
+}
+
+export type ProfessionalClassSessionsResult =
+  { ok: true; sessions: ProfessionalClassSession[] } | ActionFailure;
+
+/**
+ * Horários de turma do profissional num dia ("aaaa-mm-dd", no fuso da empresa),
+ * sem as sessões canceladas: são os horários em que o encaixe de um atendimento
+ * avulso divide o horário com a turma. A consulta é só do ADMIN; para os demais
+ * a API responde 403 e a tela simplesmente não oferece o encaixe em turma.
+ */
+export async function listProfessionalClassSessionsAction(
+  professionalId: string,
+  date: string,
+): Promise<ProfessionalClassSessionsResult> {
+  if (!isUuid(professionalId) || !isDateString(date)) {
+    return { ok: false, message: "Dados inválidos." };
+  }
+  try {
+    const { company } = await getCurrentUser();
+    const { from, to } = dayBounds(date, company.timezone);
+    const items = await listClassSessions({ from, to, professionalId });
+    return {
+      ok: true,
+      sessions: items
+        .filter((item) => item.cancelledAt === null)
+        .map((item) => ({
+          time: toTimeString(item.startAt, company.timezone),
+          label: item.classGroup?.name ?? item.service.name,
+          capacity: item.capacity,
+          occupied: item.occupied,
+        })),
     };
   } catch (error) {
     return failureFrom(error);

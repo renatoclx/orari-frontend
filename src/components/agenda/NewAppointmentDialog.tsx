@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState, useTransition } from "react";
 import { CalendarPlus, Save, TriangleAlert, X } from "lucide-react";
 import { toast } from "sonner";
+import { listProfessionalClassSessionsAction } from "@/app/(admin)/class-session-actions";
 import {
   createAppointmentAction,
   updateAppointmentAction,
@@ -12,6 +13,7 @@ import {
   type ClientOption,
 } from "@/app/(admin)/appointment-actions";
 import { AvailableTimes } from "@/components/agenda/AvailableTimes";
+import { ClassSessionTimes } from "@/components/agenda/ClassSessionTimes";
 import {
   availableOverbookingStarts,
   availableStarts,
@@ -37,6 +39,7 @@ import {
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import type { AgendaAppointment, AgendaProfessional } from "@/types/agenda";
+import type { ProfessionalClassSession } from "@/types/class-group";
 import { formatDuration } from "@/utils/format";
 import { minutesToTime, timeToMinutes } from "@/utils/time";
 
@@ -205,6 +208,41 @@ function NewAppointmentForm({
   const availabilityLoading = loaded?.key !== availabilityKey;
   const availability = availabilityLoading ? undefined : loaded?.availability;
 
+  // --- Horários de turma do profissional na data (só no encaixe). ---
+  // O encaixe também pode dividir o horário com uma turma. A consulta é do
+  // ADMIN: se falhar (outro perfil), nenhum horário de turma é oferecido.
+  const classKey = `${professionalId}|${day}|${reload}`;
+  const [loadedClasses, setLoadedClasses] = useState<{
+    key: string;
+    sessions: ProfessionalClassSession[];
+  }>();
+
+  useEffect(() => {
+    if (!overbooking || !professionalId) return;
+
+    let cancelled = false;
+    listProfessionalClassSessionsAction(professionalId, day).then((result) => {
+      if (cancelled) return;
+      setLoadedClasses({
+        key: classKey,
+        sessions: result.ok ? result.sessions : [],
+      });
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [overbooking, professionalId, day, classKey]);
+
+  // Sem os horários que já passaram (não se agenda no passado).
+  const classSessions = (
+    overbooking && loadedClasses?.key === classKey ? loadedClasses.sessions : []
+  ).filter(
+    (session) => timeToMinutes(session.time) >= (availability?.notBefore ?? 0),
+  );
+  const classStarts = classSessions.map((session) =>
+    timeToMinutes(session.time),
+  );
+
   // Comum: cabe inteiro em uma janela. Encaixe: inteiro fora de qualquer janela.
   const findStarts = overbooking ? availableOverbookingStarts : availableStarts;
   const starts =
@@ -222,7 +260,11 @@ function NewAppointmentForm({
   // (outro serviço, profissional ou data).
   const wanted = touched ? time : (desiredTime ?? "");
   const currentTime =
-    wanted && starts.includes(timeToMinutes(wanted)) ? wanted : "";
+    wanted &&
+    (starts.includes(timeToMinutes(wanted)) ||
+      classStarts.includes(timeToMinutes(wanted)))
+      ? wanted
+      : "";
 
   // Término previsto: o início mais a duração do serviço.
   const endsAt =
@@ -343,7 +385,9 @@ function NewAppointmentForm({
 
     // Dia fechado só impede o agendamento comum; o encaixe pode ser nele.
     if (overbooking) {
-      return "Sem horários disponíveis fora do expediente neste dia. Tente outra data.";
+      return classSessions.length > 0
+        ? "Sem horários livres fora do expediente neste dia. Escolha um horário de turma abaixo."
+        : "Sem horários disponíveis fora do expediente neste dia. Tente outra data.";
     }
     if (availability.windows.length === 0 && availability.notBefore < 24 * 60) {
       return "A empresa não funciona neste dia. Use Encaixar horário, se precisar.";
@@ -379,9 +423,9 @@ function NewAppointmentForm({
           />
           <p>
             {editing ? "Este agendamento é um encaixe" : "Você está agendando"}{" "}
-            <strong>fora do horário de funcionamento</strong>. Só aparecem
-            horários livres, inteiros fora do expediente, que ainda não
-            passaram.
+            <strong>fora do horário de funcionamento</strong> ou no horário de
+            uma turma. Aparecem os horários livres, inteiros fora do expediente,
+            e os horários de turma, que ainda não passaram.
           </p>
         </div>
       )}
@@ -499,6 +543,20 @@ function NewAppointmentForm({
           />
         )}
       </FormField>
+
+      {overbooking && classSessions.length > 0 && (
+        <FormField id="appointment-class-time" label="Horários de turma">
+          <ClassSessionTimes
+            sessions={classSessions}
+            value={currentTime}
+            onChange={(next) => {
+              setTime(next);
+              setTouched(true);
+              setErrors((current) => ({ ...current, time: undefined }));
+            }}
+          />
+        </FormField>
+      )}
 
       {endsAt && (
         <p className="text-sm text-muted-foreground">

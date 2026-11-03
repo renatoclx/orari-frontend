@@ -76,15 +76,17 @@ Página, e não dialog: a lista de horários cresce (até 21).
 
 ## Adicionar alunos
 
-- Dialog com a Sessão (as datas das próximas 4 semanas, com as vagas: "segunda,
-  02/11 às 09:00 · 2 de 4 vagas") e a lista de alunos, como na agenda. Datas
-  lotadas ou canceladas aparecem, mas não se escolhem.
-- Antes de encaixar, a lista é conferida com as vagas livres da data: sem vaga para
-  todos, ninguém entra e o aviso pede para tirar alunos.
-- Cada aluno ganha um agendamento avulso. A sessão do dia é criada no primeiro
-  encaixe. O encaixe é tudo ou nada: se a API recusar algum aluno (já está na
-  sessão, agenda ocupada), ninguém entra e cada recusado mostra o motivo no nome.
-  O mesmo encaixe pode ser feito pela agenda, no bloco da turma.
+- Dialog com as Sessões (as datas das próximas 4 semanas, com as vagas: "segunda,
+  02/11 às 09:00 · 2 de 4 vagas"), marcadas por botões (uma ou mais), e a lista de
+  alunos, como na agenda. Datas lotadas ou canceladas aparecem, mas não se marcam.
+- Antes de encaixar, a lista é conferida com as vagas livres de cada data marcada:
+  sem vaga para todos em alguma, ninguém entra e o aviso diz qual data.
+- Cada aluno ganha um agendamento avulso por data. A sessão do dia é criada no
+  primeiro encaixe. Cada data é tudo ou nada: se a API recusar algum aluno (já está
+  na sessão, agenda ocupada), ninguém entra naquela data. As datas são
+  independentes: se uma for recusada, as que já entraram continuam e só a recusada
+  fica marcada, com o motivo no nome de cada aluno recusado (com a data na frente).
+  O encaixe pela agenda, no bloco da turma, é de uma data só.
 
 ---
 

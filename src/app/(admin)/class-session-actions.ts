@@ -139,6 +139,57 @@ export async function enrollInClassGroupAction(
   });
 }
 
+/** Resultado do encaixe numa das datas: ok, ou o motivo da recusa. */
+export type EnrollSlotOutcome = { date: string; time: string } & (
+  { ok: true } | { ok: false; message: string; refusals?: EnrollRefusal[] }
+);
+
+export type EnrollDatesResult =
+  { ok: true; outcomes: EnrollSlotOutcome[] } | ActionFailure;
+
+// Teto de datas por pedido: as 4 semanas de uma turma com muitos horários.
+const MAX_ENROLL_DATES = 60;
+
+/**
+ * Encaixe dos mesmos clientes em várias datas da turma. Cada data é tudo ou
+ * nada, como o encaixe de uma data só, mas as datas são independentes: a API
+ * recebe uma por vez, então uma recusada não desfaz as que já entraram. O
+ * resultado diz o que aconteceu em cada uma.
+ */
+export async function enrollInClassGroupDatesAction(
+  classGroupId: string,
+  clientIds: string[],
+  slots: { date: string; time: string }[],
+): Promise<EnrollDatesResult> {
+  if (slots.length === 0) {
+    return { ok: false, message: "Escolha ao menos uma data." };
+  }
+  if (slots.length > MAX_ENROLL_DATES) {
+    return { ok: false, message: "Escolha menos datas por vez." };
+  }
+  const outcomes: EnrollSlotOutcome[] = [];
+  for (const { date, time } of slots) {
+    const result = await enrollInClassGroupAction(
+      classGroupId,
+      clientIds,
+      date,
+      time,
+    );
+    outcomes.push(
+      result.ok
+        ? { date, time, ok: true }
+        : {
+            date,
+            time,
+            ok: false,
+            message: result.message,
+            refusals: result.refusals,
+          },
+    );
+  }
+  return { ok: true, outcomes };
+}
+
 // Quantos dias à frente as próximas sessões cobrem (a API aceita até 31).
 const UPCOMING_DAYS = 28;
 

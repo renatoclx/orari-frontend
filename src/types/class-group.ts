@@ -120,3 +120,16 @@ export type ClassGroupMember = {
   /** Os horários da turma em que o aluno está. */
   days: { weekDay: WeekDay; startTime: string }[];
 };
+
+/**
+ * Horário de turma de um profissional num dia, para o encaixe de um
+ * atendimento avulso que divide o horário com ela (não ocupa vaga).
+ */
+export type ProfessionalClassSession = {
+  /** "HH:mm", no fuso da empresa. */
+  time: string;
+  /** Nome da turma ou, sem nome, o do serviço. */
+  label: string;
+  capacity: number;
+  occupied: number;
+};

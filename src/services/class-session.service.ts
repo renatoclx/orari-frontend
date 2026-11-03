@@ -79,12 +79,14 @@ export function listClassSessions(params: {
   from: Date;
   to: Date;
   classGroupId?: string;
+  professionalId?: string;
 }): Promise<ClassSessionAgendaItem[]> {
   const query = new URLSearchParams({
     from: params.from.toISOString(),
     to: params.to.toISOString(),
   });
   if (params.classGroupId) query.set("classGroupId", params.classGroupId);
+  if (params.professionalId) query.set("professionalId", params.professionalId);
   return apiFetch<ClassSessionAgendaItem[]>(`/class-sessions?${query}`);
 }
 

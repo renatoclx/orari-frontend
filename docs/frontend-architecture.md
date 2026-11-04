@@ -236,6 +236,12 @@ Duas telas, sem entidade nova no backend: a comanda é uma visão montada a part
 - Depois do cadastro, `CompaniesToolbar` abre o `UserFormDialog` com `forCompany` (tipo fixo ADMIN e `companyId`), reaproveitando o cadastro de usuários; `createUserAction` passou a aceitar o `companyId`.
 - As ações da própria empresa (nome fantasia, logo e horários) continuam em `company-actions.ts`; as do SUPER_ADMIN ficam em `company-admin-actions.ts`.
 
+## Acessos e limites da empresa
+
+- **Painel (SUPER_ADMIN):** botão em `CompanyList` abre `CompanyAccessDialog` (`AccessMatrix`, `AccessLimits`). Regras puras em `components/companies/company-access.ts` (matriz, dependências, modelos de plano, limites, conversão com a API); chamadas em `services/company-access.service.ts` e `(admin)/company-access-actions.ts`.
+- **Leitura pela empresa:** `GET /auth/me` traz `access.features`; o `CurrentUser` o carrega. `utils/access.ts` (`canAccess`) responde "pode?". No servidor, `lib/require-feature.ts` (`requireFeature`) devolve 404 nas páginas sem acesso; no cliente, `components/layout/Access.tsx` (`AccessProvider`, `useCan`, `Can`) esconde botões e atalhos.
+- **Menu:** `layout/menu-access.ts` filtra os itens (cada um tem `feature`); as páginas de servidor que consultam turmas só o fazem com `class-groups` liberada.
+
 ## Configurações da empresa
 
 - Página (`/configuracoes`) monta, no servidor, os dados da empresa (`GET /companies/:id`) e as janelas de funcionamento; `CompanySettingsForm` (Client Component) é o card único, com identidade, dados cadastrais (passados como `details`) e `BusinessHoursField`.

@@ -44,6 +44,7 @@ import {
 } from "@/components/ui/dialog";
 import type { AgendaAppointment } from "@/types/agenda";
 import { formatDuration } from "@/utils/format";
+import { useCan } from "@/components/layout/Access";
 
 type AppointmentDetailsDialogProps = {
   appointment: AgendaAppointment | null;
@@ -86,12 +87,17 @@ export function AppointmentDetailsDialog({
   onOpenChange,
 }: AppointmentDetailsDialogProps) {
   const canAccessAnamnesis = useCanAccessAnamnesis();
+  // A API usa PATCH para cancelar, marcar falta e alterar o agendamento: exige "Edita".
+  const canEditAppointment = useCan("appointments", "edit");
+  const canCreateClass = useCan("class-groups", "create");
+  const cancellable = (item: AgendaAppointment) =>
+    canCancel(item) && canEditAppointment;
   // Botões do rodapé: o atalho da anamnese e as ações do agendamento.
   const footerButtons = appointment
     ? (canAccessAnamnesis ? 1 : 0) +
       (appointment.recurrence
         ? 1 + (appointment.recurrence.clientPlanId ? 1 : 0)
-        : canCancel(appointment)
+        : cancellable(appointment)
           ? 1
           : 0)
     : 0;
@@ -105,9 +111,11 @@ export function AppointmentDetailsDialog({
         {appointment && (
           <Details
             appointment={appointment}
-            cancellable={canCancel(appointment)}
-            markable={canMarkNoShow(appointment)}
-            convertible={canConvertToClass?.(appointment) ?? false}
+            cancellable={cancellable(appointment)}
+            markable={canMarkNoShow(appointment) && canEditAppointment}
+            convertible={
+              (canConvertToClass?.(appointment) ?? false) && canCreateClass
+            }
             onConvertToClass={() => onConvertToClass?.(appointment)}
             onEdit={() => onEdit(appointment)}
             onReschedule={() => onReschedule(appointment)}

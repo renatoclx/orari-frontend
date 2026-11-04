@@ -12,6 +12,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Can } from "@/components/layout/Access";
 
 const BASE_PATH = "/pacotes/planos";
 
@@ -58,12 +59,14 @@ export function PlansToolbar({ search, status }: PlansToolbarProps) {
         </SelectContent>
       </Select>
 
-      <Button asChild className="w-full sm:ml-auto sm:w-auto">
-        <Link href={`${BASE_PATH}/novo`}>
-          <Plus aria-hidden="true" />
-          Novo plano
-        </Link>
-      </Button>
+      <Can feature="plans" action="create">
+        <Button asChild className="w-full sm:ml-auto sm:w-auto">
+          <Link href={`${BASE_PATH}/novo`}>
+            <Plus aria-hidden="true" />
+            Novo plano
+          </Link>
+        </Button>
+      </Can>
     </div>
   );
 }

@@ -6,6 +6,8 @@ export type PeopleKind = {
   type: PeopleType;
   /** Caminho da listagem, ex.: "/clientes". */
   path: string;
+  /** Funcionalidade liberada por empresa (Acessos e limites). */
+  feature: string;
   /** "Clientes" */
   plural: string;
   /** "cliente" */
@@ -19,6 +21,7 @@ export const PEOPLE_KINDS: Record<PeopleType, PeopleKind> = {
   CLIENT: {
     type: "CLIENT",
     path: "/clientes",
+    feature: "clients",
     plural: "Clientes",
     singular: "cliente",
     singularTitle: "Cliente",
@@ -26,6 +29,7 @@ export const PEOPLE_KINDS: Record<PeopleType, PeopleKind> = {
   EMPLOYEE: {
     type: "EMPLOYEE",
     path: "/funcionarios",
+    feature: "employees",
     plural: "Funcionários",
     singular: "funcionário",
     singularTitle: "Funcionário",
@@ -33,6 +37,7 @@ export const PEOPLE_KINDS: Record<PeopleType, PeopleKind> = {
   PROFESSIONAL: {
     type: "PROFESSIONAL",
     path: "/profissionais",
+    feature: "professionals",
     plural: "Profissionais",
     singular: "profissional",
     singularTitle: "Profissional",

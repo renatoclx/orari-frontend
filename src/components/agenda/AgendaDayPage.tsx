@@ -14,6 +14,7 @@ import { listClassSessions } from "@/services/class-session.service";
 import { listPeople } from "@/services/people.service";
 import { listServices } from "@/services/service.service";
 import type { TimeRange } from "@/types/agenda";
+import { canAccess } from "@/utils/access";
 import {
   dayBounds,
   formatLongDate,
@@ -61,7 +62,11 @@ export async function AgendaDayPage({ searchParams }: AgendaDayPageProps) {
     listServices({ page: 1, limit: 100 }),
     // Agenda por sessão (só o ADMIN consulta): traz as vagas, as sessões
     // canceladas e os horários das turmas ainda sem alunos.
-    currentUser.type === "ADMIN" ? listClassSessions(bounds) : null,
+    // Sem as turmas liberadas na empresa, a API recusa: nem consulta.
+    currentUser.type === "ADMIN" &&
+    canAccess(currentUser.access, "class-groups")
+      ? listClassSessions(bounds)
+      : null,
   ]);
 
   // Profissional inativo fica fora da grade (a agenda dele será remanejada).

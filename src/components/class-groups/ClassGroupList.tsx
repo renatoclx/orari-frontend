@@ -45,6 +45,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import type { ClassGroupItem } from "@/types/class-group";
 import { formatDuration } from "@/utils/format";
+import { useCan } from "@/components/layout/Access";
 
 type ClassGroupListProps = {
   classGroups: ClassGroupItem[];
@@ -95,18 +96,22 @@ function ClassGroupActions({
   busy,
 }: { classGroup: ClassGroupItem } & RowHandlers) {
   const label = classGroupLabel(classGroup);
+  const canEdit = useCan("class-groups", "edit");
+  const canRemove = useCan("class-groups", "remove");
   return (
     <div className="flex shrink-0 items-center justify-start gap-1">
-      <Hint label={`Alterar ${label}`}>
-        <Button
-          variant="ghost"
-          size="icon"
-          aria-label={`Alterar ${label}`}
-          onClick={() => onEdit(classGroup)}
-        >
-          <Pencil aria-hidden="true" />
-        </Button>
-      </Hint>
+      {canEdit && (
+        <Hint label={`Alterar ${label}`}>
+          <Button
+            variant="ghost"
+            size="icon"
+            aria-label={`Alterar ${label}`}
+            onClick={() => onEdit(classGroup)}
+          >
+            <Pencil aria-hidden="true" />
+          </Button>
+        </Hint>
+      )}
 
       {/* modal={false}: o menu fecha antes do diálogo abrir, sem travar a página. */}
       <DropdownMenu modal={false}>
@@ -127,26 +132,27 @@ function ClassGroupActions({
             Visualizar
           </DropdownMenuItem>
           {/* Turma inativa não recebe novos encaixes. */}
-          {classGroup.isActive && (
+          {canEdit && classGroup.isActive && (
             <DropdownMenuItem onSelect={() => onEnroll(classGroup)}>
               <UserPlus aria-hidden="true" />
               Adicionar alunos
             </DropdownMenuItem>
           )}
-          {classGroup.isActive ? (
-            <DropdownMenuItem onSelect={() => onDeactivate(classGroup)}>
-              <Ban aria-hidden="true" />
-              Inativar
-            </DropdownMenuItem>
-          ) : (
-            <DropdownMenuItem
-              disabled={busy}
-              onSelect={() => onActivate(classGroup)}
-            >
-              <CircleCheck aria-hidden="true" />
-              Ativar
-            </DropdownMenuItem>
-          )}
+          {canRemove &&
+            (classGroup.isActive ? (
+              <DropdownMenuItem onSelect={() => onDeactivate(classGroup)}>
+                <Ban aria-hidden="true" />
+                Inativar
+              </DropdownMenuItem>
+            ) : (
+              <DropdownMenuItem
+                disabled={busy}
+                onSelect={() => onActivate(classGroup)}
+              >
+                <CircleCheck aria-hidden="true" />
+                Ativar
+              </DropdownMenuItem>
+            ))}
         </DropdownMenuContent>
       </DropdownMenu>
     </div>

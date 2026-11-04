@@ -14,6 +14,7 @@ import { ListCard } from "@/components/shared/ListCard";
 import { StatusBadge } from "@/components/shared/StatusBadge";
 import { Button } from "@/components/ui/button";
 import type { PaymentMethodItem } from "@/types/payment-method";
+import { useCan } from "@/components/layout/Access";
 
 type PaymentMethodListProps = {
   methods: PaymentMethodItem[];
@@ -39,7 +40,11 @@ function Actions({
   /** Há uma reativação em andamento. */
   busy: boolean;
 }) {
+  const canEdit = useCan("payment-methods", "edit");
+  const canRemove = useCan("payment-methods", "remove");
   if (method.deletedAt !== null) {
+    // Reativar é o oposto de inativar: mesma coluna da matriz.
+    if (!canRemove) return null;
     return (
       <Hint label={`Reativar ${method.name}`}>
         <Button
@@ -56,26 +61,30 @@ function Actions({
   }
   return (
     <div className="flex shrink-0 items-center gap-1">
-      <Hint label={`Alterar ${method.name}`}>
-        <Button
-          variant="ghost"
-          size="icon"
-          aria-label={`Alterar ${method.name}`}
-          onClick={() => onEdit(method)}
-        >
-          <Pencil aria-hidden="true" />
-        </Button>
-      </Hint>
-      <Hint label={`Inativar ${method.name}`}>
-        <Button
-          variant="ghost"
-          size="icon"
-          aria-label={`Inativar ${method.name}`}
-          onClick={() => onDeactivate(method)}
-        >
-          <Ban aria-hidden="true" />
-        </Button>
-      </Hint>
+      {canEdit && (
+        <Hint label={`Alterar ${method.name}`}>
+          <Button
+            variant="ghost"
+            size="icon"
+            aria-label={`Alterar ${method.name}`}
+            onClick={() => onEdit(method)}
+          >
+            <Pencil aria-hidden="true" />
+          </Button>
+        </Hint>
+      )}
+      {canRemove && (
+        <Hint label={`Inativar ${method.name}`}>
+          <Button
+            variant="ghost"
+            size="icon"
+            aria-label={`Inativar ${method.name}`}
+            onClick={() => onDeactivate(method)}
+          >
+            <Ban aria-hidden="true" />
+          </Button>
+        </Hint>
+      )}
     </div>
   );
 }

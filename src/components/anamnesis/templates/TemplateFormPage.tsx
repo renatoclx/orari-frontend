@@ -13,7 +13,7 @@ type TemplateFormPageProps = {
 // Cadastro e alteração de modelo (só ADMIN): na alteração, busca o modelo com as
 // perguntas da versão vigente e entrega ao formulário.
 export async function TemplateFormPage({ id }: TemplateFormPageProps) {
-  await requireAnamnesisAdmin();
+  await requireAnamnesisAdmin("anamnesis-templates");
   if (id !== undefined && !isUuid(id)) notFound();
   const template = id
     ? await getTemplate(id).catch((error: unknown) => {

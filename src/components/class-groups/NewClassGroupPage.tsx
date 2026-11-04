@@ -3,11 +3,17 @@ import { ClassGroupForm } from "@/components/class-groups/ClassGroupForm";
 import { getCurrentUser } from "@/services/auth.service";
 import { listPeople } from "@/services/people.service";
 import { listServices } from "@/services/service.service";
+import { canAccess } from "@/utils/access";
 
 // Tela de cadastro de turma (só ADMIN): carrega as opções dos campos no servidor.
 export async function NewClassGroupPage() {
   const currentUser = await getCurrentUser();
-  if (currentUser.type !== "ADMIN") notFound();
+  if (
+    currentUser.type !== "ADMIN" ||
+    !canAccess(currentUser.access, "class-groups", "create")
+  ) {
+    notFound();
+  }
 
   const [professionals, services] = await Promise.all([
     listPeople({ type: "PROFESSIONAL", page: 1, limit: 100 }),

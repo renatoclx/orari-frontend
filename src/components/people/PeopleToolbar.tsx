@@ -13,6 +13,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Can } from "@/components/layout/Access";
 
 type PeopleToolbarProps = {
   kind: PeopleKind;
@@ -58,12 +59,14 @@ export function PeopleToolbar({ kind, search, status }: PeopleToolbarProps) {
         </SelectContent>
       </Select>
 
-      <Button asChild className="w-full sm:ml-auto sm:w-auto">
-        <Link href={`${kind.path}/novo`}>
-          <Plus aria-hidden="true" />
-          Novo {kind.singular}
-        </Link>
-      </Button>
+      <Can feature={kind.feature} action="create">
+        <Button asChild className="w-full sm:ml-auto sm:w-auto">
+          <Link href={`${kind.path}/novo`}>
+            <Plus aria-hidden="true" />
+            Novo {kind.singular}
+          </Link>
+        </Button>
+      </Can>
     </div>
   );
 }

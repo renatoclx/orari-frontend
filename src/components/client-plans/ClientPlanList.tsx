@@ -15,6 +15,7 @@ import { Hint } from "@/components/shared/Hint";
 import { Button } from "@/components/ui/button";
 import type { ClientPlanItem } from "@/types/client-plan";
 import { formatDateOnly, formatPrice } from "@/utils/format";
+import { useCan } from "@/components/layout/Access";
 
 type ClientPlanListProps = {
   items: ClientPlanItem[];
@@ -39,6 +40,8 @@ function Actions({
   active: boolean;
   onCancel: (item: ClientPlanItem) => void;
 }) {
+  // Cancelar a contratação é a ação "Exclui/Inativa" da funcionalidade.
+  const canRemove = useCan("contracts", "remove");
   return (
     <div className="flex shrink-0 items-center gap-1">
       <Hint label="Visualizar contratação">
@@ -53,7 +56,7 @@ function Actions({
           </Link>
         </Button>
       </Hint>
-      {active && (
+      {active && canRemove && (
         <Hint label="Cancelar contratação">
           <Button
             variant="ghost"

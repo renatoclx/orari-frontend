@@ -35,6 +35,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import type { PlanItem } from "@/types/plan";
 import { formatPrice } from "@/utils/format";
+import { useCan } from "@/components/layout/Access";
 
 type PlanListProps = {
   plans: PlanItem[];
@@ -69,20 +70,24 @@ function PlanActions({
   onActivate,
   busy,
 }: { plan: PlanItem } & RowHandlers) {
+  const canEdit = useCan("plans", "edit");
+  const canRemove = useCan("plans", "remove");
   return (
     <div className="flex shrink-0 items-center justify-start gap-1">
-      <Hint label={`Alterar ${plan.name}`}>
-        <Button
-          asChild
-          variant="ghost"
-          size="icon"
-          aria-label={`Alterar ${plan.name}`}
-        >
-          <Link href={`/pacotes/planos/${plan.id}/editar`}>
-            <Pencil aria-hidden="true" />
-          </Link>
-        </Button>
-      </Hint>
+      {canEdit && (
+        <Hint label={`Alterar ${plan.name}`}>
+          <Button
+            asChild
+            variant="ghost"
+            size="icon"
+            aria-label={`Alterar ${plan.name}`}
+          >
+            <Link href={`/pacotes/planos/${plan.id}/editar`}>
+              <Pencil aria-hidden="true" />
+            </Link>
+          </Button>
+        </Hint>
+      )}
 
       {/* modal={false}: o menu fecha antes do diálogo abrir, sem travar a página. */}
       <DropdownMenu modal={false}>
@@ -102,17 +107,21 @@ function PlanActions({
             <Eye aria-hidden="true" />
             Visualizar
           </DropdownMenuItem>
-          {plan.isActive ? (
-            <DropdownMenuItem onSelect={() => onDeactivate(plan)}>
-              <Ban aria-hidden="true" />
-              Inativar
-            </DropdownMenuItem>
-          ) : (
-            <DropdownMenuItem disabled={busy} onSelect={() => onActivate(plan)}>
-              <CircleCheck aria-hidden="true" />
-              Ativar
-            </DropdownMenuItem>
-          )}
+          {canRemove &&
+            (plan.isActive ? (
+              <DropdownMenuItem onSelect={() => onDeactivate(plan)}>
+                <Ban aria-hidden="true" />
+                Inativar
+              </DropdownMenuItem>
+            ) : (
+              <DropdownMenuItem
+                disabled={busy}
+                onSelect={() => onActivate(plan)}
+              >
+                <CircleCheck aria-hidden="true" />
+                Ativar
+              </DropdownMenuItem>
+            ))}
         </DropdownMenuContent>
       </DropdownMenu>
     </div>

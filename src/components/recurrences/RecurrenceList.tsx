@@ -12,6 +12,7 @@ import { Hint } from "@/components/shared/Hint";
 import { Button } from "@/components/ui/button";
 import type { RecurrenceItem } from "@/types/recurrence";
 import { formatDateOnly } from "@/utils/format";
+import { useCan } from "@/components/layout/Access";
 
 type RecurrenceListProps = {
   recurrences: RecurrenceItem[];
@@ -32,6 +33,7 @@ function RecurrenceActions({
   item: RecurrenceItem;
   onCancel: (item: RecurrenceItem) => void;
 }) {
+  const canRemove = useCan("recurrences", "remove");
   return (
     <div className="flex shrink-0 items-center justify-start gap-1">
       <Hint label="Visualizar recorrência">
@@ -47,7 +49,7 @@ function RecurrenceActions({
         </Button>
       </Hint>
       {/* A recorrência de um pacote só é encerrada pela contratação. */}
-      {item.isActive && !item.clientPlanId && (
+      {item.isActive && !item.clientPlanId && canRemove && (
         <Hint label="Cancelar recorrência">
           <Button
             variant="ghost"

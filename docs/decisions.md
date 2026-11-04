@@ -110,6 +110,14 @@ regras de cada tela, em `docs/screens/`.
 - **2026-10-27 — "Sem acompanhamento" na agenda foi testado e removido** (no bloco e no cartão de hover): a maioria dos atendimentos aparecia sem acompanhamento e o aviso ficou dúbio. O endpoint `GET /anamnesis/appointments-with-entry` ficou no backend, sem uso.
 - **2026-10-27 — Ids de fora são conferidos como UUID** antes de entrar no caminho da API (páginas dão 404; actions recusam; services usam `encodeURIComponent`).
 
+## Acessos e limites por empresa
+
+- **2026-11-04 — O SUPER_ADMIN libera, por empresa, o que os administradores enxergam** (matriz funcionalidade × Visualiza, Edita, Cria, Exclui/Inativa) **e limita profissionais e administradores,** pelo botão "Acessos e limites" da lista de Empresas. Só existem os tipos ADMIN e CLIENT. Os planos (Essencial, Profissional, Completo; nomes provisórios) são **modelos** que preenchem a matriz, ainda editáveis. _Por quê:_ vender o Orari em versões por tipo de negócio sem código diferente por plano.
+- **2026-11-04 — A API barra; o frontend esconde.** O `access` vem em `GET /auth/me` e esconde menu, telas (404), botões e atalhos; a recusa de verdade é do backend (403 `FEATURE_NOT_IN_PLAN`). Sem `access` (API antiga), nada é escondido.
+- **2026-11-04 — Funcionalidade nova nasce desmarcada;** empresa nova nasce com o modelo padrão (sem Anamnese e Turmas, 3 profissionais, 1 administrador). Agendamentos, Recorrências, Contratações, Comandas, Turmas e Anamnese exigem ver Clientes, Profissionais e Serviços.
+- **2026-11-04 — Reativar usa a coluna Exclui/Inativa;** cancelar contratação ou recorrência também; alterar, cancelar e marcar falta de um agendamento usam Edita (a API usa PATCH).
+- **2026-11-04 — Fonte hospedada no projeto** (`next/font/local`): o `next/font/google` falhava ao baixar no dev e caía na fonte do sistema.
+
 ## Empresas
 
 - **2026-10-23 — Empresas é uma tela só do SUPER_ADMIN** (`/empresas`, item no fim do menu, 404 para os outros perfis), em lista com cadastro e alteração em dialog; empresas não são excluídas, são inativadas e reativadas. _Por quê:_ cadastrar empresa por chamada direta à API não dá para o dia a dia.

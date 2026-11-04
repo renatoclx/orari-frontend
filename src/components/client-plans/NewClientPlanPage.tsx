@@ -5,6 +5,7 @@ import { listClassGroups } from "@/services/class-group.service";
 import { listPeople } from "@/services/people.service";
 import { listPlans } from "@/services/plan.service";
 import { listServices } from "@/services/service.service";
+import { canAccess } from "@/utils/access";
 import { timeToMinutes, toDateString, toTimeString } from "@/utils/time";
 
 // Tela de nova contratação: carrega as opções no servidor.
@@ -21,7 +22,8 @@ export async function NewClientPlanPage() {
       listPlans({ isActive: true, page: 1, limit: 100 }),
       listServices({ page: 1, limit: 100 }),
       // Turmas ativas: cada serviço do plano pode entrar numa (só o ADMIN as consulta).
-      currentUser.type === "ADMIN"
+      currentUser.type === "ADMIN" &&
+      canAccess(currentUser.access, "class-groups")
         ? listClassGroups({ isActive: true, page: 1, limit: 100 })
         : null,
     ]);

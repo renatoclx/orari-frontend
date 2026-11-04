@@ -6,6 +6,8 @@ export type AuthTokens = {
   refreshToken: string;
 };
 
+import type { FeatureAccessEntry } from "@/types/company-access";
+
 /** Espelha o enum UserType do backend. */
 export type UserType = "SUPER_ADMIN" | "ADMIN" | "USER";
 
@@ -32,4 +34,6 @@ export type CurrentUser = {
     timezone: string;
     logoUrl: string | null;
   };
+  /** O que a empresa do usuário enxerga (esconde menus e telas; a API é quem barra). */
+  access: { features: FeatureAccessEntry[] };
 };

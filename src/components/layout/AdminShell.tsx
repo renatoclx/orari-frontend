@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { AnamnesisAccessProvider } from "@/components/anamnesis/AnamnesisAccessProvider";
+import { AccessProvider } from "@/components/layout/Access";
 import { ActionBar } from "@/components/layout/ActionBar";
 import { Header } from "@/components/layout/Header";
 import { Sidebar } from "@/components/layout/Sidebar";
@@ -37,41 +38,43 @@ export function AdminShell({
     anamnesisAccess(user).canAccess && canAccess(user.access, "anamnesis");
 
   return (
-    <AnamnesisAccessProvider canAccess={canAccessRecords}>
-      {/* Primeiro item do teclado: leva ao conteúdo sem passar por todo o menu. */}
-      <a
-        href="#conteudo"
-        className="sr-only z-50 rounded-control bg-card px-4 py-2 text-sm font-medium text-foreground shadow-lg focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:px-4 focus:py-2"
-      >
-        Pular para o conteúdo
-      </a>
-      <div className="flex h-dvh overflow-hidden bg-background text-foreground">
-        <Sidebar
-          isSuperAdmin={user.type === "SUPER_ADMIN"}
-          isAdmin={anamnesisAccess(user).isAdmin}
-          canAccessAnamnesis={canAccessRecords}
-          access={user.access}
-          collapsed={collapsed}
-          onToggleCollapsed={toggleCollapsed}
-          mobileOpen={mobileOpen}
-          onCloseMobile={() => setMobileOpen(false)}
-        />
+    <AccessProvider access={user.access}>
+      <AnamnesisAccessProvider canAccess={canAccessRecords}>
+        {/* Primeiro item do teclado: leva ao conteúdo sem passar por todo o menu. */}
+        <a
+          href="#conteudo"
+          className="sr-only z-50 rounded-control bg-card px-4 py-2 text-sm font-medium text-foreground shadow-lg focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:px-4 focus:py-2"
+        >
+          Pular para o conteúdo
+        </a>
+        <div className="flex h-dvh overflow-hidden bg-background text-foreground">
+          <Sidebar
+            isSuperAdmin={user.type === "SUPER_ADMIN"}
+            isAdmin={anamnesisAccess(user).isAdmin}
+            canAccessAnamnesis={canAccessRecords}
+            access={user.access}
+            collapsed={collapsed}
+            onToggleCollapsed={toggleCollapsed}
+            mobileOpen={mobileOpen}
+            onCloseMobile={() => setMobileOpen(false)}
+          />
 
-        <div className="flex min-w-0 flex-1 flex-col">
-          <Header user={user} onOpenMobile={() => setMobileOpen(true)} />
-          {/* A página não rola: cada componente cuida da própria rolagem. */}
-          <main
-            id="conteudo"
-            tabIndex={-1}
-            className="flex min-h-0 flex-1 flex-col p-4 md:p-8"
-          >
-            {children}
-          </main>
+          <div className="flex min-w-0 flex-1 flex-col">
+            <Header user={user} onOpenMobile={() => setMobileOpen(true)} />
+            {/* A página não rola: cada componente cuida da própria rolagem. */}
+            <main
+              id="conteudo"
+              tabIndex={-1}
+              className="flex min-h-0 flex-1 flex-col p-4 md:p-8"
+            >
+              {children}
+            </main>
+          </div>
+
+          <ActionBar />
+          <WelcomeToast userName={user.name} />
         </div>
-
-        <ActionBar />
-        <WelcomeToast userName={user.name} />
-      </div>
-    </AnamnesisAccessProvider>
+      </AnamnesisAccessProvider>
+    </AccessProvider>
   );
 }

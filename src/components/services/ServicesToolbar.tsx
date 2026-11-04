@@ -5,6 +5,7 @@ import { Plus } from "lucide-react";
 import { ServiceFormDialog } from "@/components/services/ServiceFormDialog";
 import { ListSearch } from "@/components/shared/ListSearch";
 import { Button } from "@/components/ui/button";
+import { Can } from "@/components/layout/Access";
 
 type ServicesToolbarProps = {
   /** Termo da busca na URL (?q=). */
@@ -23,13 +24,15 @@ export function ServicesToolbar({ search }: ServicesToolbarProps) {
         label="Buscar serviço por nome"
       />
 
-      <Button
-        className="w-full sm:ml-auto sm:w-auto"
-        onClick={() => setCreating(true)}
-      >
-        <Plus aria-hidden="true" />
-        Novo serviço
-      </Button>
+      <Can feature="services" action="create">
+        <Button
+          className="w-full sm:ml-auto sm:w-auto"
+          onClick={() => setCreating(true)}
+        >
+          <Plus aria-hidden="true" />
+          Novo serviço
+        </Button>
+      </Can>
 
       <ServiceFormDialog open={creating} onOpenChange={setCreating} />
     </div>

@@ -12,6 +12,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Can } from "@/components/layout/Access";
 
 const BASE_PATH = "/turmas";
 
@@ -61,12 +62,14 @@ export function ClassGroupsToolbar({
         </SelectContent>
       </Select>
 
-      <Button asChild className="w-full sm:ml-auto sm:w-auto">
-        <Link href={`${BASE_PATH}/nova`}>
-          <Plus aria-hidden="true" />
-          Nova turma
-        </Link>
-      </Button>
+      <Can feature="class-groups" action="create">
+        <Button asChild className="w-full sm:ml-auto sm:w-auto">
+          <Link href={`${BASE_PATH}/nova`}>
+            <Plus aria-hidden="true" />
+            Nova turma
+          </Link>
+        </Button>
+      </Can>
     </div>
   );
 }

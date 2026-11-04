@@ -18,6 +18,7 @@ import {
 } from "@/components/ui/select";
 import type { AgendaProfessional } from "@/types/agenda";
 import { formatLongDate, shiftDateString } from "@/utils/time";
+import { Can } from "@/components/layout/Access";
 
 type AgendaToolbarProps = {
   /** Dia exibido, "aaaa-mm-dd". */
@@ -147,21 +148,23 @@ export function AgendaToolbar({
           </div>
         )}
 
-        <Hint label="Agendar fora do horário de funcionamento (encaixe)">
-          <Button
-            variant="outline"
-            onClick={onOverbooking}
-            className="max-sm:w-full"
-          >
-            <CalendarClock aria-hidden="true" />
-            Encaixar horário
-          </Button>
-        </Hint>
+        <Can feature="appointments" action="create">
+          <Hint label="Agendar fora do horário de funcionamento (encaixe)">
+            <Button
+              variant="outline"
+              onClick={onOverbooking}
+              className="max-sm:w-full"
+            >
+              <CalendarClock aria-hidden="true" />
+              Encaixar horário
+            </Button>
+          </Hint>
 
-        <Button onClick={onNewAppointment} className="max-sm:w-full">
-          <Plus aria-hidden="true" />
-          Novo Agendamento
-        </Button>
+          <Button onClick={onNewAppointment} className="max-sm:w-full">
+            <Plus aria-hidden="true" />
+            Novo Agendamento
+          </Button>
+        </Can>
       </div>
     </div>
   );

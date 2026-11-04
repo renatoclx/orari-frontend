@@ -37,6 +37,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import type { ServiceItem } from "@/types/service";
 import { formatDuration, formatPrice } from "@/utils/format";
+import { useCan } from "@/components/layout/Access";
 
 type ServiceListProps = {
   services: ServiceItem[];
@@ -83,18 +84,22 @@ function ServiceActions({
   onDelete,
   busy,
 }: { service: ServiceItem } & RowHandlers) {
+  const canEdit = useCan("services", "edit");
+  const canRemove = useCan("services", "remove");
   return (
     <div className="flex shrink-0 items-center justify-start gap-1">
-      <Hint label={`Alterar ${service.name}`}>
-        <Button
-          variant="ghost"
-          size="icon"
-          aria-label={`Alterar ${service.name}`}
-          onClick={() => onEdit(service)}
-        >
-          <Pencil aria-hidden="true" />
-        </Button>
-      </Hint>
+      {canEdit && (
+        <Hint label={`Alterar ${service.name}`}>
+          <Button
+            variant="ghost"
+            size="icon"
+            aria-label={`Alterar ${service.name}`}
+            onClick={() => onEdit(service)}
+          >
+            <Pencil aria-hidden="true" />
+          </Button>
+        </Hint>
+      )}
 
       {/* modal={false}: o menu fecha antes do diálogo abrir, sem travar a página. */}
       <DropdownMenu modal={false}>
@@ -114,24 +119,27 @@ function ServiceActions({
             <Eye aria-hidden="true" />
             Visualizar
           </DropdownMenuItem>
-          {service.isActive ? (
-            <DropdownMenuItem onSelect={() => onDeactivate(service)}>
-              <Ban aria-hidden="true" />
-              Inativar
-            </DropdownMenuItem>
-          ) : (
-            <DropdownMenuItem
-              disabled={busy}
-              onSelect={() => onActivate(service)}
-            >
-              <CircleCheck aria-hidden="true" />
-              Ativar
+          {canRemove &&
+            (service.isActive ? (
+              <DropdownMenuItem onSelect={() => onDeactivate(service)}>
+                <Ban aria-hidden="true" />
+                Inativar
+              </DropdownMenuItem>
+            ) : (
+              <DropdownMenuItem
+                disabled={busy}
+                onSelect={() => onActivate(service)}
+              >
+                <CircleCheck aria-hidden="true" />
+                Ativar
+              </DropdownMenuItem>
+            ))}
+          {canRemove && (
+            <DropdownMenuItem onSelect={() => onDelete(service)}>
+              <Trash2 aria-hidden="true" />
+              Excluir
             </DropdownMenuItem>
           )}
-          <DropdownMenuItem onSelect={() => onDelete(service)}>
-            <Trash2 aria-hidden="true" />
-            Excluir
-          </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
     </div>

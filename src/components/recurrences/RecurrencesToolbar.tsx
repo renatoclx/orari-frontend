@@ -11,6 +11,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Can } from "@/components/layout/Access";
 
 type RecurrencesToolbarProps = {
   professionals: { id: string; name: string }[];
@@ -74,12 +75,14 @@ export function RecurrencesToolbar({
         </SelectContent>
       </Select>
 
-      <Button asChild className="w-full sm:ml-auto sm:w-auto">
-        <Link href="/recorrencias/nova">
-          <Plus aria-hidden="true" />
-          Nova Recorrência
-        </Link>
-      </Button>
+      <Can feature="recurrences" action="create">
+        <Button asChild className="w-full sm:ml-auto sm:w-auto">
+          <Link href="/recorrencias/nova">
+            <Plus aria-hidden="true" />
+            Nova Recorrência
+          </Link>
+        </Button>
+      </Can>
     </div>
   );
 }

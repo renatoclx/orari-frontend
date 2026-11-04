@@ -9,6 +9,7 @@ import {
 import { ListSearch } from "@/components/shared/ListSearch";
 import { Button } from "@/components/ui/button";
 import type { UserType } from "@/types/auth";
+import { Can } from "@/components/layout/Access";
 
 type UsersToolbarProps = {
   /** Termo da busca na URL (?q=). */
@@ -35,13 +36,15 @@ export function UsersToolbar({
         label="Buscar usuário por nome"
       />
 
-      <Button
-        className="w-full sm:ml-auto sm:w-auto"
-        onClick={() => setCreating(true)}
-      >
-        <Plus aria-hidden="true" />
-        Novo usuário
-      </Button>
+      <Can feature="users" action="create">
+        <Button
+          className="w-full sm:ml-auto sm:w-auto"
+          onClick={() => setCreating(true)}
+        >
+          <Plus aria-hidden="true" />
+          Novo usuário
+        </Button>
+      </Can>
 
       <UserFormDialog
         open={creating}

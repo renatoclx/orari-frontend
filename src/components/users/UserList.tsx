@@ -43,6 +43,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import type { UserType } from "@/types/auth";
 import type { UserListItem } from "@/types/user";
+import { useCan } from "@/components/layout/Access";
 
 type UserListProps = {
   users: UserListItem[];
@@ -83,19 +84,23 @@ function UserActions({
   currentUserId,
 }: { user: UserListItem } & RowHandlers) {
   const active = user.deletedAt === null;
+  const canEdit = useCan("users", "edit");
+  const canRemove = useCan("users", "remove");
   return (
     <div className="flex shrink-0 items-center gap-1">
-      <Hint label={active ? `Alterar ${user.name}` : "Usuário inativo"}>
-        <Button
-          variant="ghost"
-          size="icon"
-          aria-label={`Alterar ${user.name}`}
-          disabled={!active}
-          onClick={() => onEdit(user)}
-        >
-          <Pencil aria-hidden="true" />
-        </Button>
-      </Hint>
+      {canEdit && (
+        <Hint label={active ? `Alterar ${user.name}` : "Usuário inativo"}>
+          <Button
+            variant="ghost"
+            size="icon"
+            aria-label={`Alterar ${user.name}`}
+            disabled={!active}
+            onClick={() => onEdit(user)}
+          >
+            <Pencil aria-hidden="true" />
+          </Button>
+        </Hint>
+      )}
 
       {/* modal={false}: o menu fecha antes do diálogo abrir, sem travar a página. */}
       <DropdownMenu modal={false}>
@@ -115,19 +120,19 @@ function UserActions({
             <Eye aria-hidden="true" />
             Visualizar
           </DropdownMenuItem>
-          {active && (
+          {active && canEdit && (
             <DropdownMenuItem onSelect={() => onPassword(user)}>
               <KeyRound aria-hidden="true" />
               Alterar senha
             </DropdownMenuItem>
           )}
-          {active && user.id !== currentUserId && (
+          {canRemove && active && user.id !== currentUserId && (
             <DropdownMenuItem onSelect={() => onDeactivate(user)}>
               <Ban aria-hidden="true" />
               Inativar
             </DropdownMenuItem>
           )}
-          {!active && (
+          {canRemove && !active && (
             <DropdownMenuItem disabled={busy} onSelect={() => onRestore(user)}>
               <RotateCcw aria-hidden="true" />
               Reativar

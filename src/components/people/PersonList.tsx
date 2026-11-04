@@ -15,7 +15,10 @@ import {
   deletePersonAction,
   reactivatePersonAction,
 } from "@/app/(admin)/people-actions";
-import type { PeopleKind } from "@/components/people/people-kinds";
+import {
+  PEOPLE_KINDS,
+  type PeopleKind,
+} from "@/components/people/people-kinds";
 import { PersonAvatar } from "@/components/shared/PersonAvatar";
 import { EmptyValue } from "@/components/shared/EmptyValue";
 import { StatusBadge } from "@/components/shared/StatusBadge";
@@ -38,6 +41,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import type { PersonListItem } from "@/types/people";
 import { formatCpf, formatDateOnly, formatPhone } from "@/utils/format";
+import { useCan } from "@/components/layout/Access";
 
 type PersonListProps = {
   kind: PeopleKind;
@@ -302,10 +306,13 @@ function PersonActions({
 }: { person: PersonListItem } & RowHandlers) {
   // Excluído: Alterar e Excluir ficam desabilitados (screens/pessoas.md).
   const removed = person.deletedAt !== null;
+  const { feature } = PEOPLE_KINDS[person.type];
+  const canEdit = useCan(feature, "edit");
+  const canRemove = useCan(feature, "remove");
 
   return (
     <div className="flex shrink-0 items-center justify-start gap-1">
-      {removed ? (
+      {!canEdit ? null : removed ? (
         // Desabilitado não recebe o mouse: a dica fica no invólucro.
         <Hint label={`Registro inativo: ${person.name} não pode ser alterado`}>
           <span className="inline-flex" tabIndex={0}>
@@ -348,44 +355,49 @@ function PersonActions({
       )}
 
       {/* modal={false}: o menu fecha antes do diálogo abrir, sem travar a página. */}
-      <DropdownMenu modal={false}>
-        <DropdownMenuTrigger asChild>
-          <Hint label={`Mais ações para ${person.name}`}>
-            <Button
-              variant="ghost"
-              size="icon"
-              aria-label={`Mais ações para ${person.name}`}
-            >
-              <EllipsisVertical aria-hidden="true" />
-            </Button>
-          </Hint>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent align="end">
-          {/* Clientes: os dados cadastrais estão no cabeçalho do histórico. */}
-          {!withHistory && (
-            <DropdownMenuItem onSelect={() => onView(person)}>
-              <Eye aria-hidden="true" />
-              Visualizar
-            </DropdownMenuItem>
-          )}
-          {removed && (
-            <DropdownMenuItem
-              disabled={busy}
-              onSelect={() => onReactivate(person)}
-            >
-              <RotateCcw aria-hidden="true" />
-              Reativar
-            </DropdownMenuItem>
-          )}
-          <DropdownMenuItem
-            disabled={removed}
-            onSelect={() => onDelete(person)}
-          >
-            <Trash2 aria-hidden="true" />
-            Excluir
-          </DropdownMenuItem>
-        </DropdownMenuContent>
-      </DropdownMenu>
+      {/* Cliente sem "Exclui/Inativa" ficaria com o menu vazio: some. */}
+      {(!withHistory || canRemove) && (
+        <DropdownMenu modal={false}>
+          <DropdownMenuTrigger asChild>
+            <Hint label={`Mais ações para ${person.name}`}>
+              <Button
+                variant="ghost"
+                size="icon"
+                aria-label={`Mais ações para ${person.name}`}
+              >
+                <EllipsisVertical aria-hidden="true" />
+              </Button>
+            </Hint>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end">
+            {/* Clientes: os dados cadastrais estão no cabeçalho do histórico. */}
+            {!withHistory && (
+              <DropdownMenuItem onSelect={() => onView(person)}>
+                <Eye aria-hidden="true" />
+                Visualizar
+              </DropdownMenuItem>
+            )}
+            {canRemove && removed && (
+              <DropdownMenuItem
+                disabled={busy}
+                onSelect={() => onReactivate(person)}
+              >
+                <RotateCcw aria-hidden="true" />
+                Reativar
+              </DropdownMenuItem>
+            )}
+            {canRemove && (
+              <DropdownMenuItem
+                disabled={removed}
+                onSelect={() => onDelete(person)}
+              >
+                <Trash2 aria-hidden="true" />
+                Excluir
+              </DropdownMenuItem>
+            )}
+          </DropdownMenuContent>
+        </DropdownMenu>
+      )}
     </div>
   );
 }

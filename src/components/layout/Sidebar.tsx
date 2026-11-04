@@ -20,7 +20,9 @@ import {
   type LucideIcon,
 } from "lucide-react";
 import { Logo } from "@/components/layout/Logo";
+import { filterMenuByAccess } from "@/components/layout/menu-access";
 import { Hint } from "@/components/shared/Hint";
+import type { CurrentUser } from "@/types/auth";
 import {
   Collapsible,
   CollapsibleContent,
@@ -46,47 +48,77 @@ import {
 } from "@/components/ui/tooltip";
 
 // Itens do menu: link simples ou grupo com subitens.
-type NavLink = { href: string; label: string; icon: LucideIcon };
+// `feature` liga o item ao que a empresa tem liberado (menu-access.ts); sem ele, sempre aparece.
+type NavLink = {
+  href: string;
+  label: string;
+  icon: LucideIcon;
+  feature?: string;
+};
 type NavGroup = {
   label: string;
   icon: LucideIcon;
-  children: { href: string; label: string }[];
+  children: { href: string; label: string; feature?: string }[];
 };
 
 // Menu provisório: várias rotas ainda não existem. "Pessoas" agrupa os tipos de
 // pessoa (cada um referencia um PeopleType no backend); "Usuários" é outra
 // entidade (UserType), listada junto por facilidade de acesso.
 const navItems: (NavLink | NavGroup)[] = [
-  { href: "/", label: "Agendamentos", icon: CalendarDays },
-  { href: "/recorrencias", label: "Recorrências", icon: Repeat },
+  {
+    href: "/",
+    label: "Agendamentos",
+    icon: CalendarDays,
+    feature: "appointments",
+  },
+  {
+    href: "/recorrencias",
+    label: "Recorrências",
+    icon: Repeat,
+    feature: "recurrences",
+  },
   {
     label: "Pessoas",
     icon: Users,
     children: [
-      { href: "/clientes", label: "Clientes" },
-      { href: "/funcionarios", label: "Funcionários" },
-      { href: "/profissionais", label: "Profissionais" },
-      { href: "/usuarios", label: "Usuários" },
+      { href: "/clientes", label: "Clientes", feature: "clients" },
+      { href: "/funcionarios", label: "Funcionários", feature: "employees" },
+      {
+        href: "/profissionais",
+        label: "Profissionais",
+        feature: "professionals",
+      },
+      { href: "/usuarios", label: "Usuários", feature: "users" },
     ],
   },
-  { href: "/servicos", label: "Serviços", icon: ClipboardList },
+  {
+    href: "/servicos",
+    label: "Serviços",
+    icon: ClipboardList,
+    feature: "services",
+  },
   {
     label: "Pacotes",
     icon: Package,
     children: [
-      { href: "/pacotes/planos", label: "Planos" },
-      { href: "/pacotes/contratacoes", label: "Contratações" },
+      { href: "/pacotes/planos", label: "Planos", feature: "plans" },
+      {
+        href: "/pacotes/contratacoes",
+        label: "Contratações",
+        feature: "contracts",
+      },
     ],
   },
   {
     label: "Financeiro",
     icon: Wallet,
     children: [
-      { href: "/financeiro/comandas", label: "Comandas" },
-      { href: "/financeiro", label: "Pagamentos" },
+      { href: "/financeiro/comandas", label: "Comandas", feature: "tabs" },
+      { href: "/financeiro", label: "Pagamentos", feature: "payments" },
       {
         href: "/financeiro/metodos-de-pagamento",
         label: "Métodos de pagamento",
+        feature: "payment-methods",
       },
     ],
   },
@@ -99,14 +131,23 @@ const navItems: (NavLink | NavGroup)[] = [
 const clientRecordsChild = {
   href: "/anamnese/fichas",
   label: "Fichas preenchidas",
+  feature: "anamnesis",
 };
 const anamnesisGroup: NavGroup = {
   label: "Anamnese",
   icon: FileHeart,
   children: [
     clientRecordsChild,
-    { href: "/anamnese/modelos", label: "Modelos de ficha" },
-    { href: "/anamnese/auditoria", label: "Auditoria" },
+    {
+      href: "/anamnese/modelos",
+      label: "Modelos de ficha",
+      feature: "anamnesis-templates",
+    },
+    {
+      href: "/anamnese/auditoria",
+      label: "Auditoria",
+      feature: "anamnesis-audit",
+    },
   ],
 };
 const clientRecordsLink: NavLink = { ...clientRecordsChild, icon: FileHeart };
@@ -116,6 +157,7 @@ const classGroupsLink: NavLink = {
   href: "/turmas",
   label: "Turmas",
   icon: UsersRound,
+  feature: "class-groups",
 };
 
 // Ajuda (screens/ajuda.md): os manuais em PDF. Por enquanto só para o ADMIN;
@@ -143,6 +185,8 @@ type SidebarProps = {
   isAdmin: boolean;
   /** Quem acessa as fichas (ADMIN ou profissional vinculado) vê "Fichas preenchidas". */
   canAccessAnamnesis: boolean;
+  /** O que a empresa tem liberado: some do menu o que ela não pode usar. */
+  access: CurrentUser["access"];
   collapsed: boolean;
   onToggleCollapsed: () => void;
   mobileOpen: boolean;
@@ -154,6 +198,7 @@ export function Sidebar({
   isSuperAdmin,
   isAdmin,
   canAccessAnamnesis,
+  access,
   collapsed,
   onToggleCollapsed,
   mobileOpen,
@@ -207,6 +252,7 @@ export function Sidebar({
           isSuperAdmin={isSuperAdmin}
           isAdmin={isAdmin}
           canAccessAnamnesis={canAccessAnamnesis}
+          access={access}
         />
       </aside>
 
@@ -234,6 +280,7 @@ export function Sidebar({
             isSuperAdmin={isSuperAdmin}
             isAdmin={isAdmin}
             canAccessAnamnesis={canAccessAnamnesis}
+            access={access}
             onNavigate={onCloseMobile}
           />
         </SheetContent>
@@ -247,6 +294,7 @@ type SidebarNavProps = {
   isSuperAdmin: boolean;
   isAdmin: boolean;
   canAccessAnamnesis: boolean;
+  access: CurrentUser["access"];
   onNavigate?: () => void;
 };
 
@@ -279,24 +327,28 @@ function SidebarNav({
   isSuperAdmin,
   isAdmin,
   canAccessAnamnesis,
+  access,
   onNavigate,
 }: SidebarNavProps) {
   const pathname = usePathname();
   const services = navItems.findIndex(
     (entry) => "href" in entry && entry.href === "/servicos",
   );
-  const items = [
-    ...navItems.slice(0, services + 1),
-    ...(isAdmin ? [classGroupsLink] : []),
-    ...navItems.slice(services + 1),
-    ...(isAdmin
-      ? [anamnesisGroup]
-      : canAccessAnamnesis
-        ? [clientRecordsLink]
-        : []),
-    ...(isAdmin ? [helpLink] : []),
-    ...(isSuperAdmin ? superAdminItems : []),
-  ];
+  const items = filterMenuByAccess(
+    [
+      ...navItems.slice(0, services + 1),
+      ...(isAdmin ? [classGroupsLink] : []),
+      ...navItems.slice(services + 1),
+      ...(isAdmin
+        ? [anamnesisGroup]
+        : canAccessAnamnesis
+          ? [clientRecordsLink]
+          : []),
+      ...(isAdmin ? [helpLink] : []),
+      ...(isSuperAdmin ? superAdminItems : []),
+    ],
+    access,
+  );
 
   return (
     <nav aria-label="Menu principal" className="flex-1 p-2">

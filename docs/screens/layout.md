@@ -9,6 +9,7 @@
 - Usuário é uma entidade separada, que possui referência diferente (UserType)
 - Itens do menu, em ordem: Agendamentos, Recorrências, Pessoas (dropdown), Serviços, Turmas (só para o ADMIN), Pacotes (dropdown com Planos e Contratações) e Financeiro (dropdown com Comandas, Pagamentos e Métodos de pagamento) e, para quem acessa a anamnese, Anamnese (dropdown para o ADMIN com Fichas preenchidas, Modelos de ficha e Auditoria; para o profissional vinculado, só o item Fichas preenchidas) e, só para o SUPER_ADMIN, Empresas.
 - Ordem do menu (sidebar): Agendamentos, Recorrências, Pessoas, Serviços, Turmas (só ADMIN), Pacotes e Financeiro (dropdowns: Pessoas, Pacotes e Financeiro).
+- **Acessos da empresa:** cada item do menu está ligado a uma funcionalidade (`empresas.md`, "Acessos e limites"). O item some quando a empresa não tem **Visualiza** nela, e um grupo sem nenhum subitem visível também some. Ajuda e Empresas não dependem disso. Sem o `access` na resposta de `/auth/me` (API antiga), nada é escondido.
 - Configurações da empresa (`configuracoes.md`): acessadas pelo menu do usuário.
 
 ---

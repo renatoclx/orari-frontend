@@ -7,11 +7,13 @@ import {
   Eye,
   Pencil,
   RotateCcw,
+  SlidersHorizontal,
   UserPlus,
   X,
 } from "lucide-react";
 import { toast } from "sonner";
 import { setCompanyActiveAction } from "@/app/(admin)/company-admin-actions";
+import { CompanyAccessDialog } from "@/components/companies/CompanyAccessDialog";
 import { CompanyFormDialog } from "@/components/companies/CompanyFormDialog";
 import { ConfirmDialog } from "@/components/shared/ConfirmDialog";
 import { EmptyValue } from "@/components/shared/EmptyValue";
@@ -51,6 +53,7 @@ type RowHandlers = {
   onView: (company: Company) => void;
   onEdit: (company: Company) => void;
   onAdmin: (company: Company) => void;
+  onAccess: (company: Company) => void;
   onDeactivate: (company: Company) => void;
   onRestore: (company: Company) => void;
   /** Há uma reativação em andamento. */
@@ -62,14 +65,15 @@ type RowHandlers = {
 const displayName = (company: Company) =>
   company.fantasyName ?? company.corporateReason;
 
-// Coluna Ações (screen-patterns.md): cadastrar o administrador da empresa e
-// "Alterar" à vista, só com ícone; as demais no menu de três pontos. Inativa só tem Visualizar
+// Coluna Ações (screen-patterns.md): cadastrar o administrador, acessos e
+// limites e "Alterar" à vista, só com ícone; as demais no menu de três pontos. Inativa só tem Visualizar
 // e Reativar. A própria empresa não tem "Inativar".
 function CompanyActions({
   company,
   onView,
   onEdit,
   onAdmin,
+  onAccess,
   onDeactivate,
   onRestore,
   busy,
@@ -87,6 +91,18 @@ function CompanyActions({
             onClick={() => onAdmin(company)}
           >
             <UserPlus aria-hidden="true" />
+          </Button>
+        </Hint>
+      )}
+      {company.isActive && (
+        <Hint label={`Acessos e limites de ${name}`}>
+          <Button
+            variant="ghost"
+            size="icon"
+            aria-label={`Acessos e limites de ${name}`}
+            onClick={() => onAccess(company)}
+          >
+            <SlidersHorizontal aria-hidden="true" />
           </Button>
         </Hint>
       )}
@@ -155,6 +171,8 @@ export function CompanyList({
   const [editOpen, setEditOpen] = useState(false);
   const [adminOf, setAdminOf] = useState<Company>();
   const [adminOpen, setAdminOpen] = useState(false);
+  const [accessOf, setAccessOf] = useState<Company>();
+  const [accessOpen, setAccessOpen] = useState(false);
   const [viewing, setViewing] = useState<Company | null>(null);
   const [deactivating, setDeactivating] = useState<Company | null>(null);
   const [pending, startTransition] = useTransition();
@@ -202,6 +220,10 @@ export function CompanyList({
     onAdmin: (company) => {
       setAdminOf(company);
       setAdminOpen(true);
+    },
+    onAccess: (company) => {
+      setAccessOf(company);
+      setAccessOpen(true);
     },
     onDeactivate: setDeactivating,
     onRestore: restore,
@@ -324,6 +346,16 @@ export function CompanyList({
         forCompany={
           adminOf
             ? { id: adminOf.id, name: displayName(adminOf), type: "ADMIN" }
+            : undefined
+        }
+      />
+
+      <CompanyAccessDialog
+        open={accessOpen}
+        onOpenChange={setAccessOpen}
+        company={
+          accessOf
+            ? { id: accessOf.id, name: displayName(accessOf) }
             : undefined
         }
       />

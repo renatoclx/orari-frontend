@@ -8,6 +8,7 @@ import { Sidebar } from "@/components/layout/Sidebar";
 import { WelcomeToast } from "@/components/layout/WelcomeToast";
 import { SIDEBAR_COOKIE } from "@/components/layout/sidebar-cookie";
 import { anamnesisAccess } from "@/utils/anamnesis-access";
+import { canAccess } from "@/utils/access";
 import type { CurrentUser } from "@/types/auth";
 
 type AdminShellProps = {
@@ -31,8 +32,12 @@ export function AdminShell({
     document.cookie = `${SIDEBAR_COOKIE}=${next}; path=/; max-age=31536000`;
   }
 
+  // Fichas: o perfil do usuário e também a empresa ter a anamnese liberada.
+  const canAccessRecords =
+    anamnesisAccess(user).canAccess && canAccess(user.access, "anamnesis");
+
   return (
-    <AnamnesisAccessProvider canAccess={anamnesisAccess(user).canAccess}>
+    <AnamnesisAccessProvider canAccess={canAccessRecords}>
       {/* Primeiro item do teclado: leva ao conteúdo sem passar por todo o menu. */}
       <a
         href="#conteudo"
@@ -44,7 +49,8 @@ export function AdminShell({
         <Sidebar
           isSuperAdmin={user.type === "SUPER_ADMIN"}
           isAdmin={anamnesisAccess(user).isAdmin}
-          canAccessAnamnesis={anamnesisAccess(user).canAccess}
+          canAccessAnamnesis={canAccessRecords}
+          access={user.access}
           collapsed={collapsed}
           onToggleCollapsed={toggleCollapsed}
           mobileOpen={mobileOpen}

@@ -38,7 +38,7 @@ async function clientName(id: string): Promise<[string, string] | null> {
  * vêm da lista de usuários e de uma busca por cliente da página.
  */
 export async function AuditPage({ searchParams }: AuditPageProps) {
-  const user = await requireAnamnesisAdmin();
+  const user = await requireAnamnesisAdmin("anamnesis-audit");
   const timeZone = user.company.timezone;
   const { page, ...filters } = parseAuditFilters(searchParams);
 

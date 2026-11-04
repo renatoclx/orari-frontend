@@ -18,7 +18,7 @@ type TemplatesListPageProps = {
 export async function TemplatesListPage({
   searchParams,
 }: TemplatesListPageProps) {
-  await requireAnamnesisAdmin();
+  await requireAnamnesisAdmin("anamnesis-templates");
 
   const search =
     typeof searchParams.q === "string" ? searchParams.q.trim() : "";

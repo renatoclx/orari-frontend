@@ -5,6 +5,7 @@ import { TablePagination } from "@/components/shared/TablePagination";
 import { getCurrentUser } from "@/services/auth.service";
 import { listClassGroups } from "@/services/class-group.service";
 import { listPeople } from "@/services/people.service";
+import { canAccess } from "@/utils/access";
 
 // Itens por página da listagem (a API aceita até 100).
 const PAGE_SIZE = 10;
@@ -21,7 +22,13 @@ export async function ClassGroupsListPage({
   searchParams,
 }: ClassGroupsListPageProps) {
   const currentUser = await getCurrentUser();
-  if (currentUser.type !== "ADMIN") notFound();
+  // Só o ADMIN, e só se a empresa tem as turmas liberadas.
+  if (
+    currentUser.type !== "ADMIN" ||
+    !canAccess(currentUser.access, "class-groups")
+  ) {
+    notFound();
+  }
 
   const search =
     typeof searchParams.q === "string" ? searchParams.q.trim() : "";

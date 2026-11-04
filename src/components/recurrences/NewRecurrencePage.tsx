@@ -3,6 +3,7 @@ import { getCurrentUser } from "@/services/auth.service";
 import { listClassGroups } from "@/services/class-group.service";
 import { listPeople } from "@/services/people.service";
 import { listServices } from "@/services/service.service";
+import { canAccess } from "@/utils/access";
 import { timeToMinutes, toDateString, toTimeString } from "@/utils/time";
 
 // Tela de cadastro de recorrência: carrega as opções dos campos no servidor.
@@ -17,7 +18,8 @@ export async function NewRecurrencePage() {
     listPeople({ type: "PROFESSIONAL", page: 1, limit: 100 }),
     listServices({ page: 1, limit: 100 }),
     // Turmas ativas, para encaixar a recorrência numa delas (só o ADMIN as consulta).
-    currentUser.type === "ADMIN"
+    currentUser.type === "ADMIN" &&
+    canAccess(currentUser.access, "class-groups")
       ? listClassGroups({ isActive: true, page: 1, limit: 100 })
       : null,
   ]);

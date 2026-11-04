@@ -86,6 +86,12 @@ export const ACCESS_GROUPS: { label: string; features: AccessFeature[] }[] = [
         label: "Configurações",
         actions: ["view", "edit"],
       },
+      // Visualiza = portal disponível à clínica; Edita = mudar as regras dele.
+      {
+        key: "client-portal",
+        label: "Portal do cliente",
+        actions: ["view", "edit"],
+      },
     ],
   },
 ];

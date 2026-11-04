@@ -86,6 +86,13 @@ Pontos conhecidos e aceitos por enquanto. Revisar quando o contexto mudar.
 - **Cabeçalhos de segurança do site.** O `next.config.ts` envia `X-Content-Type-Options: nosniff`, `X-Frame-Options: DENY`, `Referrer-Policy`, `Permissions-Policy` (câmera só do próprio site) e uma CSP de base, e desliga o `X-Powered-By`. A CSP **bloqueia em produção** e só **avisa (Report-Only) em desenvolvimento**; `e2e/csp.e2e.ts` falha se uma tela ou diálogo a violar. Fica pendente: (1) `Strict-Transport-Security`, que é do Caddy (`Caddyfile`, repositório do backend); (2) trocar `'unsafe-inline'` por **nonce** (guia "Content Security Policy" do Next, gerado no `proxy`): exige renderização dinâmica e tirar os estilos em linha (cores de serviço), então é uma etapa própria; (3) conferir em produção, após o primeiro deploy, que nada quebrou (câmera da foto, PDF, logo).
 - **Teste de fumaça (e2e) fora do CI.** O CI roda lint, tipos, testes e build; o `npm run test:e2e` (Playwright) precisa da API, de um banco e de dados, então roda só na sua máquina. Entrar no CI pede subir PostgreSQL e backend no workflow e semear uma empresa de demonstração.
 
+## Acessos e limites
+
+- **Lista de funcionalidades em dois repositórios.** As chaves da matriz estão no backend (`access-catalog.ts`) e no frontend (`company-access.ts` e `feature` do `Sidebar`). Ao criar uma funcionalidade, acrescentar nos dois.
+- **Botões dentro de diálogos e da agenda.** As ações Cria, Edita e Exclui/Inativa já somem nas listas, barras de ferramentas, atalhos e no detalhe do agendamento. Telas internas menos comuns (diálogos de sessão da recorrência e do pacote, remanejar, comandas e baixa de pagamentos) ainda não têm cada botão ligado ao acesso: a API recusa com 403.
+- **Limite no botão.** "Novo profissional" e "Novo usuário" não ficam desabilitados no limite (o `/auth/me` não traz o uso); a mensagem `PLAN_LIMIT_REACHED` aparece ao salvar.
+- **Contatos e endereços.** Não são barrados por funcionalidade no backend (ver `technical-debt.md` dele).
+
 ## Empresas
 
 - **Usuários do SUPER_ADMIN.** A API exige `companyId` quando o SUPER_ADMIN cria um usuário e lista os usuários de todas as empresas. A tela de Usuários não pede nem filtra por empresa: para o SUPER_ADMIN, o cadastro responde 400 ("companyId é obrigatório") e a lista mistura empresas. O fluxo "Cadastrar administrador" de Empresas já envia a empresa; falta um seletor de empresa na tela de Usuários.

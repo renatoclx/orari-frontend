@@ -77,6 +77,14 @@ específica, prevalece a documentação da entidade.
 
 ---
 
+## Acesso por funcionalidade
+
+- Botão ou item que depende de uma ação liberada na empresa (Cria, Edita, Exclui/Inativa) some quando ela não existe: `useCan(feature, action)` ou `<Can feature action>` (`components/layout/Access.tsx`). Na coluna Ações, o "Alterar" some sem Edita; Inativar, Excluir e Reativar somem sem Exclui/Inativa; se o menu ficaria vazio, o kebab também some.
+- Página de uma funcionalidade sem a ação liberada: `requireFeature(feature, action)` no `page.tsx` (404).
+- Só esconde: a API barra com 403 de qualquer forma.
+
+---
+
 ## Badges
 
 - Todas as badges exibidas na aplicação devem seguir um padrão básico.

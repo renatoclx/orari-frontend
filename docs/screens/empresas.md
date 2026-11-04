@@ -71,7 +71,7 @@ Gestão das empresas da plataforma, **só para o SUPER_ADMIN**. Substitui o cada
   - "Só leitura" (downgrade ou suspensão) é Visualiza marcado e o resto desmarcado: os dados ficam.
 - **Limites** (abaixo da matriz): **Profissionais** (incluindo o administrador que atua; o básico permite o administrador + 2) e **Administradores** (usuários com acesso). Mostram o uso ("em uso: 2 de 3"). Baixar o limite abaixo do uso é permitido, com aviso: a empresa continua funcionando e só não cadastra novos.
 - Os **modelos de plano** (nomes a definir) entram como atalho que preenche matriz e limites, ainda editáveis.
-- **Efeito para a empresa:** o `GET /auth/me` traz os acessos (`access.features`) e a tela os usa para esconder o que a empresa não tem (ver `layout.md`). Quem abre direto o endereço de uma tela sem acesso vê "não encontrada" (Turmas e Anamnese; as demais telas passam a seguir quando a API barrar as demais rotas). Sem Turmas liberadas, a agenda, a nova recorrência e a nova contratação não consultam turmas.
+- **Efeito para a empresa:** o `GET /auth/me` traz os acessos (`access.features`) e a tela os usa para esconder o que a empresa não tem (ver `layout.md`). Quem abre direto o endereço de uma tela sem acesso vê "não encontrada" (todas as telas de funcionalidade). Sem a ação, somem os botões: "Novo" (Cria), "Alterar" (Edita), Inativar, Excluir e Reativar (Exclui/Inativa), os atalhos da barra lateral e, no agendamento, Cancelar, Remanejar e Alterar (Edita). Sem Turmas liberadas, a agenda, a nova recorrência e a nova contratação não consultam turmas. Ao estourar um limite, a API recusa com a mensagem do plano (ex.: "O plano da empresa permite 3 profissionais…"), mostrada ao salvar.
 
 ---
 
@@ -89,5 +89,5 @@ Gestão das empresas da plataforma, **só para o SUPER_ADMIN**. Substitui o cada
 ## Pendências
 
 - **Logo de outras empresas:** a API só tem `POST` e `DELETE /companies/me/logo`. Para o SUPER_ADMIN trocar a logo de qualquer empresa, o backend precisa de rotas `/companies/:id/logo`; depois o formulário ganha o envio da logo.
-- **Acessos e limites:** a API barra, por ora, só Turmas e Anamnese; as demais rotas, os limites no cadastro de profissionais e administradores e o esconder dos botões Cria, Edita e Exclui/Inativa seguem nas próximas etapas. Empresas de teste atuais ficam com acesso total até o fim do prazo de testes.
+- **Acessos e limites:** botões dentro de diálogos menos comuns ainda não seguem o acesso (ver `frontend-technical-debt.md`). Empresas de teste atuais ficam com acesso total e limites de 999 até o fim do prazo de testes.
 - **Usuários do SUPER_ADMIN:** a tela de Usuários ainda não pede a empresa ao SUPER_ADMIN, que a API exige para criar usuários (ver `frontend-technical-debt.md`).

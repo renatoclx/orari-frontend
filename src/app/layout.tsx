@@ -1,12 +1,17 @@
 import type { Metadata } from "next";
-import { Plus_Jakarta_Sans } from "next/font/google";
+import localFont from "next/font/local";
 import { ThemeProvider } from "next-themes";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { AppToaster } from "@/components/layout/AppToaster";
 import "./globals.css";
 
-const jakarta = Plus_Jakarta_Sans({
-  subsets: ["latin"],
+// Fonte hospedada no projeto (variável, 200–800, só o subconjunto latin, que
+// cobre o português): o next/font/google dependia de baixar do Google no dev e
+// no build, e no dev falhava, caindo na fonte do sistema.
+const jakarta = localFont({
+  src: "./fonts/PlusJakartaSans-latin.woff2",
+  weight: "200 800",
+  display: "swap",
   variable: "--font-jakarta",
 });
 

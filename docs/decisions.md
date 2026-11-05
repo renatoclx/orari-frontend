@@ -128,6 +128,14 @@ regras de cada tela, em `docs/screens/`.
 
 - **2026-10-23 — O status da comanda tem quatro estados** (Aberta, Aguardando conclusão, Paga, Incluído no pacote), decididos no frontend a partir dos dados que a API já devolve. _Por quê:_ "nada pendente" não quer dizer "paga": o atendimento avulso só ganha cobrança quando é concluído, e a comanda de um atendimento futuro aparecia como Paga (bug visto em produção).
 
+## Portal e app do cliente
+
+- **2026-11-05 — O app do cliente é uma área própria (`/app`) do mesmo frontend,** com sessão separada da clínica. _Por quê:_ um deploy só, e as duas sessões convivem sem uma derrubar a outra.
+- **2026-11-05 — O cliente tem conta única no Orari (telefone e senha) e busca estabelecimentos;** quem entra sozinho fica "não confirmado", com até 2 agendamentos futuros, até a clínica confirmar. O link da clínica liga a conta ao cadastro existente e o confirma. _Por quê:_ conhecer novos locais sem ligar a conta a um cadastro só porque o telefone é igual.
+- **2026-11-05 — A interface do app segue o modelo do AppBarber como direção, não cópia:** tema escuro fixo, cor do Orari (ciano, com texto escuro por contraste), barra Início, Buscar, Agendamentos e Menu.
+- **2026-11-05 — Portal do cliente tem entrada própria no menu** (a última antes de Ajuda), não uma seção em Configurações; o **Acesso ao portal** fica visível na coluna Ações da lista de Clientes. _Por quê:_ Configurações é só da empresa, e ação frequente não fica atrás de outro menu.
+- **2026-11-05 — Em Meus dados o cliente altera o cadastro todo (inclusive a foto), copiado para cada clínica;** Pacotes e Recorrências são só consulta.
+
 ## Qualidade e testes
 
 - **2026-10-23 — Testes automáticos só de funções puras e de pontos de borda do servidor,** com Vitest (a mesma ferramenta do backend) e `arquivo.spec.ts` ao lado do código. _Por quê:_ é onde está a regra que quebra sem barulho (fuso, arredondamento, disponibilidade de horários); componentes e telas seguem verificados à mão e com `axe-core`. Ponta a ponta (Playwright) fica fora por ora.
@@ -144,3 +152,4 @@ regras de cada tela, em `docs/screens/`.
 
 - Almoço como duas janelas; a tela de horário de funcionamento entra em Configurações da empresa. Pausas lançadas pelo administrador são futuras.
 - Empresa sem nenhuma janela cadastrada: a API não restringe horários; falta definir o comportamento da agenda.
+- Cliente que já tinha cadastro e entra sozinho pela busca do app fica com 2 cadastros; juntá-los fica para depois.

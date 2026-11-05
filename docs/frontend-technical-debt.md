@@ -100,6 +100,14 @@ Pontos conhecidos e aceitos por enquanto. Revisar quando o contexto mudar.
 - **Documento validado nos dois lados.** O cálculo dos dígitos de CPF e CNPJ (`utils/document.ts`) repete o do backend (`document.validator.ts`); se a regra mudar, mudar nos dois.
 - **Conflito sem campo.** A API responde 409 com "documento ou subdomínio" sem dizer qual; a mensagem aparece no formulário, não num campo só.
 
+## App do cliente
+
+- **Sem uso offline nem notificações:** não há service worker.
+- **Esqueci a senha:** só pelo link da clínica; não há recuperação pelo próprio app.
+- **Telefone não confirmado:** depende do envio do código pelo WhatsApp (Meta).
+- **Clientes duplicados:** quem já era cliente e entrou sozinho pela busca fica com 2 cadastros; falta juntar.
+- **Busca só por nome;** geolocalização no futuro.
+
 ## Acessibilidade
 
 Auditoria da Etapa 9 (2026-10-22): `axe-core` em todas as rotas e em 11 diálogos e menus, sem achados de contraste, nomes ou marcos. Restos aceitos:
@@ -109,5 +117,5 @@ Auditoria da Etapa 9 (2026-10-22): `axe-core` em todas as rotas e em 11 diálogo
 - **Menus em portal (`region`).** O axe reclama de conteúdo fora de marcos nos menus do Radix, que abrem num portal. Falso positivo conhecido; não tratado.
 - **Nome do bloco cancelado.** Um bloco cancelado da agenda ainda é apontado por `label-content-name-mismatch`, embora o nome acessível comece pelo texto visível; causa não encontrada.
 - **Formulário não salvo.** Sair de um formulário com alterações não pergunta nada (previsto pela web-design-guidelines).
-- **Áreas de segurança do iPhone.** Não há `viewport-fit=cover` nem `env(safe-area-inset-*)`; só importa se o Orari virar app instalado.
+- **Áreas de segurança do iPhone.** Resolvido no app do cliente (`viewport-fit=cover` e `env(safe-area-inset-*)`); a área da clínica não precisa, porque não é instalada.
 - **Sem testes automáticos de acessibilidade.** A auditoria é manual (`axe-core` em script de teste); falta rodar no CI quando houver testes (Etapa 10).

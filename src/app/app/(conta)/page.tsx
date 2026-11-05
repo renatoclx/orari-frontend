@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { CalendarClock, ChevronRight } from "lucide-react";
+import { CalendarClock } from "lucide-react";
 import { AppFormMessage } from "@/components/client-app/AppFormMessage";
 import { PlaceAvatar } from "@/components/client-app/PlaceAvatar";
 import {
@@ -21,7 +21,7 @@ export const metadata: Metadata = { title: "Início" };
  * agendamento (de qualquer estabelecimento) e os estabelecimentos da conta.
  */
 export default async function AppHomePage({ searchParams }: PageProps<"/app">) {
-  const { bemVindo } = await searchParams;
+  const { bemVindo, agendado } = await searchParams;
   const [{ account, places }, { upcoming }] = await Promise.all([
     getAccount(),
     listAccountAppointments(),
@@ -40,6 +40,12 @@ export default async function AppHomePage({ searchParams }: PageProps<"/app">) {
           {greetingDate(new Date(), timeZone)}
         </p>
       </header>
+
+      {agendado && (
+        <AppFormMessage tone="info">
+          Agendamento confirmado. Ele aparece abaixo, em Próximo agendamento.
+        </AppFormMessage>
+      )}
 
       {bemVindo && (
         <AppFormMessage tone="info">
@@ -76,19 +82,24 @@ export default async function AppHomePage({ searchParams }: PageProps<"/app">) {
         {places.length > 0 ? (
           <ul className="space-y-2">
             {places.map((place) => (
-              <li key={place.slug}>
+              <li
+                key={place.slug}
+                className="flex items-center gap-3 rounded-card border border-border bg-card p-3"
+              >
                 <Link
                   href={`/app/local/${place.slug}`}
-                  className="flex items-center gap-3 rounded-card border border-border bg-card p-3 hover:bg-accent"
+                  className="flex min-w-0 flex-1 items-center gap-3"
                 >
                   <PlaceAvatar name={place.name} logoUrl={place.logoUrl} />
                   <span className="min-w-0 flex-1 truncate font-medium">
                     {place.name}
                   </span>
-                  <ChevronRight
-                    className="size-5 shrink-0 text-muted-foreground"
-                    aria-hidden="true"
-                  />
+                </Link>
+                <Link
+                  href={`/app/local/${place.slug}/agendar`}
+                  className="shrink-0 rounded-full border border-primary px-3 py-1 text-sm font-semibold text-primary hover:bg-primary/10"
+                >
+                  Agendar
                 </Link>
               </li>
             ))}

@@ -2,7 +2,7 @@
 
 App que o **cliente** usa para agendar nos seus estabelecimentos (rota `/app`). Sempre **escuro**, feito para o celular (no computador, uma coluna centralizada), na direção do AppBarber. A sessão é própria, separada da clínica (`frontend-auth.md`, "App do cliente").
 
-> Feitas: 7b1 (entrar, criar conta, link de acesso, Início e Menu), a instalação no celular com o splash (antecipada da 7b5) e 7b2 (Buscar e página do estabelecimento). Próximas: Agendar (7b3), Agendamentos e o resto do Menu (7b4).
+> Feitas: 7b1 (entrar, criar conta, link de acesso, Início e Menu), a instalação no celular com o splash (antecipada da 7b5) 7b2 (Buscar e página do estabelecimento) e 7b3 (Agendar). Próxima: Agendamentos e o resto do Menu (7b4).
 
 ## Telas abertas (sem entrar)
 
@@ -40,7 +40,8 @@ Barra de navegação embaixo, do app inteiro: **Início**, **Buscar** (marcada t
 
 - "Olá <primeiro nome>" (o nome em azul) e a data ("Quinta, 5 nov 2026").
 - **Próximo agendamento**: o mais próximo de todos os estabelecimentos (serviço; "Qui, 12/11 às 08:00 · profissional", no relógio da clínica; estabelecimento). Sem nenhum: "Nenhum agendamento marcado."
-- **Meus locais**: logo (ou iniciais) e nome; tocar abre a página do estabelecimento. Sem nenhum: "Você ainda não tem estabelecimentos. Encontre um em Buscar ou peça o link de acesso ao seu estabelecimento."
+- Depois de agendar (`?agendado=1`): "Agendamento confirmado. Ele aparece abaixo, em Próximo agendamento."
+- **Meus locais**: logo (ou iniciais) e nome (tocar abre a página do estabelecimento) e o botão **Agendar**, que vai direto para a tela de agendar. Sem nenhum: "Você ainda não tem estabelecimentos. Encontre um em Buscar ou peça o link de acesso ao seu estabelecimento."
 
 ### Buscar (`/app/buscar`)
 
@@ -54,13 +55,27 @@ Barra de navegação embaixo, do app inteiro: **Início**, **Buscar** (marcada t
 - Topo: logo (ou iniciais), nome e "segmento · cidade". Embaixo, os **Serviços** que aparecem no app (com profissional ligado): nome, duração, preço e descrição.
 - **Sem a conta:** "Entre ou crie sua conta para agendar aqui." e os botões **Entrar** e **Criar conta** (voltam para esta página).
 - **Com a conta, sem ser cliente:** "Você ainda não é cliente daqui. Ao entrar, o estabelecimento recebe o seu nome e telefone." e **Entrar neste estabelecimento**: cria um cadastro novo na clínica, **não confirmado** (até 2 agendamentos futuros até a clínica confirmar; `pessoas.md`). Depois: "Pronto, você agora é cliente de …".
-- **Já cliente:** a vitrine; o botão **Agendar** chega com a tela de agendar (7b3).
+- **Já cliente:** o botão **Agendar** (se há serviços no app) e a vitrine.
 - Estabelecimento inexistente, com o portal desligado ou fora do plano: a página "Não encontramos esta página", escura e com o botão **Buscar estabelecimentos** (vale para qualquer endereço do app que não existe).
 
 ### Menu (`/app/menu`)
 
 - Iniciais, nome e telefone da conta.
 - **Sair deste aparelho**: volta a Entrar com "Você saiu do app.".
+
+### Agendar (`/app/local/<subdomínio>/agendar`)
+
+- Só para quem já é cliente do estabelecimento: sem a conta, vai a Entrar e volta; sem ser cliente, volta à página do estabelecimento.
+- Topo: "‹ <estabelecimento>" (volta à página dele) e o título **Agendar**.
+- Uma página só, que se completa conforme as escolhas (mudar uma apaga as que dependem dela):
+  1. **Serviço**: cartões com nome, duração e preço.
+  2. **Profissional**: quem atende o serviço; com um só, já vem escolhido.
+  3. **Dia**: faixa que rola de lado (dia da semana, número e mês), de hoje até os **dias à frente** da clínica (no máximo 60). Começa em hoje.
+  4. **Horário · <dia por extenso>**: os horários livres do dia, calculados no servidor com as regras da clínica (antecedência, janelas, compromissos e turmas), agrupados em **Manhã**, **Tarde** e **Noite** (com a quantidade), 3 por linha, com contorno azul; o escolhido fica preenchido. Sem horário: "Nenhum horário livre neste dia. Escolha outro dia."
+- Escolha de serviço, profissional, dia e horário: contorno e, escolhido, preenchido em azul (`aria-pressed`).
+- **Confirmar <dia>, <dd/mm> às <hh:mm>**: preso embaixo, logo acima da barra de navegação. Agendado: Início com o aviso.
+- Recusas da API aparecem no topo: horário que deixou de estar livre (e os horários são buscados de novo) e o limite do cliente não confirmado ("Até o estabelecimento confirmar o seu cadastro, você pode ter no máximo 2 agendamentos futuros.").
+- Só avulsos: recorrências, pacotes e turmas continuam sendo marcados pela clínica.
 
 ## Instalar no celular
 

@@ -203,6 +203,8 @@ Interface do cliente, separada da clínica (`docs/screens/app-cliente.md`):
 - **Campos e botões maiores:** `AppField` (altura 48 px, texto de 16 px para o celular não dar zoom; máscara de telefone embutida) e botões `h-12 w-full text-base`.
 - **Avisos dentro da tela** (`AppFormMessage`, `error` ou `info`), não toasts: o Toaster da clínica fica fora da área escura.
 - **Busca no app:** o mesmo `ListSearch` da clínica, com `size="lg"` (48 px, ícone maior) e o texto de exemplo próprio. Item de lista que abre outra tela: cartão inteiro clicável com `ChevronRight` à direita.
+- **Escolhas do agendar** (serviço, profissional, dia, horário): botões com contorno e, escolhidos, preenchidos em `bg-primary` (`aria-pressed`). Horários em grade de 3 por linha com contorno `border-primary text-primary`, agrupados por período (`groupSlotsByPeriod`, os mesmos períodos da agenda da clínica). Dias numa faixa que rola de lado.
+- **Ação presa no rodapé** (ex.: Confirmar): `sticky` com `BOTTOM_NAV_OFFSET` (fica logo acima da barra de navegação, que tem altura fixa de 64 px + borda), fundo `bg-background` e borda em cima.
 - **Estabelecimento:** `PlaceAvatar` (logo em círculo ou as iniciais em `bg-primary/20 text-primary`). Saudação "Olá <primeiro nome>" com o nome em `text-primary`.
 - Cartões com `rounded-card border border-border bg-card`, como na clínica.
 - **Splash do app instalado** (`AppSplash`): fundo na cor da logo (`#00B8DB`), o símbolo em cima e a escrita "orari" embaixo, os dois na cor neutra da logo (`#F4F4F5`; `public/app-assets/symbol.svg` e `wordmark.svg`, sem a moldura dos SVGs de `public/logo`). Os ícones do app seguem o mesmo par de cores.

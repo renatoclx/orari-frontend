@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { Clock } from "lucide-react";
+import { CalendarPlus, Clock } from "lucide-react";
 import { AppFormMessage } from "@/components/client-app/AppFormMessage";
 import { JoinPlaceButton } from "@/components/client-app/JoinPlaceButton";
 import { PlaceAvatar } from "@/components/client-app/PlaceAvatar";
@@ -79,8 +79,17 @@ export default async function PlacePage({
             </Link>
           </Button>
         </div>
+      ) : isClient ? (
+        services.length > 0 && (
+          <Button asChild className="h-12 w-full text-base">
+            <Link href={`${here}/agendar`}>
+              <CalendarPlus aria-hidden="true" />
+              Agendar
+            </Link>
+          </Button>
+        )
       ) : (
-        !isClient && (
+        <>
           <div className="space-y-2">
             <p className="text-center text-sm text-muted-foreground">
               Você ainda não é cliente daqui. Ao entrar, o estabelecimento
@@ -88,7 +97,7 @@ export default async function PlacePage({
             </p>
             <JoinPlaceButton slug={slug} />
           </div>
-        )
+        </>
       )}
 
       <section className="space-y-2">

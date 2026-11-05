@@ -16,6 +16,13 @@ import {
 } from "@/services/app-account.service";
 import { joinPlace } from "@/services/app-place.service";
 import {
+  bookAppointment,
+  getAvailability,
+} from "@/services/app-booking.service";
+import type { Slot } from "@/components/client-app/booking-slots";
+import { isUuid } from "@/lib/uuid";
+import { isDateString } from "@/utils/time";
+import {
   clearAppSession,
   getAppToken,
   setAppSession,
@@ -174,4 +181,46 @@ export async function appJoinPlaceAction(
     return { ok: false, message: error.message };
   }
   redirect(`/app/local/${encodeURIComponent(slug)}?entrou=1`);
+}
+
+type BookingChoice = { serviceId: string; professionalId: string };
+
+/** Horários livres de um dia, para a tela de agendar. */
+export async function appAvailabilityAction(
+  slug: string,
+  choice: BookingChoice & { date: string },
+): Promise<{ ok: true; slots: Slot[] } | { ok: false; message: string }> {
+  if (
+    !isUuid(choice.serviceId) ||
+    !isUuid(choice.professionalId) ||
+    !isDateString(choice.date)
+  ) {
+    return { ok: false, message: "Escolha o serviço, o profissional e o dia." };
+  }
+  try {
+    return { ok: true, slots: await getAvailability(slug, choice) };
+  } catch (error) {
+    if (!(error instanceof ApiError)) throw error;
+    return { ok: false, message: error.message };
+  }
+}
+
+/**
+ * Agenda o horário escolhido. Horário que deixou de estar livre (409) volta
+ * com `refresh`, para a tela buscar os horários de novo.
+ */
+export async function appBookAction(
+  slug: string,
+  choice: BookingChoice & { startAt: string },
+): Promise<{ ok: false; message: string; refresh?: boolean } | undefined> {
+  if (!isUuid(choice.serviceId) || !isUuid(choice.professionalId)) {
+    return { ok: false, message: "Escolha o serviço e o profissional." };
+  }
+  try {
+    await bookAppointment(slug, choice);
+  } catch (error) {
+    if (!(error instanceof ApiError)) throw error;
+    return { ok: false, message: error.message, refresh: error.status === 409 };
+  }
+  redirect("/app?agendado=1");
 }

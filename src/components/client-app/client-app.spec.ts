@@ -2,6 +2,9 @@ import { describe, expect, it } from "vitest";
 import {
   accessLinkMode,
   appointmentWhen,
+  bookingDays,
+  dayChip,
+  longDate,
   firstName,
   greetingDate,
   newPasswordErrors,
@@ -78,5 +81,28 @@ describe("accessLinkMode", () => {
     expect(accessLinkMode(true, true)).toBe("attach");
     expect(accessLinkMode(false, false)).toBe("create");
     expect(accessLinkMode(false, true)).toBe("reset");
+  });
+});
+
+describe("dias para agendar", () => {
+  it("de hoje até os dias à frente da clínica", () => {
+    expect(bookingDays("2026-11-30", 2)).toEqual([
+      "2026-11-30",
+      "2026-12-01",
+      "2026-12-02",
+    ]);
+  });
+
+  it("no máximo o limite da lista", () => {
+    expect(bookingDays("2026-11-05", 365, 60)).toHaveLength(61);
+  });
+
+  it("botão do dia e data por extenso", () => {
+    expect(dayChip("2026-11-12")).toEqual({
+      weekday: "qui",
+      day: "12",
+      month: "nov",
+    });
+    expect(longDate("2026-11-12")).toBe("quinta, 12 de novembro");
   });
 });

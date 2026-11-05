@@ -95,3 +95,48 @@ export function accessLinkMode(
   if (loggedIn) return "attach";
   return hasAccount ? "reset" : "create";
 }
+
+/**
+ * Dias que o cliente pode escolher para agendar: de hoje até `maxDaysAhead`
+ * dias à frente (regra da clínica), no máximo `limit` (a lista é para o celular).
+ */
+export function bookingDays(
+  today: string,
+  maxDaysAhead: number,
+  limit = 60,
+): string[] {
+  const count = Math.min(maxDaysAhead, limit) + 1;
+  return Array.from({ length: count }, (_, index) => {
+    const date = new Date(`${today}T12:00:00Z`);
+    date.setUTCDate(date.getUTCDate() + index);
+    return date.toISOString().slice(0, 10);
+  });
+}
+
+/** Partes do botão de um dia: "qui", "12" e "nov". */
+export function dayChip(date: string): {
+  weekday: string;
+  day: string;
+  month: string;
+} {
+  const p = parts(new Date(`${date}T12:00:00Z`), "UTC", {
+    weekday: "short",
+    day: "numeric",
+    month: "short",
+  });
+  return {
+    weekday: p.weekday.replace(".", ""),
+    day: p.day,
+    month: p.month.replace(".", ""),
+  };
+}
+
+/** Data por extenso para o resumo: "quinta, 12 de novembro". */
+export function longDate(date: string): string {
+  const p = parts(new Date(`${date}T12:00:00Z`), "UTC", {
+    weekday: "long",
+    day: "numeric",
+    month: "long",
+  });
+  return `${p.weekday.split("-")[0]}, ${p.day} de ${p.month}`;
+}

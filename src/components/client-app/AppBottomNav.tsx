@@ -18,6 +18,13 @@ const TABS: {
   { href: "/app/menu", label: "Menu", icon: UserRound },
 ];
 
+/**
+ * Altura da barra (64 px dos itens + 1 px da borda), sem a área do gesto do
+ * iPhone: quem fica preso logo acima dela (ex.: o Confirmar de Agendar) usa.
+ */
+export const BOTTOM_NAV_OFFSET =
+  "bottom-[calc(4rem+1px+env(safe-area-inset-bottom))]";
+
 /** Barra de navegação de baixo do app do cliente (screens/app-cliente.md). */
 export function AppBottomNav() {
   const pathname = usePathname();
@@ -26,7 +33,7 @@ export function AppBottomNav() {
       aria-label="Navegação do app"
       className="sticky bottom-0 border-t border-border bg-sidebar pb-[env(safe-area-inset-bottom)]"
     >
-      <ul className="flex">
+      <ul className="flex h-16">
         {TABS.map(({ href, label, icon: Icon, also }) => {
           const active =
             pathname === href || Boolean(also && pathname.startsWith(also));
@@ -35,7 +42,7 @@ export function AppBottomNav() {
               <Link
                 href={href}
                 aria-current={active ? "page" : undefined}
-                className={`flex flex-col items-center gap-1 py-2.5 text-xs ${
+                className={`flex h-full flex-col items-center justify-center gap-1 text-xs ${
                   active
                     ? "text-primary"
                     : "text-muted-foreground hover:text-foreground"

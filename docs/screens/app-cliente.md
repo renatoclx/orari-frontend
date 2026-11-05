@@ -56,6 +56,7 @@ Barra de navegação embaixo, do app inteiro: **Início**, **Buscar** (marcada t
 - **Sem a conta:** "Entre ou crie sua conta para agendar aqui." e os botões **Entrar** e **Criar conta** (voltam para esta página).
 - **Com a conta, sem ser cliente:** "Você ainda não é cliente daqui. Ao entrar, o estabelecimento recebe o seu nome e telefone." e **Entrar neste estabelecimento**: cria um cadastro novo na clínica, **não confirmado** (até 2 agendamentos futuros até a clínica confirmar; `pessoas.md`). Depois: "Pronto, você agora é cliente de …".
 - **Já cliente:** o botão **Agendar** (se há serviços no app) e a vitrine.
+- Erro ao montar uma tela (ex.: a API fora do ar): "Não foi possível abrir esta tela", escura, com **Tentar de novo**.
 - Estabelecimento inexistente, com o portal desligado ou fora do plano: a página "Não encontramos esta página", escura e com o botão **Buscar estabelecimentos** (vale para qualquer endereço do app que não existe).
 
 ### Agendamentos (`/app/agendamentos`)

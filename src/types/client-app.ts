@@ -82,3 +82,46 @@ export type PlaceService = {
   price: number | null;
   professionals: { id: string; name: string; photoUrl: string | null }[];
 };
+
+/** GET /portal-account/profile: Meus dados. */
+export type AppProfile = {
+  name: string;
+  phone: string;
+  email: string | null;
+  /** CPF sem máscara. */
+  document: string | null;
+  /** Data pura (ISO, meia-noite UTC). */
+  birthDate: string | null;
+  profession: string | null;
+  photoUrl: string | null;
+  address: {
+    cep: string;
+    street: string;
+    number: string;
+    complement: string | null;
+    neighborhood: string | null;
+    city: { id: string; name: string; state: string };
+  } | null;
+};
+
+/** Item de GET /portal-account/plans (só para ver; sem valores). */
+export type AppPlan = {
+  id: string;
+  planName: string;
+  startDate: string;
+  endDate: string;
+  status: "active" | "finished" | "cancelled";
+  place: AppPlace;
+};
+
+/** Item de GET /portal-account/recurrences (só para ver). */
+export type AppRecurrence = {
+  id: string;
+  kind: "RECURRENCE" | "PLAN" | "CLASS";
+  service: { name: string };
+  professional: { name: string };
+  days: { weekDay: string; startTime: string; endTime: string }[];
+  startDate: string;
+  endDate: string | null;
+  place: AppPlace;
+};

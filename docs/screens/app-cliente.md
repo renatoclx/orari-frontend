@@ -1,8 +1,8 @@
 # App do cliente
 
-App que o **cliente** usa para agendar nos seus estabelecimentos (rota `/app`). Sempre **escuro**, feito para o celular (no computador, uma coluna centralizada), na direção do AppBarber. A sessão é própria, separada da clínica (`frontend-auth.md`, "App do cliente").
+App que o **cliente** usa para agendar nos seus estabelecimentos (rota `/app`). Cor de destaque: o **ciano da logo** (`#00B8DB`, com texto escuro sobre ele; a clínica continua azul). Sempre **escuro**, feito para o celular (no computador, uma coluna centralizada), na direção do AppBarber. A sessão é própria, separada da clínica (`frontend-auth.md`, "App do cliente").
 
-> Feitas: 7b1 (entrar, criar conta, link de acesso, Início e Menu), a instalação no celular com o splash (antecipada da 7b5) 7b2 (Buscar e página do estabelecimento) e 7b3 (Agendar). Próxima: Agendamentos e o resto do Menu (7b4).
+> Feitas: 7b1 (entrar, criar conta, link de acesso, Início e Menu), a instalação no celular com o splash (antecipada da 7b5), 7b2 (Buscar e página do estabelecimento), 7b3 (Agendar), 7b4 (Agendamentos e Menu) e Meus dados, Pacotes e Recorrências. O app do cliente está completo para a primeira versão.
 
 ## Telas abertas (sem entrar)
 
@@ -34,7 +34,7 @@ O link que a clínica gera (lista de Clientes, ícone de QR code; `pessoas.md`).
 
 ## Telas de quem entrou
 
-Barra de navegação embaixo, do app inteiro: **Início**, **Buscar** (marcada também na página de um estabelecimento) e **Menu** (Agendamentos entra quando existir).
+Barra de navegação embaixo, do app inteiro: **Início**, **Buscar** (marcada também na página de um estabelecimento), **Agendamentos** e **Menu** (marcada também nas telas abertas por ele).
 
 ### Início (`/app`)
 
@@ -58,10 +58,42 @@ Barra de navegação embaixo, do app inteiro: **Início**, **Buscar** (marcada t
 - **Já cliente:** o botão **Agendar** (se há serviços no app) e a vitrine.
 - Estabelecimento inexistente, com o portal desligado ou fora do plano: a página "Não encontramos esta página", escura e com o botão **Buscar estabelecimentos** (vale para qualquer endereço do app que não existe).
 
+### Agendamentos (`/app/agendamentos`)
+
+- De **todos** os estabelecimentos da conta. Abas **Próximos** e **Anteriores** (`?aba=`); com dois ou mais estabelecimentos, a lista "Filtrar por estabelecimento" (nativa do celular; `?local=`).
+- Cartão: serviço, "Sex, 06/11 às 08:00 · profissional" (no relógio da clínica) e o estabelecimento. Pacote, turma e horário fixo têm um selo ("Pacote", "Turma", "Horário fixo"). Nos anteriores, a situação: Concluído, Cancelado ou Não compareceu.
+- **Cancelar** (só avulso, dentro do prazo da clínica): confirma **no próprio cartão** ("Cancelar este agendamento?", **Manter** ou **Cancelar**), porque os diálogos da clínica ficam fora da área escura do app. Cancelado: some da lista, e o Início é atualizado.
+- Sem poder cancelar: "Fora do prazo para cancelar pelo app. Fale com o estabelecimento." (avulso) ou "Para cancelar ou remarcar, fale com o estabelecimento." (pacote, turma, horário fixo).
+- Vazio: "Nenhum agendamento" com "Você não tem agendamentos marcados." ou "Nenhum atendimento anterior.".
+
 ### Menu (`/app/menu`)
 
-- Iniciais, nome e telefone da conta.
-- **Sair deste aparelho**: volta a Entrar com "Você saiu do app.".
+- Foto (ou iniciais), nome e telefone da conta.
+- Linhas no estilo do AppBarber (ícone, título, explicação e seta), com espaço generoso para o dedo:
+  - **Meus dados** · Altere as informações do seu perfil → `/app/menu/dados`.
+  - **Pacotes** · Acompanhe seus pacotes → `/app/menu/pacotes`.
+  - **Recorrências** · Seus horários fixos e turmas → `/app/menu/recorrencias`.
+  - **Segurança** · Altere sua senha de acesso → `/app/menu/senha` (Senha atual, Senha nova e Confirmar; senha atual errada no campo; trocada: "Senha trocada. Os outros aparelhos saíram da sua conta.").
+  - **Sair** · Só deste aparelho.
+- Telas abertas pelo Menu têm "‹ Menu" no topo.
+
+### Meus dados (`/app/menu/dados`)
+
+- **Foto**: **Adicionar foto** / **Trocar foto** abre a escolha do celular (tirar na hora ou galeria, no Android e no iPhone) e **Remover**. A foto é reduzida no próprio celular (lado maior de 960 px, JPEG) e vale na hora, sem esperar o Salvar; trocar a foto não apaga o que já foi digitado.
+- **Dados pessoais**: Nome, CPF (opcional, com máscara), Data de nascimento (opcional; o seletor de data do celular) e Profissão (opcional).
+- **Contato**: Telefone (com DDD) e E-mail (opcional). Mudou o telefone (o login): aparece **Senha atual (para trocar o telefone)**.
+- **Endereço (opcional)**: o **CEP** preenche rua, bairro e cidade (a cidade não é digitada); Número, Complemento e Bairro. CEP não encontrado: o aviso abaixo do campo.
+- Abaixo: "Ao salvar, seus dados também são atualizados nos estabelecimentos em que você é cliente." e **Salvar**. Salvo: Menu com "Dados salvos. Eles também foram atualizados nos seus estabelecimentos.".
+- Erros no campo: nome, telefone, e-mail, CPF inválido, nascimento no futuro, endereço incompleto, senha atual, CPF já em outro cadastro de uma clínica (a mensagem da API).
+- As observações do cadastro na clínica não aparecem no app.
+
+### Pacotes (`/app/menu/pacotes`)
+
+- Só para ver ("Para contratar ou mudar, fale com o estabelecimento."). Cada pacote: nome do plano, selo da situação (**Ativo** verde, **Encerrado** cinza, **Cancelado** vermelho), "De dd/mm/aaaa a dd/mm/aaaa" e o estabelecimento. Sem valores. Ativos primeiro.
+
+### Recorrências (`/app/menu/recorrencias`)
+
+- Só para ver ("Para mudar, fale com o estabelecimento."). Cada uma: serviço, selo (**Turma**, **Pacote** ou **Horário fixo**), os dias e horários juntando os iguais ("Ter e Qui às 09:00"), profissional · estabelecimento e o período ("De … a …" ou "Desde …").
 
 ### Agendar (`/app/local/<subdomínio>/agendar`)
 
@@ -90,3 +122,9 @@ Barra de navegação embaixo, do app inteiro: **Início**, **Buscar** (marcada t
 
 - Celular e computador na mesma rede. Abra o painel da clínica pelo IP do computador (ex.: `http://172.20.10.2:3000`), não por `localhost`: o link de acesso e o QR são montados com o endereço aberto.
 - O `next.config.ts` libera as faixas de rede local em `allowedDevOrigins` (só vale em desenvolvimento). Sem isso, o Next bloqueia os scripts de desenvolvimento quando a página vem pelo IP, e nada responde (menus, máscaras, botões). Mudou o `next.config.ts`: reinicie o `npm run dev`.
+
+## Pendências
+
+- **Confirmar o telefone** ao trocá-lo em Meus dados: hoje pede a senha atual; o código no WhatsApp confirmaria que o número novo é do cliente.
+- **Recuperar a senha pelo próprio app**: hoje é pelo link da clínica; o código no WhatsApp resolve (etapa 3).
+- **Notificações** (lembrete do horário) e **abrir sem internet**: precisam do service worker.

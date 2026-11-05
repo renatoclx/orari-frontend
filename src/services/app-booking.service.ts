@@ -28,3 +28,11 @@ export function bookAppointment(
     body: JSON.stringify(data),
   });
 }
+
+/** Cancela um avulso do próprio cliente, dentro do prazo da clínica. */
+export function cancelAppointment(slug: string, id: string): Promise<void> {
+  return appFetch<void>(
+    `/portal/${encodeURIComponent(slug)}/appointments/${encodeURIComponent(id)}/cancel`,
+    { method: "PATCH" },
+  );
+}

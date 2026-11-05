@@ -1,5 +1,6 @@
 "use server";
 
+import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import {
   firstName,
@@ -9,6 +10,7 @@ import {
 import { safeReturnPath } from "@/lib/app-routes";
 import { ApiError } from "@/services/api";
 import {
+  changeAccountPassword,
   loginAccount,
   logoutAccount,
   redeemAccessLink,
@@ -17,10 +19,24 @@ import {
 import { joinPlace } from "@/services/app-place.service";
 import {
   bookAppointment,
+  cancelAppointment,
   getAvailability,
 } from "@/services/app-booking.service";
 import type { Slot } from "@/components/client-app/booking-slots";
 import { isUuid } from "@/lib/uuid";
+import {
+  orNull,
+  profileErrors,
+  type ProfileFields,
+} from "@/components/client-app/profile";
+import { lookupCep, type CepLookup } from "@/services/cep.service";
+import {
+  findCity,
+  removeProfilePhoto,
+  saveProfile,
+  uploadProfilePhoto,
+} from "@/services/app-profile.service";
+import { toDateString } from "@/utils/time";
 import { isDateString } from "@/utils/time";
 import {
   clearAppSession,
@@ -223,4 +239,177 @@ export async function appBookAction(
     return { ok: false, message: error.message, refresh: error.status === 409 };
   }
   redirect("/app?agendado=1");
+}
+
+/** Cancela um avulso do próprio cliente (a API confere o prazo da clínica). */
+export async function appCancelAction(
+  slug: string,
+  id: string,
+): Promise<{ ok: true } | { ok: false; message: string }> {
+  if (!isUuid(id)) return { ok: false, message: "Agendamento inválido." };
+  try {
+    await cancelAppointment(slug, id);
+  } catch (error) {
+    if (!(error instanceof ApiError)) throw error;
+    return { ok: false, message: error.message };
+  }
+  // A lista e o "Próximo agendamento" do Início mudam.
+  revalidatePath("/app/agendamentos");
+  revalidatePath("/app");
+  return { ok: true };
+}
+
+/** Troca a senha conferindo a atual (Menu → Segurança). */
+export async function appChangePasswordAction(
+  _previous: AppFormState | undefined,
+  formData: FormData,
+): Promise<AppFormState> {
+  const currentPassword = text(formData, "currentPassword");
+  const newPassword = text(formData, "password");
+  const newPasswordConfirmation = text(formData, "passwordConfirmation");
+  const fieldErrors = {
+    currentPassword: currentPassword ? undefined : "Informe a senha atual.",
+    ...newPasswordErrors(newPassword, newPasswordConfirmation),
+  };
+  if (hasErrors(fieldErrors)) return { values: {}, fieldErrors };
+
+  try {
+    await changeAccountPassword({
+      currentPassword,
+      newPassword,
+      newPasswordConfirmation,
+    });
+  } catch (error) {
+    if (!(error instanceof ApiError)) throw error;
+    // Senha atual errada: o aviso vai no próprio campo.
+    if (error.status === 400 && error.message === "Senha atual incorreta") {
+      return {
+        values: {},
+        fieldErrors: { currentPassword: "Senha atual incorreta." },
+      };
+    }
+    return { values: {}, fieldErrors: {}, message: error.message };
+  }
+  redirect("/app/menu?senha=1");
+}
+
+/** Endereço pelo CEP (ViaCEP), consultado no servidor. */
+export async function appCepAction(cep: string): Promise<CepLookup> {
+  const digits = onlyDigits(cep);
+  if (digits.length !== 8) return { status: "not-found" };
+  return lookupCep(digits);
+}
+
+const PROFILE_FIELDS: (keyof ProfileFields)[] = [
+  "name",
+  "phone",
+  "email",
+  "document",
+  "birthDate",
+  "profession",
+  "cep",
+  "street",
+  "number",
+  "complement",
+  "neighborhood",
+  "cityName",
+  "cityState",
+];
+
+/**
+ * Salva Meus dados (a API copia para o cadastro em cada clínica). Trocar o
+ * telefone manda junto a senha atual. Recusas da API vão para o campo certo.
+ */
+export async function appProfileAction(
+  originalPhone: string,
+  _previous: AppFormState | undefined,
+  formData: FormData,
+): Promise<AppFormState> {
+  const fields = Object.fromEntries(
+    PROFILE_FIELDS.map((name) => [name, text(formData, name)]),
+  ) as ProfileFields;
+  const currentPassword = text(formData, "currentPassword");
+  const values = { ...fields };
+  const phoneChanged = onlyDigits(fields.phone) !== originalPhone;
+  const fieldErrors: AppFormState["fieldErrors"] = {
+    ...profileErrors(fields, toDateString(new Date(), "America/Sao_Paulo")),
+    ...(phoneChanged &&
+      !currentPassword && {
+        currentPassword: "Para trocar o telefone, informe a senha atual.",
+      }),
+  };
+  if (hasErrors(fieldErrors)) return { values, fieldErrors };
+
+  try {
+    const cep = onlyDigits(fields.cep);
+    const city = cep
+      ? await findCity(fields.cityName, fields.cityState)
+      : undefined;
+    await saveProfile({
+      name: fields.name.trim(),
+      phone: onlyDigits(fields.phone),
+      email: orNull(fields.email),
+      document: orNull(onlyDigits(fields.document)),
+      birthDate: orNull(fields.birthDate),
+      profession: orNull(fields.profession),
+      address: city
+        ? {
+            cep,
+            street: fields.street.trim(),
+            number: fields.number.trim(),
+            complement: orNull(fields.complement),
+            neighborhood: orNull(fields.neighborhood),
+            cityId: city.id,
+          }
+        : null,
+      ...(phoneChanged && { currentPassword }),
+    });
+  } catch (error) {
+    if (!(error instanceof ApiError)) throw error;
+    const field = error.message.startsWith("Este CPF")
+      ? "document"
+      : error.message === "Senha atual incorreta"
+        ? "currentPassword"
+        : error.message.includes("telefone")
+          ? "phone"
+          : error.message === "Cidade não encontrada"
+            ? "cep"
+            : undefined;
+    return field
+      ? { values, fieldErrors: { [field]: error.message } }
+      : { values, fieldErrors: {}, message: error.message };
+  }
+  revalidatePath("/app", "layout");
+  redirect("/app/menu?dados=1");
+}
+
+/** Troca a foto (já reduzida no celular); a API copia para cada clínica. */
+export async function appPhotoAction(
+  formData: FormData,
+): Promise<{ ok: true } | { ok: false; message: string }> {
+  const photo = formData.get("photo");
+  if (!(photo instanceof Blob) || photo.size === 0) {
+    return { ok: false, message: "Escolha uma foto." };
+  }
+  try {
+    await uploadProfilePhoto(photo);
+  } catch (error) {
+    if (!(error instanceof ApiError)) throw error;
+    return { ok: false, message: error.message };
+  }
+  revalidatePath("/app", "layout");
+  return { ok: true };
+}
+
+export async function appRemovePhotoAction(): Promise<
+  { ok: true } | { ok: false; message: string }
+> {
+  try {
+    await removeProfilePhoto();
+  } catch (error) {
+    if (!(error instanceof ApiError)) throw error;
+    return { ok: false, message: error.message };
+  }
+  revalidatePath("/app", "layout");
+  return { ok: true };
 }

@@ -72,3 +72,15 @@ export function redeemAccessLink(data: {
     authenticated: "optional",
   });
 }
+
+/** Troca a senha conferindo a atual; os outros aparelhos saem. */
+export function changeAccountPassword(data: {
+  currentPassword: string;
+  newPassword: string;
+  newPasswordConfirmation: string;
+}): Promise<void> {
+  return appFetch<void>("/portal-account/password", {
+    method: "PATCH",
+    body: JSON.stringify(data),
+  });
+}

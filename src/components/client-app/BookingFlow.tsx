@@ -169,7 +169,7 @@ export function BookingFlow({
         <section className="space-y-2">
           <h2 className="font-semibold">Dia</h2>
           {/* Faixa que rola de lado, como no AppBarber. */}
-          <div className="-mx-4 flex gap-2 overflow-x-auto px-4 pb-1">
+          <div className="-mx-5 flex gap-2 overflow-x-auto px-5 pb-1">
             {days.map((day) => {
               const chip = dayChip(day);
               return (
@@ -251,7 +251,7 @@ export function BookingFlow({
       {/* Confirmar fica preso embaixo, logo acima da barra de navegação. */}
       {slot && service && (
         <div
-          className={`sticky ${BOTTOM_NAV_OFFSET} -mx-4 mt-auto border-t border-border bg-background px-4 py-3`}
+          className={`sticky ${BOTTOM_NAV_OFFSET} -mx-5 mt-auto border-t border-border bg-background px-5 py-3`}
         >
           <Button
             type="button"

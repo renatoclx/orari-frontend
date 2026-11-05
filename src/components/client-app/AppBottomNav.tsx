@@ -2,11 +2,17 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { House, Search, UserRound, type LucideIcon } from "lucide-react";
+import {
+  CalendarDays,
+  House,
+  Search,
+  UserRound,
+  type LucideIcon,
+} from "lucide-react";
 
 // Abas do app, como no AppBarber: a barra é do app inteiro, não de um local.
-// Agendamentos entra quando a tela existir (7b4). `also`: outras rotas em que
-// a aba fica marcada (a página de um estabelecimento faz parte de Buscar).
+// `also`: outras rotas em que a aba fica marcada (a página de um
+// estabelecimento faz parte de Buscar; a troca de senha, do Menu).
 const TABS: {
   href: string;
   label: string;
@@ -15,7 +21,8 @@ const TABS: {
 }[] = [
   { href: "/app", label: "Início", icon: House },
   { href: "/app/buscar", label: "Buscar", icon: Search, also: "/app/local/" },
-  { href: "/app/menu", label: "Menu", icon: UserRound },
+  { href: "/app/agendamentos", label: "Agendamentos", icon: CalendarDays },
+  { href: "/app/menu", label: "Menu", icon: UserRound, also: "/app/menu/" },
 ];
 
 /**

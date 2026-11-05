@@ -29,7 +29,10 @@ export const viewport: Viewport = {
  */
 export default function ClientAppLayout({ children }: LayoutProps<"/app">) {
   return (
-    <div className="dark min-h-dvh bg-background pt-[env(safe-area-inset-top)] text-foreground [color-scheme:dark]">
+    // A cor de destaque do app é a da logo (ciano), no lugar do azul da
+    // clínica. Texto escuro sobre o ciano: o branco ficaria sem contraste
+    // (2,4:1); o escuro dá 6,1:1, e o ciano sobre o fundo escuro, 7,5:1.
+    <div className="dark min-h-dvh bg-background pt-[env(safe-area-inset-top)] text-foreground [color-scheme:dark] [--primary-foreground:#052e36] [--primary:#00b8db] [--ring:#00b8db]">
       <AppSplash />
       <div className="mx-auto flex min-h-dvh w-full max-w-md flex-col">
         {children}

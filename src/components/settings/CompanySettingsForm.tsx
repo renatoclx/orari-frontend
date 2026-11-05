@@ -10,21 +10,11 @@ import {
   type BusinessHourDraft,
 } from "@/components/settings/business-hours-validation";
 import { LogoUpload, type LogoChange } from "@/components/settings/LogoUpload";
-import {
-  PortalSettingsSection,
-  type PortalDraft,
-} from "@/components/settings/PortalSettingsSection";
-import {
-  daysAheadError,
-  samePortalSettings,
-  segmentError,
-} from "@/components/settings/portal-settings";
 import { FormField } from "@/components/shared/FormField";
 import { FormFooter } from "@/components/shared/FormFooter";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import type { BusinessHour } from "@/types/business-hour";
-import type { PortalSettings } from "@/types/portal";
 
 type CompanySettingsFormProps = {
   fantasyName: string | null;
@@ -32,19 +22,7 @@ type CompanySettingsFormProps = {
   hours: BusinessHour[];
   /** Dados cadastrais (só leitura), exibidos entre a identidade e os horários. */
   details: React.ReactNode;
-  /** Portal do cliente: só quando a funcionalidade está no plano. */
-  portal?: { settings: PortalSettings; editable: boolean; url: string };
 };
-
-const toPortalDraft = (settings: PortalSettings): PortalDraft => ({
-  ...settings,
-  maxDaysAhead: String(settings.maxDaysAhead),
-});
-
-const fromPortalDraft = (draft: PortalDraft): PortalSettings => ({
-  ...draft,
-  maxDaysAhead: Number(draft.maxDaysAhead),
-});
 
 const toDrafts = (hours: BusinessHour[]): BusinessHourDraft[] =>
   hours.map((hour) => ({ key: hour.id, ...hour }));
@@ -66,7 +44,6 @@ export function CompanySettingsForm({
   logoUrl,
   hours,
   details,
-  portal,
 }: CompanySettingsFormProps) {
   const [name, setName] = useState(fantasyName ?? "");
   const [nameError, setNameError] = useState<string>();
@@ -75,24 +52,13 @@ export function CompanySettingsForm({
   const [logoVersion, setLogoVersion] = useState(0);
   const [drafts, setDrafts] = useState(() => toDrafts(hours));
   const [hourErrors, setHourErrors] = useState<Record<string, string>>({});
-  const [portalDraft, setPortalDraft] = useState(() =>
-    portal ? toPortalDraft(portal.settings) : undefined,
-  );
-  const [daysError, setDaysError] = useState<string>();
-  const [portalSegmentError, setPortalSegmentError] = useState<string>();
   const [pending, startTransition] = useTransition();
   const nextKey = useRef(1);
 
   const nameChanged = name.trim() !== (fantasyName ?? "");
   const logoChanged = Boolean(logo.file) || logo.removed;
   const hoursChanged = snapshot(drafts) !== snapshot(toDrafts(hours));
-  // Dias à frente inválidos contam como mudança: o salvar acusa o erro.
-  const portalChanged =
-    portal !== undefined &&
-    portalDraft !== undefined &&
-    (daysAheadError(portalDraft.maxDaysAhead) !== undefined ||
-      !samePortalSettings(fromPortalDraft(portalDraft), portal.settings));
-  const changed = nameChanged || logoChanged || hoursChanged || portalChanged;
+  const changed = nameChanged || logoChanged || hoursChanged;
 
   function discard() {
     setName(fantasyName ?? "");
@@ -101,8 +67,6 @@ export function CompanySettingsForm({
     setLogoVersion((version) => version + 1);
     setDrafts(toDrafts(hours));
     setHourErrors({});
-    setPortalDraft(portal ? toPortalDraft(portal.settings) : undefined);
-    setDaysError(undefined);
   }
 
   function submit(event: React.FormEvent<HTMLFormElement>) {
@@ -113,27 +77,12 @@ export function CompanySettingsForm({
       toast.error("Corrija os horários destacados.");
       return;
     }
-    const portalDaysError =
-      portalChanged && portalDraft
-        ? daysAheadError(portalDraft.maxDaysAhead)
-        : undefined;
-    const portalSegment =
-      portalChanged && portalDraft ? segmentError(portalDraft) : undefined;
-    setDaysError(portalDaysError);
-    setPortalSegmentError(portalSegment);
-    if (portalDaysError || portalSegment) {
-      toast.error("Corrija o portal do cliente.");
-      return;
-    }
 
     const data = new FormData();
     if (nameChanged) data.set("fantasyName", name);
     if (logo.file) data.set("logo", logo.file);
     else if (logo.removed) data.set("removeLogo", "1");
     if (hoursChanged) data.set("hours", JSON.stringify(drafts));
-    if (portalChanged && portalDraft) {
-      data.set("portal", JSON.stringify(fromPortalDraft(portalDraft)));
-    }
 
     startTransition(async () => {
       const result = await saveCompanySettingsAction(data);
@@ -211,21 +160,6 @@ export function CompanySettingsForm({
             />
           </div>
         </section>
-
-        {portal && portalDraft && (
-          <PortalSettingsSection
-            value={portalDraft}
-            onChange={(next) => {
-              setPortalDraft(next);
-              setDaysError(undefined);
-              setPortalSegmentError(undefined);
-            }}
-            editable={portal.editable}
-            url={portal.url}
-            daysError={daysError}
-            segmentError={portalSegmentError}
-          />
-        )}
       </div>
 
       <FormFooter note="Agendamentos já marcados não mudam com os novos horários.">

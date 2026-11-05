@@ -2,7 +2,9 @@ import { PeopleToolbar } from "@/components/people/PeopleToolbar";
 import { PersonList } from "@/components/people/PersonList";
 import type { PeopleKind } from "@/components/people/people-kinds";
 import { TablePagination } from "@/components/shared/TablePagination";
+import { getCurrentUser } from "@/services/auth.service";
 import { listPeople } from "@/services/people.service";
+import { canAccess } from "@/utils/access";
 
 // Itens por página da listagem (a API aceita até 100).
 const PAGE_SIZE = 10;
@@ -27,13 +29,21 @@ export async function PeopleListPage({
       : undefined;
   const page = Math.max(1, Number(searchParams.page) || 1);
 
-  const result = await listPeople({
-    type: kind.type,
-    name: search || undefined,
-    isActive: status && status === "active",
-    page,
-    limit: PAGE_SIZE,
-  });
+  const [result, user] = await Promise.all([
+    listPeople({
+      type: kind.type,
+      name: search || undefined,
+      isActive: status && status === "active",
+      page,
+      limit: PAGE_SIZE,
+    }),
+    getCurrentUser(),
+  ]);
+  // Clientes, com o Portal do cliente no plano: "Acesso ao portal" na coluna Ações.
+  const portal =
+    kind.type === "CLIENT" && canAccess(user.access, "client-portal")
+      ? { companyName: user.company.name, timeZone: user.company.timezone }
+      : undefined;
 
   return (
     <div className="flex min-h-0 flex-1 flex-col gap-4">
@@ -44,6 +54,7 @@ export async function PeopleListPage({
         people={result.items}
         search={search}
         filtered={Boolean(status)}
+        portal={portal}
         footer={
           <TablePagination
             page={page}

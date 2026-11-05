@@ -1,6 +1,6 @@
 import type { PortalSettings } from "@/types/portal";
 
-// Opções das regras do portal (screens/configuracoes.md, "Portal do cliente").
+// Opções e regras da tela Portal do cliente (screens/portal-do-cliente.md).
 // Os limites são os mesmos da API.
 
 /** Antecedência mínima para agendar, em minutos. */

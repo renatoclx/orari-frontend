@@ -7,7 +7,7 @@ import {
   portalUrl,
   samePortalSettings,
   segmentError,
-} from "@/components/settings/portal-settings";
+} from "@/components/client-portal/portal-settings";
 
 describe("formatMinutes", () => {
   it("escreve a antecedência por extenso", () => {

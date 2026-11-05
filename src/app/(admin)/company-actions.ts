@@ -14,12 +14,6 @@ import {
   updateCompanyName,
   uploadCompanyLogo,
 } from "@/services/company.service";
-import { savePortalSettings } from "@/services/portal-settings.service";
-import {
-  daysAheadError,
-  segmentError,
-} from "@/components/settings/portal-settings";
-import type { PortalSettings } from "@/types/portal";
 import {
   validateBusinessHours,
   type BusinessHourDraft,
@@ -32,8 +26,7 @@ const MAX_NAME_LENGTH = 100;
 
 /**
  * Grava as configurações da empresa. O formulário envia só o que mudou:
- * `fantasyName`, `logo` (arquivo) ou `removeLogo`, `hours` (a semana em JSON) e
- * `portal` (as regras do portal do cliente, em JSON).
+ * `fantasyName`, `logo` (arquivo) ou `removeLogo`, e `hours` (a semana em JSON).
  * Cada parte vai na sua rota, nessa ordem; se uma falhar, as anteriores já
  * valeram e a mensagem diz qual parte falhou.
  */
@@ -58,17 +51,6 @@ export async function saveCompanySettingsAction(
   if (drafts && Object.keys(validateBusinessHours(drafts)).length > 0) {
     return { ok: false, message: "Corrija os horários destacados." };
   }
-  const portalJson = data.get("portal");
-  const portal =
-    typeof portalJson === "string"
-      ? (JSON.parse(portalJson) as PortalSettings)
-      : null;
-  if (
-    portal &&
-    (daysAheadError(String(portal.maxDaysAhead)) || segmentError(portal))
-  ) {
-    return { ok: false, message: "Corrija o portal do cliente." };
-  }
 
   // Parte em gravação, para dizer qual falhou.
   let step = "";
@@ -87,10 +69,6 @@ export async function saveCompanySettingsAction(
     if (drafts) {
       step = "Horários";
       await saveBusinessHours(drafts);
-    }
-    if (portal) {
-      step = "Portal do cliente";
-      await savePortalSettings(portal);
     }
   } catch (error) {
     const failure = failureFrom(error);

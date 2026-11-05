@@ -14,6 +14,8 @@ export type AppPlace = {
 /** GET /portal-account. */
 export type AppAccount = {
   account: { id: string; name: string; phone: string };
+  /** Avisos ainda não vistos (o ponto na aba Menu). */
+  unreadMessages: number;
   places: AppPlace[];
 };
 
@@ -124,4 +126,42 @@ export type AppRecurrence = {
   startDate: string;
   endDate: string | null;
   place: AppPlace;
+};
+
+/** GET /portal-account/push: `publicKey` nula = avisos desligados no servidor. */
+export type PushInfo = {
+  publicKey: string | null;
+  notifyAppointments: boolean;
+  notifyPromotions: boolean;
+};
+
+export type PushPreferences = Omit<PushInfo, "publicKey">;
+
+/** Inscrição do aparelho, no formato do `PushSubscription.toJSON()`. */
+export type PushSubscriptionJson = {
+  endpoint: string;
+  expirationTime?: number | null;
+  keys: { p256dh: string; auth: string };
+};
+
+/** Item da caixa de Avisos (GET /portal-account/messages). */
+export type AppMessage = {
+  id: string;
+  kind:
+    "REMINDER" | "APPOINTMENT" | "BIRTHDAY" | "MISS_YOU" | "CAMPAIGN" | "TEST";
+  title: string;
+  body: string;
+  url: string | null;
+  readAt: string | null;
+  createdAt: string;
+  /** A clínica que enviou; nula no aviso de teste (é do Orari). */
+  place: { name: string; logoUrl: string | null } | null;
+};
+
+export type AppMessagesPage = {
+  items: AppMessage[];
+  total: number;
+  unread: number;
+  page: number;
+  limit: number;
 };

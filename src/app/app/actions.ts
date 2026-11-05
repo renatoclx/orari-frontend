@@ -44,6 +44,14 @@ import {
   setAppSession,
 } from "@/services/app-session";
 import { onlyDigits } from "@/utils/masks";
+import {
+  deletePushSubscription,
+  markMessagesRead,
+  savePushPreferences,
+  savePushSubscription,
+  sendTestPush,
+} from "@/services/app-push.service";
+import type { PushPreferences, PushSubscriptionJson } from "@/types/client-app";
 
 // Server Actions do app do cliente (screens/app-cliente.md). Validam de novo o
 // que o formulário já validou (o navegador pode ser burlado) e só então chamam a API.
@@ -412,4 +420,94 @@ export async function appRemovePhotoAction(): Promise<
   }
   revalidatePath("/app", "layout");
   return { ok: true };
+}
+
+type PushActionResult = { ok: true } | { ok: false; message: string };
+
+const isText = (value: unknown, max: number): value is string =>
+  typeof value === "string" && value.length > 0 && value.length <= max;
+
+/**
+ * Grava a inscrição deste aparelho (Menu → Avisos). Confere o formato antes de
+ * mandar: o objeto vem do navegador, que pode ser burlado.
+ */
+export async function appPushSubscribeAction(
+  subscription: PushSubscriptionJson,
+): Promise<PushActionResult> {
+  if (
+    !isText(subscription?.endpoint, 1000) ||
+    !subscription.endpoint.startsWith("https://") ||
+    !isText(subscription.keys?.p256dh, 200) ||
+    !isText(subscription.keys?.auth, 100)
+  ) {
+    return { ok: false, message: "Não foi possível ativar neste aparelho." };
+  }
+  try {
+    await savePushSubscription({
+      endpoint: subscription.endpoint,
+      expirationTime: subscription.expirationTime ?? null,
+      keys: { p256dh: subscription.keys.p256dh, auth: subscription.keys.auth },
+    });
+  } catch (error) {
+    if (!(error instanceof ApiError)) throw error;
+    return { ok: false, message: error.message };
+  }
+  return { ok: true };
+}
+
+export async function appPushUnsubscribeAction(
+  endpoint: string,
+): Promise<PushActionResult> {
+  if (!isText(endpoint, 1000)) return { ok: true };
+  try {
+    await deletePushSubscription(endpoint);
+  } catch (error) {
+    if (!(error instanceof ApiError)) throw error;
+    return { ok: false, message: error.message };
+  }
+  return { ok: true };
+}
+
+/** Os dois interruptores: lembretes e agendamentos; novidades e promoções. */
+export async function appPushPreferencesAction(
+  preferences: PushPreferences,
+): Promise<PushActionResult> {
+  try {
+    await savePushPreferences({
+      notifyAppointments: preferences.notifyAppointments === true,
+      notifyPromotions: preferences.notifyPromotions === true,
+    });
+  } catch (error) {
+    if (!(error instanceof ApiError)) throw error;
+    return { ok: false, message: error.message };
+  }
+  return { ok: true };
+}
+
+/** Aviso de teste para os aparelhos da conta. */
+export async function appPushTestAction(): Promise<
+  { ok: true; devices: number } | { ok: false; message: string }
+> {
+  try {
+    const { devices } = await sendTestPush();
+    // O aviso de teste entra na caixa de Avisos.
+    revalidatePath("/app/menu/avisos");
+    return { ok: true, devices };
+  } catch (error) {
+    if (!(error instanceof ApiError)) throw error;
+    return { ok: false, message: error.message };
+  }
+}
+
+/**
+ * Marca os avisos como lidos ao abrir Menu → Avisos. Sem revalidar: a lista
+ * continua com o destaque dos novos até sair da tela.
+ */
+export async function appMarkMessagesReadAction(): Promise<void> {
+  try {
+    await markMessagesRead();
+  } catch (error) {
+    // Não marcar não atrapalha ler; na próxima visita tenta de novo.
+    if (!(error instanceof ApiError)) throw error;
+  }
 }

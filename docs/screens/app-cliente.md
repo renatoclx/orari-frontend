@@ -2,7 +2,7 @@
 
 App que o **cliente** usa para agendar nos seus estabelecimentos (rota `/app`). Cor de destaque: o **ciano da logo** (`#00B8DB`, com texto escuro sobre ele; a clínica continua azul). Sempre **escuro**, feito para o celular (no computador, uma coluna centralizada), na direção do AppBarber. A sessão é própria, separada da clínica (`frontend-auth.md`, "App do cliente").
 
-> Feitas: 7b1 (entrar, criar conta, link de acesso, Início e Menu), a instalação no celular com o splash (antecipada da 7b5), 7b2 (Buscar e página do estabelecimento), 7b3 (Agendar), 7b4 (Agendamentos e Menu) e Meus dados, Pacotes e Recorrências. O app do cliente está completo para a primeira versão.
+> Feitas: 7b1 (entrar, criar conta, link de acesso, Início e Menu), a instalação no celular com o splash (antecipada da 7b5), 7b2 (Buscar e página do estabelecimento), 7b3 (Agendar), 7b4 (Agendamentos e Menu) e Meus dados, Pacotes e Recorrências. O app do cliente está completo para a primeira versão. Depois: **Avisos** (8b, módulo Mensagens).
 
 ## Telas abertas (sem entrar)
 
@@ -34,12 +34,13 @@ O link que a clínica gera (lista de Clientes, ícone de QR code; `pessoas.md`).
 
 ## Telas de quem entrou
 
-Barra de navegação embaixo, do app inteiro: **Início**, **Buscar** (marcada também na página de um estabelecimento), **Agendamentos** e **Menu** (marcada também nas telas abertas por ele).
+Barra de navegação embaixo, do app inteiro: **Início**, **Buscar** (marcada também na página de um estabelecimento), **Agendamentos** e **Menu** (marcada também nas telas abertas por ele). Com aviso não lido, um ponto ciano na aba Menu (some na tela Avisos).
 
 ### Início (`/app`)
 
 - "Olá <primeiro nome>" (o nome em azul) e a data ("Quinta, 5 nov 2026").
 - **Próximo agendamento**: o mais próximo de todos os estabelecimentos (serviço; "Qui, 12/11 às 08:00 · profissional", no relógio da clínica; estabelecimento). Sem nenhum: "Nenhum agendamento marcado."
+- **Convite para os avisos** (com os avisos ligados no servidor), enquanto não estão ativados neste aparelho: "Receba lembretes dos seus horários", "Ative os avisos e saiba antes de cada agendamento." e **Ativar avisos** (ativado: "Avisos ativados. Você vai receber os lembretes dos seus horários."). No iPhone pelo Safari: "No iPhone, os avisos chegam pelo app instalado na tela de início." e **Ver como instalar** (leva a Avisos). O **X** fecha o convite neste aparelho; com os avisos bloqueados, não aparece.
 - Depois de agendar (`?agendado=1`): "Agendamento confirmado. Ele aparece abaixo, em Próximo agendamento."
 - **Meus locais**: logo (ou iniciais) e nome (tocar abre a página do estabelecimento) e o botão **Agendar**, que vai direto para a tela de agendar. Sem nenhum: "Você ainda não tem estabelecimentos. Encontre um em Buscar ou peça o link de acesso ao seu estabelecimento."
 
@@ -71,6 +72,7 @@ Barra de navegação embaixo, do app inteiro: **Início**, **Buscar** (marcada t
 
 - Foto (ou iniciais), nome e telefone da conta.
 - Linhas no estilo do AppBarber (ícone, título, explicação e seta), com espaço generoso para o dedo:
+  - **Avisos** · Lembretes e mensagens dos estabelecimentos → `/app/menu/avisos`, com o número de não lidos.
   - **Meus dados** · Altere as informações do seu perfil → `/app/menu/dados`.
   - **Pacotes** · Acompanhe seus pacotes → `/app/menu/pacotes`.
   - **Recorrências** · Seus horários fixos e turmas → `/app/menu/recorrencias`.
@@ -87,6 +89,19 @@ Barra de navegação embaixo, do app inteiro: **Início**, **Buscar** (marcada t
 - Abaixo: "Ao salvar, seus dados também são atualizados nos estabelecimentos em que você é cliente." e **Salvar**. Salvo: Menu com "Dados salvos. Eles também foram atualizados nos seus estabelecimentos.".
 - Erros no campo: nome, telefone, e-mail, CPF inválido, nascimento no futuro, endereço incompleto, senha atual, CPF já em outro cadastro de uma clínica (a mensagem da API).
 - As observações do cadastro na clínica não aparecem no app.
+
+### Avisos (`/app/menu/avisos`)
+
+- **Avisos neste aparelho** (some com os avisos desligados no servidor):
+  - iPhone pelo Safari: "No iPhone, os avisos chegam pelo app instalado na tela de início." e o passo a passo (Compartilhar → Adicionar à Tela de Início → abrir pelo ícone e ativar aqui).
+  - Navegador sem suporte: "Este navegador não recebe avisos. No Android, use o Chrome; no iPhone, instale o app (iOS 16.4 ou mais novo)."
+  - Não ativados: **Ativar avisos** (o pedido de permissão do celular abre no toque). Pedido fechado sem resposta: "Toque em Permitir quando o celular perguntar."
+  - Bloqueados: "Os avisos estão bloqueados neste aparelho." e onde liberar (iPhone: Ajustes → Notificações → Orari; Android: configurações do aparelho ou o cadeado do Chrome).
+  - Ativados: "Ativados neste aparelho.", **Testar** (resposta: "Aviso de teste enviado. Ele chega em alguns segundos."; nenhum aparelho: "Nenhum aparelho recebeu. Desative e ative os avisos de novo.") e **Desativar**.
+  - Interruptores da conta, que valem em todos os aparelhos: **Lembretes e agendamentos** ("Antes do horário e quando a clínica marca, muda ou cancela") e **Novidades e promoções** ("Aniversário e mensagens dos estabelecimentos"). Mudam na hora; recusados, voltam com o aviso.
+- **Recebidos**: logo (ou iniciais) da clínica, título, "Hoje, 14:30" / "Ontem, 09:00" / "03/11, 18:15", o texto, a clínica (quando o título não é o nome dela) e um ponto nos novos. O aviso de teste vem do "Orari", com o símbolo. Tocar num aviso com destino (ex.: um lembrete) abre a tela dele. Sem nenhum: "Nenhum aviso por enquanto." Mostra os 50 mais recentes.
+- Abrir a tela marca todos como lidos (o destaque dos novos fica até sair dela).
+- **A notificação no celular**: título e texto do aviso, ícone do Orari; tocar abre o app no destino do aviso (reaproveitando o app aberto). Quem mostra é o service worker (ver "Instalar no celular").
 
 ### Pacotes (`/app/menu/pacotes`)
 
@@ -117,7 +132,8 @@ Barra de navegação embaixo, do app inteiro: **Início**, **Buscar** (marcada t
 - **iPhone:** Safari → Compartilhar → "Adicionar à Tela de Início" (o iPhone não mostra aviso de instalar). Marcas próprias: `apple-mobile-web-app-capable`, título "Orari" e a barra de status por cima do app (`black-translucent`; o layout desconta a área do entalhe com `env(safe-area-inset-*)`).
 - **Android:** o Chrome oferece "Instalar app" **só em HTTPS** (em produção). Pelo IP do computador (`http://…`), não aparece.
 - **Splash** (`AppSplash`): ao abrir o app **instalado**, fundo `#00B8DB` com o símbolo em cima e "orari" embaixo, em branco gelo; sai em cerca de 1 segundo (sem animação para quem pede menos movimento). Não aparece no navegador (CSS `display-mode: standalone`). No Android, antes dele, o sistema mostra o próprio splash com a mesma cor (`background_color` do manifesto).
-- Sem service worker por enquanto (abrir sem internet e notificações ficam para depois; a instalação não depende dele).
+- **Service worker** (`public/app-assets/sw.js`), registrado ao ativar os avisos, só para `/app/` (o `next.config.ts` manda `Service-Worker-Allowed: /app/` e sem cache). Só mostra as notificações e abre o app ao tocar; não guarda nada em cache (o app continua precisando de internet). Avisos só em HTTPS (em produção) ou em `localhost`; pelo IP do computador (`http://…`), não.
+- Ao abrir o app com os avisos já permitidos, a inscrição do aparelho é enviada de novo à API: quem saiu e entrou no mesmo celular volta a receber sem ativar outra vez.
 
 ## Testar no celular (desenvolvimento)
 
@@ -128,4 +144,6 @@ Barra de navegação embaixo, do app inteiro: **Início**, **Buscar** (marcada t
 
 - **Confirmar o telefone** ao trocá-lo em Meus dados: hoje pede a senha atual; o código no WhatsApp confirmaria que o número novo é do cliente.
 - **Recuperar a senha pelo próprio app**: hoje é pelo link da clínica; o código no WhatsApp resolve (etapa 3).
-- **Notificações** (lembrete do horário) e **abrir sem internet**: precisam do service worker.
+- **Abrir sem internet**: o service worker existe, mas não guarda as telas.
+- **Avisos além dos 50 mais recentes**: a tela não pagina.
+- **Número no ícone do app** (Badging API) com os não lidos: não feito.

@@ -3,6 +3,7 @@ import Link from "next/link";
 import { CalendarClock } from "lucide-react";
 import { AppFormMessage } from "@/components/client-app/AppFormMessage";
 import { PlaceAvatar } from "@/components/client-app/PlaceAvatar";
+import { PushInvite } from "@/components/client-app/PushInvite";
 import {
   DEFAULT_TIME_ZONE,
   appointmentWhen,
@@ -13,18 +14,21 @@ import {
   getAccount,
   listAccountAppointments,
 } from "@/services/app-account.service";
+import { getPushInfo } from "@/services/app-push.service";
 
 export const metadata: Metadata = { title: "Início" };
 
 /**
  * Início do app (screens/app-cliente.md): saudação com a data, o próximo
- * agendamento (de qualquer estabelecimento) e os estabelecimentos da conta.
+ * agendamento (de qualquer estabelecimento), o convite para ativar os avisos
+ * (enquanto não estão ativados neste aparelho) e os estabelecimentos da conta.
  */
 export default async function AppHomePage({ searchParams }: PageProps<"/app">) {
   const { bemVindo, agendado } = await searchParams;
-  const [{ account, places }, { upcoming }] = await Promise.all([
+  const [{ account, places }, { upcoming }, { publicKey }] = await Promise.all([
     getAccount(),
     listAccountAppointments(),
+    getPushInfo(),
   ]);
   const next = upcoming[0];
   // A data da saudação no fuso do primeiro estabelecimento (todos no Brasil).
@@ -52,6 +56,9 @@ export default async function AppHomePage({ searchParams }: PageProps<"/app">) {
           Conta criada. Boas-vindas ao Orari!
         </AppFormMessage>
       )}
+
+      {/* Sem as chaves no servidor, os avisos estão desligados: sem convite. */}
+      {publicKey && <PushInvite publicKey={publicKey} />}
 
       <section className="space-y-2">
         <h2 className="font-semibold">Próximo agendamento</h2>

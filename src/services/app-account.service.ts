@@ -1,5 +1,6 @@
 import "server-only";
 
+import { cache } from "react";
 import { appFetch } from "@/services/app-api";
 import type {
   AccessLinkCheck,
@@ -39,9 +40,11 @@ export function logoutAccount(): Promise<void> {
   return appFetch<void>("/portal-account/logout", { method: "POST" });
 }
 
-export function getAccount(): Promise<AppAccount> {
-  return appFetch<AppAccount>("/portal-account");
-}
+// Uma chamada por requisição: o layout (o ponto da aba Menu), o Início e o
+// Menu leem a mesma conta.
+export const getAccount = cache((): Promise<AppAccount> =>
+  appFetch<AppAccount>("/portal-account"),
+);
 
 export function listAccountAppointments(): Promise<{
   upcoming: AppAppointment[];

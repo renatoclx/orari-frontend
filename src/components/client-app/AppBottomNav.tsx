@@ -32,9 +32,14 @@ const TABS: {
 export const BOTTOM_NAV_OFFSET =
   "bottom-[calc(4rem+1px+env(safe-area-inset-bottom))]";
 
-/** Barra de navegação de baixo do app do cliente (screens/app-cliente.md). */
-export function AppBottomNav() {
+/**
+ * Barra de navegação de baixo do app do cliente (screens/app-cliente.md).
+ * `hasUnread`: avisos não lidos, um ponto na aba Menu (some na tela Avisos,
+ * que os marca como lidos).
+ */
+export function AppBottomNav({ hasUnread }: { hasUnread: boolean }) {
   const pathname = usePathname();
+  const showDot = hasUnread && pathname !== "/app/menu/avisos";
   return (
     <nav
       aria-label="Navegação do app"
@@ -55,7 +60,14 @@ export function AppBottomNav() {
                     : "text-muted-foreground hover:text-foreground"
                 }`}
               >
-                <Icon className="size-6" aria-hidden="true" />
+                <span className="relative">
+                  <Icon className="size-6" aria-hidden="true" />
+                  {href === "/app/menu" && showDot && (
+                    <span className="absolute -top-0.5 -right-1 size-2.5 rounded-full bg-primary ring-2 ring-sidebar">
+                      <span className="sr-only">Avisos novos</span>
+                    </span>
+                  )}
+                </span>
                 {label}
               </Link>
             </li>

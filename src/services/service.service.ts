@@ -63,3 +63,21 @@ export function updateService(
     body: JSON.stringify(input),
   });
 }
+
+/** Profissionais que atendem o serviço (o portal do cliente mostra o serviço com ao menos um). */
+export function listServiceProfessionals(
+  id: string,
+): Promise<{ id: string; name: string; deletedAt: string | null }[]> {
+  return apiFetch(`/services/${encodeURIComponent(id)}/professionals`);
+}
+
+/** Substitui a lista de profissionais do serviço. */
+export async function setServiceProfessionals(
+  id: string,
+  professionalIds: string[],
+): Promise<void> {
+  await apiFetch(`/services/${encodeURIComponent(id)}/professionals`, {
+    method: "PUT",
+    body: JSON.stringify({ professionalIds }),
+  });
+}

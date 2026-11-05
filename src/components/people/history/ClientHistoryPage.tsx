@@ -26,6 +26,7 @@ import {
   HistoryTabs,
   type HistoryTab,
 } from "@/components/people/history/HistoryTabs";
+import { PortalAccessDialog } from "@/components/portal-access/PortalAccessDialog";
 import { PersonAvatar } from "@/components/shared/PersonAvatar";
 import { StatusBadge } from "@/components/shared/StatusBadge";
 import { TablePagination } from "@/components/shared/TablePagination";
@@ -34,6 +35,7 @@ import { ApiError } from "@/services/api";
 import { listAnamneses } from "@/services/anamnesis.service";
 import { listClientAppointments } from "@/services/appointment.service";
 import { getCurrentUser } from "@/services/auth.service";
+import { canAccess } from "@/utils/access";
 import { listClientPlans } from "@/services/client-plan.service";
 import { listContacts } from "@/services/contact.service";
 import { listClientPayments } from "@/services/payment.service";
@@ -301,6 +303,18 @@ export async function ClientHistoryPage({
                 .join(" · ") || "Sem contato principal"}
             </p>
           </div>
+          {/* Portal: cliente ativo, portal no plano e quem pode editar clientes. */}
+          {client.deletedAt === null &&
+            canAccess(user.access, "client-portal") &&
+            canAccess(user.access, "clients", "edit") && (
+              <PortalAccessDialog
+                personId={client.id}
+                clientName={client.name}
+                companyName={user.company.name}
+                phone={principal?.phone ?? null}
+                timeZone={timeZone}
+              />
+            )}
           {/* Inativo: só consulta (a API não altera pessoa inativa). */}
           {client.deletedAt === null && (
             <Button asChild variant="outline">

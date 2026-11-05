@@ -13,6 +13,7 @@ import {
   type ServiceFormErrors,
 } from "@/components/services/service-validation";
 import { ColorField } from "@/components/shared/ColorField";
+import { ServiceProfessionalsField } from "@/components/services/ServiceProfessionalsField";
 import { FormField } from "@/components/shared/FormField";
 import { MaskedInput } from "@/components/shared/MaskedInput";
 import { Button } from "@/components/ui/button";
@@ -230,6 +231,8 @@ function ServiceForm({
         />
         <Label htmlFor="service-allows-classes">Aceita turma</Label>
       </div>
+
+      <ServiceProfessionalsField serviceId={service?.id} />
 
       <DialogFooter>
         <Button

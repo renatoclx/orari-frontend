@@ -31,6 +31,7 @@
 - Duração
 - Cor (que será exibida no agendamento)
 - Aceita turma
+- **Profissionais que atendem** (caixas de seleção com os profissionais ativos; busca ao abrir o formulário). O serviço aparece no **portal do cliente** quando tem ao menos um profissional. A lista é gravada depois do serviço, pela rota própria (`PUT /services/:id/professionals`); se a busca falhar, nada é apagado. Se só a lista falhar, o aviso diz que o serviço foi salvo e os profissionais não.
 
 ### Regras específicas
 

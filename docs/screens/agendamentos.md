@@ -83,7 +83,7 @@
 
 ## Detalhes do agendamento
 
-- Exibe foto e nome do cliente, serviço com cor e duração, horário, profissional, status, indicação de encaixe, indicação de recorrência ("Recorrente" ou "Sessão de pacote", cada uma com o seu ícone) e observação.
+- Exibe foto e nome do cliente, serviço com cor e duração, horário, profissional, status, indicação de encaixe, indicação de recorrência ("Recorrente" ou "Sessão de pacote", cada uma com o seu ícone), "Agendado pelo cliente, no portal" (origem `PORTAL`) e observação.
 - Ações, lado a lado, exibidas apenas enquanto o agendamento ainda não iniciou: **Cancelar** e **Remanejar** (ver "Remanejar agendamento").
 - As ações de status são **Cancelar** (antes de iniciar) e **Marcar falta** (depois de iniciar; ver abaixo). **Cancelar**:
   - Botão vermelho, centralizado, exibido apenas enquanto o agendamento ainda não iniciou (status Agendado ou Confirmado, com o horário de início no futuro).

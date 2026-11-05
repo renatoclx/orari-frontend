@@ -204,6 +204,7 @@
 ### Cabeçalho
 
 - Avatar, nome, contato principal, e-mail e status; botão **Alterar** (abre a alteração).
+- **Acesso ao portal** (ao lado de Alterar): só para cliente ativo, com o Portal do cliente no plano e a ação Edita em Clientes. Abre um dialog que **gera o link só quando a clínica pede** (gerar invalida o anterior) e mostra o **QR code** (gerado no navegador, biblioteca `qrcode`), o link com **Copiar**, a validade ("Vale até 05/11/2026 às 17:00, uma vez só") e **Enviar pelo WhatsApp** (abre o WhatsApp da própria clínica, `wa.me`, com o telefone principal do cliente e a mensagem pronta; sem telefone, só a mensagem). "Gerar outro" troca o link. Portal desligado: o aviso da API orienta ligar em Configurações.
 - Resumo (cartões pequenos), montado com os filtros que a API já tem:
   - Próximo agendamento (data, horário, serviço): agendamentos do cliente a partir de agora, com status Agendado, o primeiro;
   - Atendimentos concluídos: total de agendamentos com status Concluído;

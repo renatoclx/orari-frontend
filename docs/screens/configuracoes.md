@@ -36,10 +36,18 @@ Um único card, com rolagem própria e rodapé fixo, com três seções e um só
 - Os erros aparecem na própria janela. O servidor valida de novo.
 - Alterar os horários não muda agendamentos já marcados (o rodapé avisa).
 
+### Portal do cliente
+
+- Só aparece com a funcionalidade **Portal do cliente** no plano (matriz de acessos); sem a ação Edita, fica só leitura.
+- **Portal ligado** (interruptor; desligado por padrão). Desligado, o portal e os links de acesso não funcionam.
+- **Antecedência mínima** (lista: sem antecedência, 30 min, 1 h, 2 h, 3 h, 6 h, 12 h, 1 dia, 2 dias), **Agendar até (dias à frente)** (1 a 365) e **O cliente cancela** (até o início, 2, 6, 12 horas, 1, 2 ou 3 dias antes). Um valor gravado fora das listas também aparece.
+- **Endereço do portal** (`<site>/p/<subdomínio>`), só leitura, com o botão **Copiar**, para a clínica divulgar.
+- O cliente só entra com o link de acesso gerado na ficha dele (ver `pessoas.md`, "Acesso ao portal").
+
 ## Salvar
 
 - Um só botão, **Salvar alterações**, habilitado quando algo mudou; **Descartar alterações** volta tudo ao que está gravado.
-- Envia apenas o que mudou, na ordem: nome fantasia, logo e horários. Cada parte usa a sua rota; se uma falhar, as anteriores já valeram e a mensagem diz qual parte falhou (ex.: "Logo: A logo deve ter até 2 MB.").
+- Envia apenas o que mudou, na ordem: nome fantasia, logo, horários e portal do cliente. Cada parte usa a sua rota; se uma falhar, as anteriores já valeram e a mensagem diz qual parte falhou (ex.: "Logo: A logo deve ter até 2 MB.").
 - Os horários são gravados pela diferença com a API: exclui as janelas removidas, altera as que mudaram e cria as novas em lote.
 - Depois de salvar, a tela e o header se atualizam sozinhos (nome e logo novos).
 

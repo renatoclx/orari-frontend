@@ -63,7 +63,7 @@ Gestão das empresas da plataforma, **só para o SUPER_ADMIN**. Substitui o cada
 > Os dados vêm da API (`GET` e `PUT /companies/:id/access`, só SUPER_ADMIN). O dialog busca ao abrir ("Buscando…"; se falhar, a mensagem e "Tentar de novo"). Ao salvar, a API valida a matriz (dependências entre funcionalidades) e a recusa aparece num aviso, com o dialog aberto. Contexto: Obsidian, pasta "Planos e assinatura".
 
 - Botão com ícone na linha de cada empresa ativa, só para o SUPER_ADMIN. Abre um dialog com o nome da empresa.
-- **Matriz de funcionalidades:** uma linha por funcionalidade do menu, agrupadas (Agenda, Cadastros, Pacotes, Financeiro, Anamnese, Turmas, Empresa), e as colunas **Visualiza**, **Edita**, **Cria** e **Exclui/Inativa**, cada uma com uma caixa de seleção.
+- **Matriz de funcionalidades:** uma linha por funcionalidade do menu, agrupadas (Agenda, Cadastros, Pacotes, Financeiro, Anamnese, Turmas, Empresa; em Empresa, Configurações e **Portal do cliente**), e as colunas **Visualiza**, **Edita**, **Cria** e **Exclui/Inativa**, cada uma com uma caixa de seleção.
   - Edita, Cria e Exclui/Inativa exigem Visualiza: desmarcar Visualiza desmarca e desabilita as outras da linha.
   - Coluna que não se aplica à funcionalidade fica desabilitada com "–" (ex.: Auditoria só tem Visualiza). A Ajuda não entra: é sempre visível.
   - Vale para a empresa toda (todos os administradores dela); não há permissão por usuário. Só existem os tipos ADMIN e CLIENT.

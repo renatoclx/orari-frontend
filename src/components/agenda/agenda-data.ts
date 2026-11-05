@@ -43,6 +43,7 @@ export function toAgendaAppointment(
     durationMinutes: item.service.duration,
     note: item.note,
     overbooking: item.overBooking,
+    fromPortal: item.source === "PORTAL",
     status: item.status,
     recurrence: item.recurringAppointment,
     paid: item.payment?.status === "PAID" && item.payment.deletedAt === null,

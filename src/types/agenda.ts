@@ -40,6 +40,8 @@ export type AgendaAppointment = {
    * `overBooking` da API).
    */
   overbooking: boolean;
+  /** Marcado pelo cliente, no portal (campo `source` da API). */
+  fromPortal?: boolean;
   /** Recorrência de origem (nulo no agendamento avulso). */
   recurrence: { id: string; clientPlanId: string | null } | null;
   /** O pagamento já foi recebido: a falta não se marca (não há reembolso). */

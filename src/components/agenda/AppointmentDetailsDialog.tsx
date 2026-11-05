@@ -1,6 +1,7 @@
 "use client";
 
 import {
+  Ban,
   CalendarClock,
   CalendarSync,
   ClipboardList,
@@ -8,11 +9,11 @@ import {
   ListChecks,
   Package,
   Pencil,
+  Smartphone,
   StickyNote,
   UserRound,
   UserX,
   UsersRound,
-  Ban,
 } from "lucide-react";
 import Link from "next/link";
 import { useState, useTransition } from "react";
@@ -269,6 +270,15 @@ function Details({
               aria-hidden="true"
             />
             Encaixe fora do horário de funcionamento
+          </li>
+        )}
+        {appointment.fromPortal && (
+          <li className="flex items-center gap-2">
+            <Smartphone
+              className="size-4 shrink-0 text-muted-foreground"
+              aria-hidden="true"
+            />
+            Agendado pelo cliente, no portal
           </li>
         )}
         {appointment.recurrence && (

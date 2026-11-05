@@ -8,12 +8,16 @@ import {
 import { ApiError } from "@/services/api";
 import { failureFrom, type ActionFailure } from "@/lib/action-result";
 import { formText } from "@/lib/form-data";
+import { listPeople } from "@/services/people.service";
 import {
   createService,
   deleteService,
+  listServiceProfessionals,
   setServiceActive,
+  setServiceProfessionals,
   updateService,
 } from "@/services/service.service";
+import { isUuid } from "@/lib/uuid";
 import type { ServiceInput } from "@/types/service";
 
 /** Campos do formulário de serviço a que um erro pode se referir. */
@@ -62,6 +66,66 @@ function parseForm(
   };
 }
 
+// Profissionais marcados no formulário (só ids válidos; a API confere o resto).
+const professionalIdsOf = (data: FormData) =>
+  data
+    .getAll("professionalIds")
+    .filter(
+      (value): value is string => typeof value === "string" && isUuid(value),
+    );
+
+// Grava quem atende o serviço; numa falha, o serviço já ficou salvo.
+async function saveProfessionals(
+  id: string,
+  data: FormData,
+): Promise<ServiceActionResult | null> {
+  if (data.get("professionalsLoaded") !== "1") return null;
+  try {
+    await setServiceProfessionals(id, professionalIdsOf(data));
+    return null;
+  } catch (error) {
+    const failure = failureFrom(error);
+    return {
+      ok: false,
+      message: `Serviço salvo, mas os profissionais não: ${failure.message}`,
+    };
+  }
+}
+
+/**
+ * Profissionais ativos (para marcar) e os que já atendem o serviço. Sem
+ * serviço (cadastro), nenhum vem marcado.
+ */
+export async function loadServiceProfessionalsAction(
+  serviceId?: string,
+): Promise<
+  | {
+      ok: true;
+      professionals: { id: string; name: string }[];
+      selected: string[];
+    }
+  | ActionFailure
+> {
+  if (serviceId !== undefined && !isUuid(serviceId)) {
+    return { ok: false, message: "Serviço inválido." };
+  }
+  try {
+    const [people, linked] = await Promise.all([
+      listPeople({ type: "PROFESSIONAL", isActive: true, page: 1, limit: 100 }),
+      serviceId ? listServiceProfessionals(serviceId) : [],
+    ]);
+    return {
+      ok: true,
+      professionals: people.items
+        .map(({ id, name }) => ({ id, name }))
+        .sort((a, b) => a.name.localeCompare(b.name, "pt-BR")),
+      selected: linked.map((person) => person.id),
+    };
+  } catch (error) {
+    return failureFrom(error);
+  }
+}
+
 /** Cadastro: o serviço nasce sempre ativo (padrão da API). */
 export async function createServiceAction(
   data: FormData,
@@ -69,14 +133,17 @@ export async function createServiceAction(
   const parsed = parseForm(data);
   if ("error" in parsed) return parsed.error;
 
+  let created;
   try {
-    await createService(parsed.input);
+    created = await createService(parsed.input);
   } catch (error) {
     // O 409 é nome duplicado: aparece no campo.
     return failureFrom(error, "name" as const);
   }
 
+  const professionalsFailure = await saveProfessionals(created.id, data);
   revalidatePath("/servicos");
+  if (professionalsFailure) return professionalsFailure;
   return { ok: true };
 }
 
@@ -103,7 +170,9 @@ export async function updateServiceAction(
     return failureFrom(error, "name" as const);
   }
 
+  const professionalsFailure = await saveProfessionals(id, data);
   revalidatePath("/servicos");
+  if (professionalsFailure) return professionalsFailure;
   return { ok: true };
 }
 

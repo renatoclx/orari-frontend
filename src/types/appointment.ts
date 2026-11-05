@@ -44,6 +44,8 @@ export type AppointmentItem = {
   cancelReason: AppointmentCancelReason | null;
   /** Encaixe: marcado fora do horário de funcionamento (retrato do momento). */
   overBooking: boolean;
+  /** Onde foi marcado: na clínica ou pelo cliente, no portal (API antiga: ausente). */
+  source?: "CLINIC" | "PORTAL";
   note: string | null;
   client: AppointmentPerson;
   professional: AppointmentPerson;

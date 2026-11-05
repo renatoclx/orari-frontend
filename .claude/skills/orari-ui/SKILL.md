@@ -204,6 +204,7 @@ Interface do cliente, separada da clínica (`docs/screens/app-cliente.md`):
 - **Avisos dentro da tela** (`AppFormMessage`, `error` ou `info`), não toasts: o Toaster da clínica fica fora da área escura.
 - **Estabelecimento:** `PlaceAvatar` (logo em círculo ou as iniciais em `bg-primary/20 text-primary`). Saudação "Olá <primeiro nome>" com o nome em `text-primary`.
 - Cartões com `rounded-card border border-border bg-card`, como na clínica.
+- **Splash do app instalado** (`AppSplash`): fundo na cor da logo (`#00B8DB`), o símbolo em cima e a escrita "orari" embaixo, os dois na cor neutra da logo (`#F4F4F5`; `public/app-assets/symbol.svg` e `wordmark.svg`, sem a moldura dos SVGs de `public/logo`). Os ícones do app seguem o mesmo par de cores.
 
 ## Toasts
 

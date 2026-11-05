@@ -6,6 +6,7 @@ describe("appRouteKind", () => {
     expect(appRouteKind("/clientes")).toBeNull();
     expect(appRouteKind("/apple-icon.png")).toBeNull();
     expect(appRouteKind("/application")).toBeNull();
+    expect(appRouteKind("/app-assets/icon-192.png")).toBeNull();
   });
 
   it("entrar e criar conta: só para quem não entrou", () => {
@@ -16,6 +17,7 @@ describe("appRouteKind", () => {
   it("link de acesso e fim da sessão: abertas", () => {
     expect(appRouteKind("/app/acesso/abc")).toBe("open");
     expect(appRouteKind("/app/sessao-encerrada")).toBe("open");
+    expect(appRouteKind("/app/manifest.webmanifest")).toBe("open");
   });
 
   it("o resto do app: precisa da conta", () => {

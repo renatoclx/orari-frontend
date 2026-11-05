@@ -6,8 +6,12 @@ export const APP_LOGIN_PATH = "/app/entrar";
 
 // Só para quem não entrou: entrado, vai para o Início.
 const GUEST_PATHS = new Set(["/app/entrar", "/app/criar-conta"]);
-// Abertas com ou sem a conta entrada.
-const OPEN_PREFIXES = ["/app/acesso/", "/app/sessao-encerrada"];
+// Abertas com ou sem a conta entrada (o manifesto é lido pelo celular ao instalar).
+const OPEN_PREFIXES = [
+  "/app/acesso/",
+  "/app/sessao-encerrada",
+  "/app/manifest.webmanifest",
+];
 
 /**
  * "guest": entrar e criar conta; "open": link de acesso e fim da sessão;

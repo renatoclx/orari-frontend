@@ -1,12 +1,26 @@
 import type { Metadata, Viewport } from "next";
+import { AppSplash } from "@/components/client-app/AppSplash";
 
 export const metadata: Metadata = {
   title: { default: "Orari", template: "%s | Orari" },
   description: "Agende seus horários nos seus estabelecimentos.",
+  // Instalar no celular: o manifesto só do app e, no iPhone, as marcas próprias dele.
+  manifest: "/app/manifest.webmanifest",
+  appleWebApp: {
+    capable: true,
+    title: "Orari",
+    // O app desenha por baixo da barra de status (ver o padding de cima).
+    statusBarStyle: "black-translucent",
+  },
+  icons: { apple: "/app-assets/apple-touch-icon.png" },
 };
 
-// Barra do navegador do celular na cor do fundo escuro do app.
-export const viewport: Viewport = { themeColor: "#18181b" };
+// Barra do navegador na cor do fundo escuro do app; `cover` usa a tela toda
+// (o padding com env(safe-area-inset-*) evita o entalhe da câmera).
+export const viewport: Viewport = {
+  themeColor: "#18181b",
+  viewportFit: "cover",
+};
 
 /**
  * App do cliente (screens/app-cliente.md): sempre escuro, como o AppBarber,
@@ -15,7 +29,8 @@ export const viewport: Viewport = { themeColor: "#18181b" };
  */
 export default function ClientAppLayout({ children }: LayoutProps<"/app">) {
   return (
-    <div className="dark min-h-dvh bg-background text-foreground [color-scheme:dark]">
+    <div className="dark min-h-dvh bg-background pt-[env(safe-area-inset-top)] text-foreground [color-scheme:dark]">
+      <AppSplash />
       <div className="mx-auto flex min-h-dvh w-full max-w-md flex-col">
         {children}
       </div>

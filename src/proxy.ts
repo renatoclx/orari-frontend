@@ -178,10 +178,10 @@ function endSession(request: NextRequest, isLoginPage: boolean) {
   return response;
 }
 
-// Arquivos estáticos (logo, ícones do site, fotos em /uploads) não passam pelo
+// Arquivos estáticos (logo, ícones do site e do app, fotos em /uploads) não passam pelo
 // proxy: o navegador os pede antes do login e eles não podem redirecionar.
 export const config = {
   matcher: [
-    "/((?!_next/static|_next/image|favicon.ico|icon.svg|apple-icon.png|logo/|uploads/).*)",
+    "/((?!_next/static|_next/image|favicon.ico|icon.svg|apple-icon.png|logo/|uploads/|app-assets/).*)",
   ],
 };

@@ -26,7 +26,7 @@ type NestErrorBody = {
 };
 
 // 204 não tem corpo; as demais respostas são JSON ou texto.
-async function readBody(response: Response): Promise<unknown> {
+export async function readBody(response: Response): Promise<unknown> {
   if (response.status === 204) return undefined;
 
   const contentType = response.headers.get("content-type") ?? "";
@@ -36,7 +36,7 @@ async function readBody(response: Response): Promise<unknown> {
 }
 
 // O NestJS devolve `message` como lista quando vários campos falham na validação.
-function errorMessage(body: unknown): string {
+export function errorMessage(body: unknown): string {
   const message = (body as NestErrorBody | undefined)?.message;
   if (Array.isArray(message)) return message.join(" ");
   return message ?? "Não foi possível concluir a operação.";

@@ -194,6 +194,17 @@ Fonte: `docs/screens/agendamentos.md`. Modelo: `src/components/agenda/`.
 - Painéis abertos por ela usam o `Popover` do shadcn com `side="left"` e `sideOffset={0}`, colados à barra e flutuando sobre o conteúdo.
 - O componente principal não reserva espaço para ela: a barra flutua sobre a borda dele.
 
+## App do cliente (`/app`)
+
+Interface do cliente, separada da clínica (`docs/screens/app-cliente.md`):
+
+- **Sempre escuro:** o layout de `/app` põe a classe `dark` num invólucro (os tokens de cor trocam só ali), com `[color-scheme:dark]` e `themeColor` escuro. Não depende do tema escolhido na clínica.
+- **Celular primeiro:** coluna `max-w-md` centralizada; margens de `px-4`. Barra de navegação **embaixo** (`AppBottomNav`), do app inteiro, fundo `bg-sidebar`, aba ativa em `text-primary`, ícone de 24 px com o nome embaixo; uma aba só entra quando a tela dela existe.
+- **Campos e botões maiores:** `AppField` (altura 48 px, texto de 16 px para o celular não dar zoom; máscara de telefone embutida) e botões `h-12 w-full text-base`.
+- **Avisos dentro da tela** (`AppFormMessage`, `error` ou `info`), não toasts: o Toaster da clínica fica fora da área escura.
+- **Estabelecimento:** `PlaceAvatar` (logo em círculo ou as iniciais em `bg-primary/20 text-primary`). Saudação "Olá <primeiro nome>" com o nome em `text-primary`.
+- Cartões com `rounded-card border border-border bg-card`, como na clínica.
+
 ## Toasts
 
 - Biblioteca: **Sonner** (via shadcn). O `<AppToaster />` (`@/components/layout/AppToaster`) já está no layout raiz, **antes** do conteúdo — não adicione outro.

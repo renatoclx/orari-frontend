@@ -110,3 +110,39 @@ describe("proxy: proteção das rotas", () => {
     expect(new URL(response.headers.get("location")!).pathname).toBe("/login");
   });
 });
+
+describe("proxy: app do cliente (/app)", () => {
+  const at = (path: string, cookie?: string) =>
+    new NextRequest(`https://app.orariapp.com.br${path}`, {
+      headers: cookie ? { cookie } : {},
+    });
+  const location = (response: Response) => response.headers.get("location");
+
+  it("sem a conta: telas de quem entrou levam a entrar", async () => {
+    expect(location(await proxy(at("/app")))).toBe(
+      "https://app.orariapp.com.br/app/entrar",
+    );
+  });
+
+  it("entrado: entrar e criar conta levam ao Início", async () => {
+    expect(location(await proxy(at("/app/criar-conta", "orari_app=t")))).toBe(
+      "https://app.orariapp.com.br/app",
+    );
+  });
+
+  it("o link de acesso abre com ou sem a conta", async () => {
+    expect(location(await proxy(at("/app/acesso/abc")))).toBeNull();
+    expect(
+      location(await proxy(at("/app/acesso/abc", "orari_app=t"))),
+    ).toBeNull();
+  });
+
+  it("os cookies da clínica não valem no app, e o do app não vale na clínica", async () => {
+    expect(
+      location(await proxy(at("/app", "orari_access=x; orari_refresh=y"))),
+    ).toBe("https://app.orariapp.com.br/app/entrar");
+    expect(location(await proxy(at("/clientes", "orari_app=t")))).toBe(
+      "https://app.orariapp.com.br/login",
+    );
+  });
+});

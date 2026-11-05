@@ -14,6 +14,7 @@ import {
   getAccount,
   listAccountAppointments,
 } from "@/services/app-account.service";
+import { ApiError } from "@/services/api";
 import { getPushInfo } from "@/services/app-push.service";
 
 export const metadata: Metadata = { title: "Início" };
@@ -25,11 +26,17 @@ export const metadata: Metadata = { title: "Início" };
  */
 export default async function AppHomePage({ searchParams }: PageProps<"/app">) {
   const { bemVindo, agendado } = await searchParams;
-  const [{ account, places }, { upcoming }, { publicKey }] = await Promise.all([
+  const [{ account, places }, { upcoming }, pushInfo] = await Promise.all([
     getAccount(),
     listAccountAppointments(),
-    getPushInfo(),
+    // Os avisos são um extra do Início: se a API falhar só nessa parte, a
+    // tela abre sem o convite (a sessão vencida continua indo para Entrar).
+    getPushInfo().catch((error: unknown) => {
+      if (error instanceof ApiError) return null;
+      throw error;
+    }),
   ]);
+  const publicKey = pushInfo?.publicKey ?? null;
   const next = upcoming[0];
   // A data da saudação no fuso do primeiro estabelecimento (todos no Brasil).
   const timeZone = places[0]?.timezone ?? DEFAULT_TIME_ZONE;

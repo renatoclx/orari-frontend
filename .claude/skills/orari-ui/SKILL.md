@@ -203,6 +203,7 @@ Interface do cliente, separada da clínica (`docs/screens/app-cliente.md`):
 - **Celular primeiro:** coluna `max-w-md` centralizada; margem lateral de `px-5` (20 px) nas telas de quem entrou. Barra de navegação **embaixo** (`AppBottomNav`), do app inteiro, fundo `bg-sidebar`, aba ativa em `text-primary`, ícone de 24 px com o nome embaixo; uma aba só entra quando a tela dela existe.
 - **Campos e botões maiores:** `AppField` (altura 48 px, texto de 16 px para o celular não dar zoom; máscara de telefone embutida) e botões `h-12 w-full text-base`.
 - **Avisos dentro da tela** (`AppFormMessage`, `error` ou `info`), não toasts: o Toaster da clínica fica fora da área escura.
+- Confirmações do app (`AppFormMessage` tone info) somem em 5 s, como um toast; `persistent` para as que explicam uma regra. Erros não somem.
 - **Busca no app:** o mesmo `ListSearch` da clínica, com `size="lg"` (48 px, ícone maior) e o texto de exemplo próprio. Item de lista que abre outra tela: cartão inteiro clicável com `ChevronRight` à direita.
 - **Escolhas do agendar** (serviço, profissional, dia, horário): botões com contorno e, escolhidos, preenchidos em `bg-primary` (`aria-pressed`). Horários em grade de 3 por linha com contorno `border-primary text-primary`, agrupados por período (`groupSlotsByPeriod`, os mesmos períodos da agenda da clínica). Dias numa faixa que rola de lado.
 - **Ação presa no rodapé** (ex.: Confirmar): `sticky` com `BOTTOM_NAV_OFFSET` (fica logo acima da barra de navegação, que tem altura fixa de 64 px + borda), fundo `bg-background` e borda em cima.

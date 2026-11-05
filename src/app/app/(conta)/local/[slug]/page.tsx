@@ -56,8 +56,9 @@ export default async function PlacePage({
         </p>
       </header>
 
+      {/* Fica na tela: explica o limite de agendamentos, não é só uma confirmação. */}
       {entrou && (
-        <AppFormMessage tone="info">
+        <AppFormMessage tone="info" persistent>
           Pronto, você agora é cliente de {place.name}. Até o estabelecimento
           confirmar o seu cadastro, você pode ter até 2 agendamentos futuros.
         </AppFormMessage>

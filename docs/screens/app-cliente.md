@@ -36,6 +36,8 @@ O link que a clínica gera (lista de Clientes, ícone de QR code; `pessoas.md`).
 
 Barra de navegação embaixo, do app inteiro: **Início**, **Buscar** (marcada também na página de um estabelecimento), **Agendamentos** e **Menu** (marcada também nas telas abertas por ele). Com aviso não lido, um ponto ciano na aba Menu (some na tela Avisos).
 
+Mensagens de confirmação (faixa ciano) somem sozinhas em 5 segundos; as de erro ficam até o cliente corrigir. Exceção: "Pronto, você agora é cliente de…", que explica o limite de agendamentos e fica na tela.
+
 ### Início (`/app`)
 
 - "Olá <primeiro nome>" (o nome em azul) e a data ("Quinta, 5 nov 2026").

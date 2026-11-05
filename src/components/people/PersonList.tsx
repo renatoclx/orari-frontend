@@ -42,6 +42,7 @@ import {
 import type { PersonListItem } from "@/types/people";
 import { formatCpf, formatDateOnly, formatPhone } from "@/utils/format";
 import { useCan } from "@/components/layout/Access";
+import { PortalAccessDialog } from "@/components/portal-access/PortalAccessDialog";
 
 type PersonListProps = {
   kind: PeopleKind;
@@ -52,7 +53,11 @@ type PersonListProps = {
   filtered: boolean;
   /** Rodapé fixo do card (paginação). */
   footer: React.ReactNode;
+  /** Clientes, com o Portal do cliente no plano: dados do "Acesso ao portal". */
+  portal?: PortalContext;
 };
+
+type PortalContext = { companyName: string; timeZone: string };
 
 // Celular do contato principal, formatado.
 function formatContact(person: PersonListItem): string | null {
@@ -67,6 +72,7 @@ export function PersonList({
   search,
   filtered,
   footer,
+  portal,
 }: PersonListProps) {
   const [viewing, setViewing] = useState<PersonListItem | null>(null);
   const [deleting, setDeleting] = useState<PersonListItem | null>(null);
@@ -140,6 +146,7 @@ export function PersonList({
                         busy={reactivating}
                         basePath={kind.path}
                         withHistory={kind.type === "CLIENT"}
+                        portal={portal}
                       />
                     </div>
                     <dl className="mt-1 grid grid-cols-[auto_1fr] gap-x-3 gap-y-0.5 text-sm [&_dd]:whitespace-nowrap">
@@ -171,6 +178,7 @@ export function PersonList({
               busy={reactivating}
               basePath={kind.path}
               withHistory={kind.type === "CLIENT"}
+              portal={portal}
             />
           </>
         )}
@@ -219,6 +227,8 @@ type RowHandlers = {
   withHistory: boolean;
   /** Há uma reativação em andamento. */
   busy: boolean;
+  /** Clientes, com o portal no plano: botão "Acesso ao portal" à vista. */
+  portal?: PortalContext;
 };
 
 function PersonTable({
@@ -303,6 +313,7 @@ function PersonActions({
   busy,
   basePath,
   withHistory,
+  portal,
 }: { person: PersonListItem } & RowHandlers) {
   // Excluído: Alterar e Excluir ficam desabilitados (screens/pessoas.md).
   const removed = person.deletedAt !== null;
@@ -337,6 +348,19 @@ function PersonActions({
             </Link>
           </Button>
         </Hint>
+      )}
+
+      {/* Acesso ao portal (screens/pessoas.md): à vista, fora do menu; só para
+          cliente ativo e quem pode alterar clientes. */}
+      {portal && canEdit && !removed && (
+        <PortalAccessDialog
+          compact
+          personId={person.id}
+          clientName={person.name}
+          companyName={portal.companyName}
+          phone={person.principalContact?.phone ?? null}
+          timeZone={portal.timeZone}
+        />
       )}
 
       {/* Histórico do cliente (screens/pessoas.md): também para o inativo,

@@ -34,18 +34,38 @@ type PortalAccessDialogProps = {
 type Generated = { url: string; expiresAt: string; qr: string };
 
 /**
- * "Acesso ao portal" no histórico do cliente (screens/pessoas.md). Gera o link
+ * "Acesso ao portal" na listagem e no histórico do cliente (screens/pessoas.md). Gera o link
  * só quando a clínica pede (gerar invalida o anterior) e mostra o QR code, o
  * link para copiar e o atalho para enviar pelo WhatsApp da própria clínica.
  */
-export function PortalAccessDialog(props: PortalAccessDialogProps) {
+export function PortalAccessDialog({
+  compact = false,
+  ...props
+}: PortalAccessDialogProps & {
+  /** Na coluna Ações da listagem: só o ícone, com a dica. */
+  compact?: boolean;
+}) {
   const [open, setOpen] = useState(false);
+  const label = `Acesso ao portal de ${props.clientName}`;
   return (
     <>
-      <Button variant="outline" onClick={() => setOpen(true)}>
-        <QrCode aria-hidden="true" />
-        Acesso ao portal
-      </Button>
+      {compact ? (
+        <Hint label={label}>
+          <Button
+            variant="ghost"
+            size="icon"
+            aria-label={label}
+            onClick={() => setOpen(true)}
+          >
+            <QrCode aria-hidden="true" />
+          </Button>
+        </Hint>
+      ) : (
+        <Button variant="outline" onClick={() => setOpen(true)}>
+          <QrCode aria-hidden="true" />
+          Acesso ao portal
+        </Button>
+      )}
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogContent className="sm:max-w-md">
           {/* Só existe aberto: fechar e abrir de novo recomeça (sem link gerado). */}

@@ -6,7 +6,8 @@ import {
   optionsWith,
   portalUrl,
   samePortalSettings,
-} from "@/components/settings/portal-settings";
+  segmentError,
+} from "@/components/client-portal/portal-settings";
 
 describe("formatMinutes", () => {
   it("escreve a antecedência por extenso", () => {
@@ -49,7 +50,7 @@ describe("daysAheadError", () => {
 describe("portalUrl", () => {
   it("monta o endereço sem barra dupla", () => {
     expect(portalUrl("https://app.orariapp.com.br/", "aurora")).toBe(
-      "https://app.orariapp.com.br/p/aurora",
+      "https://app.orariapp.com.br/app/local/aurora",
     );
   });
 });
@@ -60,9 +61,28 @@ describe("samePortalSettings", () => {
     minAdvanceMinutes: 60,
     maxDaysAhead: 30,
     cancelUntilHours: 24,
+    listed: false,
+    segment: null,
   };
-  it("compara as quatro regras", () => {
+  it("compara as regras e os campos da busca", () => {
     expect(samePortalSettings(base, { ...base })).toBe(true);
     expect(samePortalSettings(base, { ...base, maxDaysAhead: 15 })).toBe(false);
+    expect(samePortalSettings(base, { ...base, listed: true })).toBe(false);
+    expect(samePortalSettings(base, { ...base, segment: "PILATES" })).toBe(
+      false,
+    );
+  });
+});
+
+describe("segmentError", () => {
+  it("aparecer na busca sem segmento: pede o segmento", () => {
+    expect(segmentError({ listed: true, segment: null })).toBe(
+      "Escolha o segmento para aparecer na busca.",
+    );
+  });
+
+  it("com segmento, ou fora da busca: sem erro", () => {
+    expect(segmentError({ listed: true, segment: "PILATES" })).toBeUndefined();
+    expect(segmentError({ listed: false, segment: null })).toBeUndefined();
   });
 });

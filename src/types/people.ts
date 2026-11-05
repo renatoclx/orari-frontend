@@ -31,6 +31,11 @@ export type PersonListItem = {
   updatedAt: string | null;
   /** Preenchido quando a pessoa foi excluída (o status é derivado disso). */
   deletedAt: string | null;
+  /**
+   * false: o cliente entrou sozinho pelo app e a clínica ainda não confirmou
+   * (no máximo 2 agendamentos futuros pelo app até confirmar).
+   */
+  portalConfirmed?: boolean;
   principalContact: PrincipalContact | null;
 };
 

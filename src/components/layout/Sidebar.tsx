@@ -13,6 +13,7 @@ import {
   PanelLeftClose,
   PanelLeftOpen,
   Repeat,
+  Smartphone,
   Users,
   UsersRound,
   Wallet,
@@ -158,6 +159,15 @@ const classGroupsLink: NavLink = {
   label: "Turmas",
   icon: UsersRound,
   feature: "class-groups",
+};
+
+// Portal do cliente (screens/portal-do-cliente.md): só o ADMIN; o item fica
+// por último, logo antes da Ajuda.
+const clientPortalLink: NavLink = {
+  href: "/portal-do-cliente",
+  label: "Portal do cliente",
+  icon: Smartphone,
+  feature: "client-portal",
 };
 
 // Ajuda (screens/ajuda.md): os manuais em PDF. Por enquanto só para o ADMIN;
@@ -344,7 +354,7 @@ function SidebarNav({
         : canAccessAnamnesis
           ? [clientRecordsLink]
           : []),
-      ...(isAdmin ? [helpLink] : []),
+      ...(isAdmin ? [clientPortalLink, helpLink] : []),
       ...(isSuperAdmin ? superAdminItems : []),
     ],
     access,

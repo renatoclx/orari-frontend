@@ -1,9 +1,13 @@
 "use server";
 
+import { revalidatePath } from "next/cache";
 import { failureFrom, type ActionFailure } from "@/lib/action-result";
 import { publicOrigin } from "@/lib/public-origin";
 import { isUuid } from "@/lib/uuid";
-import { createPortalAccessLink } from "@/services/portal-settings.service";
+import {
+  confirmPortalClient,
+  createPortalAccessLink,
+} from "@/services/portal-settings.service";
 
 export type PortalAccessResult =
   { ok: true; url: string; expiresAt: string } | ActionFailure;
@@ -29,4 +33,21 @@ export async function createPortalAccessAction(
   } catch (error) {
     return failureFrom(error);
   }
+}
+
+/**
+ * Confirma o cliente que entrou sozinho pelo app: a clínica conferiu quem ele
+ * é. Recarrega o histórico, que deixa de mostrar o aviso.
+ */
+export async function confirmPortalClientAction(
+  personId: string,
+): Promise<{ ok: true } | ActionFailure> {
+  if (!isUuid(personId)) return { ok: false, message: "Cliente inválido." };
+  try {
+    await confirmPortalClient(personId);
+  } catch (error) {
+    return failureFrom(error);
+  }
+  revalidatePath(`/clientes/${personId}`);
+  return { ok: true };
 }

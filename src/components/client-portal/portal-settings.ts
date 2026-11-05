@@ -1,6 +1,6 @@
 import type { PortalSettings } from "@/types/portal";
 
-// Opções das regras do portal (screens/configuracoes.md, "Portal do cliente").
+// Opções e regras da tela Portal do cliente (screens/portal-do-cliente.md).
 // Os limites são os mesmos da API.
 
 /** Antecedência mínima para agendar, em minutos. */
@@ -53,9 +53,18 @@ export function daysAheadError(value: string): string | undefined {
     : `Informe de ${MIN_DAYS_AHEAD} a ${MAX_DAYS_AHEAD} dias.`;
 }
 
-/** Endereço do portal para divulgar (`https://app…/p/<subdomínio>`). */
+/** Endereço da clínica no app do cliente, para divulgar (`https://app…/app/local/<subdomínio>`). */
 export function portalUrl(origin: string, subdomain: string): string {
-  return `${origin.replace(/\/$/, "")}/p/${subdomain}`;
+  return `${origin.replace(/\/$/, "")}/app/local/${subdomain}`;
+}
+
+/** Aparecer na busca exige o segmento (a API recusa sem ele). */
+export function segmentError(
+  settings: Pick<PortalSettings, "listed" | "segment">,
+): string | undefined {
+  return settings.listed && !settings.segment
+    ? "Escolha o segmento para aparecer na busca."
+    : undefined;
 }
 
 /** Comparação para saber se a seção mudou. */
@@ -63,4 +72,6 @@ export const samePortalSettings = (a: PortalSettings, b: PortalSettings) =>
   a.enabled === b.enabled &&
   a.minAdvanceMinutes === b.minAdvanceMinutes &&
   a.maxDaysAhead === b.maxDaysAhead &&
-  a.cancelUntilHours === b.cancelUntilHours;
+  a.cancelUntilHours === b.cancelUntilHours &&
+  a.listed === b.listed &&
+  a.segment === b.segment;

@@ -15,7 +15,10 @@ import {
   uploadCompanyLogo,
 } from "@/services/company.service";
 import { savePortalSettings } from "@/services/portal-settings.service";
-import { daysAheadError } from "@/components/settings/portal-settings";
+import {
+  daysAheadError,
+  segmentError,
+} from "@/components/settings/portal-settings";
 import type { PortalSettings } from "@/types/portal";
 import {
   validateBusinessHours,
@@ -60,7 +63,10 @@ export async function saveCompanySettingsAction(
     typeof portalJson === "string"
       ? (JSON.parse(portalJson) as PortalSettings)
       : null;
-  if (portal && daysAheadError(String(portal.maxDaysAhead))) {
+  if (
+    portal &&
+    (daysAheadError(String(portal.maxDaysAhead)) || segmentError(portal))
+  ) {
     return { ok: false, message: "Corrija o portal do cliente." };
   }
 

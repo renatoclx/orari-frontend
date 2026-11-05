@@ -9,11 +9,11 @@ describe("accessMessage", () => {
     const message = accessMessage(
       "  Beatriz Nogueira ",
       "Studio Aurora",
-      "https://x/p/a/acesso/t",
+      "https://x/app/acesso/t",
     );
     expect(message).toMatch(/^Olá, Beatriz!/);
     expect(message).toContain("Studio Aurora");
-    expect(message).toContain("https://x/p/a/acesso/t");
+    expect(message).toContain("https://x/app/acesso/t");
     expect(message).toContain("24 horas");
   });
 });

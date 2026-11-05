@@ -41,8 +41,9 @@ Um único card, com rolagem própria e rodapé fixo, com três seções e um só
 - Só aparece com a funcionalidade **Portal do cliente** no plano (matriz de acessos); sem a ação Edita, fica só leitura.
 - **Portal ligado** (interruptor; desligado por padrão). Desligado, o portal e os links de acesso não funcionam.
 - **Antecedência mínima** (lista: sem antecedência, 30 min, 1 h, 2 h, 3 h, 6 h, 12 h, 1 dia, 2 dias), **Agendar até (dias à frente)** (1 a 365) e **O cliente cancela** (até o início, 2, 6, 12 horas, 1, 2 ou 3 dias antes). Um valor gravado fora das listas também aparece.
-- **Endereço do portal** (`<site>/p/<subdomínio>`), só leitura, com o botão **Copiar**, para a clínica divulgar.
-- O cliente só entra com o link de acesso gerado na ficha dele (ver `pessoas.md`, "Acesso ao portal").
+- **Aparecer na busca do app** (interruptor; desligado por padrão) e **Segmento** (Barbearia, Salão de beleza, Estética, Esmalteria, Design de sobrancelhas, Fisioterapia, Pilates, Psicologia, Nutrição, Odontologia, Outros). Aparecer na busca exige o segmento: sem ele, o campo acusa "Escolha o segmento para aparecer na busca." e nada é gravado. O texto abaixo do interruptor avisa que quem se cadastra pela busca fica não confirmado, com até 2 agendamentos futuros.
+- **Endereço no app** (`<site>/app/local/<subdomínio>`), só leitura, com o botão **Copiar**, para a clínica divulgar.
+- O cliente entra pelo link de acesso gerado na ficha dele (ver `pessoas.md`, "Acesso ao portal") ou, com a clínica na busca, encontra o estabelecimento no app e se cadastra sozinho (fica não confirmado; ver `pessoas.md`, "Confirmar cliente").
 
 ## Salvar
 

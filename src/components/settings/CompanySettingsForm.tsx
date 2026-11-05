@@ -17,6 +17,7 @@ import {
 import {
   daysAheadError,
   samePortalSettings,
+  segmentError,
 } from "@/components/settings/portal-settings";
 import { FormField } from "@/components/shared/FormField";
 import { FormFooter } from "@/components/shared/FormFooter";
@@ -78,6 +79,7 @@ export function CompanySettingsForm({
     portal ? toPortalDraft(portal.settings) : undefined,
   );
   const [daysError, setDaysError] = useState<string>();
+  const [portalSegmentError, setPortalSegmentError] = useState<string>();
   const [pending, startTransition] = useTransition();
   const nextKey = useRef(1);
 
@@ -111,12 +113,15 @@ export function CompanySettingsForm({
       toast.error("Corrija os horários destacados.");
       return;
     }
-    const portalError =
+    const portalDaysError =
       portalChanged && portalDraft
         ? daysAheadError(portalDraft.maxDaysAhead)
         : undefined;
-    setDaysError(portalError);
-    if (portalError) {
+    const portalSegment =
+      portalChanged && portalDraft ? segmentError(portalDraft) : undefined;
+    setDaysError(portalDaysError);
+    setPortalSegmentError(portalSegment);
+    if (portalDaysError || portalSegment) {
       toast.error("Corrija o portal do cliente.");
       return;
     }
@@ -213,10 +218,12 @@ export function CompanySettingsForm({
             onChange={(next) => {
               setPortalDraft(next);
               setDaysError(undefined);
+              setPortalSegmentError(undefined);
             }}
             editable={portal.editable}
             url={portal.url}
             daysError={daysError}
+            segmentError={portalSegmentError}
           />
         )}
       </div>

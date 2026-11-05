@@ -27,3 +27,11 @@ export function createPortalAccessLink(
     { method: "POST" },
   );
 }
+
+/** Confirma o cliente que entrou sozinho pelo app (tira o limite de 2 agendamentos). */
+export function confirmPortalClient(personId: string): Promise<void> {
+  return apiFetch<void>(
+    `/people/${encodeURIComponent(personId)}/portal-confirm`,
+    { method: "PATCH" },
+  );
+}

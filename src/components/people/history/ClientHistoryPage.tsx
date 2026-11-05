@@ -7,6 +7,7 @@ import {
   CircleX,
   Package,
   Pencil,
+  Smartphone,
   UserX,
 } from "lucide-react";
 import { HistoryAnamnesis } from "@/components/anamnesis/records/HistoryAnamnesis";
@@ -27,9 +28,11 @@ import {
   type HistoryTab,
 } from "@/components/people/history/HistoryTabs";
 import { PortalAccessDialog } from "@/components/portal-access/PortalAccessDialog";
+import { PortalConfirmButton } from "@/components/portal-access/PortalConfirmButton";
 import { PersonAvatar } from "@/components/shared/PersonAvatar";
 import { StatusBadge } from "@/components/shared/StatusBadge";
 import { TablePagination } from "@/components/shared/TablePagination";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { ApiError } from "@/services/api";
 import { listAnamneses } from "@/services/anamnesis.service";
@@ -138,6 +141,10 @@ export async function ClientHistoryPage({
     }),
   ]);
   const nextItem = next.items[0];
+  // Entrou sozinho pelo app e a clínica ainda não confirmou (só cliente ativo).
+  const unconfirmed =
+    client.portalConfirmed === false && client.deletedAt === null;
+  const canEditClients = canAccess(user.access, "clients", "edit");
 
   const pagination = (total: number, query: Record<string, string>) => (
     <TablePagination
@@ -293,6 +300,12 @@ export async function ClientHistoryPage({
             <div className="flex flex-wrap items-center gap-3">
               <h1 className="text-2xl font-semibold">{client.name}</h1>
               <StatusBadge active={client.deletedAt === null} />
+              {unconfirmed && (
+                <Badge variant="secondary">
+                  <Smartphone aria-hidden="true" />
+                  Não confirmado
+                </Badge>
+              )}
             </div>
             <p className="text-sm text-muted-foreground">
               {[
@@ -302,11 +315,23 @@ export async function ClientHistoryPage({
                 .filter(Boolean)
                 .join(" · ") || "Sem contato principal"}
             </p>
+            {unconfirmed && (
+              <p className="text-sm text-muted-foreground">
+                Cadastrado pelo app, com o telefone ainda não conferido. Até a
+                confirmação, agenda no máximo 2 horários futuros pelo app.
+              </p>
+            )}
           </div>
+          {unconfirmed && canEditClients && (
+            <PortalConfirmButton
+              personId={client.id}
+              clientName={client.name}
+            />
+          )}
           {/* Portal: cliente ativo, portal no plano e quem pode editar clientes. */}
           {client.deletedAt === null &&
             canAccess(user.access, "client-portal") &&
-            canAccess(user.access, "clients", "edit") && (
+            canEditClients && (
               <PortalAccessDialog
                 personId={client.id}
                 clientName={client.name}

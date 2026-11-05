@@ -5,6 +5,8 @@ import {
   clientIpFrom,
   forwardedForHeader,
 } from "@/lib/client-ip";
+import { APP_HOME_PATH, APP_LOGIN_PATH, appRouteKind } from "@/lib/app-routes";
+import { APP_SESSION_COOKIE } from "@/services/app-session-cookies";
 import {
   ACCESS_TOKEN_COOKIE,
   REFRESH_TOKEN_COOKIE,
@@ -23,6 +25,10 @@ const HOME_PATH = "/";
  *    token de verdade é a API.
  */
 export async function proxy(request: NextRequest) {
+  // App do cliente (/app): sessão própria, sem passar pelas regras da clínica.
+  const appRoute = appRouteKind(request.nextUrl.pathname);
+  if (appRoute) return guardAppRoute(request, appRoute);
+
   // Só para desenvolvimento: AUTH_GUARD=off desliga os redirecionamentos de
   // proteção (em produção a variável é ignorada). A renovação continua valendo.
   const guardEnabled = isAuthGuardEnabled(process.env);
@@ -142,6 +148,25 @@ function continueWithTokens(
   return response;
 }
 
+/**
+ * Checagem otimista do app do cliente: só olha se o cookie do app existe (quem
+ * valida o token é a API). Sem conta, as telas de quem entrou levam a entrar;
+ * entrado, entrar e criar conta levam ao Início.
+ */
+function guardAppRoute(
+  request: NextRequest,
+  route: "guest" | "open" | "private",
+) {
+  const hasAppSession = Boolean(request.cookies.get(APP_SESSION_COOKIE)?.value);
+  if (route === "private" && !hasAppSession) {
+    return NextResponse.redirect(new URL(APP_LOGIN_PATH, request.url));
+  }
+  if (route === "guest" && hasAppSession) {
+    return NextResponse.redirect(new URL(APP_HOME_PATH, request.url));
+  }
+  return NextResponse.next();
+}
+
 /** Sessão sem volta (refresh recusado): apaga os cookies e vai para o login. */
 function endSession(request: NextRequest, isLoginPage: boolean) {
   const response = isLoginPage
@@ -153,10 +178,10 @@ function endSession(request: NextRequest, isLoginPage: boolean) {
   return response;
 }
 
-// Arquivos estáticos (logo, ícones do site, fotos em /uploads) não passam pelo
+// Arquivos estáticos (logo, ícones do site e do app, fotos em /uploads) não passam pelo
 // proxy: o navegador os pede antes do login e eles não podem redirecionar.
 export const config = {
   matcher: [
-    "/((?!_next/static|_next/image|favicon.ico|icon.svg|apple-icon.png|logo/|uploads/).*)",
+    "/((?!_next/static|_next/image|favicon.ico|icon.svg|apple-icon.png|logo/|uploads/|app-assets/).*)",
   ],
 };

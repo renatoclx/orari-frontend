@@ -194,6 +194,24 @@ Fonte: `docs/screens/agendamentos.md`. Modelo: `src/components/agenda/`.
 - Painéis abertos por ela usam o `Popover` do shadcn com `side="left"` e `sideOffset={0}`, colados à barra e flutuando sobre o conteúdo.
 - O componente principal não reserva espaço para ela: a barra flutua sobre a borda dele.
 
+## App do cliente (`/app`)
+
+Interface do cliente, separada da clínica (`docs/screens/app-cliente.md`):
+
+- **Cor de destaque do app = a da logo** (`--primary: #00b8db`, só dentro de `/app`; a clínica continua azul). Sobre o ciano, **texto escuro** (`--primary-foreground: #052e36`, 6,1:1); branco não (2,4:1). Ciano como texto ou contorno sobre o fundo escuro: 7,5:1.
+- **Sempre escuro:** o layout de `/app` põe a classe `dark` num invólucro (os tokens de cor trocam só ali), com `[color-scheme:dark]` e `themeColor` escuro. Não depende do tema escolhido na clínica.
+- **Celular primeiro:** coluna `max-w-md` centralizada; margem lateral de `px-5` (20 px) nas telas de quem entrou. Barra de navegação **embaixo** (`AppBottomNav`), do app inteiro, fundo `bg-sidebar`, aba ativa em `text-primary`, ícone de 24 px com o nome embaixo; uma aba só entra quando a tela dela existe.
+- **Campos e botões maiores:** `AppField` (altura 48 px, texto de 16 px para o celular não dar zoom; máscara de telefone embutida) e botões `h-12 w-full text-base`.
+- **Avisos dentro da tela** (`AppFormMessage`, `error` ou `info`), não toasts: o Toaster da clínica fica fora da área escura.
+- **Busca no app:** o mesmo `ListSearch` da clínica, com `size="lg"` (48 px, ícone maior) e o texto de exemplo próprio. Item de lista que abre outra tela: cartão inteiro clicável com `ChevronRight` à direita.
+- **Escolhas do agendar** (serviço, profissional, dia, horário): botões com contorno e, escolhidos, preenchidos em `bg-primary` (`aria-pressed`). Horários em grade de 3 por linha com contorno `border-primary text-primary`, agrupados por período (`groupSlotsByPeriod`, os mesmos períodos da agenda da clínica). Dias numa faixa que rola de lado.
+- **Ação presa no rodapé** (ex.: Confirmar): `sticky` com `BOTTOM_NAV_OFFSET` (fica logo acima da barra de navegação, que tem altura fixa de 64 px + borda), fundo `bg-background` e borda em cima.
+- **Confirmação dentro do app:** no próprio cartão (faixa `border-destructive/30 bg-destructive/10` com a pergunta e os botões lado a lado), não `ConfirmDialog` nem `Select` do shadcn: os portais deles ficam fora da área escura. Filtros usam o `<select>` nativo (o celular abre a lista dele, já escura por `color-scheme`).
+- **Menu do app:** linhas com ícone de 24 px, título, explicação em `text-muted-foreground` e `ChevronRight` quando abre outra tela, separadas por borda, com `py-5` e `gap-4` (alvo grande para o dedo).
+- **Estabelecimento:** `PlaceAvatar` (logo em círculo ou as iniciais em `bg-primary/20 text-primary`). Saudação "Olá <primeiro nome>" com o nome em `text-primary`.
+- Cartões com `rounded-card border border-border bg-card`, como na clínica.
+- **Splash do app instalado** (`AppSplash`): fundo na cor da logo (`#00B8DB`), o símbolo em cima e a escrita "orari" embaixo, os dois na cor neutra da logo (`#F4F4F5`; `public/app-assets/symbol.svg` e `wordmark.svg`, sem a moldura dos SVGs de `public/logo`). Os ícones do app seguem o mesmo par de cores.
+
 ## Toasts
 
 - Biblioteca: **Sonner** (via shadcn). O `<AppToaster />` (`@/components/layout/AppToaster`) já está no layout raiz, **antes** do conteúdo — não adicione outro.

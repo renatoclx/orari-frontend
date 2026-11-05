@@ -16,6 +16,7 @@ recorrentes, planos contratados pelos clientes e controle de pagamentos.
 - **shadcn/ui** (base **Radix UI**) para componentes acessíveis
 - **lucide-react** (ícones), **Sonner** (toasts), **react-day-picker** (calendário)
 - **next-themes** (tema claro/escuro)
+- **qrcode** (QR code do link de acesso ao portal do cliente)
 - Autenticação com cookies `httpOnly` e refresh token rotativo
 - **ESLint** (`eslint-config-next`) + **Prettier** (`prettier-plugin-tailwindcss`)
 

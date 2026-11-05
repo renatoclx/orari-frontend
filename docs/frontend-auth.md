@@ -136,6 +136,23 @@ Componente `AuthNoticeToast`, com `id` fixo e limpeza da URL.
 | `components/layout/UserMenu.tsx`                                             | menu do usuário e confirmação de saída          |
 | `components/layout/WelcomeToast.tsx` / `components/auth/AuthNoticeToast.tsx` | toasts de entrada, saída e sessão expirada      |
 
+## App do cliente (`/app`): sessão própria
+
+O app do cliente (`screens/app-cliente.md`) tem uma sessão **separada** da clínica. As duas convivem no mesmo navegador e uma não derruba a outra.
+
+| | Clínica | App do cliente |
+|---|---|---|
+| Quem entra | usuário (e-mail e senha) | conta do cliente (telefone e senha) |
+| Cookie | `orari_access` e `orari_refresh` (JWT) | `orari_app` (token opaco do portal, 90 dias) |
+| Gravar e apagar | `services/session.ts` | `services/app-session.ts` (nome e opções em `app-session-cookies.ts`) |
+| Chamadas à API | `apiFetch` | `appFetch` (`services/app-api.ts`): manda só o token do app; `authenticated: "optional"` no link de acesso |
+| 401 da API | `/session-expired` → `/login?expired=1` | `/app/sessao-encerrada` → `/app/entrar?expirou=1` |
+| Proxy | regras da clínica | `appRouteKind` (`lib/app-routes.ts`): as rotas `/app` saem antes das regras da clínica |
+
+- **Proxy no app:** "private" (Início, Menu…) sem o cookie do app → `/app/entrar`; "guest" (entrar, criar conta) com o cookie → `/app`; "open" (link de acesso, fim da sessão) abre sempre. Os cookies da clínica não valem no app, e o do app não vale na clínica.
+- **Sem renovação:** o token do app dura 90 dias e não tem refresh; vencido, o cliente entra de novo (ou usa um link novo da clínica).
+- **Sair** (`appLogoutAction`): revoga a sessão na API (se a API falhar, sai do mesmo jeito) e apaga o cookie.
+
 ## Limitações conhecidas
 
 Ver `frontend-technical-debt.md`.

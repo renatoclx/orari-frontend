@@ -11,6 +11,8 @@
 
 ```
 public/                      arquivos estáticos (logo) — fica na raiz do projeto
+  app-assets/               ícones e splash do app do cliente (fora de /app,
+                             que o proxy protege)
 src/
   app/                       rotas (App Router)
     layout.tsx               layout raiz: fonte, tema (next-themes), toasts
@@ -63,10 +65,24 @@ src/
       anamnesis-template-actions.ts  Server Actions dos modelos de ficha
       funcionarios/          Funcionários (mesma estrutura)
       profissionais/         Profissionais (mesma estrutura)
+      portal-do-cliente/     Portal do cliente: page (regras, busca, divulgação)
+      client-portal-actions.ts  Server Action das configurações do portal
+      portal-access-actions.ts  Server Actions do link de acesso e de Confirmar
+                             cliente
     (auth)/                  telas públicas (sem sidebar)
       layout.tsx             dois painéis: formulário + painel da marca
       login/                 página e Server Action do login
     session-expired/route.ts apaga os cookies da sessão e leva ao login
+    app/                     app do cliente (PWA, tema escuro, sessão própria)
+      layout.tsx             tema escuro, cor do Orari, splash e metadados do PWA
+      (publico)/             entrar, criar-conta, acesso/[token] (link da clínica)
+      (conta)/               Início, buscar/, agendamentos/, local/[slug]/ (e
+                             agendar/), menu/ (dados/, pacotes/, recorrencias/,
+                             senha/)
+      actions.ts             Server Actions do app
+      error.tsx, not-found.tsx  telas de erro e 404 do próprio app
+      manifest.webmanifest/  Route Handler do manifesto (instalar no celular)
+      sessao-encerrada/      apaga o cookie do app e leva a /app/entrar
   components/
     ui/                      componentes do shadcn/ui (nomes em minúsculas)
     layout/                  estrutura: AdminShell, Sidebar, Header, ActionBar,
@@ -90,6 +106,9 @@ src/
                              records/ (fichas, acompanhamento, PDF) e audit/
                              (auditoria); AnamnesisAccessProvider (acesso)
     settings/                configurações da empresa (formulário, logo, horários)
+    client-portal/           tela Portal do cliente (formulário e regras)
+    portal-access/           Acesso ao portal (QR + WhatsApp) e Confirmar cliente
+    client-app/              telas e regras puras do app do cliente
     <tela>/                  componentes das demais telas (auth/)
   services/                  comunicação com a API e sessão (somente servidor)
   types/                     tipos do domínio, espelhando o backend
@@ -123,7 +142,7 @@ Layout ──────────────────┘
 ```
 
 - **`apiFetch`** (`services/api.ts`) é o ponto único de chamada à API: monta a URL com `API_URL`, envia JSON sem cache, anexa o token da sessão e transforma erros em `ApiError` (status + mensagem). Status `0` = API fora do ar. Um 401 em chamada autenticada leva ao login (`/session-expired`).
-- **Services por assunto** (`auth.service.ts`, `people.service.ts`, `contact.service.ts`, `address.service.ts`, `location.service.ts`, `cep.service.ts`, `service.service.ts`, `appointment.service.ts`, `recurrence.service.ts`, `plan.service.ts`, `client-plan.service.ts`, `payment.service.ts`, `payment-method.service.ts`, `user.service.ts`, `business-hour.service.ts`, `company.service.ts`, `anamnesis.service.ts`, `anamnesis-template.service.ts`, `audit.service.ts`) conhecem os caminhos da API e são chamados pelas telas, layouts e Server Actions — nunca o `apiFetch` direto.
+- **Services por assunto** (`auth.service.ts`, `people.service.ts`, `contact.service.ts`, `address.service.ts`, `location.service.ts`, `cep.service.ts`, `service.service.ts`, `appointment.service.ts`, `recurrence.service.ts`, `plan.service.ts`, `client-plan.service.ts`, `payment.service.ts`, `payment-method.service.ts`, `user.service.ts`, `business-hour.service.ts`, `company.service.ts`, `anamnesis.service.ts`, `anamnesis-template.service.ts`, `audit.service.ts`, `portal-settings.service.ts`) conhecem os caminhos da API e são chamados pelas telas, layouts e Server Actions — nunca o `apiFetch` direto. O app do cliente usa `appFetch` e os seus `app-*.service.ts` (ver "App do cliente").
 - **`apiFetchBytes`** (`services/api.ts`) é a variante para respostas que são arquivo (o PDF da ficha): devolve os bytes sem passar pelo parser de JSON (o `apiFetch` leria como texto e corromperia o arquivo) e não redireciona no 401, porque quem chama é um Route Handler que responde ao navegador.
 - Os services importam `server-only`: rodam só no servidor. O navegador nunca fala com a API diretamente.
 - Server Actions tratam `ApiError` (viram mensagem na tela) e deixam estourar erros inesperados — inclusive o `redirect()` do Next, que também é lançado como erro.
@@ -250,6 +269,19 @@ Duas telas, sem entidade nova no backend: a comanda é uma visão montada a part
 - A logo do header (`CompanyLogo`) usa `next/image` com `unoptimized` e some se não carregar; o `key` é o endereço da logo, para recomeçar quando ela muda.
 - O tema claro/escuro vive no menu do usuário (`ThemeMenuItem`); o switch com sol e lua (`ThemeToggle`) só aparece na tela de login.
 
+## App do cliente (`/app`)
+
+Telas em `screens/app-cliente.md`; sessão em `frontend-auth.md` ("App do cliente").
+
+- **Área à parte da clínica:** cookie próprio (`orari_app`), `appFetch` (`services/app-api.ts`) e services `app-*.service.ts`; nada da sessão da clínica. O `proxy.ts` classifica a rota com `appRouteKind` (`lib/app-routes.ts`): **guest** (entrar, criar conta), **open** (link de acesso, página do local, manifesto) e **private** (as demais). O `?voltar=` passa por `safeReturnPath`, que só aceita caminho do próprio app.
+- **Tema:** escuro e ciano do Orari só no wrapper do `app/app/layout.tsx` (classe `dark`, `--primary`, `--primary-foreground`, `--ring`); a clínica não muda.
+- **Sem toasts, diálogos e Select do shadcn:** abrem num portal fora do wrapper e sairiam claros. No lugar: confirmação na própria tela, `<select>` nativo e `AppFormMessage`.
+- **Barra inferior** (`AppBottomNav`) fixa; os botões fixos de confirmar ficam acima dela com `BOTTOM_NAV_OFFSET`. Entalhe e barra do sistema com `env(safe-area-inset-*)` e `viewportFit: cover`.
+- **PWA:** manifesto por Route Handler (`app/app/manifest.webmanifest/route.ts`), ícones em `public/app-assets` (fora de `/app`, que o proxy protege), `appleWebApp` nos metadados e `AppSplash`, que só aparece no app instalado (`display-mode: standalone`). Sem service worker: o app não funciona sem internet.
+- **Erros:** `app/app/error.tsx` e `not-found.tsx` são do próprio app (escuros, em português), em vez das páginas padrão.
+- **Foto em Meus dados:** reduzida no navegador (`resize-photo.ts`, 960 px, JPEG) antes do envio, para caber no limite mesmo com a câmera do celular.
+- **Lado da clínica:** `components/client-portal/` (tela Portal do cliente) e `components/portal-access/` (Acesso ao portal com QR e WhatsApp; Confirmar cliente).
+
 ## Sessão e rotas protegidas
 
 Resumo; detalhes em `frontend-auth.md`.
@@ -306,7 +338,7 @@ Imagem real, contêiner atrás de um Caddy local com a API real: `/login` 200, h
 | `.env.local`      | `API_URL`; `AUTH_GUARD=off` (só desenvolvimento: libera as rotas)             | não    |
 | `.env.example`    | lista das variáveis, sem valores reais                                        | sim    |
 | `components.json` | configuração do shadcn/ui                                                     | sim    |
-| `next.config.ts`  | modo `standalone`, limite do corpo das Server Actions e rewrite de `/uploads` | sim    |
+| `next.config.ts`  | modo `standalone`, limite do corpo das Server Actions, rewrite de `/uploads` e `allowedDevOrigins` (abrir o dev pelo IP da rede, para testar no celular) | sim    |
 | `Dockerfile`      | imagem de produção (três etapas)                                              | sim    |
 | `.dockerignore`   | o que não entra na imagem                                                     | sim    |
 

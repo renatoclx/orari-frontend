@@ -64,6 +64,11 @@ const nextConfig: NextConfig = {
   output: "standalone",
   // Não anuncia "X-Powered-By: Next.js" (informação a menos para quem procura versões).
   poweredByHeader: false,
+  // Só em desenvolvimento: abrir pelo IP da rede local (o celular testando o
+  // app do cliente). Sem isso, o Next bloqueia os scripts de desenvolvimento e
+  // a página não responde. As faixas são as de rede local (Wi-Fi, roteador do
+  // celular), que mudam a cada conexão.
+  allowedDevOrigins: ["192.168.*.*", "10.*.*.*", "172.*.*.*"],
   experimental: {
     serverActions: {
       // O padrão é 1 MB; a foto da pessoa pode ter até 2 MB.

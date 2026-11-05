@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { cn } from "cn";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { maskCep, maskCpf, maskPhone } from "@/utils/masks";
@@ -62,7 +63,13 @@ export function AppField({
         onBlur={onBlur}
         aria-invalid={error ? true : undefined}
         aria-describedby={error ? `${id}-error` : undefined}
-        className="h-12 bg-card text-base md:text-base"
+        className={cn(
+          "h-12 bg-card text-base md:text-base",
+          // No iPhone, a data nativa tem largura própria e passa da tela: sem a
+          // aparência nativa ela ocupa a largura do campo (o seletor continua).
+          type === "date" &&
+            "appearance-none [&::-webkit-date-and-time-value]:text-left",
+        )}
       />
       {error && (
         <p id={`${id}-error`} className="text-sm text-destructive">

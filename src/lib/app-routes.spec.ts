@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { appRouteKind } from "@/lib/app-routes";
+import { appRouteKind, safeReturnPath } from "@/lib/app-routes";
 
 describe("appRouteKind", () => {
   it("fora do app: null (inclusive o que só começa com /app)", () => {
@@ -18,10 +18,21 @@ describe("appRouteKind", () => {
     expect(appRouteKind("/app/acesso/abc")).toBe("open");
     expect(appRouteKind("/app/sessao-encerrada")).toBe("open");
     expect(appRouteKind("/app/manifest.webmanifest")).toBe("open");
+    expect(appRouteKind("/app/local/studio-aurora-demo")).toBe("open");
   });
 
   it("o resto do app: precisa da conta", () => {
     expect(appRouteKind("/app")).toBe("private");
     expect(appRouteKind("/app/menu")).toBe("private");
+  });
+});
+
+describe("safeReturnPath", () => {
+  it("aceita só caminhos do app", () => {
+    expect(safeReturnPath("/app/local/aurora")).toBe("/app/local/aurora");
+    expect(safeReturnPath("https://outro.site/app/x")).toBeUndefined();
+    expect(safeReturnPath("//outro.site")).toBeUndefined();
+    expect(safeReturnPath("/clientes")).toBeUndefined();
+    expect(safeReturnPath(undefined)).toBeUndefined();
   });
 });

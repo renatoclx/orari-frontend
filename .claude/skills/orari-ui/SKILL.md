@@ -202,6 +202,7 @@ Interface do cliente, separada da clínica (`docs/screens/app-cliente.md`):
 - **Celular primeiro:** coluna `max-w-md` centralizada; margens de `px-4`. Barra de navegação **embaixo** (`AppBottomNav`), do app inteiro, fundo `bg-sidebar`, aba ativa em `text-primary`, ícone de 24 px com o nome embaixo; uma aba só entra quando a tela dela existe.
 - **Campos e botões maiores:** `AppField` (altura 48 px, texto de 16 px para o celular não dar zoom; máscara de telefone embutida) e botões `h-12 w-full text-base`.
 - **Avisos dentro da tela** (`AppFormMessage`, `error` ou `info`), não toasts: o Toaster da clínica fica fora da área escura.
+- **Busca no app:** o mesmo `ListSearch` da clínica, com `size="lg"` (48 px, ícone maior) e o texto de exemplo próprio. Item de lista que abre outra tela: cartão inteiro clicável com `ChevronRight` à direita.
 - **Estabelecimento:** `PlaceAvatar` (logo em círculo ou as iniciais em `bg-primary/20 text-primary`). Saudação "Olá <primeiro nome>" com o nome em `text-primary`.
 - Cartões com `rounded-card border border-border bg-card`, como na clínica.
 - **Splash do app instalado** (`AppSplash`): fundo na cor da logo (`#00B8DB`), o símbolo em cima e a escrita "orari" embaixo, os dois na cor neutra da logo (`#F4F4F5`; `public/app-assets/symbol.svg` e `wordmark.svg`, sem a moldura dos SVGs de `public/logo`). Os ícones do app seguem o mesmo par de cores.

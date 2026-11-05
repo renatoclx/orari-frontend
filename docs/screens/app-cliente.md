@@ -2,7 +2,7 @@
 
 App que o **cliente** usa para agendar nos seus estabelecimentos (rota `/app`). Sempre **escuro**, feito para o celular (no computador, uma coluna centralizada), na direção do AppBarber. A sessão é própria, separada da clínica (`frontend-auth.md`, "App do cliente").
 
-> Feitas: 7b1 (entrar, criar conta, link de acesso, Início e Menu) e a instalação no celular com o splash (antecipada da 7b5). Próximas: Buscar e página do estabelecimento (7b2), Agendar (7b3), Agendamentos e o resto do Menu (7b4).
+> Feitas: 7b1 (entrar, criar conta, link de acesso, Início e Menu), a instalação no celular com o splash (antecipada da 7b5) e 7b2 (Buscar e página do estabelecimento). Próximas: Agendar (7b3), Agendamentos e o resto do Menu (7b4).
 
 ## Telas abertas (sem entrar)
 
@@ -10,6 +10,7 @@ App que o **cliente** usa para agendar nos seus estabelecimentos (rota `/app`). 
 
 - **Telefone** (com máscara) e **Senha**; botão **Entrar**.
 - Erro: "Telefone ou senha incorretos." (a mesma mensagem com ou sem conta).
+- `?voltar=<caminho do app>` (vindo da página de um estabelecimento): depois de entrar, volta para ela; o link Criar conta leva o mesmo `voltar`. Só caminhos de `/app/` são aceitos.
 - Link **Criar conta** e a dica: "Esqueceu a senha? Peça ao estabelecimento um novo link de acesso: com ele, você cria uma senha nova."
 - Avisos: "Sua sessão terminou. Entre de novo." (`?expirou=1`) e "Você saiu do app." (`?saiu=1`).
 - Já entrado: vai para o Início.
@@ -18,7 +19,7 @@ App que o **cliente** usa para agendar nos seus estabelecimentos (rota `/app`). 
 
 - **Nome**, **Telefone (com DDD)**, **Senha (mínimo de 8 caracteres)** e **Confirmar a senha**; botão **Criar conta**.
 - Erros no campo (nome, telefone com 10 ou 11 dígitos, senha de 8 a 72, confirmação igual). Telefone já usado: a mensagem da API ("Já existe uma conta com este telefone…").
-- A conta nasce sem estabelecimentos. Depois de criar, Início com "Conta criada. Boas-vindas ao Orari!".
+- A conta nasce sem estabelecimentos. Depois de criar, Início com "Conta criada. Boas-vindas ao Orari!" (ou, com `?voltar=`, de volta à página do estabelecimento).
 
 ### Link de acesso (`/app/acesso/<token>`)
 
@@ -33,13 +34,28 @@ O link que a clínica gera (lista de Clientes, ícone de QR code; `pessoas.md`).
 
 ## Telas de quem entrou
 
-Barra de navegação embaixo, do app inteiro: **Início** e **Menu** (Buscar e Agendamentos entram quando existirem).
+Barra de navegação embaixo, do app inteiro: **Início**, **Buscar** (marcada também na página de um estabelecimento) e **Menu** (Agendamentos entra quando existir).
 
 ### Início (`/app`)
 
 - "Olá <primeiro nome>" (o nome em azul) e a data ("Quinta, 5 nov 2026").
 - **Próximo agendamento**: o mais próximo de todos os estabelecimentos (serviço; "Qui, 12/11 às 08:00 · profissional", no relógio da clínica; estabelecimento). Sem nenhum: "Nenhum agendamento marcado."
-- **Meus locais**: logo (ou iniciais) e nome. Sem nenhum: "Você ainda não tem estabelecimentos. Peça o link de acesso ao seu estabelecimento."
+- **Meus locais**: logo (ou iniciais) e nome; tocar abre a página do estabelecimento. Sem nenhum: "Você ainda não tem estabelecimentos. Encontre um em Buscar ou peça o link de acesso ao seu estabelecimento."
+
+### Buscar (`/app/buscar`)
+
+- Campo "Pesquise pelo nome" (o `ListSearch` da clínica, no tamanho grande): busca durante a digitação, a partir de 2 letras, pelo nome fantasia ou pela razão social, sem diferença de acentos.
+- Cada resultado: logo (ou iniciais), nome e "segmento · cidade"; tocar abre a página do estabelecimento.
+- Só aparecem os estabelecimentos com o portal ligado e "Aparecer na busca" (`portal-do-cliente.md`). Antes de digitar: "Encontre um estabelecimento pelo nome."; sem resultado: "Nenhum estabelecimento encontrado para “…”".
+
+### Página do estabelecimento (`/app/local/<subdomínio>`)
+
+- É o **Endereço no app** que a clínica divulga: abre **com ou sem** a conta.
+- Topo: logo (ou iniciais), nome e "segmento · cidade". Embaixo, os **Serviços** que aparecem no app (com profissional ligado): nome, duração, preço e descrição.
+- **Sem a conta:** "Entre ou crie sua conta para agendar aqui." e os botões **Entrar** e **Criar conta** (voltam para esta página).
+- **Com a conta, sem ser cliente:** "Você ainda não é cliente daqui. Ao entrar, o estabelecimento recebe o seu nome e telefone." e **Entrar neste estabelecimento**: cria um cadastro novo na clínica, **não confirmado** (até 2 agendamentos futuros até a clínica confirmar; `pessoas.md`). Depois: "Pronto, você agora é cliente de …".
+- **Já cliente:** a vitrine; o botão **Agendar** chega com a tela de agendar (7b3).
+- Estabelecimento inexistente, com o portal desligado ou fora do plano: a página "Não encontramos esta página", escura e com o botão **Buscar estabelecimentos** (vale para qualquer endereço do app que não existe).
 
 ### Menu (`/app/menu`)
 

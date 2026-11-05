@@ -2,12 +2,19 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { House, UserRound, type LucideIcon } from "lucide-react";
+import { House, Search, UserRound, type LucideIcon } from "lucide-react";
 
 // Abas do app, como no AppBarber: a barra é do app inteiro, não de um local.
-// Buscar e Agendamentos entram quando suas telas existirem (7b2 e 7b4).
-const TABS: { href: string; label: string; icon: LucideIcon }[] = [
+// Agendamentos entra quando a tela existir (7b4). `also`: outras rotas em que
+// a aba fica marcada (a página de um estabelecimento faz parte de Buscar).
+const TABS: {
+  href: string;
+  label: string;
+  icon: LucideIcon;
+  also?: string;
+}[] = [
   { href: "/app", label: "Início", icon: House },
+  { href: "/app/buscar", label: "Buscar", icon: Search, also: "/app/local/" },
   { href: "/app/menu", label: "Menu", icon: UserRound },
 ];
 
@@ -20,8 +27,9 @@ export function AppBottomNav() {
       className="sticky bottom-0 border-t border-border bg-sidebar pb-[env(safe-area-inset-bottom)]"
     >
       <ul className="flex">
-        {TABS.map(({ href, label, icon: Icon }) => {
-          const active = pathname === href;
+        {TABS.map(({ href, label, icon: Icon, also }) => {
+          const active =
+            pathname === href || Boolean(also && pathname.startsWith(also));
           return (
             <li key={href} className="flex-1">
               <Link

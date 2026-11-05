@@ -14,6 +14,10 @@ type ListSearchProps = {
   label: string;
   /** Outros parâmetros da URL a manter na busca (ex.: filtro de status). */
   query?: Record<string, string | undefined>;
+  /** Texto de exemplo do campo ("Buscar por nome" por padrão). */
+  placeholder?: string;
+  /** Campo maior, para o app do cliente no celular. */
+  size?: "default" | "lg";
 };
 
 // A busca atualiza a listagem durante a digitação (screen-patterns.md): depois
@@ -24,6 +28,8 @@ export function ListSearch({
   search,
   label,
   query = {},
+  placeholder = "Buscar por nome",
+  size = "default",
 }: ListSearchProps) {
   const router = useRouter();
   const [value, setValue] = useState(search);
@@ -50,9 +56,11 @@ export function ListSearch({
   }, [value, search, router, basePath, kept]);
 
   return (
-    <div className="relative w-full sm:w-72">
+    <div className={`relative w-full ${size === "lg" ? "" : "sm:w-72"}`}>
       <Search
-        className="pointer-events-none absolute top-1/2 left-2.5 size-4 -translate-y-1/2 text-muted-foreground"
+        className={`pointer-events-none absolute top-1/2 -translate-y-1/2 text-muted-foreground ${
+          size === "lg" ? "left-3.5 size-5" : "left-2.5 size-4"
+        }`}
         aria-hidden="true"
       />
       <Input
@@ -60,8 +68,12 @@ export function ListSearch({
         value={value}
         onChange={(event) => setValue(event.target.value)}
         aria-label={label}
-        placeholder="Buscar por nome"
-        className="bg-card pl-8"
+        placeholder={placeholder}
+        className={
+          size === "lg"
+            ? "h-12 bg-card pl-11 text-base md:text-base"
+            : "bg-card pl-8"
+        }
       />
     </div>
   );

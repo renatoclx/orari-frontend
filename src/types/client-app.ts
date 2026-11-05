@@ -1,3 +1,5 @@
+import type { BusinessSegment } from "@/types/portal";
+
 // Espelham as respostas da conta do cliente no backend (/portal-account), o
 // app do cliente em /app (screens/app-cliente.md).
 
@@ -44,4 +46,39 @@ export type AppAppointment = {
   professional: { name: string };
   canCancel: boolean;
   place: AppPlace;
+};
+
+/** Resultado de GET /portal-directory?q= (busca de estabelecimentos). */
+export type DirectoryPlace = {
+  slug: string;
+  name: string;
+  logoUrl: string | null;
+  segment: BusinessSegment;
+  /** "Cidade - UF"; nula sem endereço cadastrado. */
+  city: string | null;
+};
+
+/** GET /portal/:slug: a vitrine do estabelecimento. */
+export type PlaceShowcase = {
+  name: string;
+  logoUrl: string | null;
+  segment: BusinessSegment | null;
+  city: string | null;
+  timezone: string;
+  rules: {
+    minAdvanceMinutes: number;
+    maxDaysAhead: number;
+    cancelUntilHours: number;
+  };
+};
+
+/** Item de GET /portal/:slug/services. */
+export type PlaceService = {
+  id: string;
+  name: string;
+  description: string | null;
+  /** Em minutos. */
+  duration: number;
+  price: number | null;
+  professionals: { id: string; name: string; photoUrl: string | null }[];
 };

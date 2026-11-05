@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
-import { CalendarClock } from "lucide-react";
+import Link from "next/link";
+import { CalendarClock, ChevronRight } from "lucide-react";
 import { AppFormMessage } from "@/components/client-app/AppFormMessage";
 import { PlaceAvatar } from "@/components/client-app/PlaceAvatar";
 import {
@@ -75,19 +76,33 @@ export default async function AppHomePage({ searchParams }: PageProps<"/app">) {
         {places.length > 0 ? (
           <ul className="space-y-2">
             {places.map((place) => (
-              <li
-                key={place.slug}
-                className="flex items-center gap-3 rounded-card border border-border bg-card p-3"
-              >
-                <PlaceAvatar name={place.name} logoUrl={place.logoUrl} />
-                <span className="font-medium">{place.name}</span>
+              <li key={place.slug}>
+                <Link
+                  href={`/app/local/${place.slug}`}
+                  className="flex items-center gap-3 rounded-card border border-border bg-card p-3 hover:bg-accent"
+                >
+                  <PlaceAvatar name={place.name} logoUrl={place.logoUrl} />
+                  <span className="min-w-0 flex-1 truncate font-medium">
+                    {place.name}
+                  </span>
+                  <ChevronRight
+                    className="size-5 shrink-0 text-muted-foreground"
+                    aria-hidden="true"
+                  />
+                </Link>
               </li>
             ))}
           </ul>
         ) : (
           <p className="rounded-card border border-border bg-card p-4 text-sm text-muted-foreground">
-            Você ainda não tem estabelecimentos. Peça o link de acesso ao seu
-            estabelecimento.
+            Você ainda não tem estabelecimentos. Encontre um em{" "}
+            <Link
+              href="/app/buscar"
+              className="font-semibold text-primary hover:underline"
+            >
+              Buscar
+            </Link>{" "}
+            ou peça o link de acesso ao seu estabelecimento.
           </p>
         )}
       </section>

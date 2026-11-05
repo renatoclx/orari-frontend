@@ -8,10 +8,16 @@ import { AppFormMessage } from "@/components/client-app/AppFormMessage";
 import { Button } from "@/components/ui/button";
 
 /** Criar a conta do app: nome, telefone e senha (screens/app-cliente.md). */
-export function AppRegisterForm() {
+export function AppRegisterForm({
+  returnTo,
+}: {
+  /** Caminho para voltar depois (a página de um estabelecimento). */
+  returnTo?: string;
+}) {
   const [state, action, pending] = useActionState(appRegisterAction, undefined);
   return (
     <form action={action} noValidate className="space-y-4">
+      {returnTo && <input type="hidden" name="voltar" value={returnTo} />}
       {state?.message && <AppFormMessage>{state.message}</AppFormMessage>}
       <AppField
         name="name"

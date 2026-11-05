@@ -6,9 +6,12 @@ export const APP_LOGIN_PATH = "/app/entrar";
 
 // Só para quem não entrou: entrado, vai para o Início.
 const GUEST_PATHS = new Set(["/app/entrar", "/app/criar-conta"]);
-// Abertas com ou sem a conta entrada (o manifesto é lido pelo celular ao instalar).
+// Abertas com ou sem a conta entrada: o link de acesso, a página do
+// estabelecimento (o endereço que a clínica divulga) e o manifesto, lido pelo
+// celular ao instalar.
 const OPEN_PREFIXES = [
   "/app/acesso/",
+  "/app/local/",
   "/app/sessao-encerrada",
   "/app/manifest.webmanifest",
 ];
@@ -26,4 +29,18 @@ export function appRouteKind(
   if (OPEN_PREFIXES.some((prefix) => pathname.startsWith(prefix)))
     return "open";
   return "private";
+}
+
+/**
+ * Para onde voltar depois de entrar ou criar a conta (`?voltar=`). Só aceita
+ * um caminho do próprio app: um endereço de fora viraria um redirecionamento
+ * para outro site.
+ */
+export function safeReturnPath(value: unknown): string | undefined {
+  return typeof value === "string" &&
+    value.startsWith(`${APP_HOME_PATH}/`) &&
+    !value.startsWith("//") &&
+    !value.includes("\\")
+    ? value
+    : undefined;
 }

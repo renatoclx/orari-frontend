@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { safeReturnPath } from "@/lib/app-routes";
 import { AppFormMessage } from "@/components/client-app/AppFormMessage";
 import { AppLoginForm } from "@/components/client-app/AppLoginForm";
 
@@ -9,7 +10,8 @@ export const metadata: Metadata = { title: "Entrar" };
 export default async function AppLoginPage({
   searchParams,
 }: PageProps<"/app/entrar">) {
-  const { expirou, saiu } = await searchParams;
+  const { expirou, saiu, voltar } = await searchParams;
+  const returnTo = safeReturnPath(voltar);
   return (
     <div className="space-y-6">
       <div className="space-y-1">
@@ -24,11 +26,15 @@ export default async function AppLoginPage({
         </AppFormMessage>
       )}
       {saiu && <AppFormMessage tone="info">Você saiu do app.</AppFormMessage>}
-      <AppLoginForm />
+      <AppLoginForm returnTo={returnTo} />
       <p className="text-center text-sm">
         Não tem conta?{" "}
         <Link
-          href="/app/criar-conta"
+          href={
+            returnTo
+              ? `/app/criar-conta?voltar=${encodeURIComponent(returnTo)}`
+              : "/app/criar-conta"
+          }
           className="font-semibold text-primary hover:underline"
         >
           Criar conta

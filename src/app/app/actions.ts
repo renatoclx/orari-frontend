@@ -6,6 +6,7 @@ import {
   newPasswordErrors,
   phoneError,
 } from "@/components/client-app/client-app";
+import { safeReturnPath } from "@/lib/app-routes";
 import { ApiError } from "@/services/api";
 import {
   loginAccount,
@@ -13,6 +14,7 @@ import {
   redeemAccessLink,
   registerAccount,
 } from "@/services/app-account.service";
+import { joinPlace } from "@/services/app-place.service";
 import {
   clearAppSession,
   getAppToken,
@@ -62,8 +64,9 @@ export async function appLoginAction(
       error.status === 401 ? "Telefone ou senha incorretos." : error.message;
     return { values, fieldErrors: {}, message };
   }
-  // Fora do try: o redirect lança um erro especial do Next.
-  redirect("/app");
+  // Fora do try: o redirect lança um erro especial do Next. Veio da página de
+  // um estabelecimento: volta para ela.
+  redirect(safeReturnPath(formData.get("voltar")) ?? "/app");
 }
 
 /** Criar a conta: nome, telefone, senha e confirmação. */
@@ -96,7 +99,10 @@ export async function appRegisterAction(
     if (!(error instanceof ApiError)) throw error;
     return { values, fieldErrors: {}, message: error.message };
   }
-  redirect(`/app?bemVindo=${encodeURIComponent(firstName(name))}`);
+  redirect(
+    safeReturnPath(formData.get("voltar")) ??
+      `/app?bemVindo=${encodeURIComponent(firstName(name))}`,
+  );
 }
 
 /**
@@ -152,4 +158,20 @@ export async function appLogoutAction(): Promise<void> {
   }
   await clearAppSession();
   redirect("/app/entrar?saiu=1");
+}
+
+/**
+ * Entra sozinho num estabelecimento: vira cliente dele, como não confirmado
+ * (até 2 agendamentos futuros até a clínica confirmar).
+ */
+export async function appJoinPlaceAction(
+  slug: string,
+): Promise<{ ok: false; message: string } | undefined> {
+  try {
+    await joinPlace(slug);
+  } catch (error) {
+    if (!(error instanceof ApiError)) throw error;
+    return { ok: false, message: error.message };
+  }
+  redirect(`/app/local/${encodeURIComponent(slug)}?entrou=1`);
 }

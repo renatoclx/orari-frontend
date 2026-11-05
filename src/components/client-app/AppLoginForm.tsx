@@ -8,10 +8,16 @@ import { AppFormMessage } from "@/components/client-app/AppFormMessage";
 import { Button } from "@/components/ui/button";
 
 /** Entrar no app com telefone e senha (screens/app-cliente.md). */
-export function AppLoginForm() {
+export function AppLoginForm({
+  returnTo,
+}: {
+  /** Caminho para voltar depois (a página de um estabelecimento). */
+  returnTo?: string;
+}) {
   const [state, action, pending] = useActionState(appLoginAction, undefined);
   return (
     <form action={action} noValidate className="space-y-4">
+      {returnTo && <input type="hidden" name="voltar" value={returnTo} />}
       {state?.message && <AppFormMessage>{state.message}</AppFormMessage>}
       <AppField
         name="phone"

@@ -90,7 +90,7 @@ describe("modelos de plano", () => {
     expect(matrix["class-groups"].view).toBe(false);
   });
 
-  it("Completo libera tudo o que existe; Auditoria e Configurações só têm as colunas aplicáveis", () => {
+  it("Completo libera tudo o que existe (menos Portal e Mensagens); Auditoria e Configurações só têm as colunas aplicáveis", () => {
     const { matrix } = template("complete");
     expect(matrix["anamnesis-audit"]).toEqual({
       view: true,
@@ -104,6 +104,19 @@ describe("modelos de plano", () => {
       create: false,
       remove: false,
     });
+  });
+
+  it("nenhum modelo inclui Portal do cliente e Mensagens (liberados empresa por empresa)", () => {
+    for (const key of ["essential", "professional", "complete"]) {
+      const { matrix } = template(key);
+      expect(matrix["client-portal"].view).toBe(false);
+      expect(matrix.messages).toEqual({
+        view: false,
+        edit: false,
+        create: false,
+        remove: false,
+      });
+    }
   });
 
   it("aplicar o Essencial define 3 profissionais e 1 administrador; os outros mantêm os profissionais", () => {

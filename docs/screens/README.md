@@ -32,6 +32,7 @@ diferente. Em caso de conflito, prevalece o arquivo da tela.
 | [anamnese.md](anamnese.md)                   | Anamnese: modelos, fichas, PDF e auditoria              |
 | [turmas.md](turmas.md)                       | Turmas fixas (só ADMIN)                                 |
 | [portal-do-cliente.md](portal-do-cliente.md) | Portal do cliente: regras e busca do app (só ADMIN)     |
+| [mensagens.md](mensagens.md)                 | Mensagens automáticas ao cliente do app (só ADMIN)      |
 | [ajuda.md](ajuda.md)                         | Ajuda: manuais em PDF (só ADMIN)                        |
 | [app-cliente.md](app-cliente.md)             | App do cliente (`/app`): entrar, buscar, agendar, Menu  |
 

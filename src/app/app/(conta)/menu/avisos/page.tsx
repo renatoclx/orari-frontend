@@ -3,6 +3,7 @@ import { MarkMessagesRead } from "@/components/client-app/MarkMessagesRead";
 import { MenuSubpageHeader } from "@/components/client-app/MenuSubpageHeader";
 import { MessageList } from "@/components/client-app/MessageList";
 import { PushDeviceCard } from "@/components/client-app/PushDeviceCard";
+import { ReceivedHeader } from "@/components/client-app/ReceivedHeader";
 import { getPushInfo, listMessages } from "@/services/app-push.service";
 
 export const metadata: Metadata = { title: "Avisos" };
@@ -27,9 +28,7 @@ export default async function AppMessagesPage() {
         <PushDeviceCard publicKey={publicKey} preferences={preferences} />
       )}
       <section aria-labelledby="messages-title" className="space-y-3">
-        <h2 id="messages-title" className="font-semibold">
-          Recebidos
-        </h2>
+        <ReceivedHeader canClear={messages.items.length > 0} />
         {messages.items.length > 0 ? (
           <MessageList messages={messages.items} />
         ) : (

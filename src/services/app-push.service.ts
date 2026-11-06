@@ -53,3 +53,8 @@ export function listMessages(limit = 50): Promise<AppMessagesPage> {
 export function markMessagesRead(): Promise<void> {
   return appFetch<void>("/portal-account/messages/read", { method: "PATCH" });
 }
+
+/** Limpa a caixa de Avisos (apaga todos os avisos da conta). */
+export function clearMessages(): Promise<void> {
+  return appFetch<void>("/portal-account/messages", { method: "DELETE" });
+}

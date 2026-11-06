@@ -104,6 +104,7 @@ Mensagens de confirmação (faixa ciano) somem sozinhas em 5 segundos; as de err
   - Interruptores da conta, que valem em todos os aparelhos: **Lembretes e agendamentos** ("Antes do horário e quando a clínica marca, muda ou cancela") e **Novidades e promoções** ("Aniversário e mensagens dos estabelecimentos"). Mudam na hora; recusados, voltam com o aviso.
 - **Recebidos**: logo (ou iniciais) da clínica, título, "Hoje, 14:30" / "Ontem, 09:00" / "03/11, 18:15", o texto, a clínica (quando o título não é o nome dela) e um ponto nos novos. O aviso de teste vem do "Orari", com o símbolo. Tocar num aviso com destino (ex.: um lembrete) abre a tela dele. Sem nenhum: "Nenhum aviso por enquanto." Mostra os 50 mais recentes.
 - Abrir a tela marca todos como lidos (o destaque dos novos fica até sair dela).
+- **Limpar** (ao lado de "Recebidos", só com avisos): confirma no próprio lugar ("Apagar todos os avisos?", **Manter** / **Apagar**) e apaga todos os avisos da conta (`DELETE /portal-account/messages`). Não muda nada na clínica (o "Recebida por N" e os automáticos já enviados ficam como estão).
 - **A notificação no celular**: título e texto do aviso, ícone do Orari; tocar abre o app no destino do aviso (reaproveitando o app aberto). Quem mostra é o service worker (ver "Instalar no celular").
 
 ### Pacotes (`/app/menu/pacotes`)

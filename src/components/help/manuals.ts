@@ -29,4 +29,22 @@ export const MANUALS: Manual[] = [
       "Cadastro de turmas, alunos, vagas na agenda, cancelamentos e reposições.",
     file: "/manuais/manual-turmas.pdf",
   },
+  {
+    title: "Manual do Portal do cliente",
+    description:
+      "Ligar o portal, regras, busca no app, link de acesso e confirmar clientes.",
+    file: "/manuais/manual-portal.pdf",
+  },
+  {
+    title: "Manual do app do cliente",
+    description:
+      "Para enviar aos clientes: instalar, entrar, agendar, cancelar e ativar os avisos.",
+    file: "/manuais/manual-app.pdf",
+  },
+  {
+    title: "Manual de Mensagens",
+    description:
+      "Mensagens automáticas, os dados do cliente no texto e o envio a todos.",
+    file: "/manuais/manual-mensagens.pdf",
+  },
 ];

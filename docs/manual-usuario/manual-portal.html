@@ -1,0 +1,167 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<title>Manual do Portal do cliente — Orari</title>
+<link rel="stylesheet" href="manual.css">
+<style>
+  /* Cabeçalho das páginas: o manual.css traz o do manual do administrador. */
+  @page { @top-left { content: "Orari · Manual do Portal do cliente"; } }
+</style>
+</head>
+<body>
+
+<!-- ===== Capa ===== -->
+<section class="cover">
+  <img class="logo" src="assets/logo-white.svg" alt="Orari">
+  <div class="spacer"></div>
+  <div class="bar"></div>
+  <div class="kicker">Manual do Portal do cliente</div>
+  <h1>Seus clientes agendando sozinhos, pelo celular</h1>
+  <p>Guia passo a passo para o administrador: ligar o portal, definir as regras, levar os clientes para o app do Orari e acompanhar o que eles marcam.</p>
+  <div class="foot">As telas deste manual usam dados fictícios do “Studio Aurora”.</div>
+</section>
+
+<!-- ===== Sumário (os números de página são preenchidos pelo build) ===== -->
+<section class="toc">
+  <h2>Sumário</h2>
+  <ol id="toc"></ol>
+  <div class="intro">
+    <b>Como usar este manual.</b> Os capítulos seguem a ordem em que você costuma configurar o portal: primeiro ligar e definir as regras, depois convidar os clientes. Os quadros azuis trazem dicas; os amarelos, avisos importantes. Os nomes de botões e campos aparecem <span class="ui">assim</span>, como na tela. Para o que o cliente vê no celular, consulte o <b>Manual do app do cliente</b>, que você também pode enviar a eles.
+  </div>
+</section>
+
+<!-- ===== 1 ===== -->
+<h1 class="chapter" data-toc="O que é o portal"><span class="num"></span>O que é o portal</h1>
+<p class="lead">O seu estabelecimento dentro do app do Orari.</p>
+
+<p>Com o portal ligado, os seus clientes usam o <b>app do Orari</b> no celular para ver os serviços, escolher o profissional, marcar e cancelar horários. Tudo o que eles marcam aparece na sua agenda, como qualquer outro agendamento.</p>
+<p>O app é um só para todos os estabelecimentos: o cliente cria uma conta com o telefone e uma senha e pode ser cliente de vários lugares ao mesmo tempo.</p>
+
+<h2>Quem pode usar</h2>
+<ul>
+  <li>O menu <span class="ui">Portal do cliente</span> aparece só para o <b>administrador</b>.</li>
+  <li>Ele precisa estar liberado no seu plano. Se o menu não aparece, fale com o suporte do Orari.</li>
+</ul>
+<figure class="w25"><img src="images/p01-menu.png" alt=""><figcaption>O menu Portal do cliente, antes de Mensagens.</figcaption></figure>
+
+<!-- ===== 2 ===== -->
+<h1 class="chapter" data-toc="Ligar o portal e definir as regras"><span class="num"></span>Ligar o portal e definir as regras</h1>
+<p class="lead">Uma tela só, com quatro blocos.</p>
+
+<figure><img src="images/p02-portal.png" alt=""><figcaption>A tela Portal do cliente.</figcaption></figure>
+
+<ol class="steps">
+  <li>No menu, abra <span class="ui">Portal do cliente</span>.</li>
+  <li>Em <b>Situação</b>, ligue <span class="ui">Portal ligado</span>. Desligado, o app e os links de acesso deixam de funcionar para o seu estabelecimento.</li>
+  <li>Em <b>Regras de agendamento</b>, escolha:
+    <ul>
+      <li><b>Antecedência mínima</b>: quanto tempo antes do horário o cliente ainda pode marcar (de “sem antecedência” a 2 dias).</li>
+      <li><b>Agendar até (dias à frente)</b>: até quantos dias no futuro aparecem no app (de 1 a 365).</li>
+      <li><b>O cliente cancela</b>: até quando o cliente pode cancelar pelo app (até o início, ou de 2 horas a 3 dias antes).</li>
+    </ul>
+  </li>
+  <li>Clique em <span class="ui">Salvar alterações</span>. A mensagem “Portal do cliente salvo.” confirma.</li>
+</ol>
+<div class="box tip"><b class="t">Dica</b><p>As regras valem só para o que o cliente faz pelo app. Na sua agenda, você continua marcando e cancelando como sempre, sem essas restrições.</p></div>
+
+<!-- ===== 3 ===== -->
+<h1 class="chapter" data-toc="Serviços no app"><span class="num"></span>Serviços no app</h1>
+<p class="lead">Só aparece no app o serviço que tem quem atenda.</p>
+
+<p>Para um serviço aparecer no app, ele precisa de <b>ao menos um profissional</b> ligado a ele. Assim o cliente escolhe o serviço, depois o profissional, e o Orari mostra só os horários livres daquele profissional.</p>
+<ol class="steps">
+  <li>Em <span class="ui">Serviços</span>, clique em <span class="ui">Alterar</span> (o lápis) no serviço.</li>
+  <li>Em <b>Profissionais que atendem</b>, marque quem faz aquele serviço.</li>
+  <li>Clique em <span class="ui">Salvar alterações</span>.</li>
+</ol>
+<figure class="w55"><img src="images/p04-servico-profissionais.png" alt=""><figcaption>Rafael Duarte atende a Massagem relaxante.</figcaption></figure>
+<div class="box warn"><b class="t">Atenção</b><p>Os horários livres seguem o horário de atendimento de cada profissional, os compromissos e as turmas da agenda. Se um profissional não tem horário cadastrado num dia, o app não mostra horários dele naquele dia.</p></div>
+
+<!-- ===== 4 ===== -->
+<h1 class="chapter" data-toc="Aparecer na busca do app"><span class="num"></span>Aparecer na busca do app</h1>
+<p class="lead">Opcional: para novos clientes encontrarem você pelo nome.</p>
+
+<p>No bloco <b>Busca no app</b>, ligue <span class="ui">Aparecer na busca do app</span> e escolha o <b>Segmento</b> (barbearia, salão de beleza, estética, esmalteria, design de sobrancelhas, fisioterapia, pilates, psicologia, nutrição, odontologia ou outros). Sem o segmento, o Orari não salva.</p>
+<p>Desligado, o seu estabelecimento continua no app para quem tem o link: ele só não aparece na busca.</p>
+<div class="box warn"><b class="t">Cliente não confirmado</b><p>Quem entra sozinho, pela busca ou pelo endereço do app, chega como <b>não confirmado</b> e pode ter no máximo <b>2 agendamentos futuros</b>, até você confirmar o cadastro (capítulo 6). Isso evita reservas de quem você não conhece.</p></div>
+
+<!-- ===== 5 ===== -->
+<h1 class="chapter" data-toc="Levar os clientes para o app"><span class="num"></span>Levar os clientes para o app</h1>
+<p class="lead">Dois caminhos, que podem ser usados juntos.</p>
+
+<h2>Endereço no app: para divulgar</h2>
+<p>No bloco <b>Divulgação</b> fica o <b>Endereço no app</b> do seu estabelecimento. Clique no botão de copiar e divulgue no Instagram, no site ou no WhatsApp. Quem abrir vê os seus serviços e pode criar a conta para agendar.</p>
+<figure><img src="images/p03-portal-divulgacao.png" alt=""><figcaption>Busca no app e Divulgação, com o endereço para copiar.</figcaption></figure>
+
+<h2>Link de acesso: para quem já é cliente</h2>
+<p>O link de acesso liga o cadastro que você já tem à conta do cliente no app. Ele é pessoal.</p>
+<ol class="steps">
+  <li>Em <span class="ui">Clientes</span>, na coluna Ações, clique no ícone de <b>QR code</b> do cliente (a dica diz “Acesso ao portal de …”). O mesmo botão está no histórico do cliente.</li>
+  <li>Clique em <span class="ui">Gerar link</span>.</li>
+  <li>Mostre o <b>QR code</b> para o cliente ler com a câmera, copie o link ou clique em <span class="ui">Enviar pelo WhatsApp</span>, que abre o seu WhatsApp com a mensagem pronta para o telefone do cliente.</li>
+</ol>
+<div class="row">
+  <figure><img src="images/p05-clientes.png" alt=""><figcaption>O ícone de QR code na coluna Ações.</figcaption></figure>
+  <figure><img src="images/p06-acesso-portal.png" alt=""><figcaption>O link gerado, com o QR code.</figcaption></figure>
+</div>
+<div class="box tip"><b class="t">Como o link funciona</b>
+  <ul>
+    <li>Vale por <b>24 horas</b> e pode ser usado <b>uma vez só</b>. <span class="ui">Gerar outro</span> anula o anterior.</li>
+    <li>Cliente sem conta: cria a senha e já entra como seu cliente.</li>
+    <li>Cliente que já tem conta e <b>esqueceu a senha</b>: cria uma senha nova pelo link.</li>
+    <li>Usar o link já <b>confirma</b> o cadastro.</li>
+  </ul>
+</div>
+
+<!-- ===== 6 ===== -->
+<h1 class="chapter" data-toc="Confirmar clientes novos"><span class="num"></span>Confirmar clientes novos</h1>
+<p class="lead">Quem entrou sozinho espera a sua confirmação.</p>
+
+<p>Quando alguém entra no seu estabelecimento pelo app, sem o link, o Orari cria um cadastro de cliente com o nome e o telefone da conta. Ele aparece com o selo <b>Não confirmado</b>.</p>
+<ol class="steps">
+  <li>Abra o histórico do cliente (o olho, na lista de Clientes).</li>
+  <li>Confira quem é e clique em <span class="ui">Confirmar cliente</span>.</li>
+  <li>Confirme no aviso. O selo e o limite de 2 agendamentos saem na hora.</li>
+</ol>
+<figure><img src="images/p07-historico-nao-confirmado.png" alt=""><figcaption>Cliente não confirmado, com o botão Confirmar cliente.</figcaption></figure>
+<div class="box warn"><b class="t">Atenção</b><p>Confirme só quem você sabe quem é. Se a pessoa já era sua cliente e entrou sozinha, ela fica com dois cadastros: o antigo e o novo, do app. Para evitar isso, envie o link de acesso aos clientes antigos: com ele, o app usa o cadastro que você já tem, com o histórico.</p></div>
+
+<!-- ===== 7 ===== -->
+<h1 class="chapter" data-toc="O portal na agenda"><span class="num"></span>O portal na agenda</h1>
+<p class="lead">O que o cliente marca aparece como qualquer agendamento.</p>
+
+<p>Os horários marcados pelo app entram na agenda no mesmo momento. Ao abrir o agendamento, a linha <b>“Agendado pelo cliente, no portal”</b> mostra a origem. Você pode cancelar, remanejar ou alterar normalmente.</p>
+<figure class="w55"><img src="images/p08-agenda-portal.png" alt=""><figcaption>Um agendamento feito pelo app.</figcaption></figure>
+<p>Pelo app, o cliente marca só horários <b>avulsos</b>. Recorrências, pacotes e turmas continuam sendo marcados por você; o cliente apenas os vê no app.</p>
+
+<!-- ===== 8 ===== -->
+<h1 class="chapter" data-toc="Dúvidas comuns"><span class="num"></span>Dúvidas comuns</h1>
+<p class="lead">Respostas rápidas para as situações mais frequentes.</p>
+
+<h3>Não vejo o menu Portal do cliente.</h3>
+<p>O menu é só do administrador e precisa estar liberado no plano. Fale com o suporte do Orari.</p>
+<h3>O cliente não encontra um serviço no app.</h3>
+<p>O serviço precisa estar ativo e ter ao menos um profissional em <span class="ui">Profissionais que atendem</span>.</p>
+<h3>O cliente não acha horário livre.</h3>
+<p>Confira a <b>antecedência mínima</b>, os <b>dias à frente</b> e o horário de atendimento do profissional naquele dia.</p>
+<h3>O cliente esqueceu a senha.</h3>
+<p>Gere um novo link de acesso para ele. Com o link, ele cria uma senha nova.</p>
+<h3>O cliente diz que não consegue marcar mais horários.</h3>
+<p>Se ele está como <b>Não confirmado</b>, o limite é de 2 agendamentos futuros. Confirme o cliente no histórico.</p>
+<h3>O link não funciona.</h3>
+<p>O link vale 24 horas e uma vez só, e gerar outro anula o anterior. Confira também se o portal está ligado. Gere um link novo.</p>
+<h3>Quero parar de receber agendamentos pelo app.</h3>
+<p>Desligue <span class="ui">Portal ligado</span> e salve. Os agendamentos já marcados continuam na agenda.</p>
+
+<h2>Glossário</h2>
+<dl class="gloss">
+  <dt>Portal</dt><dd>O seu estabelecimento no app do Orari, com as regras que você define.</dd>
+  <dt>App do Orari</dt><dd>O app que o cliente usa no celular, o mesmo para todos os estabelecimentos.</dd>
+  <dt>Endereço no app</dt><dd>A página do seu estabelecimento no app, para divulgar.</dd>
+  <dt>Link de acesso</dt><dd>Link pessoal, de uso único e válido por 24 horas, que liga o cadastro do cliente à conta dele no app.</dd>
+  <dt>Não confirmado</dt><dd>Cliente que entrou sozinho pelo app. Tem até 2 agendamentos futuros até você confirmar.</dd>
+</dl>
+
+</body>
+</html>

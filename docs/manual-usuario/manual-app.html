@@ -1,0 +1,177 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<title>Manual do app do cliente — Orari</title>
+<link rel="stylesheet" href="manual.css">
+<style>
+  /* Cabeçalho das páginas: o manual.css traz o do manual do administrador. */
+  @page { @top-left { content: "Orari · Manual do app do cliente"; } }
+  /* Capturas do celular: estreitas e altas, lado a lado. */
+  .row figure img { max-height: 120mm; }
+</style>
+</head>
+<body>
+
+<!-- ===== Capa ===== -->
+<section class="cover">
+  <img class="logo" src="assets/logo-white.svg" alt="Orari">
+  <div class="spacer"></div>
+  <div class="bar"></div>
+  <div class="kicker">Manual do app do cliente</div>
+  <h1>Agende seus horários pelo celular</h1>
+  <p>Como instalar o app do Orari, entrar, agendar, cancelar e receber os lembretes dos seus horários.</p>
+  <div class="foot">As telas deste manual usam dados fictícios: a cliente “Ana Demo” e o “Studio Aurora”.</div>
+</section>
+
+<!-- ===== Sumário (os números de página são preenchidos pelo build) ===== -->
+<section class="toc">
+  <h2>Sumário</h2>
+  <ol id="toc"></ol>
+  <div class="intro">
+    <b>Como usar este manual.</b> Comece pela instalação e pela entrada; depois, consulte o capítulo do que quiser fazer. Os quadros azuis trazem dicas; os amarelos, avisos importantes. Os nomes de botões aparecem <span class="ui">assim</span>, como na tela. Com uma conta só, você agenda em todos os estabelecimentos que usam o Orari.
+  </div>
+</section>
+
+<!-- ===== 1 ===== -->
+<h1 class="chapter" data-toc="Instalar no celular"><span class="num"></span>Instalar no celular</h1>
+<p class="lead">O app é instalado pelo navegador, em poucos toques.</p>
+
+<p>O app do Orari não fica na App Store nem na Play Store. Abra o link que o estabelecimento enviou, ou o endereço <b>app.orariapp.com.br/app</b>, e instale:</p>
+
+<h2>No iPhone</h2>
+<ol class="steps">
+  <li>Abra o endereço no <b>Safari</b>. Outros navegadores do iPhone não instalam o app.</li>
+  <li>Toque em <span class="ui">Compartilhar</span> (o quadrado com a seta para cima).</li>
+  <li>Escolha <span class="ui">Adicionar à Tela de Início</span> e confirme.</li>
+  <li>A partir daí, abra o Orari <b>pelo ícone</b> na tela de início.</li>
+</ol>
+
+<h2>No Android</h2>
+<ol class="steps">
+  <li>Abra o endereço no <b>Chrome</b>.</li>
+  <li>Toque em <span class="ui">Instalar app</span> quando aparecer, ou no menu <b>⋮</b> → <span class="ui">Instalar app</span>.</li>
+  <li>Abra o Orari pelo ícone.</li>
+</ol>
+<div class="box tip"><b class="t">Dica</b><p>Também dá para usar o Orari direto no navegador, sem instalar. Mas, no iPhone, os lembretes no celular só chegam com o app instalado.</p></div>
+
+<!-- ===== 2 ===== -->
+<h1 class="chapter" data-toc="Entrar pela primeira vez"><span class="num"></span>Entrar pela primeira vez</h1>
+<p class="lead">Pelo link do estabelecimento ou criando a conta.</p>
+
+<h2>Pelo link do estabelecimento (o mais fácil)</h2>
+<p>Abra o link ou leia o QR code que o estabelecimento enviou. Crie a sua senha e pronto: você já entra como cliente de lá, com o cadastro que o estabelecimento tem. O link vale por 24 horas e uma vez só.</p>
+
+<h2>Criando a conta</h2>
+<ol class="steps">
+  <li>Toque em <span class="ui">Criar conta</span>.</li>
+  <li>Informe o <b>nome</b>, o <b>telefone com DDD</b> e uma <b>senha</b> de pelo menos 8 caracteres. O telefone e a senha são o seu login.</li>
+  <li>Toque em <span class="ui">Criar conta</span>.</li>
+</ol>
+<div class="row">
+  <figure><img src="images/a01-entrar.png" alt=""><figcaption>Entrar.</figcaption></figure>
+  <figure><img src="images/a02-criar-conta.png" alt=""><figcaption>Criar conta.</figcaption></figure>
+  <figure><img src="images/a03-inicio.png" alt=""><figcaption>O Início, logo depois.</figcaption></figure>
+</div>
+
+<!-- ===== 3 ===== -->
+<h1 class="chapter" data-toc="Encontrar um estabelecimento"><span class="num"></span>Encontrar um estabelecimento</h1>
+<p class="lead">Busque pelo nome e entre como cliente.</p>
+
+<ol class="steps">
+  <li>Na aba <span class="ui">Buscar</span>, digite o nome do estabelecimento (a partir de 2 letras).</li>
+  <li>Toque no resultado para ver os serviços, com duração e preço.</li>
+  <li>Toque em <span class="ui">Entrar neste estabelecimento</span>. O estabelecimento recebe o seu nome e telefone.</li>
+</ol>
+<div class="row">
+  <figure><img src="images/a04-buscar.png" alt=""><figcaption>Buscar.</figcaption></figure>
+  <figure><img src="images/a05-local.png" alt=""><figcaption>A página do estabelecimento.</figcaption></figure>
+  <figure><img src="images/a06-local-cliente.png" alt=""><figcaption>Já cliente: o botão Agendar.</figcaption></figure>
+</div>
+<div class="box warn"><b class="t">Até o estabelecimento confirmar</b><p>Entrando pela busca, você pode ter até <b>2 agendamentos futuros</b> até o estabelecimento confirmar o seu cadastro. Quem entra pelo link do estabelecimento já chega confirmado.</p></div>
+
+<!-- ===== 4 ===== -->
+<h1 class="chapter" data-toc="Agendar"><span class="num"></span>Agendar</h1>
+<p class="lead">Serviço, profissional, dia e horário, numa tela só.</p>
+
+<ol class="steps">
+  <li>No <span class="ui">Início</span>, toque em <span class="ui">Agendar</span> ao lado do estabelecimento (ou na página dele).</li>
+  <li>Escolha o <b>serviço</b> e o <b>profissional</b>. Se só um profissional atende, ele já vem escolhido.</li>
+  <li>Escolha o <b>dia</b> na faixa, que rola para o lado.</li>
+  <li>Escolha o <b>horário</b>. Eles aparecem separados em Manhã, Tarde e Noite.</li>
+  <li>Toque em <span class="ui">Confirmar</span>, embaixo da tela.</li>
+</ol>
+<div class="row">
+  <figure><img src="images/a07-agendar.png" alt=""><figcaption>Escolhas feitas: falta confirmar.</figcaption></figure>
+  <figure><img src="images/a08-inicio-agendado.png" alt=""><figcaption>Agendado: aparece no Início.</figcaption></figure>
+</div>
+<div class="box tip"><b class="t">Dica</b><p>Pacotes, turmas e horários fixos são marcados pelo estabelecimento. No app, eles aparecem em <span class="ui">Agendamentos</span> e em <span class="ui">Menu</span> → <span class="ui">Recorrências</span>.</p></div>
+
+<!-- ===== 5 ===== -->
+<h1 class="chapter" data-toc="Ver e cancelar agendamentos"><span class="num"></span>Ver e cancelar agendamentos</h1>
+<p class="lead">Os horários de todos os estabelecimentos, num lugar só.</p>
+
+<p>A aba <span class="ui">Agendamentos</span> mostra os <b>Próximos</b> e os <b>Anteriores</b>. Com mais de um estabelecimento, dá para filtrar por um deles.</p>
+<ol class="steps">
+  <li>No horário, toque em <span class="ui">Cancelar</span>.</li>
+  <li>Confirme em <span class="ui">Cancelar</span>, ou toque em <span class="ui">Manter</span> para desistir.</li>
+</ol>
+<figure class="w40"><img src="images/a09-agendamentos-cancelar.png" alt=""><figcaption>A confirmação aparece no próprio horário.</figcaption></figure>
+<div class="box warn"><b class="t">Prazo para cancelar</b><p>Cada estabelecimento define até quando dá para cancelar pelo app. Fora do prazo, ou para pacotes, turmas e horários fixos, fale com o estabelecimento.</p></div>
+
+<!-- ===== 6 ===== -->
+<h1 class="chapter" data-toc="Lembretes e avisos"><span class="num"></span>Lembretes e avisos</h1>
+<p class="lead">Saiba antes de cada horário, mesmo com o app fechado.</p>
+
+<h2>Ativar os avisos</h2>
+<ol class="steps">
+  <li>Abra <span class="ui">Menu</span> → <span class="ui">Avisos</span> (ou toque em <span class="ui">Ativar avisos</span> no convite do Início). No iPhone, o app precisa estar instalado e aberto pelo ícone.</li>
+  <li>Toque em <span class="ui">Ativar avisos</span> e, quando o celular perguntar, em <span class="ui">Permitir</span>.</li>
+  <li>Toque em <span class="ui">Testar</span>. Um aviso de teste chega em alguns segundos.</li>
+</ol>
+<p>Os dois interruptores escolhem o que você recebe, em todos os seus aparelhos: <b>Lembretes e agendamentos</b> (antes do horário e quando o estabelecimento marca, muda ou cancela) e <b>Novidades e promoções</b> (aniversário e mensagens dos estabelecimentos).</p>
+
+<h2>Os avisos recebidos</h2>
+<p>Todo aviso fica guardado em <b>Recebidos</b>, mesmo que você não tenha ativado os avisos no celular. Os novos têm um ponto azul, e a aba Menu mostra um ponto enquanto houver aviso não lido. Para esvaziar a lista, toque em <span class="ui">Limpar</span> e confirme em <span class="ui">Apagar</span>.</p>
+<div class="row">
+  <figure><img src="images/a11-avisos.png" alt=""><figcaption>Avisos neste aparelho.</figcaption></figure>
+  <figure><img src="images/a11b-avisos-recebidos.png" alt=""><figcaption>Recebidos.</figcaption></figure>
+  <figure><img src="images/a12-avisos-limpar.png" alt=""><figcaption>Limpar a lista.</figcaption></figure>
+</div>
+<div class="box warn"><b class="t">O aviso chega sem som e sem aparecer na tela?</b><p>Confira se o <b>Não Perturbe</b> ou outro <b>Foco</b> (Sono, Trabalho) está ligado. Eles guardam os avisos em silêncio, só na central de notificações.</p></div>
+
+<!-- ===== 7 ===== -->
+<h1 class="chapter" data-toc="Menu e seus dados"><span class="num"></span>Menu e seus dados</h1>
+<p class="lead">Seu perfil, pacotes, horários fixos e senha.</p>
+
+<div class="side">
+  <figure><img src="images/a10-menu.png" alt=""><figcaption>Menu.</figcaption></figure>
+  <ul>
+    <li><b>Avisos</b>: os avisos recebidos e os interruptores (capítulo 6).</li>
+    <li><b>Meus dados</b>: nome, foto, CPF, nascimento, profissão, telefone, e-mail e endereço. Ao salvar, os dados também são atualizados nos estabelecimentos em que você é cliente. Para trocar o telefone, que é o seu login, o app pede a senha atual.</li>
+    <li><b>Pacotes</b>: os pacotes contratados, com a situação e o período. Só para ver.</li>
+    <li><b>Recorrências</b>: os seus horários fixos e turmas. Só para ver.</li>
+    <li><b>Segurança</b>: trocar a senha. Os outros aparelhos saem da conta.</li>
+    <li><b>Sair</b>: sai só deste aparelho.</li>
+  </ul>
+</div>
+
+<!-- ===== 8 ===== -->
+<h1 class="chapter" data-toc="Dúvidas comuns"><span class="num"></span>Dúvidas comuns</h1>
+<p class="lead">Respostas rápidas para as situações mais frequentes.</p>
+
+<h3>Esqueci a minha senha.</h3>
+<p>Peça ao estabelecimento um novo link de acesso. Com ele, você cria uma senha nova.</p>
+<h3>Não aparece o botão para ativar os avisos no iPhone.</h3>
+<p>O iPhone só recebe avisos do app instalado. Instale pelo Safari (Compartilhar → Adicionar à Tela de Início) e abra pelo ícone. É preciso ter o iOS 16.4 ou mais novo.</p>
+<h3>Os avisos estão bloqueados.</h3>
+<p><b>iPhone:</b> Ajustes → Notificações → Orari → ligue <span class="ui">Permitir Notificações</span>. <b>Android:</b> configurações do aparelho → Apps → Orari → Notificações, ou o ícone ao lado do endereço, no Chrome.</p>
+<h3>Não encontro o estabelecimento na busca.</h3>
+<p>Nem todo estabelecimento aparece na busca. Peça o link ou o endereço no app diretamente a ele.</p>
+<h3>Não encontro horário livre.</h3>
+<p>Escolha outro dia ou outro profissional. Cada estabelecimento define com quanta antecedência e até quantos dias à frente dá para agendar.</p>
+<h3>Não consigo marcar mais horários.</h3>
+<p>Se você entrou pela busca, o limite é de 2 agendamentos futuros até o estabelecimento confirmar o seu cadastro. Fale com ele.</p>
+
+</body>
+</html>

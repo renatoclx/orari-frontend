@@ -46,6 +46,7 @@ import {
 import { onlyDigits } from "@/utils/masks";
 import {
   deletePushSubscription,
+  clearMessages,
   markMessagesRead,
   savePushPreferences,
   savePushSubscription,
@@ -497,6 +498,21 @@ export async function appPushTestAction(): Promise<
     if (!(error instanceof ApiError)) throw error;
     return { ok: false, message: error.message };
   }
+}
+
+/** Limpa a caixa de Avisos (o Limpar de Menu → Avisos). */
+export async function appClearMessagesAction(): Promise<
+  { ok: true } | { ok: false; message: string }
+> {
+  try {
+    await clearMessages();
+  } catch (error) {
+    if (!(error instanceof ApiError)) throw error;
+    return { ok: false, message: error.message };
+  }
+  // A lista some, e o número de não lidos (Menu e o ponto da barra) também.
+  revalidatePath("/app", "layout");
+  return { ok: true };
 }
 
 /**

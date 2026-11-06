@@ -77,7 +77,9 @@ export function AutoMessagesForm({
       onSubmit={submit}
       className="flex min-h-0 flex-1 flex-col rounded-card border border-border bg-card"
     >
-      <div className="min-h-0 flex-1 divide-y divide-border overflow-auto">
+      {/* relative: os inputs escondidos do Radix (Switch, Checkbox, Select) são
+          absolutos; sem isso, aumentam a altura da página e ela rola. */}
+      <div className="relative min-h-0 flex-1 divide-y divide-border overflow-auto">
         <div className="p-4 md:p-6">{notice}</div>
         {draft.map((message) => (
           <AutoMessageSection

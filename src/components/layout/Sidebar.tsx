@@ -172,7 +172,7 @@ const clientPortalLink: NavLink = {
 };
 
 // Mensagens (screens/mensagens.md): só o ADMIN, com Mensagens no plano; logo
-// depois do Portal do cliente, de que elas dependem. "Enviar" entra na 8e.
+// depois do Portal do cliente, de que elas dependem.
 const messagesGroup: NavGroup = {
   label: "Mensagens",
   icon: MessageSquareText,
@@ -182,6 +182,7 @@ const messagesGroup: NavGroup = {
       label: "Automáticas",
       feature: "messages",
     },
+    { href: "/mensagens/enviar", label: "Enviar", feature: "messages" },
   ],
 };
 

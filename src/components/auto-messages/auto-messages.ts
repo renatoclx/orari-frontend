@@ -77,14 +77,21 @@ const SAMPLE = {
 
 const VARIABLE = /\{([^{}\s]+)\}/g;
 
+/** Variáveis do texto que não estão entre as permitidas. */
+export function variablesOutside(
+  text: string,
+  allowed: readonly string[],
+): string[] {
+  const found = [...text.matchAll(VARIABLE)].map((match) => match[1]);
+  return [...new Set(found.filter((name) => !allowed.includes(name)))];
+}
+
 /** Variáveis do texto que não existem na situação. */
 export function unknownVariables(
   body: string,
   kind: AutoMessageKind,
 ): string[] {
-  const allowed: readonly string[] = AUTO_MESSAGE_INFO[kind].variables;
-  const found = [...body.matchAll(VARIABLE)].map((match) => match[1]);
-  return [...new Set(found.filter((name) => !allowed.includes(name)))];
+  return variablesOutside(body, AUTO_MESSAGE_INFO[kind].variables);
 }
 
 export type AutoMessageErrors = { body?: string; offsets?: string };

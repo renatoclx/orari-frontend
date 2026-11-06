@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import {
+  Bell,
   ChevronRight,
   LockKeyhole,
   LogOut,
@@ -12,6 +13,7 @@ import {
 } from "lucide-react";
 import { appLogoutAction } from "@/app/app/actions";
 import { AppFormMessage } from "@/components/client-app/AppFormMessage";
+import { getAccount } from "@/services/app-account.service";
 import { getProfile } from "@/services/app-profile.service";
 import { formatPhone, getInitials } from "@/utils/format";
 
@@ -28,6 +30,12 @@ const ITEMS: {
   title: string;
   detail: string;
 }[] = [
+  {
+    href: "/app/menu/avisos",
+    icon: Bell,
+    title: "Avisos",
+    detail: "Lembretes e mensagens dos estabelecimentos",
+  },
   {
     href: "/app/menu/dados",
     icon: UserRound,
@@ -55,14 +63,17 @@ const ITEMS: {
 ];
 
 /**
- * Menu do app (screens/app-cliente.md): a conta (foto, nome e telefone), Meus
- * dados, Pacotes, Recorrências, Segurança e Sair.
+ * Menu do app (screens/app-cliente.md): a conta (foto, nome e telefone),
+ * Avisos (com os não lidos), Meus dados, Pacotes, Recorrências, Segurança e Sair.
  */
 export default async function AppMenuPage({
   searchParams,
 }: PageProps<"/app/menu">) {
   const { senha, dados } = await searchParams;
-  const profile = await getProfile();
+  const [profile, { unreadMessages }] = await Promise.all([
+    getProfile(),
+    getAccount(),
+  ]);
   return (
     <>
       <header className="flex items-center gap-4">
@@ -112,6 +123,12 @@ export default async function AppMenuPage({
                 {detail}
               </span>
             </span>
+            {href === "/app/menu/avisos" && unreadMessages > 0 && (
+              <span className="grid h-6 min-w-6 shrink-0 place-items-center rounded-full bg-primary px-1.5 text-xs font-bold text-primary-foreground tabular-nums">
+                {unreadMessages}
+                <span className="sr-only"> não lidos</span>
+              </span>
+            )}
             <ChevronRight
               className="size-5 shrink-0 text-muted-foreground"
               aria-hidden="true"

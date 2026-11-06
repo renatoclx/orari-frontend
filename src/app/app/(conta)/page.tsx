@@ -3,6 +3,7 @@ import Link from "next/link";
 import { CalendarClock } from "lucide-react";
 import { AppFormMessage } from "@/components/client-app/AppFormMessage";
 import { PlaceAvatar } from "@/components/client-app/PlaceAvatar";
+import { PushInvite } from "@/components/client-app/PushInvite";
 import {
   DEFAULT_TIME_ZONE,
   appointmentWhen,
@@ -13,19 +14,29 @@ import {
   getAccount,
   listAccountAppointments,
 } from "@/services/app-account.service";
+import { ApiError } from "@/services/api";
+import { getPushInfo } from "@/services/app-push.service";
 
 export const metadata: Metadata = { title: "Início" };
 
 /**
  * Início do app (screens/app-cliente.md): saudação com a data, o próximo
- * agendamento (de qualquer estabelecimento) e os estabelecimentos da conta.
+ * agendamento (de qualquer estabelecimento), o convite para ativar os avisos
+ * (enquanto não estão ativados neste aparelho) e os estabelecimentos da conta.
  */
 export default async function AppHomePage({ searchParams }: PageProps<"/app">) {
   const { bemVindo, agendado } = await searchParams;
-  const [{ account, places }, { upcoming }] = await Promise.all([
+  const [{ account, places }, { upcoming }, pushInfo] = await Promise.all([
     getAccount(),
     listAccountAppointments(),
+    // Os avisos são um extra do Início: se a API falhar só nessa parte, a
+    // tela abre sem o convite (a sessão vencida continua indo para Entrar).
+    getPushInfo().catch((error: unknown) => {
+      if (error instanceof ApiError) return null;
+      throw error;
+    }),
   ]);
+  const publicKey = pushInfo?.publicKey ?? null;
   const next = upcoming[0];
   // A data da saudação no fuso do primeiro estabelecimento (todos no Brasil).
   const timeZone = places[0]?.timezone ?? DEFAULT_TIME_ZONE;
@@ -52,6 +63,9 @@ export default async function AppHomePage({ searchParams }: PageProps<"/app">) {
           Conta criada. Boas-vindas ao Orari!
         </AppFormMessage>
       )}
+
+      {/* Sem as chaves no servidor, os avisos estão desligados: sem convite. */}
+      {publicKey && <PushInvite publicKey={publicKey} />}
 
       <section className="space-y-2">
         <h2 className="font-semibold">Próximo agendamento</h2>

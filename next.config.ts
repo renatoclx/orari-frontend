@@ -81,6 +81,19 @@ const nextConfig: NextConfig = {
       // Os manuais em PDF (tela Ajuda) aparecem num iframe do próprio site: só
       // eles podem ser embutidos, e só pelo mesmo endereço.
       { source: "/manuais/:path*", headers: manualHeaders },
+      // Service worker do app do cliente: mora em /app-assets/ (fora do que o
+      // proxy protege), mas cuida de /app/. Sem cache, para o celular pegar a
+      // versão nova assim que ela for publicada.
+      {
+        source: "/app-assets/sw.js",
+        headers: [
+          { key: "Service-Worker-Allowed", value: "/app/" },
+          {
+            key: "Cache-Control",
+            value: "no-cache, no-store, must-revalidate",
+          },
+        ],
+      },
     ];
   },
   async rewrites() {

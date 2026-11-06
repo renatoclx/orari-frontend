@@ -63,14 +63,14 @@ Gestão das empresas da plataforma, **só para o SUPER_ADMIN**. Substitui o cada
 > Os dados vêm da API (`GET` e `PUT /companies/:id/access`, só SUPER_ADMIN). O dialog busca ao abrir ("Buscando…"; se falhar, a mensagem e "Tentar de novo"). Ao salvar, a API valida a matriz (dependências entre funcionalidades) e a recusa aparece num aviso, com o dialog aberto. Contexto: Obsidian, pasta "Planos e assinatura".
 
 - Botão com ícone na linha de cada empresa ativa, só para o SUPER_ADMIN. Abre um dialog com o nome da empresa.
-- **Matriz de funcionalidades:** uma linha por funcionalidade do menu, agrupadas (Agenda, Cadastros, Pacotes, Financeiro, Anamnese, Turmas, Empresa; em Empresa, Configurações e **Portal do cliente**), e as colunas **Visualiza**, **Edita**, **Cria** e **Exclui/Inativa**, cada uma com uma caixa de seleção.
+- **Matriz de funcionalidades:** uma linha por funcionalidade do menu, agrupadas (Agenda, Cadastros, Pacotes, Financeiro, Anamnese, Turmas, Empresa; em Empresa, Configurações, **Portal do cliente** e **Mensagens**, só com Visualiza e Edita; Mensagens exige o Portal do cliente, e a API recusa salvar sem ele), e as colunas **Visualiza**, **Edita**, **Cria** e **Exclui/Inativa**, cada uma com uma caixa de seleção.
   - Edita, Cria e Exclui/Inativa exigem Visualiza: desmarcar Visualiza desmarca e desabilita as outras da linha.
   - Coluna que não se aplica à funcionalidade fica desabilitada com "–" (ex.: Auditoria só tem Visualiza). A Ajuda não entra: é sempre visível.
   - Vale para a empresa toda (todos os administradores dela); não há permissão por usuário. Só existem os tipos ADMIN e CLIENT.
   - Funcionalidade nova nasce **desmarcada** nas empresas existentes; o SUPER_ADMIN libera.
   - "Só leitura" (downgrade ou suspensão) é Visualiza marcado e o resto desmarcado: os dados ficam.
 - **Limites** (abaixo da matriz): **Profissionais** (incluindo o administrador que atua; o básico permite o administrador + 2) e **Administradores** (usuários com acesso). Mostram o uso ("em uso: 2 de 3"). Baixar o limite abaixo do uso é permitido, com aviso: a empresa continua funcionando e só não cadastra novos.
-- Os **modelos de plano** (nomes a definir) entram como atalho que preenche matriz e limites, ainda editáveis.
+- Os **modelos de plano** (nomes a definir) entram como atalho que preenche matriz e limites, ainda editáveis. **Nenhum modelo inclui Portal do cliente e Mensagens** (desde 2026-11-06): os dois são liberados empresa por empresa, marcando as linhas à mão. A migração do backend `client_portal_off` tirou o Portal de todas as empresas que o tinham.
 - **Efeito para a empresa:** o `GET /auth/me` traz os acessos (`access.features`) e a tela os usa para esconder o que a empresa não tem (ver `layout.md`). Quem abre direto o endereço de uma tela sem acesso vê "não encontrada" (todas as telas de funcionalidade). Sem a ação, somem os botões: "Novo" (Cria), "Alterar" (Edita), Inativar, Excluir e Reativar (Exclui/Inativa), os atalhos da barra lateral e, no agendamento, Cancelar, Remanejar e Alterar (Edita). Sem Turmas liberadas, a agenda, a nova recorrência e a nova contratação não consultam turmas. Ao estourar um limite, a API recusa com a mensagem do plano (ex.: "O plano da empresa permite 3 profissionais…"), mostrada ao salvar.
 
 ---

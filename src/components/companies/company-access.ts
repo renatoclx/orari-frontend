@@ -92,6 +92,8 @@ export const ACCESS_GROUPS: { label: string; features: AccessFeature[] }[] = [
         label: "Portal do cliente",
         actions: ["view", "edit"],
       },
+      // Mensagens automáticas ao cliente do app; a API exige o Portal do cliente.
+      { key: "messages", label: "Mensagens", actions: ["view", "edit"] },
     ],
   },
 ];
@@ -163,6 +165,9 @@ export function toggleAccess(
 // Funcionalidades que cada modelo deixa de fora.
 const ANAMNESIS_KEYS = ["anamnesis", "anamnesis-templates", "anamnesis-audit"];
 const CLASS_KEYS = ["class-groups"];
+// Portal do cliente e Mensagens ficam fora de todos os modelos por enquanto: o
+// SUPER_ADMIN libera empresa por empresa (backend: migração client_portal_off).
+const PORTAL_KEYS = ["client-portal", "messages"];
 
 export type AccessTemplate = {
   key: string;
@@ -180,7 +185,10 @@ export const ACCESS_TEMPLATES: AccessTemplate[] = [
     key: "essential",
     label: "Essencial",
     matrix: matrixWith(
-      (key) => !ANAMNESIS_KEYS.includes(key) && !CLASS_KEYS.includes(key),
+      (key) =>
+        !ANAMNESIS_KEYS.includes(key) &&
+        !CLASS_KEYS.includes(key) &&
+        !PORTAL_KEYS.includes(key),
     ),
     admins: 1,
     professionals: 3,
@@ -188,13 +196,15 @@ export const ACCESS_TEMPLATES: AccessTemplate[] = [
   {
     key: "professional",
     label: "Profissional",
-    matrix: matrixWith((key) => !CLASS_KEYS.includes(key)),
+    matrix: matrixWith(
+      (key) => !CLASS_KEYS.includes(key) && !PORTAL_KEYS.includes(key),
+    ),
     admins: 1,
   },
   {
     key: "complete",
     label: "Completo",
-    matrix: matrixWith(() => true),
+    matrix: matrixWith((key) => !PORTAL_KEYS.includes(key)),
     admins: 2,
   },
 ];

@@ -9,6 +9,7 @@ import {
   CircleHelp,
   ClipboardList,
   FileHeart,
+  MessageSquareText,
   Package,
   PanelLeftClose,
   PanelLeftOpen,
@@ -168,6 +169,21 @@ const clientPortalLink: NavLink = {
   label: "Portal do cliente",
   icon: Smartphone,
   feature: "client-portal",
+};
+
+// Mensagens (screens/mensagens.md): só o ADMIN, com Mensagens no plano; logo
+// depois do Portal do cliente, de que elas dependem.
+const messagesGroup: NavGroup = {
+  label: "Mensagens",
+  icon: MessageSquareText,
+  children: [
+    {
+      href: "/mensagens/automaticas",
+      label: "Automáticas",
+      feature: "messages",
+    },
+    { href: "/mensagens/enviar", label: "Enviar", feature: "messages" },
+  ],
 };
 
 // Ajuda (screens/ajuda.md): os manuais em PDF. Por enquanto só para o ADMIN;
@@ -354,7 +370,7 @@ function SidebarNav({
         : canAccessAnamnesis
           ? [clientRecordsLink]
           : []),
-      ...(isAdmin ? [clientPortalLink, helpLink] : []),
+      ...(isAdmin ? [clientPortalLink, messagesGroup, helpLink] : []),
       ...(isSuperAdmin ? superAdminItems : []),
     ],
     access,

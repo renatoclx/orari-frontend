@@ -27,6 +27,73 @@ const isStandalone = () =>
   // Safari do iPhone antigo: a marca própria dele.
   (navigator as Navigator & { standalone?: boolean }).standalone === true;
 
+// Cada etapa da ativação tem um limite: travada, vira um erro que diz onde
+// parou (no celular não há console para descobrir). O pedido de permissão fica
+// de fora: ali quem decide o tempo é o cliente.
+const STEP_TIMEOUT_MS = 20_000;
+
+const STEP_MESSAGES = {
+  worker:
+    "O app não conseguiu preparar os avisos neste aparelho. Feche e abra o app e tente de novo.",
+  subscribe:
+    "O serviço de avisos do celular não respondeu. Tente de novo em instantes.",
+  save: "Não foi possível salvar os avisos. Tente de novo.",
+} as const;
+
+type Step = keyof typeof STEP_MESSAGES;
+
+class StepError extends Error {
+  constructor(readonly step: Step) {
+    super(STEP_MESSAGES[step]);
+  }
+}
+
+/** A etapa termina, falha (vira o erro dela) ou passa do limite. */
+function step<T>(name: Step, promise: Promise<T>): Promise<T> {
+  return new Promise((resolve, reject) => {
+    const timer = setTimeout(
+      () => reject(new StepError(name)),
+      STEP_TIMEOUT_MS,
+    );
+    promise.then(
+      (value) => {
+        clearTimeout(timer);
+        resolve(value);
+      },
+      () => {
+        clearTimeout(timer);
+        reject(new StepError(name));
+      },
+    );
+  });
+}
+
+/**
+ * Espera o service worker deste registro ficar ativo. Não usa o
+ * `navigator.serviceWorker.ready`: ele procura o registro pelo endereço em que
+ * a página abriu, e o app instalado abre em /app, fora do escopo /app/ (as
+ * telas seguintes não recarregam a página). No iPhone, o `ready` nunca
+ * terminava; esperar o próprio registro vale para qualquer navegador.
+ */
+function activeRegistration(
+  registration: ServiceWorkerRegistration,
+): Promise<ServiceWorkerRegistration> {
+  if (registration.active) return Promise.resolve(registration);
+  const worker = registration.installing ?? registration.waiting;
+  return new Promise((resolve, reject) => {
+    if (!worker) {
+      reject(new Error("Registro sem service worker."));
+      return;
+    }
+    worker.addEventListener("statechange", () => {
+      if (worker.state === "activated") resolve(registration);
+      if (worker.state === "redundant") {
+        reject(new Error("O service worker não foi instalado."));
+      }
+    });
+  });
+}
+
 async function currentSubscription(): Promise<PushSubscription | null> {
   const registration = await navigator.serviceWorker.getRegistration(SW_SCOPE);
   return registration ? registration.pushManager.getSubscription() : null;
@@ -90,19 +157,28 @@ export function usePushDevice(publicKey: string) {
         }
         return false;
       }
-      await navigator.serviceWorker.register(SW_URL, {
-        scope: SW_SCOPE,
-        updateViaCache: "none",
-      });
-      const registration = await navigator.serviceWorker.ready;
-      const subscription =
-        (await registration.pushManager.getSubscription()) ??
-        (await registration.pushManager.subscribe({
-          userVisibleOnly: true,
-          applicationServerKey: urlBase64ToUint8Array(publicKey),
-        }));
-      const result = await appPushSubscribeAction(
-        subscription.toJSON() as PushSubscriptionJson,
+      const registration = await step(
+        "worker",
+        navigator.serviceWorker
+          .register(SW_URL, { scope: SW_SCOPE, updateViaCache: "none" })
+          .then(activeRegistration),
+      );
+      const subscription = await step(
+        "subscribe",
+        registration.pushManager
+          .getSubscription()
+          .then(
+            (existing) =>
+              existing ??
+              registration.pushManager.subscribe({
+                userVisibleOnly: true,
+                applicationServerKey: urlBase64ToUint8Array(publicKey),
+              }),
+          ),
+      );
+      const result = await step(
+        "save",
+        appPushSubscribeAction(subscription.toJSON() as PushSubscriptionJson),
       );
       if (!result.ok) {
         // Sem a API gravar, o aparelho não receberia nada: desfaz aqui também.
@@ -112,8 +188,12 @@ export function usePushDevice(publicKey: string) {
       }
       setSituation("on");
       return true;
-    } catch {
-      setError("Não foi possível ativar os avisos neste aparelho.");
+    } catch (failure) {
+      setError(
+        failure instanceof StepError
+          ? failure.message
+          : "Não foi possível ativar os avisos neste aparelho.",
+      );
       return false;
     } finally {
       setBusy(false);

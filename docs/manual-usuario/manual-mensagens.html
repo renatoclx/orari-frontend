@@ -1,0 +1,155 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<title>Manual de Mensagens — Orari</title>
+<link rel="stylesheet" href="manual.css">
+<style>
+  /* Cabeçalho das páginas: o manual.css traz o do manual do administrador. */
+  @page { @top-left { content: "Orari · Manual de Mensagens"; } }
+  table.vars { width: 100%; border-collapse: collapse; font-size: 10pt; margin: 3mm 0 5mm; break-inside: avoid; }
+  table.vars th, table.vars td { text-align: left; padding: 1.8mm 2.5mm; border-bottom: 0.3mm solid var(--line); vertical-align: top; }
+  table.vars th { font-size: 8.5pt; text-transform: uppercase; letter-spacing: 0.04em; color: var(--muted); }
+  table.vars td:first-child { font-weight: 600; white-space: nowrap; }
+  code { font-family: "DejaVu Sans Mono", monospace; font-size: 9pt; }
+</style>
+</head>
+<body>
+
+<!-- ===== Capa ===== -->
+<section class="cover">
+  <img class="logo" src="assets/logo-white.svg" alt="Orari">
+  <div class="spacer"></div>
+  <div class="bar"></div>
+  <div class="kicker">Manual de Mensagens</div>
+  <h1>Lembretes e recados no celular dos seus clientes</h1>
+  <p>Guia passo a passo para o administrador: mensagens automáticas (lembretes, agendamentos, aniversário) e mensagens que você escreve e envia na hora.</p>
+  <div class="foot">As telas deste manual usam dados fictícios do “Studio Aurora”.</div>
+</section>
+
+<!-- ===== Sumário (os números de página são preenchidos pelo build) ===== -->
+<section class="toc">
+  <h2>Sumário</h2>
+  <ol id="toc"></ol>
+  <div class="intro">
+    <b>Como usar este manual.</b> Comece por “Quem recebe”: as mensagens chegam pelo app do Orari, então os clientes precisam usá-lo. Os quadros azuis trazem dicas; os amarelos, avisos importantes. Os nomes de botões e campos aparecem <span class="ui">assim</span>, como na tela. Para levar os clientes ao app, veja o <b>Manual do Portal do cliente</b>.
+  </div>
+</section>
+
+<!-- ===== 1 ===== -->
+<h1 class="chapter" data-toc="Quem recebe"><span class="num"></span>Quem recebe</h1>
+<p class="lead">As mensagens chegam como notificação, pelo app do Orari.</p>
+
+<ul>
+  <li>Recebem no celular os clientes que usam o <b>app do Orari</b> e <b>ativaram os avisos</b> no aparelho.</li>
+  <li>Toda mensagem também fica guardada no app, em <b>Menu → Avisos</b>, mesmo para quem não ativou os avisos.</li>
+  <li>O cliente escolhe o que recebe, com dois interruptores: <b>Lembretes e agendamentos</b> e <b>Novidades e promoções</b>.</li>
+  <li>O <b>portal precisa estar ligado</b>. Desligado, nenhuma mensagem sai.</li>
+</ul>
+
+<h2>Quem pode usar</h2>
+<p>O menu <span class="ui">Mensagens</span>, com <span class="ui">Automáticas</span> e <span class="ui">Enviar</span>, aparece só para o <b>administrador</b> e precisa estar liberado no seu plano, junto com o Portal do cliente.</p>
+<div class="box tip"><b class="t">Dica</b><p>Quanto mais clientes usarem o app, mais gente recebe. Envie o link de acesso aos seus clientes (Manual do Portal do cliente, capítulo 5).</p></div>
+
+<!-- ===== 2 ===== -->
+<h1 class="chapter" data-toc="Mensagens automáticas"><span class="num"></span>Mensagens automáticas</h1>
+<p class="lead">Saem sozinhas, na situação certa, uma vez só.</p>
+
+<figure><img src="images/m01-automaticas.png" alt=""><figcaption>Mensagens → Automáticas.</figcaption></figure>
+
+<table class="vars">
+  <thead><tr><th>Situação</th><th>Quando sai</th><th>Opção</th></tr></thead>
+  <tbody>
+    <tr><td>Lembrete</td><td>Antes de cada horário marcado.</td><td>30 min, 1h, 2h, 24h ou 48h antes; dá para marcar mais de um. Padrão: 24h e 30 min.</td></tr>
+    <tr><td>Agendamento marcado</td><td>Quando você marca um horário avulso para o cliente.</td><td>—</td></tr>
+    <tr><td>Agendamento alterado</td><td>Quando você muda a data ou o horário (alterar, remanejar ou repor).</td><td>—</td></tr>
+    <tr><td>Agendamento cancelado</td><td>Quando você cancela um horário, uma sessão ou uma aula de turma.</td><td>—</td></tr>
+    <tr><td>Aniversário</td><td>No dia do aniversário, às 9h, pela data de nascimento do cadastro.</td><td>—</td></tr>
+    <tr><td>Sentimos sua falta</td><td>Às 10h, para quem não volta desde o último atendimento e não tem nada marcado.</td><td>15, 30, 45, 60 ou 90 dias sem vir. Padrão: 30.</td></tr>
+  </tbody>
+</table>
+
+<ol class="steps">
+  <li>No menu, abra <span class="ui">Mensagens</span> → <span class="ui">Automáticas</span>.</li>
+  <li>Ligue as situações que quiser, no interruptor de cada uma. No lembrete, marque os tempos antes do horário.</li>
+  <li>Ajuste o texto, se quiser (até 500 caracteres). Os botões de <span class="ui">Inserir</span> colocam os dados do cliente no lugar do cursor (capítulo 3). O <b>Exemplo</b> mostra como a mensagem vai chegar.</li>
+  <li>Clique em <span class="ui">Salvar alterações</span>. A mensagem “Mensagens automáticas salvas.” confirma.</li>
+</ol>
+<div class="box tip"><b class="t">Já vêm prontas</b><p>O lembrete e as três de agendamento já vêm <b>ligadas</b>, com o texto pronto. Aniversário e “Sentimos sua falta” vêm desligadas, também com o texto pronto: é só ligar e salvar.</p></div>
+<div class="box warn"><b class="t">Bom saber</b>
+  <ul>
+    <li>As mensagens de agendamento saem quando <b>você</b> marca, muda ou cancela. O que o cliente faz pelo app não gera mensagem para ele mesmo.</li>
+    <li>O lembrete pode chegar alguns minutos depois do tempo escolhido.</li>
+    <li>Um horário marcado em cima da hora não recebe o lembrete cujo tempo já passou. Exemplo: marcado 10 minutos antes, não recebe o de 30 minutos.</li>
+  </ul>
+</div>
+
+<!-- ===== 3 ===== -->
+<h1 class="chapter" data-toc="Os dados do cliente no texto"><span class="num"></span>Os dados do cliente no texto</h1>
+<p class="lead">Cada cliente recebe a mensagem com os próprios dados.</p>
+
+<p>Escreva o campo entre chaves, ou clique no botão dele em <span class="ui">Inserir</span>. Na hora de enviar, o Orari troca o campo pelo dado do cliente.</p>
+<table class="vars">
+  <thead><tr><th>Campo</th><th>Vira</th><th>Onde vale</th></tr></thead>
+  <tbody>
+    <tr><td><code>{nome}</code></td><td>O primeiro nome do cliente</td><td>Todas</td></tr>
+    <tr><td><code>{estabelecimento}</code></td><td>O nome do seu estabelecimento</td><td>Todas</td></tr>
+    <tr><td><code>{data}</code></td><td>A data do horário (12/11)</td><td>Lembrete e agendamentos</td></tr>
+    <tr><td><code>{hora}</code></td><td>O horário (09:00)</td><td>Lembrete e agendamentos</td></tr>
+    <tr><td><code>{servico}</code></td><td>O serviço (Pilates)</td><td>Lembrete e agendamentos</td></tr>
+    <tr><td><code>{profissional}</code></td><td>Quem atende (Camila)</td><td>Lembrete e agendamentos</td></tr>
+  </tbody>
+</table>
+<div class="box tip"><b class="t">Exemplo</b>
+  <p>O texto “Olá {nome}! Lembrete: {servico} com {profissional} em {data} às {hora}.” chega assim:</p>
+  <p>“Olá Ana! Lembrete: Pilates com Camila em 12/11 às 09:00.”</p>
+</div>
+<p>Se um campo não vale para a mensagem, o Orari avisa e não salva. Exemplo: “{data} não existe nesta mensagem.” no aniversário, que não tem horário marcado.</p>
+
+<!-- ===== 4 ===== -->
+<h1 class="chapter" data-toc="Enviar uma mensagem a todos"><span class="num"></span>Enviar uma mensagem a todos</h1>
+<p class="lead">Promoções, feriados, horários especiais.</p>
+
+<p>Em <span class="ui">Mensagens</span> → <span class="ui">Enviar</span>, você escreve uma mensagem livre que vai, na hora, para <b>todos os clientes que usam o app</b>. A tela mostra quantos vão receber.</p>
+<ol class="steps">
+  <li>Escreva o <b>Título</b> (até 100 caracteres). Ele aparece em destaque na notificação.</li>
+  <li>Escreva a <b>Mensagem</b> (até 500 caracteres). Aqui valem só <code>{nome}</code> e <code>{estabelecimento}</code>.</li>
+  <li>Confira o <b>Exemplo</b>.</li>
+  <li>Clique em <span class="ui">Enviar</span> e confirme em <span class="ui">Enviar</span>.</li>
+</ol>
+<div class="row">
+  <figure><img src="images/m02-enviar.png" alt=""><figcaption>A mensagem escrita, com o exemplo.</figcaption></figure>
+  <figure><img src="images/m03-enviar-confirmar.png" alt=""><figcaption>A confirmação, com quantos vão receber.</figcaption></figure>
+</div>
+<div class="box warn"><b class="t">Atenção</b>
+  <ul>
+    <li>A mensagem sai na hora e <b>não pode ser desfeita</b>.</li>
+    <li>Dá para enviar <b>uma mensagem por dia</b>. Assim os clientes não deixam de ler os avisos por excesso.</li>
+    <li>Quem desligou <b>Novidades e promoções</b> no app não recebe.</li>
+  </ul>
+</div>
+<p>Embaixo, em <b>Enviadas</b>, ficam as 20 mensagens mais recentes, com a data, quem enviou, o texto e quantos clientes receberam.</p>
+
+<!-- ===== 5 ===== -->
+<h1 class="chapter" data-toc="Dúvidas comuns"><span class="num"></span>Dúvidas comuns</h1>
+<p class="lead">Respostas rápidas para as situações mais frequentes.</p>
+
+<h3>Não vejo o menu Mensagens.</h3>
+<p>O menu é só do administrador e precisa estar liberado no plano, junto com o Portal do cliente. Fale com o suporte do Orari.</p>
+<h3>Um cliente diz que não recebeu o lembrete.</h3>
+<ul>
+  <li>Ele usa o app do Orari e <b>ativou os avisos</b> em Menu → Avisos?</li>
+  <li>O interruptor <b>Lembretes e agendamentos</b> está ligado no app dele?</li>
+  <li>O celular dele está com <b>Não Perturbe</b> ou outro Foco ligado?</li>
+  <li>O <b>Lembrete</b> está ligado em Mensagens → Automáticas, com o tempo escolhido?</li>
+  <li>O <b>portal</b> está ligado?</li>
+</ul>
+<h3>Aparece “Hoje já foi enviada uma mensagem”.</h3>
+<p>O limite é de uma mensagem por dia. A próxima pode ser enviada amanhã.</p>
+<h3>A tela diz que nenhum cliente usa o app.</h3>
+<p>Ainda não há para quem enviar. Convide os clientes com o link de acesso.</p>
+<h3>As mensagens saem pelo WhatsApp?</h3>
+<p>Por enquanto, não: elas chegam pelo app do Orari. O envio pelo WhatsApp está nos planos.</p>
+
+</body>
+</html>

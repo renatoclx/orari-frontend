@@ -20,4 +20,17 @@ com capturas de tela de uma clínica fictícia ("Clínica Bem-Estar").
    os outros com o mesmo nome) e faça o commit. A lista da tela fica em
    `src/components/help/manuals.ts`.
 
+8. Manuais do Portal do cliente, do app do cliente e de Mensagens
+   (`manual-portal.pdf`, `manual-app.pdf`, `manual-mensagens.pdf`), no "Studio Aurora":
+   - ligue "Aparecer na busca" do Aurora (com um segmento) só durante as capturas;
+   - `node scripts/cap-9-app.mjs conta`: **grava** a conta da cliente fictícia
+     "Ana Demo" (`AURORA_APP`, telefone de teste 31990009999), a entrada no Aurora
+     e um agendamento; ponha avisos de exemplo na caixa dela (`client_messages`) e
+     rode `node scripts/cap-9-app.mjs avisos`;
+   - `node scripts/cap-10-portal-mensagens.mjs`: telas da clínica (gera um link de
+     acesso da Ana; a mensagem de Enviar não é enviada);
+   - depois, **apague tudo o que é da Ana** (conta, sessões, avisos, o cadastro no
+     Aurora com contato, link e agendamento) e volte a busca do Aurora como estava;
+   - PDFs: `node build.mjs manual-portal`, `manual-app` e `manual-mensagens`.
+
 O sumário é numerado pelo `build.mjs` em duas passadas. Textos: `manual.html`.

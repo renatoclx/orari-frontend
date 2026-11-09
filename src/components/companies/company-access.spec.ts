@@ -119,9 +119,10 @@ describe("modelos de plano", () => {
     }
   });
 
-  it("nenhum modelo inclui a Carteira de clientes (nasce desmarcada)", () => {
+  it("todos os modelos incluem os relatórios (Visualiza)", () => {
     for (const key of ["essential", "professional", "complete"]) {
-      expect(template(key).matrix["client-portfolio"].view).toBe(false);
+      expect(template(key).matrix["client-portfolio"].view).toBe(true);
+      expect(template(key).matrix["receivables"].view).toBe(true);
     }
   });
 

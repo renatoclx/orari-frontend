@@ -198,6 +198,11 @@ const reportsGroup: NavGroup = {
       label: "Carteira de clientes",
       feature: "client-portfolio",
     },
+    {
+      href: "/relatorios/contas-a-receber",
+      label: "Contas a receber",
+      feature: "receivables",
+    },
   ],
 };
 

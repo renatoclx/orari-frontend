@@ -24,9 +24,17 @@
   --destructive: #b91c1c;
   /* Informação positiva (ex.: status ativo). */
   --success: #166534;
-  /* Gráficos: o neutro (pendente, novo), mais claro que o texto secundário
-     para se distinguir do verde (validado para daltonismo e contraste). */
-  --chart-neutral: #8a8a93;
+  /* Gráficos (validados para daltonismo e contraste com o script da skill
+     dataviz). Positivo, informativo (a vencer, pendente, novo) e negativo; o
+     índigo não é o azul das ações. Atraso: escala de um tom, do laranja ao
+     vinho, mais escura quanto mais antigo. */
+  --chart-positive: #166534;
+  --chart-info: #4f46e5;
+  --chart-negative: #b91c1c;
+  --chart-aging-1: #f97316;
+  --chart-aging-2: #dc2626;
+  --chart-aging-3: #b91c1c;
+  --chart-aging-4: #7f1d1d;
   --border: #e4e4e7;
   --input: #e4e4e7;
   /* Contorno de foco (navegação por teclado). */
@@ -65,7 +73,15 @@
   --input: rgb(255 255 255 / 0.15);
   --success: #4ade80;
   --destructive: #f87171;
-  --chart-neutral: #71717a;
+  /* Tons próprios do escuro: os de success/destructive saem da faixa de
+     luminosidade dos gráficos. A escala do atraso escurece no mesmo sentido. */
+  --chart-positive: #16a34a;
+  --chart-info: #6366f1;
+  --chart-negative: #ef4444;
+  --chart-aging-1: #fca472;
+  --chart-aging-2: #f6713e;
+  --chart-aging-3: #e8433a;
+  --chart-aging-4: #b91c1c;
 
   /* Um tom abaixo do fundo, para a sidebar continuar se destacando. */
   --sidebar: #09090b;
@@ -90,7 +106,13 @@
   --color-accent-foreground: var(--accent-foreground);
   --color-destructive: var(--destructive);
   --color-success: var(--success);
-  --color-chart-neutral: var(--chart-neutral);
+  --color-chart-positive: var(--chart-positive);
+  --color-chart-info: var(--chart-info);
+  --color-chart-negative: var(--chart-negative);
+  --color-chart-aging-1: var(--chart-aging-1);
+  --color-chart-aging-2: var(--chart-aging-2);
+  --color-chart-aging-3: var(--chart-aging-3);
+  --color-chart-aging-4: var(--chart-aging-4);
   --color-border: var(--border);
   --color-input: var(--input);
   --color-ring: var(--ring);
@@ -210,4 +232,14 @@
     var(--border) 0 1px,
     transparent 1px 8px
   );
+}
+
+/* Impressão dos relatórios: papel branco e as cores de fundo impressas (barras
+   do atraso, faixas dos cartões); sem isso o navegador as descarta. */
+@media print {
+  body {
+    background: #ffffff;
+    print-color-adjust: exact;
+    -webkit-print-color-adjust: exact;
+  }
 }

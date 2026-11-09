@@ -105,6 +105,12 @@ export const ACCESS_GROUPS: { label: string; features: AccessFeature[] }[] = [
         label: "Carteira de clientes",
         actions: ["view"],
       },
+      // Só leitura; a API exige ver Pagamentos e Clientes.
+      {
+        key: "receivables",
+        label: "Contas a receber",
+        actions: ["view"],
+      },
     ],
   },
 ];
@@ -179,8 +185,6 @@ const CLASS_KEYS = ["class-groups"];
 // Portal do cliente e Mensagens ficam fora de todos os modelos por enquanto: o
 // SUPER_ADMIN libera empresa por empresa (backend: migração client_portal_off).
 const PORTAL_KEYS = ["client-portal", "messages"];
-// Relatórios nascem desmarcados nos modelos; mais tarde entram em todos.
-const REPORT_KEYS = ["client-portfolio"];
 
 export type AccessTemplate = {
   key: string;
@@ -201,8 +205,7 @@ export const ACCESS_TEMPLATES: AccessTemplate[] = [
       (key) =>
         !ANAMNESIS_KEYS.includes(key) &&
         !CLASS_KEYS.includes(key) &&
-        !PORTAL_KEYS.includes(key) &&
-        !REPORT_KEYS.includes(key),
+        !PORTAL_KEYS.includes(key),
     ),
     admins: 1,
     professionals: 3,
@@ -211,19 +214,14 @@ export const ACCESS_TEMPLATES: AccessTemplate[] = [
     key: "professional",
     label: "Profissional",
     matrix: matrixWith(
-      (key) =>
-        !CLASS_KEYS.includes(key) &&
-        !PORTAL_KEYS.includes(key) &&
-        !REPORT_KEYS.includes(key),
+      (key) => !CLASS_KEYS.includes(key) && !PORTAL_KEYS.includes(key),
     ),
     admins: 1,
   },
   {
     key: "complete",
     label: "Completo",
-    matrix: matrixWith(
-      (key) => !PORTAL_KEYS.includes(key) && !REPORT_KEYS.includes(key),
-    ),
+    matrix: matrixWith((key) => !PORTAL_KEYS.includes(key)),
     admins: 2,
   },
 ];

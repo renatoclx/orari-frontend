@@ -62,7 +62,7 @@ Calculada em relação ao profissional (não à empresa toda):
   clicar no ativo desfaz.
 - Gráficos, abaixo dos cartões (lado a lado no computador, um embaixo do outro
   no celular), com Recharts pelo componente `chart` do shadcn e cores pelos
-  tokens (`success`, `destructive`, `chart-neutral`), validadas para
+  tokens de gráfico (`chart-positive`, `chart-info`, `chart-negative`), validadas para
   daltonismo e contraste:
   - **Situação dos clientes**: barra segmentada (não rosca) com Novos, Ativos e
     Sem retorno; a legenda traz número e porcentagem e filtra a lista.
@@ -85,6 +85,12 @@ Calculada em relação ao profissional (não à empresa toda):
 - Ordem padrão: último atendimento, mais antigo primeiro (quem precisa de
   contato aparece em cima).
 - Paginação como nas demais listas.
+- **Imprimir** (cabeçalho, só no computador): abre numa aba nova a versão de
+  impressão (`.../imprimir`, mesmos filtros), fora da moldura do sistema, em
+  tema claro e na largura de uma folha A4: cabeçalho com empresa, filtros e
+  data de geração, cartões, gráficos (sem animação) e a **lista inteira** numa
+  tabela simples, a partir da segunda folha. A impressão do navegador abre
+  sozinha; na tela ficam Imprimir e Fechar.
 
 ## Fora desta etapa
 

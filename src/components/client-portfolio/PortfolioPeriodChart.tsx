@@ -15,8 +15,8 @@ import { formatPrice } from "@/utils/format";
 // Cores pelos tokens (trocam sozinhas no tema escuro); validadas para
 // daltonismo e contraste com o script da skill de gráficos.
 const config = {
-  received: { label: "Recebido", color: "var(--success)" },
-  pending: { label: "Pendente", color: "var(--chart-neutral)" },
+  received: { label: "Recebido", color: "var(--chart-positive)" },
+  pending: { label: "Pendente", color: "var(--chart-info)" },
 } satisfies ChartConfig;
 
 // "05/11" a partir de "2026-11-05".
@@ -85,8 +85,11 @@ function TooltipBody({
  */
 export function PortfolioPeriodChart({
   series,
+  print = false,
 }: {
   series: PortfolioSummary["series"];
+  /** Versão de impressão: sem animação (a folha sai com as barras inteiras). */
+  print?: boolean;
 }) {
   const rows: Row[] = series.points.map((point: PortfolioSeriesPoint) => ({
     date: point.date,
@@ -107,8 +110,11 @@ export function PortfolioPeriodChart({
         </h2>
         <p className="text-sm text-muted-foreground">
           Atendimentos concluídos, por{" "}
-          {series.unit === "week" ? "semana" : "dia"}. Toque ou passe o mouse
-          nas barras para ver os valores.
+          {series.unit === "week" ? "semana" : "dia"}.
+          <span className="print:hidden">
+            {" "}
+            Toque ou passe o mouse nas barras para ver os valores.
+          </span>
         </p>
       </div>
 
@@ -152,6 +158,7 @@ export function PortfolioPeriodChart({
               stroke="var(--card)"
               strokeWidth={1}
               maxBarSize={32}
+              isAnimationActive={!print}
             />
             <Bar
               dataKey="pending"
@@ -161,6 +168,7 @@ export function PortfolioPeriodChart({
               strokeWidth={1}
               radius={[4, 4, 0, 0]}
               maxBarSize={32}
+              isAnimationActive={!print}
             />
           </BarChart>
         </ChartContainer>

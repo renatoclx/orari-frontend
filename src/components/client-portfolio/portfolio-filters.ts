@@ -1,5 +1,6 @@
 // Filtros da Carteira de clientes (na URL), comuns ao servidor e ao navegador.
 import type { PortfolioStatus } from "@/types/client-portfolio";
+import { isDateString } from "@/utils/time";
 
 export const PORTFOLIO_PATH = "/relatorios/carteira-clientes";
 
@@ -34,6 +35,40 @@ export type PortfolioFiltersState = {
   status: string;
   search: string;
 };
+
+type SearchParams = Record<string, string | string[] | undefined>;
+const text = (value: string | string[] | undefined) =>
+  typeof value === "string" ? value : "";
+
+/**
+ * Filtros a partir da URL (?profissional=, ?de=, ?ate=, ?situacao=, ?q=), da
+ * tela e da versão impressa. Valor inválido é ignorado: sem profissional
+ * válido, o primeiro da lista; o período só vale com as duas datas em ordem.
+ */
+export function readPortfolioFilters(
+  searchParams: SearchParams,
+  professionalIds: string[],
+) {
+  const from = text(searchParams.de);
+  const to = text(searchParams.ate);
+  const validPeriod = isDateString(from) && isDateString(to) && from <= to;
+  const statusFilter =
+    PORTFOLIO_STATUS_FILTERS.find(
+      (item) => item.id === searchParams.situacao,
+    ) ??
+    PORTFOLIO_STATUS_FILTERS.find((item) => item.id === DEFAULT_STATUS_FILTER)!;
+  const chosen = text(searchParams.profissional);
+  const filters: PortfolioFiltersState = {
+    professional: professionalIds.includes(chosen)
+      ? chosen
+      : (professionalIds[0] ?? ""),
+    from: validPeriod ? from : "",
+    to: validPeriod ? to : "",
+    status: statusFilter.id,
+    search: text(searchParams.q),
+  };
+  return { filters, statusFilter };
+}
 
 /** Primeiro e último dia do mês de `today` ("aaaa-mm-dd"). */
 export function monthOf(today: string): { from: string; to: string } {
@@ -77,7 +112,7 @@ export function portfolioQuery(
  * fim (ou o contrário), a outra acompanha. Data apagada volta ao mês atual.
  */
 export function changeDate(
-  filters: PortfolioFiltersState,
+  filters: Pick<PortfolioFiltersState, "from" | "to">,
   month: { from: string; to: string },
   field: "from" | "to",
   value: string,

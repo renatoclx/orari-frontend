@@ -4,13 +4,13 @@ import { PortfolioStatusChart } from "@/components/client-portfolio/PortfolioSta
 import {
   DEFAULT_STATUS_FILTER,
   PORTFOLIO_PATH,
-  PORTFOLIO_STATUS_FILTERS,
   monthOf,
   portfolioQuery,
-  type PortfolioFiltersState,
+  readPortfolioFilters,
 } from "@/components/client-portfolio/portfolio-filters";
 import { PortfolioSummaryCards } from "@/components/client-portfolio/PortfolioSummaryCards";
 import { PortfolioToolbar } from "@/components/client-portfolio/PortfolioToolbar";
+import { PrintButton } from "@/components/shared/PrintButton";
 import { TablePagination } from "@/components/shared/TablePagination";
 import { getCurrentUser } from "@/services/auth.service";
 import {
@@ -18,7 +18,7 @@ import {
   listPortfolioClients,
 } from "@/services/client-portfolio.service";
 import { listPeople } from "@/services/people.service";
-import { isDateString, toDateString } from "@/utils/time";
+import { toDateString } from "@/utils/time";
 
 const PAGE_SIZE = 10;
 // Máximo da API por página: os profissionais cabem numa só.
@@ -28,9 +28,6 @@ type ClientPortfolioPageProps = {
   /** ?profissional=, ?de=, ?ate=, ?situacao=, ?q= e ?page=. */
   searchParams: Record<string, string | string[] | undefined>;
 };
-
-const text = (value: string | string[] | undefined) =>
-  typeof value === "string" ? value : "";
 
 /**
  * Carteira de clientes (screens/carteira-clientes.md): renderizada no
@@ -71,26 +68,11 @@ export async function ClientPortfolioPage({
     );
   }
 
-  // Período só vale com as duas datas; fim antes do início é ignorado.
-  const from = text(searchParams.de);
-  const to = text(searchParams.ate);
-  const validPeriod = isDateString(from) && isDateString(to) && from <= to;
-  const statusFilter =
-    PORTFOLIO_STATUS_FILTERS.find(
-      (item) => item.id === searchParams.situacao,
-    ) ??
-    PORTFOLIO_STATUS_FILTERS.find((item) => item.id === DEFAULT_STATUS_FILTER)!;
-  const chosen = text(searchParams.profissional);
-  const filters: PortfolioFiltersState = {
-    // Sem escolha (ou inválida), o primeiro profissional da lista.
-    professional: options.some((option) => option.id === chosen)
-      ? chosen
-      : options[0].id,
-    from: validPeriod ? from : "",
-    to: validPeriod ? to : "",
-    status: statusFilter.id,
-    search: text(searchParams.q),
-  };
+  const { filters, statusFilter } = readPortfolioFilters(
+    searchParams,
+    options.map((option) => option.id),
+  );
+  const query = portfolioQuery(filters, month).toString();
   const page = Math.max(1, Number(searchParams.page) || 1);
   const period = {
     professionalId: filters.professional,
@@ -111,7 +93,11 @@ export async function ClientPortfolioPage({
 
   return (
     <div className="-m-1 flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto p-1">
-      {header}
+      <div className="flex flex-wrap items-start justify-between gap-3">
+        {header}
+        {/* A impressão leva os mesmos filtros e a lista inteira. */}
+        <PrintButton href={`${PORTFOLIO_PATH}/imprimir?${query}`} />
+      </div>
       <PortfolioToolbar
         filters={filters}
         month={month}
@@ -145,7 +131,7 @@ export async function ClientPortfolioPage({
               limit={PAGE_SIZE}
               total={result.total}
               basePath={PORTFOLIO_PATH}
-              query={Object.fromEntries(portfolioQuery(filters, month))}
+              query={Object.fromEntries(new URLSearchParams(query))}
             />
           }
         />

@@ -31,19 +31,19 @@ export function PortfolioStatusChart({
       key: "novos",
       label: "Novos",
       count: summary.newClients,
-      className: "bg-chart-neutral",
+      className: "bg-chart-info",
     },
     {
       key: "ativos",
       label: "Ativos",
       count: active,
-      className: "bg-success",
+      className: "bg-chart-positive",
     },
     {
       key: "sem-retorno",
       label: "Sem retorno",
       count: summary.lapsedClients,
-      className: "bg-destructive",
+      className: "bg-chart-negative",
     },
   ];
   const percent = (count: number) =>

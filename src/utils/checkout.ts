@@ -1,4 +1,4 @@
-import type { CheckoutItem } from "@/types/payment";
+import type { CheckoutAppointment, CheckoutItem } from "@/types/payment";
 
 /**
  * Situação de uma comanda na listagem:
@@ -35,10 +35,31 @@ export function checkoutState(checkout: CheckoutItem): CheckoutState {
   if (awaiting) return "awaiting";
 
   const hasPaid =
-    appointments.some((appointment) => appointment.payment?.status === "PAID") ||
-    previousPayments.some((payment) => payment.status === "PAID");
+    appointments.some(
+      (appointment) => appointment.payment?.status === "PAID",
+    ) || previousPayments.some((payment) => payment.status === "PAID");
   if (hasPaid) return "paid";
 
   // Sobrou só sessão de pacote.
   return "package";
+}
+
+/**
+ * Atendimento que dá para receber antes da conclusão: avulso ainda sem
+ * pagamento e com preço no serviço (é o valor cobrado). A API confere de novo.
+ */
+export function receivableAhead(appointment: CheckoutAppointment): boolean {
+  return (
+    appointment.payment === null &&
+    appointment.clientPlanId === null &&
+    appointment.service.price !== null
+  );
+}
+
+/** A comanda tem o que receber: pendência ou atendimento a receber antes. */
+export function canReceive(checkout: CheckoutItem): boolean {
+  return (
+    checkoutState(checkout) === "open" ||
+    checkout.appointments.some(receivableAhead)
+  );
 }

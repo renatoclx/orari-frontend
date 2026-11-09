@@ -96,6 +96,23 @@ export const ACCESS_GROUPS: { label: string; features: AccessFeature[] }[] = [
       { key: "messages", label: "Mensagens", actions: ["view", "edit"] },
     ],
   },
+  {
+    label: "Relatórios",
+    features: [
+      // Só leitura; a API exige ver Clientes e Profissionais.
+      {
+        key: "client-portfolio",
+        label: "Carteira de clientes",
+        actions: ["view"],
+      },
+      // Só leitura; a API exige ver Pagamentos e Clientes.
+      {
+        key: "receivables",
+        label: "Contas a receber",
+        actions: ["view"],
+      },
+    ],
+  },
 ];
 
 const FEATURES = ACCESS_GROUPS.flatMap((group) => group.features);

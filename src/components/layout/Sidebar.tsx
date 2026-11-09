@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import {
   Building2,
   CalendarDays,
+  ChartColumn,
   ChevronDown,
   CircleHelp,
   ClipboardList,
@@ -183,6 +184,25 @@ const messagesGroup: NavGroup = {
       feature: "messages",
     },
     { href: "/mensagens/enviar", label: "Enviar", feature: "messages" },
+  ],
+};
+
+// Relatórios (screens/carteira-clientes.md): só o ADMIN; o grupo recebe os
+// próximos relatórios. Fica depois do Financeiro.
+const reportsGroup: NavGroup = {
+  label: "Relatórios",
+  icon: ChartColumn,
+  children: [
+    {
+      href: "/relatorios/carteira-clientes",
+      label: "Carteira de clientes",
+      feature: "client-portfolio",
+    },
+    {
+      href: "/relatorios/contas-a-receber",
+      label: "Contas a receber",
+      feature: "receivables",
+    },
   ],
 };
 
@@ -365,6 +385,7 @@ function SidebarNav({
       ...navItems.slice(0, services + 1),
       ...(isAdmin ? [classGroupsLink] : []),
       ...navItems.slice(services + 1),
+      ...(isAdmin ? [reportsGroup] : []),
       ...(isAdmin
         ? [anamnesisGroup]
         : canAccessAnamnesis

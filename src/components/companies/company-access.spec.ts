@@ -119,6 +119,13 @@ describe("modelos de plano", () => {
     }
   });
 
+  it("todos os modelos incluem os relatórios (Visualiza)", () => {
+    for (const key of ["essential", "professional", "complete"]) {
+      expect(template(key).matrix["client-portfolio"].view).toBe(true);
+      expect(template(key).matrix["receivables"].view).toBe(true);
+    }
+  });
+
   it("aplicar o Essencial define 3 profissionais e 1 administrador; os outros mantêm os profissionais", () => {
     const current = {
       matrix: emptyMatrix(),

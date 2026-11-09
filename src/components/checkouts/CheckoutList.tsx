@@ -9,7 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import type { CheckoutItem } from "@/types/payment";
 import type { PaymentMethodItem } from "@/types/payment-method";
-import { checkoutState } from "@/utils/checkout";
+import { canReceive, checkoutState } from "@/utils/checkout";
 import { formatPrice } from "@/utils/format";
 
 type CheckoutListProps = {
@@ -40,7 +40,7 @@ function CheckoutBadge({ checkout }: { checkout: CheckoutItem }) {
   }
 }
 
-// Receber só na comanda aberta; nas demais, Ver (só leitura).
+// Receber quando há o que receber (também antes da conclusão); senão, Ver.
 function OpenButton({
   checkout,
   onOpen,
@@ -48,7 +48,7 @@ function OpenButton({
   checkout: CheckoutItem;
   onOpen: (checkout: CheckoutItem) => void;
 }) {
-  if (checkoutState(checkout) === "open") {
+  if (canReceive(checkout)) {
     return (
       <Button size="sm" onClick={() => onOpen(checkout)}>
         <HandCoins aria-hidden="true" />

@@ -50,7 +50,8 @@ export type CheckoutAppointment = {
   id: string;
   startAt: string;
   status: AppointmentStatus;
-  service: { id: string; name: string };
+  /** price: valor de quem recebe antes da conclusão (em reais, texto); null sem preço. */
+  service: { id: string; name: string; price: string | null };
   professional: { id: string; name: string };
   /** Preenchido quando o atendimento é uma sessão de recorrência (ou de pacote). */
   recurringAppointmentId: string | null;

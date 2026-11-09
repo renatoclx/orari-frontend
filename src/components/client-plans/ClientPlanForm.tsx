@@ -471,10 +471,10 @@ export function ClientPlanForm({
 
         <section className="space-y-4">
           <div>
-            <h2 className="font-semibold">Agenda dos serviços</h2>
+            <h2 className="font-semibold">Agendamento dos serviços</h2>
             <p className="text-sm text-muted-foreground">
-              Para cada serviço, o profissional e os dias da semana. Só aparecem
-              horários livres em todas as datas do período.
+              Agende os dias e horários. Para agendamento em uma turma, os dias
+              e horários serão limitados de acordo com o cadastro da turma.
             </p>
           </div>
           {plan ? (

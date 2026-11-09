@@ -25,14 +25,7 @@ import { StatusBadge } from "@/components/shared/StatusBadge";
 import { ConfirmDialog } from "@/components/shared/ConfirmDialog";
 import { Hint } from "@/components/shared/Hint";
 import { Button } from "@/components/ui/button";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogFooter } from "@/components/ui/dialog";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -43,6 +36,7 @@ import type { PersonListItem } from "@/types/people";
 import { formatCpf, formatDateOnly, formatPhone } from "@/utils/format";
 import { useCan } from "@/components/layout/Access";
 import { PortalAccessDialog } from "@/components/portal-access/PortalAccessDialog";
+import { PersonDetails } from "@/components/people/PersonDetails";
 
 type PersonListProps = {
   kind: PeopleKind;
@@ -423,59 +417,5 @@ function PersonActions({
         </DropdownMenu>
       )}
     </div>
-  );
-}
-
-// Conteúdo do dialog de visualização.
-function PersonDetails({
-  person,
-  kind,
-}: {
-  person: PersonListItem;
-  kind: PeopleKind;
-}) {
-  const rows: [string, React.ReactNode][] = [
-    ["Celular", formatContact(person)],
-    ["E-mail", person.principalContact?.email],
-    ["CPF", person.document && formatCpf(person.document)],
-    [
-      "Data de nascimento",
-      person.birthDate && formatDateOnly(person.birthDate),
-    ],
-    ["Profissão", person.profession],
-    ["Observações", person.note],
-  ];
-
-  return (
-    <>
-      <DialogHeader>
-        <div className="flex flex-1 justify-center">
-          <PersonAvatar
-            name={person.name}
-            photoUrl={person.photoUrl}
-            className="size-20 **:data-[slot=avatar-fallback]:text-3xl"
-          />
-        </div>
-        <DialogTitle className="flex items-center gap-3">
-          {person.name}
-        </DialogTitle>
-        <DialogDescription>Dados do {kind.singular}.</DialogDescription>
-      </DialogHeader>
-
-      <dl className="grid grid-cols-[auto_1fr] gap-x-4 gap-y-2 text-sm">
-        {rows.map(([label, value]) => (
-          <div key={label} className="contents">
-            <dt className="text-muted-foreground">{label}</dt>
-            <dd className="tabular-nums">
-              <EmptyValue>{value}</EmptyValue>
-            </dd>
-          </div>
-        ))}
-        <dt className="text-muted-foreground">Status</dt>
-        <dd>
-          <StatusBadge active={person.deletedAt === null} />
-        </dd>
-      </dl>
-    </>
   );
 }

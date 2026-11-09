@@ -12,12 +12,20 @@ import {
   type ActionFailure as BaseActionFailure,
 } from "@/lib/action-result";
 import { formText } from "@/lib/form-data";
-import { createAddress, deleteAddress } from "@/services/address.service";
+import { isUuid } from "@/lib/uuid";
+import type { PersistedAddress } from "@/components/people/AddressesField";
+import {
+  createAddress,
+  deleteAddress,
+  listAddresses,
+} from "@/services/address.service";
 import {
   createContact,
   deleteContact,
+  listContacts,
   updateContact,
 } from "@/services/contact.service";
+import { getCity, listStates } from "@/services/location.service";
 import {
   createPerson,
   deletePerson,
@@ -28,6 +36,7 @@ import {
 } from "@/services/people.service";
 import type {
   AddressType,
+  ContactRecord,
   ContactType,
   NewAddressInput,
   NewContactInput,
@@ -421,4 +430,53 @@ export async function deleteAddressAction(
 
   revalidatePerson(type, personId);
   return { ok: true };
+}
+
+/**
+ * Contatos e endereços de uma pessoa, para o Visualizar do histórico do
+ * cliente (screens/pessoas.md). A API devolve só o código da cidade: o nome e
+ * a UF são resolvidos aqui, como na tela de alteração.
+ */
+export async function getPersonContactsAction(id: string): Promise<
+  | {
+      ok: true;
+      contacts: ContactRecord[];
+      addresses: PersistedAddress[];
+    }
+  | BaseActionFailure
+> {
+  if (!isUuid(id)) return { ok: false, message: "Pessoa inválida." };
+  try {
+    const [contacts, addresses, states] = await Promise.all([
+      listContacts(id),
+      listAddresses(id),
+      listStates(),
+    ]);
+    const cityIds = [...new Set(addresses.map((address) => address.cityId))];
+    const cities = new Map(
+      await Promise.all(
+        cityIds.map(async (cityId) => [cityId, await getCity(cityId)] as const),
+      ),
+    );
+    const acronyms = new Map(states.map((state) => [state.id, state.acronym]));
+    return {
+      ok: true,
+      // O principal primeiro.
+      contacts: [...contacts].sort(
+        (a, b) => Number(b.isPrincipal) - Number(a.isPrincipal),
+      ),
+      addresses: addresses
+        .map((address) => {
+          const city = cities.get(address.cityId);
+          return {
+            ...address,
+            cityName: city?.name ?? "",
+            stateAcronym: (city && acronyms.get(city.stateId)) ?? "",
+          };
+        })
+        .sort((a, b) => Number(b.isPrincipal) - Number(a.isPrincipal)),
+    };
+  } catch (error) {
+    return failureFrom(error);
+  }
 }

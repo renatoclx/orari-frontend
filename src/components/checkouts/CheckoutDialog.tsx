@@ -20,6 +20,7 @@ import {
 } from "@/components/ui/dialog";
 import type { CheckoutAppointment, CheckoutItem } from "@/types/payment";
 import type { PaymentMethodItem } from "@/types/payment-method";
+import { receivableAhead } from "@/utils/checkout";
 import { formatDateOnly, formatPrice } from "@/utils/format";
 import { toDateString, toTimeString } from "@/utils/time";
 
@@ -123,10 +124,14 @@ function CheckoutForm({
   const visitPending = checkout.appointments.flatMap((appointment) =>
     appointment.payment?.status === "PENDING" ? [appointment.payment] : [],
   );
+  // Avulsos ainda não concluídos que já podem ser recebidos (preço do serviço).
+  const ahead = checkout.appointments.filter(receivableAhead);
   // Comanda paga: nada a receber, o dialog é só consulta.
-  const readOnly = visitPending.length + previousPending.length === 0;
+  const readOnly =
+    visitPending.length + previousPending.length + ahead.length === 0;
 
-  // Os da visita começam marcados; as pendências anteriores, não (o atendente decide).
+  // Os da visita começam marcados; as pendências anteriores e o receber antes
+  // da conclusão, não (o atendente decide).
   const [selected, setSelected] = useState<Set<string>>(
     () => new Set(visitPending.map((payment) => payment.id)),
   );
@@ -140,8 +145,16 @@ function CheckoutForm({
   const chosen = [...visitPending, ...previousPending].filter((payment) =>
     selected.has(payment.id),
   );
+  const chosenAhead = ahead.filter((appointment) =>
+    selected.has(appointment.id),
+  );
   const total =
-    chosen.reduce((sum, payment) => sum + cents(payment.amount), 0) / 100;
+    (chosen.reduce((sum, payment) => sum + cents(payment.amount), 0) +
+      chosenAhead.reduce(
+        (sum, appointment) => sum + cents(appointment.service.price!),
+        0,
+      )) /
+    100;
 
   function toggle(id: string, checked: boolean) {
     setSelected((current) => {
@@ -162,6 +175,7 @@ function CheckoutForm({
     startTransition(async () => {
       const result = await settlePaymentsAction({
         paymentIds: chosen.map((payment) => payment.id),
+        appointmentIds: chosenAhead.map((appointment) => appointment.id),
         paymentMethodId: methodId,
         paidDate: paidDate || undefined,
       });
@@ -216,13 +230,19 @@ function CheckoutForm({
               : appointment.recurringAppointmentId
                 ? Repeat
                 : null;
+            const when = `${appointment.service.name} às ${toTimeString(appointment.startAt, timeZone)}`;
+            const canAhead = receivableAhead(appointment);
+            // Avulso sem preço: o valor só nasce na conclusão (lançado depois).
+            const noPrice =
+              !payment &&
+              !appointment.clientPlanId &&
+              appointment.service.price === null;
             return (
               <li key={appointment.id} className={row}>
                 {payment?.status === "PENDING" && !readOnly ? (
-                  checkbox(
-                    payment.id,
-                    `Receber ${appointment.service.name} às ${toTimeString(appointment.startAt, timeZone)}`,
-                  )
+                  checkbox(payment.id, `Receber ${when}`)
+                ) : canAhead && !readOnly ? (
+                  checkbox(appointment.id, `Receber antes da conclusão ${when}`)
                 ) : (
                   <span
                     className="size-4 shrink-0 max-sm:hidden"
@@ -242,13 +262,20 @@ function CheckoutForm({
                   </span>
                   <span className="block text-xs text-muted-foreground">
                     com {appointment.professional.name}
+                    {noPrice && " · sem preço: receba após a conclusão"}
                   </span>
                 </span>
                 <VisitState appointment={appointment} />
-                {payment && (
+                {payment ? (
                   <span className="tabular-nums">
                     {formatPrice(payment.amount)}
                   </span>
+                ) : (
+                  canAhead && (
+                    <span className="tabular-nums">
+                      {formatPrice(appointment.service.price!)}
+                    </span>
+                  )
                 )}
               </li>
             );
@@ -351,7 +378,11 @@ function CheckoutForm({
             </Button>
             <Button
               type="submit"
-              disabled={pending || chosen.length === 0 || methods.length === 0}
+              disabled={
+                pending ||
+                chosen.length + chosenAhead.length === 0 ||
+                methods.length === 0
+              }
             >
               <Check aria-hidden="true" />
               {pending ? "Finalizando…" : "Finalizar comanda"}

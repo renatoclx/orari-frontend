@@ -112,9 +112,12 @@ Três grupos, nesta ordem:
    profissional, valor e o ícone de recorrência ou de pacote.
    - Com pagamento pendente: pode ser recebido.
    - Já pago: mostra "Pago" e o método.
-   - Avulso ainda não concluído: "Aguardando conclusão", sem valor a receber (o
-     pagamento nasce quando o atendimento é concluído). Receber antes de
-     concluir (sinal) fica para depois.
+   - Avulso ainda não concluído: "Aguardando conclusão". **Receber antes da
+     conclusão:** com preço no serviço, pode ser marcado na comanda (começa
+     desmarcado) e é recebido pelo preço do serviço; o pagamento já nasce pago e
+     a conclusão não cobra de novo. Serviço sem preço continua sem caixa ("sem
+     preço: receba após a conclusão"). Cancelar depois não devolve o valor, e a
+     falta fica bloqueada. Valor inteiro só (sinal parcial fica de fora).
    - Sessão de pacote: "Incluído no pacote", sem valor.
 2. **Pendências anteriores** do cliente, que não são da visita de hoje:
    pagamentos atrasados, parcela de pacote que vence hoje ou já venceu e pacote
@@ -138,7 +141,8 @@ Três grupos, nesta ordem:
   3. **Paga**: nada pendente nem aguardando, e algo foi pago (em atendimento
      de hoje ou em pagamento anterior).
   4. **Incluído no pacote**: só sessões de pacote, sem pendente nem pago.
-  Nos três últimos, a ação é o ícone de olho (só leitura). Um atendimento pago e
+  A ação é **Receber** na comanda aberta e também na "Aguardando conclusão" que
+  tem atendimento a receber antes; nas demais, o ícone de olho (só leitura). Um atendimento pago e
   outro não concluído não deixam a comanda "Paga". Comanda sem nada (não deveria
   existir) aparece como Aguardando conclusão.
 - No celular, lista empilhada.
@@ -161,7 +165,8 @@ Três grupos, nesta ordem:
 
 ## Implementação futura
 
-- Receber antes de o atendimento ser concluído (sinal).
+- Sinal parcial antes do atendimento (exige mais de um pagamento por
+  atendimento).
 - Vários métodos na mesma comanda (ex.: dinheiro + cartão), desconto, gorjeta,
   produtos, troco e caixa: exigem a entidade Comanda no backend.
 - Recibo ou impressão da comanda.

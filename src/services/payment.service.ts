@@ -94,10 +94,13 @@ export async function listCheckouts(params: {
 
 /**
  * Baixa de vários pagamentos do mesmo cliente com o mesmo método, de uma vez:
- * ou todos ficam pagos, ou nenhum.
+ * ou todos ficam pagos, ou nenhum. Atendimentos ainda sem pagamento ganham um,
+ * já pago, com o preço do serviço.
  */
 export async function settlePayments(input: {
   paymentIds: string[];
+  /** Atendimentos avulsos sem pagamento, recebidos antes da conclusão. */
+  appointmentIds?: string[];
   paymentMethodId: string;
   /** Instante do pagamento; sem ele, a API usa o momento da requisição. */
   paidAt?: string;

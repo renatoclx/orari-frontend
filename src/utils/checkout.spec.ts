@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import type { CheckoutAppointment, CheckoutItem } from "@/types/payment";
-import { checkoutState } from "@/utils/checkout";
+import { canReceive, checkoutState, receivableAhead } from "@/utils/checkout";
 
 type AppointmentPayment = NonNullable<CheckoutAppointment["payment"]>;
 type PreviousPayment = CheckoutItem["previousPayments"][number];
@@ -8,12 +8,13 @@ type PreviousPayment = CheckoutItem["previousPayments"][number];
 function appointment(
   payment: Pick<AppointmentPayment, "status"> | null,
   clientPlanId: string | null = null,
+  price: string | null = "120.00",
 ): CheckoutAppointment {
   return {
     id: "a1",
     startAt: "2026-10-23T22:30:00.000Z",
     status: "SCHEDULED",
-    service: { id: "s1", name: "Limpeza de Pele" },
+    service: { id: "s1", name: "Limpeza de Pele", price },
     professional: { id: "p1", name: "Helena" },
     recurringAppointmentId: null,
     clientPlanId,
@@ -117,5 +118,19 @@ describe("checkoutState", () => {
 
   it("comanda vazia não quebra e não é Paga", () => {
     expect(checkoutState(checkout([]))).toBe("awaiting");
+  });
+});
+
+describe("receber antes da conclusão", () => {
+  it("avulso sem pagamento e com preço pode ser recebido", () => {
+    expect(receivableAhead(appointment(null))).toBe(true);
+    expect(canReceive(checkout([appointment(null)]))).toBe(true);
+  });
+
+  it("serviço sem preço, sessão de pacote ou já com pagamento: não", () => {
+    expect(receivableAhead(appointment(null, null, null))).toBe(false);
+    expect(receivableAhead(appointment(null, "plan-1"))).toBe(false);
+    expect(receivableAhead(appointment({ status: "PAID" }))).toBe(false);
+    expect(canReceive(checkout([appointment(null, null, null)]))).toBe(false);
   });
 });

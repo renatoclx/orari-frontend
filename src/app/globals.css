@@ -24,6 +24,9 @@
   --destructive: #b91c1c;
   /* Informação positiva (ex.: status ativo). */
   --success: #166534;
+  /* Gráficos: o neutro (pendente, novo), mais claro que o texto secundário
+     para se distinguir do verde (validado para daltonismo e contraste). */
+  --chart-neutral: #8a8a93;
   --border: #e4e4e7;
   --input: #e4e4e7;
   /* Contorno de foco (navegação por teclado). */
@@ -62,6 +65,7 @@
   --input: rgb(255 255 255 / 0.15);
   --success: #4ade80;
   --destructive: #f87171;
+  --chart-neutral: #71717a;
 
   /* Um tom abaixo do fundo, para a sidebar continuar se destacando. */
   --sidebar: #09090b;
@@ -86,6 +90,7 @@
   --color-accent-foreground: var(--accent-foreground);
   --color-destructive: var(--destructive);
   --color-success: var(--success);
+  --color-chart-neutral: var(--chart-neutral);
   --color-border: var(--border);
   --color-input: var(--input);
   --color-ring: var(--ring);

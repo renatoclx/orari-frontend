@@ -119,6 +119,12 @@ describe("modelos de plano", () => {
     }
   });
 
+  it("nenhum modelo inclui a Carteira de clientes (nasce desmarcada)", () => {
+    for (const key of ["essential", "professional", "complete"]) {
+      expect(template(key).matrix["client-portfolio"].view).toBe(false);
+    }
+  });
+
   it("aplicar o Essencial define 3 profissionais e 1 administrador; os outros mantêm os profissionais", () => {
     const current = {
       matrix: emptyMatrix(),

@@ -39,6 +39,11 @@
 - O encaixe é exibido com uma cor cinza exclusiva e identificado como encaixe (o backend guarda o agendamento como `overBooking`).
 - Horário que já passou, na área livre ou sombreada, não aceita agendamento: o clique exibe um aviso.
 
+### Horário bloqueado
+
+- O intervalo bloqueado (ver "Bloquear horários") aparece com a mesma hachura do fora do expediente e a etiqueta **"Agenda bloqueada"**, em todas as colunas. Um bloqueio fora da janela visível amplia a grade.
+- Conta como fora do funcionamento: o clique abre o **Encaixe**; o novo agendamento não o oferece entre os horários livres (no encaixe, sim). As janelas do dia são descontadas dos bloqueios (`agenda-blocks/agenda-block.ts`, `subtractRanges`, com testes).
+
 ### Bloco de agendamento
 
 - Posicionado pelo horário de início e pela duração do serviço.
@@ -78,6 +83,19 @@
 
 - Confirmação do agendamento pelo cliente (status Confirmado).
 - Empresa sem nenhuma janela de atendimento cadastrada: a API não restringe horários nem há encaixe; a agenda ainda trata o dia sem janela como "somente encaixe".
+
+---
+
+## Bloquear horários
+
+- Atalho na barra lateral (ícone de calendário riscado) e, no celular, no header, ao lado do calendário (`layout.md`). Só com a ação **Cria** de Agendamentos.
+- Dialog "Bloquear horários": "O horário bloqueado fica fechado na agenda e no app do cliente. Só o encaixe entra nele."
+  - **Data** (começa no dia aberto na agenda, ou hoje se ele já passou; sem dias passados), **Início** e **Fim** (de 15 em 15 minutos) e **Bloquear**.
+  - Erros no campo: "Escolha a data.", "Informe o início.", "Informe o fim.", "O fim precisa ser depois do início." e "Esse horário já começou." A sobreposição a outro bloqueio vem da API ("Já existe um bloqueio neste horário").
+  - Com agendamentos no horário, confirmação "Bloquear mesmo assim?" com a mensagem da API ("Há N agendamentos neste horário. Eles continuam marcados."). Os agendamentos não são cancelados nem alterados, inclusive as sessões de recorrência.
+  - Bloqueado: toast "Horário bloqueado." com o dia e os horários; a agenda aberta é atualizada.
+- **Bloqueados:** os de hoje em diante, "Ter, 10/11/2026 · 14:00 às 16:30" e "Bloqueado por <nome>". **Desbloquear** (só com a ação **Exclui** de Agendamentos) pede confirmação ("Desbloquear horário?"; o horário volta a ficar livre na agenda e no app do cliente).
+- O bloqueio é da empresa toda (todos os profissionais). Recorrência ou plano novo que caia num horário bloqueado é recusado pela API, com a data do problema.
 
 ---
 

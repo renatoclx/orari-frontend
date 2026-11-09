@@ -10,7 +10,7 @@
 - Itens do menu, em ordem: Agendamentos, Recorrências, Pessoas (dropdown), Serviços, Turmas (só para o ADMIN), Pacotes (dropdown com Planos e Contratações) e Financeiro (dropdown com Comandas, Pagamentos e Métodos de pagamento) e, para quem acessa a anamnese, Anamnese (dropdown para o ADMIN com Fichas preenchidas, Modelos de ficha e Auditoria; para o profissional vinculado, só o item Fichas preenchidas) e, só para o ADMIN, Portal do cliente (`portal-do-cliente.md`), Mensagens (dropdown com Automáticas e Enviar; `mensagens.md`) e Ajuda, nessa ordem, no fim; só para o SUPER_ADMIN, Empresas.
 - Ordem do menu (sidebar): Agendamentos, Recorrências, Pessoas, Serviços, Turmas (só ADMIN), Pacotes e Financeiro (dropdowns: Pessoas, Pacotes e Financeiro).
 - **Acessos da empresa:** cada item do menu está ligado a uma funcionalidade (`empresas.md`, "Acessos e limites"). O item some quando a empresa não tem **Visualiza** nela, e um grupo sem nenhum subitem visível também some. Ajuda e Empresas não dependem disso. Sem o `access` na resposta de `/auth/me` (API antiga), nada é escondido.
-- **Atalhos da barra lateral** (novo cliente, novo serviço, nova recorrência e comandas) também seguem o acesso: cada um some sem a ação correspondente (Cria; Visualiza para comandas).
+- **Atalhos da barra lateral** (novo cliente, novo serviço, nova recorrência, comandas e bloquear horários) também seguem o acesso: cada um some sem a ação correspondente (Cria; Visualiza para comandas; Cria de Agendamentos para bloquear horários).
 - Configurações da empresa (`configuracoes.md`): acessadas pelo menu do usuário.
 
 ---
@@ -32,5 +32,6 @@
   - Serviços (ícone para cadastro rápido de um serviço);
   - Recorrência (ícone que abre o cadastro de uma nova recorrência);
   - Comandas (ícone de recibo; leva às comandas do dia, `/financeiro/comandas`);
+  - Bloquear horários (ícone de calendário riscado; abre o dialog "Bloquear horários", ver `agendamentos.md`). Só com a ação Cria de Agendamentos.
 
-No celular, somente o item calendário será exibido, os demais devem permanecer ocultos.
+No celular, somente o calendário e o bloquear horários aparecem, no header; os demais ficam ocultos.

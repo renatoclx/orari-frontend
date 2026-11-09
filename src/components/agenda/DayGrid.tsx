@@ -31,7 +31,7 @@ const PX_PER_MINUTE = SLOT_HEIGHT / SLOT_MINUTES;
 
 // "closed": fora das janelas de atendimento (inclui o intervalo entre janelas):
 // só aceita encaixe.
-type SlotState = "free" | "past" | "closed" | "occupied";
+type SlotState = "free" | "past" | "closed" | "blocked" | "occupied";
 
 type DayGridProps = {
   professionals: AgendaProfessional[];
@@ -42,6 +42,8 @@ type DayGridProps = {
   unavailable: TimeRange[];
   /** Intervalos entre janelas de atendimento (almoço), em cinza. */
   breaks: TimeRange[];
+  /** Horários bloqueados na agenda: hachurados, com "Agenda bloqueada"; só encaixe. */
+  blocked: TimeRange[];
   /** "HH:mm" do momento atual; nulo quando o dia exibido não é hoje. */
   now: string | null;
   /**
@@ -82,6 +84,7 @@ export function DayGrid({
   range,
   unavailable,
   breaks,
+  blocked,
   now,
   mobileProfessionalId,
   onMobileProfessionalChange,
@@ -120,6 +123,8 @@ export function DayGrid({
     if (slot < pastMinutes) return "past";
     const overlaps = (gap: TimeRange) =>
       timeToMinutes(gap.start) < end && timeToMinutes(gap.end) > slot;
+    // Bloqueado na agenda: como fora do funcionamento, só encaixe.
+    if (blocked.some(overlaps)) return "blocked";
     // Fora de qualquer janela (inclusive o intervalo entre janelas): encaixe.
     if (unavailable.some(overlaps) || breaks.some(overlaps)) return "closed";
     const occupied = appointments.some(
@@ -333,13 +338,13 @@ export function DayGrid({
 
               // Fora do funcionamento: só encaixe. O botão fica acima do
               // sombreado (z-[1]) para o destaque do mouse aparecer.
-              if (state === "closed") {
+              if (state === "closed" || state === "blocked") {
                 return (
                   <button
                     key={slot}
                     type="button"
                     onClick={() => onSlotOverbooking?.(professional.id, time)}
-                    aria-label={`Encaixar às ${time} com ${professional.name}, fora do horário de funcionamento`}
+                    aria-label={`Encaixar às ${time} com ${professional.name}, ${state === "blocked" ? "horário bloqueado" : "fora do horário de funcionamento"}`}
                     className={`relative z-[1] flex w-full cursor-pointer items-center justify-center text-xs text-transparent transition-colors hover:bg-muted hover:text-foreground focus-visible:bg-muted focus-visible:text-foreground ${line}`}
                     style={{ height: SLOT_HEIGHT }}
                   >
@@ -378,6 +383,22 @@ export function DayGrid({
                 }}
                 aria-hidden="true"
               />
+            ))}
+
+            {/* Bloqueado na agenda: a hachura do fora do expediente, com o nome. */}
+            {blocked.map((range) => (
+              <div
+                key={`blocked-${range.start}`}
+                className="pointer-events-none absolute inset-x-0 flex items-start justify-center border-y border-border bg-unavailable pt-1 text-xs font-medium text-muted-foreground"
+                style={{
+                  top: toPixels(range.start),
+                  height: toPixels(range.end) - toPixels(range.start),
+                }}
+              >
+                <span className="rounded-control bg-card px-1.5">
+                  Agenda bloqueada
+                </span>
+              </div>
             ))}
 
             {/* Intervalo entre janelas (almoço): área cinza, sem agendamento. */}

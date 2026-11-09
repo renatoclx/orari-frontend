@@ -71,7 +71,7 @@ export function AdminShell({
             </main>
           </div>
 
-          <ActionBar />
+          <ActionBar timeZone={user.company.timezone} />
           <WelcomeToast userName={user.name} />
         </div>
       </AnamnesisAccessProvider>

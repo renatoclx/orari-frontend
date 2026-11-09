@@ -57,9 +57,9 @@ export function ClassSessionTimes({
         >
           <UsersRound className="mt-0.5 size-4 shrink-0" aria-hidden="true" />
           <span>
-            Este horário pertence à turma <strong>{selected.label}</strong>. O
-            atendimento será marcado à parte, dividindo o horário com ela, sem
-            ocupar vaga da turma.
+            Este horário pertence à turma{" "}
+            <strong className="text-blue-500">{selected.label}</strong>. O
+            atendimento será realizado em paralelo com o horário da turma.
           </span>
         </p>
       )}

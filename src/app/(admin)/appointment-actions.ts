@@ -1,9 +1,14 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import {
+  blockRangesOfDay,
+  subtractRanges,
+} from "@/components/agenda-blocks/agenda-block";
 import { toAgendaAppointment } from "@/components/agenda/agenda-data";
 import { failureFrom, type ActionFailure } from "@/lib/action-result";
 import { isUuid } from "@/lib/uuid";
+import { listAgendaBlocks } from "@/services/agenda-block.service";
 import {
   cancelAppointment,
   markAppointmentNoShow,
@@ -71,19 +76,22 @@ export async function getAvailabilityAction(
     }
 
     const bounds = dayBounds(date, timeZone);
-    const [hours, appointments] = await Promise.all([
+    const [hours, appointments, blocks] = await Promise.all([
       listBusinessHours(weekDayOf(date)),
       listAppointments({ ...bounds, professionalId }),
+      listAgendaBlocks({ from: date, to: date }),
     ]);
 
     const nowTime = toTimeString(new Date().toISOString(), timeZone);
     return {
       ok: true,
       availability: {
-        windows: hours.map((item) => ({
-          start: item.openAt,
-          end: item.closeAt,
-        })),
+        // O bloqueado sai das janelas: conta como fora do funcionamento
+        // (some dos livres e passa a valer para o encaixe), como na API.
+        windows: subtractRanges(
+          hours.map((item) => ({ start: item.openAt, end: item.closeAt })),
+          blockRangesOfDay(blocks, date, timeZone),
+        ),
         busy: appointments
           .filter(
             (item) =>

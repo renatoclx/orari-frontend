@@ -223,13 +223,13 @@ function ServiceForm({
       </FormField>
 
       {/* Liga o serviço ao cadastro de turmas (vários clientes no mesmo horário). */}
-      <div className="flex items-center gap-2">
+      <div className="flex items-center justify-center gap-2">
         <Switch
           id="service-allows-classes"
           name="allowsClasses"
           defaultChecked={service?.allowsClasses ?? false}
         />
-        <Label htmlFor="service-allows-classes">Aceita turma</Label>
+        <Label htmlFor="service-allows-classes">Aceitar turmas</Label>
       </div>
 
       <ServiceProfessionalsField serviceId={service?.id} />

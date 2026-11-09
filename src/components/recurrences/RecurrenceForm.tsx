@@ -214,7 +214,10 @@ export function RecurrenceForm({
       <div className="relative min-h-0 flex-1 space-y-4 overflow-auto p-4 md:p-6">
         {classOptions.length > 0 && (
           <div className="max-w-md">
-            <FormField id="recurrence-class" label="Turma">
+            <FormField
+              id="recurrence-class"
+              label="Vincular recorrência à turma:"
+            >
               <ClassGroupSelect
                 id="recurrence-class"
                 classGroups={classOptions}

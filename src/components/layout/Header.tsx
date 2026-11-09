@@ -1,4 +1,6 @@
 import { Menu } from "lucide-react";
+import { AgendaBlockShortcut } from "@/components/agenda-blocks/AgendaBlockShortcut";
+import { Can } from "@/components/layout/Access";
 import { CalendarShortcut } from "@/components/layout/CalendarShortcut";
 import { Hint } from "@/components/shared/Hint";
 import { Logo } from "@/components/layout/Logo";
@@ -36,10 +38,17 @@ export function Header({ user, onOpenMobile }: HeaderProps) {
       </p>
 
       <div className="ml-auto flex items-center gap-3">
-        {/* No celular só o calendário aparece (screens/layout.md); os demais atalhos
-            ficam na barra lateral, do tablet em diante. */}
+        {/* No celular só o calendário e o bloqueio de horários aparecem
+            (screens/layout.md); os demais atalhos ficam na barra lateral, do
+            tablet em diante. */}
         <div className="flex items-center md:hidden">
           <CalendarShortcut placement="header" />
+          <Can feature="appointments" action="create">
+            <AgendaBlockShortcut
+              timeZone={user.company.timezone}
+              placement="header"
+            />
+          </Can>
         </div>
         {/* key: logo nova recomeça do zero (a anterior pode ter falhado). */}
         <CompanyLogo

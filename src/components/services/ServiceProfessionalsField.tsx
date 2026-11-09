@@ -54,10 +54,10 @@ export function ServiceProfessionalsField({
 
   return (
     <fieldset className="space-y-2">
-      <legend className="text-sm font-medium">Profissionais que atendem</legend>
+      <legend className="text-sm font-medium">Profissionais vinculados</legend>
       <p className="text-sm text-muted-foreground">
-        O serviço aparece no portal do cliente quando tem ao menos um
-        profissional.
+        Profissionais que ficam disponíveis para agendamento através do
+        aplicativo.
       </p>
       {error ? (
         <p role="alert" className="text-sm text-destructive">

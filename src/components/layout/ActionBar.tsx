@@ -1,3 +1,4 @@
+import { AgendaBlockShortcut } from "@/components/agenda-blocks/AgendaBlockShortcut";
 import { Can } from "@/components/layout/Access";
 import { CalendarShortcut } from "@/components/layout/CalendarShortcut";
 import { QuickCheckoutShortcut } from "@/components/layout/QuickCheckoutShortcut";
@@ -6,9 +7,9 @@ import { QuickRecurrenceShortcut } from "@/components/layout/QuickRecurrenceShor
 import { QuickServiceShortcut } from "@/components/layout/QuickServiceShortcut";
 
 // Barra de atalhos fixa na borda direita, presente em todas as telas
-// administrativas a partir do tablet. No celular ela some e só o calendário
-// aparece, no header (screens/layout.md).
-export function ActionBar() {
+// administrativas a partir do tablet. No celular ela some e só o calendário e
+// o bloqueio de horários aparecem, no header (screens/layout.md).
+export function ActionBar({ timeZone }: { timeZone: string }) {
   return (
     <aside
       aria-label="Atalhos rápidos"
@@ -27,6 +28,9 @@ export function ActionBar() {
         </Can>
         <Can feature="tabs">
           <QuickCheckoutShortcut />
+        </Can>
+        <Can feature="appointments" action="create">
+          <AgendaBlockShortcut timeZone={timeZone} placement="bar" />
         </Can>
       </div>
     </aside>

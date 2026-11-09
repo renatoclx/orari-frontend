@@ -42,6 +42,8 @@ type AgendaDayViewProps = {
   unavailable: TimeRange[];
   /** Intervalos entre janelas de atendimento (almoço), em cinza. */
   breaks: TimeRange[];
+  /** Horários bloqueados na agenda: hachurados, com "Agenda bloqueada"; só encaixe. */
+  blocked: TimeRange[];
   /** Fuso da empresa e o instante (ms) em que o servidor montou a página. */
   timeZone: string;
   serverNow: number;

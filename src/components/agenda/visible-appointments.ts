@@ -29,7 +29,9 @@ export function visibleAppointments(
   const busy: TimeRange[] = sessions.filter(
     (session) => session.professionalId === professionalId,
   );
-  const shown = mine.filter((appointment) => appointment.status !== "CANCELLED");
+  const shown = mine.filter(
+    (appointment) => appointment.status !== "CANCELLED",
+  );
   for (const appointment of mine) {
     if (appointment.status !== "CANCELLED") continue;
     if (![...shown, ...busy].some((other) => overlaps(other, appointment))) {

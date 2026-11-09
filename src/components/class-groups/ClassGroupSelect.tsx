@@ -44,7 +44,7 @@ export function ClassGroupSelect({
         <SelectValue />
       </SelectTrigger>
       <SelectContent>
-        <SelectItem value={NO_CLASS}>Sem turma (horário livre)</SelectItem>
+        <SelectItem value={NO_CLASS}>Sem turma...</SelectItem>
         {classGroups.map((group) => (
           <SelectItem key={group.id} value={group.id}>
             {classGroupLabel(group)}

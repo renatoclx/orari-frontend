@@ -248,7 +248,7 @@ export function PlanForm({ services, plan }: PlanFormProps) {
                 rows={4}
                 value={values.description}
                 onChange={(event) => set("description", event.target.value)}
-                placeholder="O que o pacote oferece"
+                placeholder="Informe a descrição do plano..."
               />
             </FormField>
           </section>

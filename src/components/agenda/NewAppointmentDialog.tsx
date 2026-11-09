@@ -400,15 +400,15 @@ function NewAppointmentForm({
       <DialogHeader>
         <DialogTitle>
           {editing
-            ? "Alterar agendamento"
+            ? "Alterar Agendamento"
             : overbooking
               ? "Encaixar horário"
-              : "Novo agendamento"}
+              : "Novo Agendamento"}
         </DialogTitle>
         <DialogDescription>
           {editing
-            ? "Altere os dados do agendamento."
-            : "Escolha o cliente, o serviço e o horário do atendimento."}
+            ? "Informe os dados a serem alterados."
+            : "Preencha as informações para realizar o agendamento."}
         </DialogDescription>
       </DialogHeader>
 
@@ -423,9 +423,10 @@ function NewAppointmentForm({
           />
           <p>
             {editing ? "Este agendamento é um encaixe" : "Você está agendando"}{" "}
-            <strong>fora do horário de funcionamento</strong> ou no horário de
-            uma turma. Aparecem os horários livres, inteiros fora do expediente,
-            e os horários de turma, que ainda não passaram.
+            <strong className="text-blue-500">
+              fora do horário de funcionamento
+            </strong>
+            .
           </p>
         </div>
       )}
@@ -448,7 +449,7 @@ function NewAppointmentForm({
             setPickedClient(clientList.find((client) => client.id === next));
             setErrors((current) => ({ ...current, client: undefined }));
           }}
-          placeholder="Selecione o cliente"
+          placeholder="Selecione o cliente..."
           searchPlaceholder="Buscar cliente…"
           emptyMessage="Nenhum cliente encontrado."
           loading={clientsLoading}

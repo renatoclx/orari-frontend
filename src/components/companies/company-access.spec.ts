@@ -123,6 +123,7 @@ describe("modelos de plano", () => {
     for (const key of ["essential", "professional", "complete"]) {
       expect(template(key).matrix["client-portfolio"].view).toBe(true);
       expect(template(key).matrix["receivables"].view).toBe(true);
+      expect(template(key).matrix["appointments-report"].view).toBe(true);
     }
   });
 

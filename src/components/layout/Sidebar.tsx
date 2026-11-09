@@ -203,6 +203,11 @@ const reportsGroup: NavGroup = {
       label: "Contas a receber",
       feature: "receivables",
     },
+    {
+      href: "/relatorios/agendamentos",
+      label: "Agendamentos",
+      feature: "appointments-report",
+    },
   ],
 };
 

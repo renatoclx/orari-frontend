@@ -213,6 +213,11 @@ const reportsGroup: NavGroup = {
       label: "Rankings",
       feature: "rankings",
     },
+    {
+      href: "/relatorios/financeiro",
+      label: "Financeiro",
+      feature: "financial-report",
+    },
   ],
 };
 

@@ -125,6 +125,7 @@ describe("modelos de plano", () => {
       expect(template(key).matrix["receivables"].view).toBe(true);
       expect(template(key).matrix["appointments-report"].view).toBe(true);
       expect(template(key).matrix["rankings"].view).toBe(true);
+      expect(template(key).matrix["financial-report"].view).toBe(true);
     }
   });
 

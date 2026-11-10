@@ -123,6 +123,12 @@ export const ACCESS_GROUPS: { label: string; features: AccessFeature[] }[] = [
         label: "Rankings",
         actions: ["view"],
       },
+      // Só leitura; a API exige ver Pagamentos.
+      {
+        key: "financial-report",
+        label: "Financeiro",
+        actions: ["view"],
+      },
     ],
   },
 ];

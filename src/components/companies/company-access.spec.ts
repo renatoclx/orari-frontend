@@ -106,7 +106,7 @@ describe("modelos de plano", () => {
     });
   });
 
-  it("nenhum modelo inclui Portal do cliente e Mensagens (liberados empresa por empresa)", () => {
+  it("só o Agenda inclui o Portal do cliente; Mensagens em nenhum (liberadas empresa por empresa)", () => {
     for (const key of ["essential", "professional", "complete"]) {
       const { matrix } = template(key);
       expect(matrix["client-portal"].view).toBe(false);
@@ -119,16 +119,42 @@ describe("modelos de plano", () => {
     }
   });
 
-  it("todos os modelos incluem os relatórios (Visualiza)", () => {
-    for (const key of ["essential", "professional", "complete"]) {
-      expect(template(key).matrix["client-portfolio"].view).toBe(true);
-      expect(template(key).matrix["receivables"].view).toBe(true);
-      expect(template(key).matrix["appointments-report"].view).toBe(true);
-      expect(template(key).matrix["rankings"].view).toBe(true);
-      expect(template(key).matrix["financial-report"].view).toBe(true);
-      expect(template(key).matrix["packages-report"].view).toBe(true);
-      expect(template(key).matrix["clients-report"].view).toBe(true);
-      expect(template(key).matrix["dashboard"].view).toBe(true);
+  it("relatórios por modelo: agenda em todos, dinheiro a partir do Essencial", () => {
+    const reports = (key: string) =>
+      [
+        "appointments-report",
+        "dashboard",
+        "financial-report",
+        "receivables",
+        "rankings",
+        "client-portfolio",
+        "clients-report",
+        "packages-report",
+      ].filter((report) => template(key).matrix[report].view);
+    expect(reports("agenda")).toEqual(["appointments-report", "dashboard"]);
+    expect(reports("essential")).toEqual([
+      "appointments-report",
+      "dashboard",
+      "financial-report",
+      "receivables",
+    ]);
+    for (const key of ["professional", "complete"]) {
+      expect(reports(key)).toHaveLength(8);
+    }
+  });
+
+  it("Agenda: agenda, cadastros e o app; sem pacotes nem financeiro", () => {
+    const { matrix } = template("agenda");
+    for (const key of [
+      "appointments",
+      "clients",
+      "services",
+      "client-portal",
+    ]) {
+      expect(matrix[key].view).toBe(true);
+    }
+    for (const key of ["plans", "contracts", "tabs", "payments", "messages"]) {
+      expect(matrix[key].view).toBe(false);
     }
   });
 

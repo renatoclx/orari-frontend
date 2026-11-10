@@ -53,6 +53,9 @@ export const PEOPLE_KINDS: Record<PeopleType, PeopleKind> = {
   },
 };
 
+/** Valor do "Sem categoria" no Select do fornecedor (o Radix não aceita vazio). */
+export const NO_CATEGORY = "NONE";
+
 /** Confere um valor vindo do navegador (não confiável) contra os tipos. */
 export function isPeopleType(value: unknown): value is PeopleType {
   return typeof value === "string" && value in PEOPLE_KINDS;

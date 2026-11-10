@@ -33,7 +33,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import type { PersonListItem } from "@/types/people";
-import { formatCpf, formatDateOnly, formatPhone } from "@/utils/format";
+import { formatDateOnly, formatDocument, formatPhone } from "@/utils/format";
 import { useCan } from "@/components/layout/Access";
 import { PortalAccessDialog } from "@/components/portal-access/PortalAccessDialog";
 import { PersonDetails } from "@/components/people/PersonDetails";
@@ -148,10 +148,12 @@ export function PersonList({
                       <dd className="tabular-nums">
                         <EmptyValue>{formatContact(person)}</EmptyValue>
                       </dd>
-                      <dt className="text-muted-foreground">CPF</dt>
+                      <dt className="text-muted-foreground">
+                        {kind.type === "SUPPLIER" ? "CPF/CNPJ" : "CPF"}
+                      </dt>
                       <dd className="tabular-nums">
                         <EmptyValue>
-                          {person.document && formatCpf(person.document)}
+                          {person.document && formatDocument(person.document)}
                         </EmptyValue>
                       </dd>
                       <dt className="text-muted-foreground">Status</dt>
@@ -166,6 +168,7 @@ export function PersonList({
 
             <PersonTable
               people={people}
+              supplier={kind.type === "SUPPLIER"}
               onView={setViewing}
               onDelete={setDeleting}
               onReactivate={reactivate}
@@ -227,8 +230,13 @@ type RowHandlers = {
 
 function PersonTable({
   people,
+  supplier,
   ...handlers
-}: { people: PersonListItem[] } & RowHandlers) {
+}: {
+  people: PersonListItem[];
+  /** Fornecedores: CPF/CNPJ e categoria principal no lugar de nascimento e profissão. */
+  supplier: boolean;
+} & RowHandlers) {
   const headerClass =
     "sticky top-0 z-10 border-b border-border bg-card px-4 py-3 font-medium text-muted-foreground";
 
@@ -243,14 +251,22 @@ function PersonTable({
             Celular
           </th>
           <th scope="col" className={headerClass}>
-            CPF
+            {supplier ? "CPF/CNPJ" : "CPF"}
           </th>
-          <th scope="col" className={`${headerClass} hidden xl:table-cell`}>
-            Data de nascimento
-          </th>
-          <th scope="col" className={`${headerClass} hidden lg:table-cell`}>
-            Profissão
-          </th>
+          {supplier ? (
+            <th scope="col" className={`${headerClass} hidden lg:table-cell`}>
+              Categoria principal
+            </th>
+          ) : (
+            <>
+              <th scope="col" className={`${headerClass} hidden xl:table-cell`}>
+                Data de nascimento
+              </th>
+              <th scope="col" className={`${headerClass} hidden lg:table-cell`}>
+                Profissão
+              </th>
+            </>
+          )}
           <th scope="col" className={headerClass}>
             Status
           </th>
@@ -273,17 +289,25 @@ function PersonTable({
             </td>
             <td className="px-4 py-3 whitespace-nowrap tabular-nums">
               <EmptyValue>
-                {person.document && formatCpf(person.document)}
+                {person.document && formatDocument(person.document)}
               </EmptyValue>
             </td>
-            <td className="hidden px-4 py-3 tabular-nums xl:table-cell">
-              <EmptyValue>
-                {person.birthDate && formatDateOnly(person.birthDate)}
-              </EmptyValue>
-            </td>
-            <td className="hidden px-4 py-3 lg:table-cell">
-              <EmptyValue>{person.profession}</EmptyValue>
-            </td>
+            {supplier ? (
+              <td className="hidden px-4 py-3 lg:table-cell">
+                <EmptyValue>{person.expenseCategory?.name}</EmptyValue>
+              </td>
+            ) : (
+              <>
+                <td className="hidden px-4 py-3 tabular-nums xl:table-cell">
+                  <EmptyValue>
+                    {person.birthDate && formatDateOnly(person.birthDate)}
+                  </EmptyValue>
+                </td>
+                <td className="hidden px-4 py-3 lg:table-cell">
+                  <EmptyValue>{person.profession}</EmptyValue>
+                </td>
+              </>
+            )}
             <td className="px-4 py-3">
               <StatusBadge active={person.deletedAt === null} />
             </td>

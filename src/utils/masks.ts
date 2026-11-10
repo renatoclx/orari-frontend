@@ -26,6 +26,20 @@ export function maskCpf(value: string): string {
     .replace(/^(\d{3})\.(\d{3})\.(\d{3})(\d)/, "$1.$2.$3-$4");
 }
 
+/**
+ * CPF até 11 dígitos; com mais, CNPJ (fornecedor):
+ * "11222333000181" → "11.222.333/0001-81".
+ */
+export function maskCpfOrCnpj(value: string): string {
+  const digits = onlyDigits(value).slice(0, 14);
+  if (digits.length <= 11) return maskCpf(digits);
+  return digits
+    .replace(/^(\d{2})(\d)/, "$1.$2")
+    .replace(/^(\d{2})\.(\d{3})(\d)/, "$1.$2.$3")
+    .replace(/^(\d{2})\.(\d{3})\.(\d{3})(\d)/, "$1.$2.$3/$4")
+    .replace(/^(\d{2})\.(\d{3})\.(\d{3})\/(\d{4})(\d)/, "$1.$2.$3/$4-$5");
+}
+
 /** "17500000" → "17500-000" */
 export function maskCep(value: string): string {
   const digits = onlyDigits(value).slice(0, 8);

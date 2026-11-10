@@ -20,8 +20,11 @@ export type PrincipalContact = {
 export type PersonListItem = {
   id: string;
   name: string;
-  /** CPF sem máscara. */
+  /** CPF sem máscara (no fornecedor, CPF ou CNPJ). */
   document: string | null;
+  /** Só no fornecedor: categoria de despesa principal. */
+  expenseCategoryId?: string | null;
+  expenseCategory?: { id: string; name: string } | null;
   birthDate: string | null;
   profession: string | null;
   type: PeopleType;
@@ -79,6 +82,8 @@ export type CreatePersonInput = {
   phone?: string;
   contacts?: NewContactInput[];
   addresses?: NewAddressInput[];
+  /** Só no fornecedor (ADMIN); `null` tira. */
+  expenseCategoryId?: string | null;
 };
 
 /** Contato cadastrado (GET /contacts). */
@@ -112,4 +117,6 @@ export type UpdatePersonInput = {
   note: string | null;
   /** Só o ADMIN envia, e só para profissional; ausente, não muda. */
   receivesCommission?: boolean;
+  /** Só no fornecedor (ADMIN); `null` tira. */
+  expenseCategoryId?: string | null;
 };

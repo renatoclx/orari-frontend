@@ -1,6 +1,7 @@
 import { PersonForm } from "@/components/people/PersonForm";
 import type { PeopleKind } from "@/components/people/people-kinds";
 import { getCurrentUser } from "@/services/auth.service";
+import { listExpenseCategories } from "@/services/expense-category.service";
 import { listStates } from "@/services/location.service";
 
 type NewPersonPageProps = {
@@ -15,6 +16,13 @@ export async function NewPersonPage({ kind }: NewPersonPageProps) {
   // Comissão é remuneração: só o ADMIN vê a chave, e só no profissional.
   const canSetCommission =
     kind.type === "PROFESSIONAL" && user.type === "ADMIN";
+  // Categoria principal do fornecedor: as categorias são só do ADMIN.
+  const categories =
+    kind.type === "SUPPLIER" && user.type === "ADMIN"
+      ? (
+          await listExpenseCategories({ isActive: true, page: 1, limit: 100 })
+        ).items.map(({ id, name }) => ({ id, name }))
+      : undefined;
 
   return (
     <div className="flex min-h-0 flex-1 flex-col gap-4">
@@ -30,6 +38,7 @@ export async function NewPersonPage({ kind }: NewPersonPageProps) {
         kind={kind}
         states={states}
         canSetCommission={canSetCommission}
+        expenseCategories={categories}
       />
     </div>
   );

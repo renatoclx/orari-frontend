@@ -3,8 +3,13 @@
 > **Fornecedores** (2026-11-10): quarto tipo de pessoa (`SUPPLIER`), favorecido
 > das contas a pagar. Mesmas telas e campos dos demais (`PEOPLE_KINDS`), rota
 > `/fornecedores`, item **Pessoas → Fornecedores** (antes de Usuários) e
-> funcionalidade `suppliers` em Acessos e limites (Cadastros). O documento,
-> como nos demais tipos, é CPF.
+> funcionalidade `suppliers` em Acessos e limites (Cadastros).
+> Diferenças do fornecedor: o documento aceita **CPF ou CNPJ** (rótulo
+> "CPF/CNPJ", máscara que vira CNPJ acima de 11 dígitos; nos demais tipos só
+> CPF); em "Mais informações" há a **Categoria principal** (Select das
+> categorias de despesa ativas, "Sem categoria" por padrão; só o ADMIN vê),
+> que pré-preenche as contas a pagar; a listagem mostra **CPF/CNPJ** e
+> **Categoria principal** no lugar de Data de nascimento e Profissão.
 
 ## Listagem
 

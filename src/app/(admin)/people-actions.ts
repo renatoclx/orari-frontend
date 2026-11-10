@@ -86,6 +86,14 @@ const INVALID_TYPE: ActionFailure = {
 
 // "Recebe comissão" só vem no formulário do profissional aberto pelo ADMIN
 // (campo de controle); sem ele, nada é enviado e a chave gravada não muda.
+// Categoria principal: só no formulário do fornecedor aberto pelo ADMIN (campo
+// de controle); "Sem categoria" vira null, que é como a API a tira.
+const categoryOf = (data: FormData) => {
+  if (data.get("expenseCategoryEnabled") !== "1") return {};
+  const value = formText(data, "expenseCategoryId");
+  return { expenseCategoryId: isUuid(value) ? value : null };
+};
+
 const commissionOf = (data: FormData) =>
   data.get("commissionEnabled") === "1"
     ? { receivesCommission: data.get("receivesCommission") === "on" }
@@ -111,7 +119,10 @@ export async function createPersonAction(
     document: formText(data, "document"),
   };
 
-  const errors = validatePersonForm(values);
+  const errors = validatePersonForm(values, {
+    // Fornecedor pode ser empresa: aceita CNPJ.
+    allowCnpj: type === "SUPPLIER",
+  });
   const invalid = (Object.keys(errors) as PersonField[]).find(
     (field) => errors[field],
   );
@@ -171,6 +182,7 @@ export async function createPersonAction(
       ...(profession && { profession }),
       ...(note && { note }),
       ...commissionOf(data),
+      ...categoryOf(data),
       contacts: [mainContact, ...extraContacts],
       ...(addresses.length > 0 && { addresses }),
     });
@@ -288,7 +300,10 @@ export async function updatePersonAction(
     document: formText(data, "document"),
   };
 
-  const errors = validatePersonForm(values);
+  const errors = validatePersonForm(values, {
+    // Fornecedor pode ser empresa: aceita CNPJ.
+    allowCnpj: type === "SUPPLIER",
+  });
   const invalid = (Object.keys(errors) as PersonField[]).find(
     (field) => errors[field],
   );
@@ -305,6 +320,7 @@ export async function updatePersonAction(
       profession: formText(data, "profession") || null,
       note: formText(data, "note") || null,
       ...commissionOf(data),
+      ...categoryOf(data),
     });
   } catch (error) {
     return failureFrom(error, "document" as const);

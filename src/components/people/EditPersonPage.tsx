@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import { PersonForm } from "@/components/people/PersonForm";
 import type { PeopleKind } from "@/components/people/people-kinds";
 import { getCurrentUser } from "@/services/auth.service";
+import { listExpenseCategories } from "@/services/expense-category.service";
 import { ApiError } from "@/services/api";
 import { listAddresses } from "@/services/address.service";
 import { listContacts } from "@/services/contact.service";
@@ -31,6 +32,14 @@ export async function EditPersonPage({ kind, id }: EditPersonPageProps) {
   // Inativo: a API consulta, mas não altera (o histórico é só leitura).
   if (person.deletedAt !== null) notFound();
 
+  // Categoria principal do fornecedor: as categorias são só do ADMIN.
+  const categories =
+    kind.type === "SUPPLIER" && user.type === "ADMIN"
+      ? (
+          await listExpenseCategories({ isActive: true, page: 1, limit: 100 })
+        ).items.map(({ id, name }) => ({ id, name }))
+      : undefined;
+
   // A API devolve só o código da cidade; resolve o nome (uma busca por cidade).
   const cityIds = [...new Set(addresses.map((address) => address.cityId))];
   const cities = new Map(
@@ -56,6 +65,7 @@ export async function EditPersonPage({ kind, id }: EditPersonPageProps) {
         states={states}
         // Comissão é remuneração: só o ADMIN vê a chave, e só no profissional.
         canSetCommission={kind.type === "PROFESSIONAL" && user.type === "ADMIN"}
+        expenseCategories={categories}
         editing={{
           person,
           mainContact,

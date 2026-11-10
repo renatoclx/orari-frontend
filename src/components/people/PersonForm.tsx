@@ -25,6 +25,7 @@ import { FormField } from "@/components/shared/FormField";
 import { FormFooter } from "@/components/shared/FormFooter";
 import { FormSection } from "@/components/shared/FormSection";
 import { Label } from "@/components/ui/label";
+import { NO_CATEGORY } from "@/components/people/people-kinds";
 import { Switch } from "@/components/ui/switch";
 import { MaskedInput } from "@/components/shared/MaskedInput";
 import { PhotoUpload } from "@/components/shared/PhotoUpload";
@@ -46,7 +47,7 @@ import type {
   PersonListItem,
 } from "@/types/people";
 import { contactTypeLabels } from "@/utils/format";
-import { maskCpf, maskPhone } from "@/utils/masks";
+import { maskCpf, maskCpfOrCnpj, maskPhone } from "@/utils/masks";
 
 /** Dados da pessoa na alteração (vêm do servidor). */
 export type EditablePerson = {
@@ -65,6 +66,11 @@ type PersonFormProps = {
   editing?: EditablePerson;
   /** Profissional aberto pelo ADMIN: mostra "Recebe comissão". */
   canSetCommission?: boolean;
+  /**
+   * Fornecedor aberto pelo ADMIN: as categorias de despesa ativas para a
+   * "Categoria principal". Sem elas, o campo não aparece.
+   */
+  expenseCategories?: { id: string; name: string }[];
 };
 
 // Duas colunas ocupando a largura do card (screens/pessoas.md, "Layout do formulário"):
@@ -74,7 +80,10 @@ export function PersonForm({
   states,
   editing,
   canSetCommission = false,
+  expenseCategories,
 }: PersonFormProps) {
+  // Fornecedor pode ser empresa: o documento aceita CPF ou CNPJ.
+  const isSupplier = kind.type === "SUPPLIER";
   const [errors, setErrors] = useState<PersonFormErrors>({});
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [personName, setPersonName] = useState("");
@@ -92,7 +101,7 @@ export function PersonForm({
       document: String(data.get("document") ?? ""),
     };
 
-    const found = validatePersonForm(values);
+    const found = validatePersonForm(values, { allowCnpj: isSupplier });
     setErrors(found);
 
     const firstInvalid = personFieldOrder.find((field) => found[field]);
@@ -334,14 +343,18 @@ export function PersonForm({
               <div>
                 <FormSection
                   title="Mais informações"
-                  description="CPF, data de nascimento e profissão"
+                  description={
+                    isSupplier
+                      ? "CPF/CNPJ, categoria principal, data e profissão"
+                      : "CPF, data de nascimento e profissão"
+                  }
                   defaultOpen
                 >
                   <div className="space-y-4">
                     <div className="grid grid-cols-2 gap-3">
                       <FormField
                         id="document"
-                        label="CPF"
+                        label={isSupplier ? "CPF/CNPJ" : "CPF"}
                         error={errors.document}
                       >
                         <MaskedInput
@@ -352,9 +365,11 @@ export function PersonForm({
                           }
                           name="document"
                           initialValue={editing?.person.document ?? ""}
-                          mask={maskCpf}
+                          mask={isSupplier ? maskCpfOrCnpj : maskCpf}
                           inputMode="numeric"
-                          placeholder="000.000.000-00"
+                          placeholder={
+                            isSupplier ? "CPF ou CNPJ" : "000.000.000-00"
+                          }
                         />
                       </FormField>
 
@@ -367,6 +382,43 @@ export function PersonForm({
                         />
                       </FormField>
                     </div>
+
+                    {/* Só o ADMIN vê as categorias: pré-preenche as contas a pagar. */}
+                    {isSupplier && expenseCategories && (
+                      <FormField
+                        id="expenseCategoryId"
+                        label="Categoria principal"
+                      >
+                        <input
+                          type="hidden"
+                          name="expenseCategoryEnabled"
+                          value="1"
+                        />
+                        <Select
+                          name="expenseCategoryId"
+                          defaultValue={
+                            editing?.person.expenseCategoryId ?? NO_CATEGORY
+                          }
+                        >
+                          <SelectTrigger
+                            id="expenseCategoryId"
+                            className="w-full"
+                          >
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value={NO_CATEGORY}>
+                              Sem categoria
+                            </SelectItem>
+                            {expenseCategories.map((category) => (
+                              <SelectItem key={category.id} value={category.id}>
+                                {category.name}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </FormField>
+                    )}
 
                     <FormField id="profession" label="Profissão">
                       <Input

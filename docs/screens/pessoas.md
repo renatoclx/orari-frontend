@@ -70,6 +70,11 @@
   - O cliente poderá ter mais de um endereço cadastrado;
 - Combobox para selecionar Estado.
   - Ao selecionar o Estado, habilita a seleção de Cidades (combobox), referente ao estado selecionado;
+- **Recebe comissão** (2026-11-10, só **profissional** e só o **ADMIN** vê):
+  chave abaixo de Observações, ligada por padrão, com a explicação "Desligue
+  para quem não recebe (ex.: o dono que atende). Religar vale para os
+  atendimentos daí em diante." Vale no cadastro e na alteração. O profissional
+  vinculado a um usuário ADMIN já vem desligado (ver Usuários).
 
 ---
 

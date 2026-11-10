@@ -1,5 +1,6 @@
 import { PersonForm } from "@/components/people/PersonForm";
 import type { PeopleKind } from "@/components/people/people-kinds";
+import { getCurrentUser } from "@/services/auth.service";
 import { listStates } from "@/services/location.service";
 
 type NewPersonPageProps = {
@@ -10,7 +11,10 @@ type NewPersonPageProps = {
 export async function NewPersonPage({ kind }: NewPersonPageProps) {
   // Os 27 estados vão prontos para o formulário; as cidades são buscadas
   // conforme o estado escolhido.
-  const states = await listStates();
+  const [states, user] = await Promise.all([listStates(), getCurrentUser()]);
+  // Comissão é remuneração: só o ADMIN vê a chave, e só no profissional.
+  const canSetCommission =
+    kind.type === "PROFESSIONAL" && user.type === "ADMIN";
 
   return (
     <div className="flex min-h-0 flex-1 flex-col gap-4">
@@ -22,7 +26,11 @@ export async function NewPersonPage({ kind }: NewPersonPageProps) {
         </p>
       </div>
 
-      <PersonForm kind={kind} states={states} />
+      <PersonForm
+        kind={kind}
+        states={states}
+        canSetCommission={canSetCommission}
+      />
     </div>
   );
 }

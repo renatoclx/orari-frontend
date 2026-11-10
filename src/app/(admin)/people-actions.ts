@@ -84,6 +84,13 @@ const INVALID_TYPE: ActionFailure = {
   message: "Tipo de cadastro inválido.",
 };
 
+// "Recebe comissão" só vem no formulário do profissional aberto pelo ADMIN
+// (campo de controle); sem ele, nada é enviado e a chave gravada não muda.
+const commissionOf = (data: FormData) =>
+  data.get("commissionEnabled") === "1"
+    ? { receivesCommission: data.get("receivesCommission") === "on" }
+    : {};
+
 /**
  * Cadastro completo da pessoa (cliente, funcionário ou profissional). O formulário entra como FormData (os campos,
  * mais as listas de contatos e endereços em JSON e a foto, se houver). Valida
@@ -163,6 +170,7 @@ export async function createPersonAction(
       ...(birthDate && { birthDate }),
       ...(profession && { profession }),
       ...(note && { note }),
+      ...commissionOf(data),
       contacts: [mainContact, ...extraContacts],
       ...(addresses.length > 0 && { addresses }),
     });
@@ -296,6 +304,7 @@ export async function updatePersonAction(
       birthDate: formText(data, "birthDate") || null,
       profession: formText(data, "profession") || null,
       note: formText(data, "note") || null,
+      ...commissionOf(data),
     });
   } catch (error) {
     return failureFrom(error, "document" as const);

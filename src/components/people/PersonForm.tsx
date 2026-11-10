@@ -24,6 +24,8 @@ import { DatePicker } from "@/components/shared/DatePicker";
 import { FormField } from "@/components/shared/FormField";
 import { FormFooter } from "@/components/shared/FormFooter";
 import { FormSection } from "@/components/shared/FormSection";
+import { Label } from "@/components/ui/label";
+import { Switch } from "@/components/ui/switch";
 import { MaskedInput } from "@/components/shared/MaskedInput";
 import { PhotoUpload } from "@/components/shared/PhotoUpload";
 import { ConfirmDialog } from "@/components/shared/ConfirmDialog";
@@ -61,11 +63,18 @@ type PersonFormProps = {
   states: State[];
   /** Presente na alteração; sem isso, é o cadastro. */
   editing?: EditablePerson;
+  /** Profissional aberto pelo ADMIN: mostra "Recebe comissão". */
+  canSetCommission?: boolean;
 };
 
 // Duas colunas ocupando a largura do card (screens/pessoas.md, "Layout do formulário"):
 // à esquerda os dados principais; à direita os opcionais, em seções recolhíveis.
-export function PersonForm({ kind, states, editing }: PersonFormProps) {
+export function PersonForm({
+  kind,
+  states,
+  editing,
+  canSetCommission = false,
+}: PersonFormProps) {
   const [errors, setErrors] = useState<PersonFormErrors>({});
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [personName, setPersonName] = useState("");
@@ -289,6 +298,32 @@ export function PersonForm({ kind, states, editing }: PersonFormProps) {
                   placeholder="Preferências, cuidados, informações úteis para o atendimento"
                 />
               </FormField>
+
+              {/* Remuneração: só o ADMIN, só no profissional. Quem é o dono e
+                  atende desliga; religar vale dali em diante. */}
+              {canSetCommission && (
+                <div className="space-y-1">
+                  <input type="hidden" name="commissionEnabled" value="1" />
+                  <div className="flex items-center gap-2">
+                    <Switch
+                      id="receivesCommission"
+                      name="receivesCommission"
+                      defaultChecked={
+                        editing?.person.receivesCommission ?? true
+                      }
+                      aria-describedby="receivesCommission-hint"
+                    />
+                    <Label htmlFor="receivesCommission">Recebe comissão</Label>
+                  </div>
+                  <p
+                    id="receivesCommission-hint"
+                    className="text-sm text-muted-foreground"
+                  >
+                    Desligue para quem não recebe (ex.: o dono que atende).
+                    Religar vale para os atendimentos daí em diante.
+                  </p>
+                </div>
+              )}
             </section>
 
             <section aria-labelledby="person-optional" className="space-y-4">

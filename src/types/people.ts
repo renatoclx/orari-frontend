@@ -36,6 +36,8 @@ export type PersonListItem = {
    * (no máximo 2 agendamentos futuros pelo app até confirmar).
    */
   portalConfirmed?: boolean;
+  /** Só profissional: recebe comissão (o vinculado a um usuário ADMIN nasce sem). */
+  receivesCommission?: boolean;
   principalContact: PrincipalContact | null;
 };
 
@@ -72,6 +74,8 @@ export type CreatePersonInput = {
   birthDate?: string;
   profession?: string;
   note?: string;
+  /** Só o ADMIN envia, e só para profissional. */
+  receivesCommission?: boolean;
   phone?: string;
   contacts?: NewContactInput[];
   addresses?: NewAddressInput[];
@@ -106,4 +110,6 @@ export type UpdatePersonInput = {
   birthDate: string | null;
   profession: string | null;
   note: string | null;
+  /** Só o ADMIN envia, e só para profissional; ausente, não muda. */
+  receivesCommission?: boolean;
 };

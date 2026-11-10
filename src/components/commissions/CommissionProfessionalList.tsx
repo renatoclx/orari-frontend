@@ -9,7 +9,8 @@ import { formatPrice } from "@/utils/format";
 type Row = CommissionSummary["byProfessional"][number];
 
 /**
- * Comissões por profissional (sem profissional no filtro). "Ver" filtra o
+ * Comissões por profissional (sem profissional no filtro). Comissão e pago
+ * pelos clientes são do período; adiantado e a pagar, do que está em aberto. "Ver" filtra o
  * profissional e mostra os atendimentos dele.
  */
 export function CommissionProfessionalList({
@@ -43,9 +44,10 @@ export function CommissionProfessionalList({
       columns={[
         "Profissional",
         "Atendimentos",
-        "Base",
         "Comissão",
         "Pago pelos clientes",
+        "Adiantado",
+        "A pagar",
         { key: "Ações", header: <span className="sr-only">Ações</span> },
       ]}
       emptyMessage={
@@ -56,13 +58,16 @@ export function CommissionProfessionalList({
           <td className="px-4 py-3 font-medium">{row.name}</td>
           <td className="px-4 py-3">{row.count}</td>
           <td className="px-4 py-3 whitespace-nowrap">
-            {formatPrice(row.base)}
-          </td>
-          <td className="px-4 py-3 font-medium whitespace-nowrap">
             {formatPrice(row.amount)}
           </td>
           <td className="px-4 py-3 whitespace-nowrap">
             {formatPrice(row.clientPaid)}
+          </td>
+          <td className="px-4 py-3 whitespace-nowrap">
+            {Number(row.advanced) > 0 ? formatPrice(row.advanced) : "--"}
+          </td>
+          <td className="px-4 py-3 font-medium whitespace-nowrap">
+            {formatPrice(row.toPay)}
           </td>
           <td className="px-4 py-2">{view(row)}</td>
         </tr>
@@ -80,6 +85,10 @@ export function CommissionProfessionalList({
             <dd>{row.count}</dd>
             <dt className="text-muted-foreground">Pago pelos clientes</dt>
             <dd>{formatPrice(row.clientPaid)}</dd>
+            <dt className="text-muted-foreground">Adiantado</dt>
+            <dd>{formatPrice(row.advanced)}</dd>
+            <dt className="text-muted-foreground">A pagar</dt>
+            <dd className="font-medium">{formatPrice(row.toPay)}</dd>
           </dl>
         </li>
       ))}

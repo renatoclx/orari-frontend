@@ -1,4 +1,4 @@
-import { CalendarCheck, HandCoins, Percent } from "lucide-react";
+import { HandCoins, Percent, Wallet, WalletMinimal } from "lucide-react";
 import {
   SummaryCardContent as Card,
   summaryCardClass as cardClass,
@@ -10,13 +10,13 @@ import { formatPercent, formatPrice } from "@/utils/format";
 export function CommissionsCards({ summary }: { summary: CommissionSummary }) {
   const base = Number(summary.base);
   return (
-    <div className="grid gap-3 sm:grid-cols-3">
+    <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
       <div className={cardClass}>
         <Card
           icon={Percent}
           label="Comissão gerada"
           value={formatPrice(summary.amount)}
-          detail={`Sobre ${formatPrice(summary.base)} de base`}
+          detail={`${summary.count} ${summary.count === 1 ? "atendimento" : "atendimentos"} no período`}
           tone="positive"
         />
       </div>
@@ -35,10 +35,19 @@ export function CommissionsCards({ summary }: { summary: CommissionSummary }) {
       </div>
       <div className={cardClass}>
         <Card
-          icon={CalendarCheck}
-          label="Atendimentos"
-          value={summary.count}
-          detail="Concluídos com comissão"
+          icon={WalletMinimal}
+          label="Adiantado"
+          value={formatPrice(summary.advanced)}
+          detail="Em aberto"
+          tone="neutral"
+        />
+      </div>
+      <div className={cardClass}>
+        <Card
+          icon={Wallet}
+          label="A pagar"
+          value={formatPrice(summary.toPay)}
+          detail="Em aberto, já sem o adiantado"
           tone="neutral"
         />
       </div>

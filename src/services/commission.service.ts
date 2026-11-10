@@ -2,7 +2,12 @@ import "server-only";
 
 import { apiFetch } from "@/services/api";
 import type { Paginated } from "@/types/api";
-import type { CommissionItem, CommissionSummary } from "@/types/commission";
+import type {
+  CommissionAdvance,
+  CommissionAdvanceInput,
+  CommissionItem,
+  CommissionSummary,
+} from "@/types/commission";
 
 type CommissionFilters = {
   /** "aaaa-mm-dd"; sem as duas, o mês atual. */
@@ -37,4 +42,35 @@ export function listCommissions(
   query.set("page", String(filters.page));
   query.set("limit", String(filters.limit));
   return apiFetch<Paginated<CommissionItem>>(`/commissions?${query}`);
+}
+
+/** Adiantamentos em aberto do profissional, do mais recente. */
+export function listCommissionAdvances(
+  professionalId: string,
+): Promise<CommissionAdvance[]> {
+  return apiFetch<CommissionAdvance[]>(
+    `/commission-advances?professionalId=${encodeURIComponent(professionalId)}`,
+  );
+}
+
+/** Disponível para adiantar (comissão em aberto − adiantado). */
+export function getAdvanceAvailable(
+  professionalId: string,
+): Promise<{ available: string }> {
+  return apiFetch<{ available: string }>(
+    `/commission-advances/available?professionalId=${encodeURIComponent(professionalId)}`,
+  );
+}
+
+export function createCommissionAdvance(
+  input: CommissionAdvanceInput,
+): Promise<CommissionAdvance> {
+  return apiFetch<CommissionAdvance>("/commission-advances", {
+    method: "POST",
+    body: JSON.stringify(input),
+  });
+}
+
+export function deleteCommissionAdvance(id: string): Promise<void> {
+  return apiFetch<void>(`/commission-advances/${id}`, { method: "DELETE" });
 }

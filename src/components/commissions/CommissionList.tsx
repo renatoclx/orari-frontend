@@ -10,6 +10,8 @@ type CommissionListProps = {
   timeZone: string;
   /** Rodapé fixo do card (paginação). */
   footer: React.ReactNode;
+  /** Abas do quadro (Atendimentos | Adiantamentos). */
+  tabs: React.ReactNode;
 };
 
 /** "40%" ou "R$ 15,00 fixo": a regra gravada na comissão. */
@@ -23,6 +25,7 @@ export function CommissionList({
   items,
   timeZone,
   footer,
+  tabs,
 }: CommissionListProps) {
   const day = (item: CommissionItem) =>
     formatDateOnly(
@@ -40,11 +43,7 @@ export function CommissionList({
 
   return (
     <ListCard
-      toolbar={
-        <h2 className="border-b border-border px-4 py-3 font-semibold">
-          Atendimentos
-        </h2>
-      }
+      toolbar={tabs}
       // Sem nada clicável nas linhas: a área com rolagem recebe foco.
       scrollLabel="Comissões por atendimento"
       columns={[

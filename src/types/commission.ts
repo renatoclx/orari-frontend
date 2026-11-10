@@ -10,8 +10,36 @@ export type CommissionTotals = {
   clientPaid: string;
 };
 
-export type CommissionSummary = CommissionTotals & {
-  byProfessional: (CommissionTotals & { id: string; name: string })[];
+/** Em aberto (ainda não fechado), sem depender do período. */
+export type OpenTotals = {
+  advanced: string;
+  /** Comissão em aberto menos o adiantado. */
+  toPay: string;
+};
+
+export type CommissionSummary = CommissionTotals &
+  OpenTotals & {
+    byProfessional: (CommissionTotals &
+      OpenTotals & { id: string; name: string })[];
+  };
+
+export type CommissionAdvance = {
+  id: string;
+  amount: string;
+  /** "aaaa-mm-dd". */
+  date: string;
+  note: string | null;
+  /** Quem lançou. */
+  createdBy: { id: string; name: string };
+  createdAt: string;
+};
+
+/** Corpo do POST /commission-advances. */
+export type CommissionAdvanceInput = {
+  professionalId: string;
+  amount: number;
+  date: string;
+  note?: string;
 };
 
 export type CommissionItem = {

@@ -232,6 +232,13 @@ const reportsGroup: NavGroup = {
   ],
 };
 
+// Comissões (screens/comissoes.md): só o ADMIN, no fim do grupo Financeiro.
+const commissionsItem = {
+  href: "/financeiro/comissoes",
+  label: "Comissões",
+  feature: "commissions",
+};
+
 // Dashboard (screens/dashboard.md): só o ADMIN, no topo do menu. A página
 // inicial continua sendo a agenda.
 const dashboardLink: NavLink = {
@@ -415,12 +422,19 @@ function SidebarNav({
   const services = navItems.findIndex(
     (entry) => "href" in entry && entry.href === "/servicos",
   );
+  // Comissões é remuneração do profissional: o item entra no grupo Financeiro
+  // só para o ADMIN.
+  const withCommissions = navItems.map((entry) =>
+    isAdmin && "children" in entry && entry.label === "Financeiro"
+      ? { ...entry, children: [...entry.children, commissionsItem] }
+      : entry,
+  );
   const items = filterMenuByAccess(
     [
       ...(isAdmin ? [dashboardLink] : []),
-      ...navItems.slice(0, services + 1),
+      ...withCommissions.slice(0, services + 1),
       ...(isAdmin ? [classGroupsLink] : []),
-      ...navItems.slice(services + 1),
+      ...withCommissions.slice(services + 1),
       ...(isAdmin ? [reportsGroup] : []),
       ...(isAdmin
         ? [anamnesisGroup]

@@ -128,6 +128,7 @@ describe("modelos de plano", () => {
       expect(template(key).matrix["financial-report"].view).toBe(true);
       expect(template(key).matrix["packages-report"].view).toBe(true);
       expect(template(key).matrix["clients-report"].view).toBe(true);
+      expect(template(key).matrix["dashboard"].view).toBe(true);
     }
   });
 

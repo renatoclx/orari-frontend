@@ -141,6 +141,12 @@ export const ACCESS_GROUPS: { label: string; features: AccessFeature[] }[] = [
         label: "Perfil do cliente",
         actions: ["view"],
       },
+      // Só a tela; cada bloco segue o relatório de origem.
+      {
+        key: "dashboard",
+        label: "Dashboard",
+        actions: ["view"],
+      },
     ],
   },
 ];

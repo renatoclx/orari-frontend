@@ -117,6 +117,12 @@ export const ACCESS_GROUPS: { label: string; features: AccessFeature[] }[] = [
         label: "Agendamentos",
         actions: ["view"],
       },
+      // Só leitura; a API exige ver Agendamentos e Pagamentos.
+      {
+        key: "rankings",
+        label: "Rankings",
+        actions: ["view"],
+      },
     ],
   },
 ];

@@ -208,6 +208,11 @@ const reportsGroup: NavGroup = {
       label: "Agendamentos",
       feature: "appointments-report",
     },
+    {
+      href: "/relatorios/rankings",
+      label: "Rankings",
+      feature: "rankings",
+    },
   ],
 };
 

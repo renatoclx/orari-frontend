@@ -21,6 +21,7 @@ import {
   Wallet,
   X,
   type LucideIcon,
+  LayoutDashboard,
 } from "lucide-react";
 import { Logo } from "@/components/layout/Logo";
 import { filterMenuByAccess } from "@/components/layout/menu-access";
@@ -203,7 +204,41 @@ const reportsGroup: NavGroup = {
       label: "Contas a receber",
       feature: "receivables",
     },
+    {
+      href: "/relatorios/agendamentos",
+      label: "Agendamentos",
+      feature: "appointments-report",
+    },
+    {
+      href: "/relatorios/rankings",
+      label: "Rankings",
+      feature: "rankings",
+    },
+    {
+      href: "/relatorios/financeiro",
+      label: "Financeiro",
+      feature: "financial-report",
+    },
+    {
+      href: "/relatorios/pacotes",
+      label: "Pacotes",
+      feature: "packages-report",
+    },
+    {
+      href: "/relatorios/perfil-do-cliente",
+      label: "Perfil do cliente",
+      feature: "clients-report",
+    },
   ],
+};
+
+// Dashboard (screens/dashboard.md): só o ADMIN, no topo do menu. A página
+// inicial continua sendo a agenda.
+const dashboardLink: NavLink = {
+  href: "/dashboard",
+  label: "Dashboard",
+  icon: LayoutDashboard,
+  feature: "dashboard",
 };
 
 // Ajuda (screens/ajuda.md): os manuais em PDF. Por enquanto só para o ADMIN;
@@ -382,6 +417,7 @@ function SidebarNav({
   );
   const items = filterMenuByAccess(
     [
+      ...(isAdmin ? [dashboardLink] : []),
       ...navItems.slice(0, services + 1),
       ...(isAdmin ? [classGroupsLink] : []),
       ...navItems.slice(services + 1),

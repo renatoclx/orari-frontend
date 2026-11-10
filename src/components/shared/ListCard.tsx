@@ -25,6 +25,11 @@ type ListCardProps = {
   footer?: React.ReactNode;
   /** Diálogos da lista; ficam fora da área com rolagem. */
   children?: React.ReactNode;
+  /**
+   * Lista sem nada clicável (ex.: extrato): a área com rolagem recebe foco,
+   * com este nome, para rolar pelo teclado.
+   */
+  scrollLabel?: string;
 };
 
 // Estilo do cabeçalho da tabela: fixo no topo enquanto a lista rola.
@@ -45,12 +50,20 @@ export function ListCard({
   toolbar,
   footer,
   children,
+  scrollLabel,
 }: ListCardProps) {
   return (
     <div className="flex min-h-0 flex-1 flex-col rounded-card border border-border bg-card">
       {toolbar}
 
-      <div className="min-h-0 flex-1 overflow-auto">
+      <div
+        className="min-h-0 flex-1 overflow-auto"
+        {...(scrollLabel && {
+          tabIndex: 0,
+          role: "region",
+          "aria-label": scrollLabel,
+        })}
+      >
         {emptyMessage ? (
           <p className="flex h-full items-center justify-center p-8 text-center text-sm text-muted-foreground">
             {emptyMessage}

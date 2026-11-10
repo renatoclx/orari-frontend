@@ -69,6 +69,12 @@ src/
       client-portal-actions.ts  Server Action das configurações do portal
       portal-access-actions.ts  Server Actions do link de acesso e de Confirmar
                              cliente
+      relatorios/            relatórios (só ADMIN): carteira-clientes/,
+                             contas-a-receber/, agendamentos/, rankings/,
+                             financeiro/, pacotes/, perfil-do-cliente/
+      dashboard/             Dashboard (só ADMIN): os números dos relatórios
+    (print)/                 versões de impressão dos relatórios (largura A4,
+                             tema claro): relatorios/<relatório>/imprimir/
     (auth)/                  telas públicas (sem sidebar)
       layout.tsx             dois painéis: formulário + painel da marca
       login/                 página e Server Action do login
@@ -109,6 +115,11 @@ src/
     client-portal/           tela Portal do cliente (formulário e regras)
     portal-access/           Acesso ao portal (QR + WhatsApp) e Confirmar cliente
     client-app/              telas e regras puras do app do cliente
+    client-portfolio/, receivables/, appointment-report/, rankings/,
+    financial-report/, packages-report/, clients-report/
+                             um relatório por pasta (filtros, cartões, gráficos,
+                             listas, página e impressão)
+    dashboard/               Dashboard (métricas, comparação, rosca)
     <tela>/                  componentes das demais telas (auth/)
   services/                  comunicação com a API e sessão (somente servidor)
   types/                     tipos do domínio, espelhando o backend
@@ -124,7 +135,7 @@ vitest.config.mts            testes (arquivo.spec.ts ao lado do código; ver fro
 .github/workflows/ci.yml     lint, tipos, testes e build a cada push e PR
 ```
 
-- Pastas entre parênteses (`(admin)`, `(auth)`) são **grupos de rotas**: organizam layouts sem mudar a URL.
+- Pastas entre parênteses (`(admin)`, `(auth)`, `(print)`) são **grupos de rotas**: organizam layouts sem mudar a URL.
 - Hooks próprios ficam junto da tela que os usa (ex.: `components/agenda/useAgendaClock.ts`). Uma pasta `hooks/` só será criada quando um hook for usado por mais de uma tela.
 
 ## Organização
@@ -260,6 +271,16 @@ Duas telas, sem entidade nova no backend: a comanda é uma visão montada a part
 - **Painel (SUPER_ADMIN):** botão em `CompanyList` abre `CompanyAccessDialog` (`AccessMatrix`, `AccessLimits`). Regras puras em `components/companies/company-access.ts` (matriz, dependências, modelos de plano, limites, conversão com a API); chamadas em `services/company-access.service.ts` e `(admin)/company-access-actions.ts`.
 - **Leitura pela empresa:** `GET /auth/me` traz `access.features`; o `CurrentUser` o carrega. `utils/access.ts` (`canAccess`) responde "pode?". No servidor, `lib/require-feature.ts` (`requireFeature`) devolve 404 nas páginas sem acesso; no cliente, `components/layout/Access.tsx` (`AccessProvider`, `useCan`, `Can`) esconde botões e atalhos.
 - **Menu:** `layout/menu-access.ts` filtra os itens (cada um tem `feature`); as páginas de servidor que consultam turmas só o fazem com `class-groups` liberada.
+
+## Relatórios e Dashboard
+
+Só leitura e só do ADMIN; cada relatório é uma funcionalidade com só Visualiza (`requireFeature` + `user.type !== "ADMIN"` → 404). A API também recusa.
+
+- **Página no servidor, filtros na URL:** cada relatório tem um `*-filters.ts` (ler e validar os `searchParams`, montar a URL sem o padrão) comum à tela e à impressão; a barra de filtros é o único Client Component (`router.push`). Resumo e lista vêm em paralelo (`Promise.all`); as listas paginam pela URL (`TablePagination`).
+- **Impressão:** `PrintButton` abre `.../imprimir` em aba nova, no grupo `(print)` (layout próprio em largura A4). `AutoPrint` força o tema claro (um `MutationObserver` tira a classe `dark` que o `next-themes` repõe) e chama `window.print`; `PrintHeader` e `PrintTable` (shared); as listas inteiras vêm de `fetchAllPages` (`MAX_PAGE_SIZE` 100).
+- **Componentes compartilhados:** `shared/SummaryCard` (cartões), `rankings/RankingTable` (barras com posição), `clients-report/ShareList` (distribuições sem posição), gráficos Recharts via `ui/chart` com a prop `print` (sem animação).
+- **Dashboard** (`/dashboard`, item próprio no topo do menu): sem rota própria na API. `DashboardPage` chama as rotas dos relatórios que a empresa tem (`canAccess`) e, para a comparação, as mesmas rotas com o período anterior (`previousPeriod`, puro e testado). A rosca de métodos (`PaymentMethodDonut`) dá a cor pela ordem do cadastro de métodos (`payment-method-slices.ts`).
+- **Tokens de gráfico** no `globals.css` (`chart-*`); as regras visuais estão na skill `orari-ui`, "Relatórios e gráficos".
 
 ## Configurações da empresa
 

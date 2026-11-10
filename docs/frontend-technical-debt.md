@@ -93,6 +93,14 @@ Pontos conhecidos e aceitos por enquanto. Revisar quando o contexto mudar.
 - **Limite no botão.** "Novo profissional" e "Novo usuário" não ficam desabilitados no limite (o `/auth/me` não traz o uso); a mensagem `PLAN_LIMIT_REACHED` aparece ao salvar.
 - **Contatos e endereços.** Não são barrados por funcionalidade no backend (ver `technical-debt.md` dele).
 
+## Relatórios
+
+- **Sem exportar em planilha.** Os relatórios só têm a tela e a impressão.
+- **Dashboard dobra as chamadas:** a comparação consulta cada relatório duas vezes (período e anterior). Com muitos dados, uma rota própria de resumo seria mais leve.
+- **Erro de um relatório derruba o Dashboard inteiro** (`Promise.all`); isolar cada bloco fica para depois.
+- **Rosca com mais de 5 métodos:** do 6º em diante (pela ordem do cadastro) somam em "Outros", mesmo que um deles receba muito.
+- **Modelos de plano a revisar:** a distribuição dos relatórios por modelo é provisória.
+
 ## Empresas
 
 - **Usuários do SUPER_ADMIN.** A API exige `companyId` quando o SUPER_ADMIN cria um usuário e lista os usuários de todas as empresas. A tela de Usuários não pede nem filtra por empresa: para o SUPER_ADMIN, o cadastro responde 400 ("companyId é obrigatório") e a lista mistura empresas. O fluxo "Cadastrar administrador" de Empresas já envia a empresa; falta um seletor de empresa na tela de Usuários.

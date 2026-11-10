@@ -136,6 +136,16 @@ regras de cada tela, em `docs/screens/`.
 - **2026-11-05 — Portal do cliente tem entrada própria no menu** (a última antes de Ajuda), não uma seção em Configurações; o **Acesso ao portal** fica visível na coluna Ações da lista de Clientes. _Por quê:_ Configurações é só da empresa, e ação frequente não fica atrás de outro menu.
 - **2026-11-05 — Em Meus dados o cliente altera o cadastro todo (inclusive a foto), copiado para cada clínica;** Pacotes e Recorrências são só consulta.
 
+## Relatórios e Dashboard
+
+- **2026-11-09 — Relatórios só do ADMIN, cada um com funcionalidade própria (só Visualiza),** marcados no modelo padrão. _Por quê:_ mostram faturamento; e a venda por versões precisa ligar e desligar cada um.
+- **2026-11-09 — Toda impressão é uma rota própria `(print)/.../imprimir`,** em aba nova e tema claro, com a lista inteira. _Por quê:_ o `window.print` da tela pegaria o tema escuro, a sidebar e só a página atual da lista.
+- **2026-11-10 — Menu Relatórios em um nível só;** ordem feita: Agendamentos, Rankings, Financeiro, Pacotes, Perfil do cliente e Dashboard.
+- **2026-11-10 — Financeiro pela data do pagamento** (o que entrou no caixa); Rankings pelo atendimento concluído (o faturado); Contas a receber pelo vencimento (o que falta). _Por quê:_ três perguntas diferentes sobre dinheiro, sem um relatório repetir o outro.
+- **2026-11-10 — Dashboard é item próprio no topo da sidebar** (a agenda continua sendo a página inicial), só visual, e **sem API própria:** cada bloco usa a rota do relatório e segue a funcionalidade dele; as métricas comparam com o período anterior. _Por quê:_ o número do Dashboard é sempre o do relatório.
+- **2026-11-10 — Cores categóricas `chart-cat-1..5`** para categorias sem ordem (métodos de pagamento), com a cor presa à entidade (ordem do cadastro), não à posição. _Por quê:_ verde e vermelho já dizem bom e ruim; e a cor não pode mudar quando o ranking muda.
+- **2026-11-10 — Modelo de plano "Agenda"** (só agendamento, com o app do cliente) e relatórios por modelo; empresa nova continua com todos. Empresas de teste em produção são ajustadas à mão (sem migração). Distribuição a revisar.
+
 ## Qualidade e testes
 
 - **2026-10-23 — Testes automáticos só de funções puras e de pontos de borda do servidor,** com Vitest (a mesma ferramenta do backend) e `arquivo.spec.ts` ao lado do código. _Por quê:_ é onde está a regra que quebra sem barulho (fuso, arredondamento, disponibilidade de horários); componentes e telas seguem verificados à mão e com `axe-core`. Ponta a ponta (Playwright) fica fora por ora.

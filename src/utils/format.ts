@@ -65,6 +65,14 @@ export function formatPrice(price: string | number): string {
   }).format(Number(price));
 }
 
+/** 0.125 → "12,5%"; 0.5 → "50%" (até uma casa, só quando há). */
+export function formatPercent(rate: number): string {
+  return new Intl.NumberFormat("pt-BR", {
+    style: "percent",
+    maximumFractionDigits: 1,
+  }).format(rate);
+}
+
 /** 60 → "60 minutos"; 1 → "1 minuto" */
 export function formatDuration(minutes: number): string {
   return `${minutes} ${minutes === 1 ? "minuto" : "minutos"}`;

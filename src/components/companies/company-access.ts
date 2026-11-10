@@ -111,6 +111,42 @@ export const ACCESS_GROUPS: { label: string; features: AccessFeature[] }[] = [
         label: "Contas a receber",
         actions: ["view"],
       },
+      // Só leitura; a API exige ver Agendamentos.
+      {
+        key: "appointments-report",
+        label: "Agendamentos",
+        actions: ["view"],
+      },
+      // Só leitura; a API exige ver Agendamentos e Pagamentos.
+      {
+        key: "rankings",
+        label: "Rankings",
+        actions: ["view"],
+      },
+      // Só leitura; a API exige ver Pagamentos.
+      {
+        key: "financial-report",
+        label: "Financeiro",
+        actions: ["view"],
+      },
+      // Só leitura; a API exige ver Contratações.
+      {
+        key: "packages-report",
+        label: "Pacotes",
+        actions: ["view"],
+      },
+      // Só leitura; a API exige ver Clientes e Agendamentos.
+      {
+        key: "clients-report",
+        label: "Perfil do cliente",
+        actions: ["view"],
+      },
+      // Só a tela; cada bloco segue o relatório de origem.
+      {
+        key: "dashboard",
+        label: "Dashboard",
+        actions: ["view"],
+      },
     ],
   },
 ];
@@ -185,6 +221,29 @@ const CLASS_KEYS = ["class-groups"];
 // Portal do cliente e Mensagens ficam fora de todos os modelos por enquanto: o
 // SUPER_ADMIN libera empresa por empresa (backend: migração client_portal_off).
 const PORTAL_KEYS = ["client-portal", "messages"];
+// Relatórios por versão (a revisar): os da agenda em todas; os do dinheiro a
+// partir do Essencial; os demais a partir do Profissional.
+const FULL_REPORT_KEYS = [
+  "rankings",
+  "client-portfolio",
+  "clients-report",
+  "packages-report",
+];
+// Versão só de agendamento: agenda, cadastros, configurações, o app do
+// cliente e os relatórios da agenda; sem pacotes nem financeiro.
+const AGENDA_KEYS = [
+  "appointments",
+  "recurrences",
+  "clients",
+  "employees",
+  "professionals",
+  "users",
+  "services",
+  "settings",
+  "client-portal",
+  "appointments-report",
+  "dashboard",
+];
 
 export type AccessTemplate = {
   key: string;
@@ -199,13 +258,20 @@ export type AccessTemplate = {
 // depois de aplicados, tudo continua editável.
 export const ACCESS_TEMPLATES: AccessTemplate[] = [
   {
+    key: "agenda",
+    label: "Agenda",
+    matrix: matrixWith((key) => AGENDA_KEYS.includes(key)),
+    admins: 1,
+  },
+  {
     key: "essential",
     label: "Essencial",
     matrix: matrixWith(
       (key) =>
         !ANAMNESIS_KEYS.includes(key) &&
         !CLASS_KEYS.includes(key) &&
-        !PORTAL_KEYS.includes(key),
+        !PORTAL_KEYS.includes(key) &&
+        !FULL_REPORT_KEYS.includes(key),
     ),
     admins: 1,
     professionals: 3,

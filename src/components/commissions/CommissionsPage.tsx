@@ -82,7 +82,11 @@ export async function CommissionsPage({
       ? listCommissions({ ...params, page, limit: PAGE_SIZE })
       : Promise.resolve(null),
     professionalId
-      ? listCommissionAdvances(professionalId)
+      ? listCommissionAdvances({
+          professionalId,
+          from: params.from,
+          to: params.to,
+        })
       : Promise.resolve(null),
     professionalId ? listClosings(professionalId) : Promise.resolve(null),
     // Métodos ativos, para o pagamento do fechamento.

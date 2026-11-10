@@ -32,6 +32,8 @@ export type CommissionAdvance = {
   /** Quem lançou. */
   createdBy: { id: string; name: string };
   createdAt: string;
+  /** Fechamento que o abateu; null = em aberto. */
+  closing: { id: string; number: number } | null;
 };
 
 /** Corpo do POST /commission-advances. */

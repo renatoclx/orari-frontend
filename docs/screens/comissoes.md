@@ -57,8 +57,10 @@ falta pagar; fechar (quitar) e emitir o recibo para o profissional assinar.
   - **Atendimentos (N)**: data, cliente, serviço — com "(pacote)" na sessão de
     pacote —, base, regra "40%" ou "R$ 15,00 fixo", comissão e cliente pagou,
     do mais recente, 10 por página;
-  - **Adiantamentos (N)**: os em aberto, com data, valor, observação, lançado
-    por e a lixeira;
+  - **Adiantamentos (N)**: os com data no período (em aberto ou fechados) e
+    os em aberto de qualquer data, com data, valor, observação, lançado por e
+    **Situação** ("Em aberto" ou "Fechado nº 0001"); a lixeira só nos em
+    aberto;
   - **Fechamentos (N)**: nº, até, pago em, método, comissões, adiantado e
     pago, do mais recente; imprimir recibo (`Printer`, aba nova) e, só no
     último não desfeito, desfazer (`Undo2`, `ConfirmDialog` vermelho). O

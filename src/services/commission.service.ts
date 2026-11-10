@@ -48,13 +48,19 @@ export function listCommissions(
   return apiFetch<Paginated<CommissionItem>>(`/commissions?${query}`);
 }
 
-/** Adiantamentos em aberto do profissional, do mais recente. */
-export function listCommissionAdvances(
-  professionalId: string,
-): Promise<CommissionAdvance[]> {
-  return apiFetch<CommissionAdvance[]>(
-    `/commission-advances?professionalId=${encodeURIComponent(professionalId)}`,
-  );
+/**
+ * Adiantamentos do profissional: os do período (abertos ou fechados) e os em
+ * aberto de qualquer data, do mais recente.
+ */
+export function listCommissionAdvances(params: {
+  professionalId: string;
+  from?: string;
+  to?: string;
+}): Promise<CommissionAdvance[]> {
+  const query = new URLSearchParams({ professionalId: params.professionalId });
+  if (params.from) query.set("from", params.from);
+  if (params.to) query.set("to", params.to);
+  return apiFetch<CommissionAdvance[]>(`/commission-advances?${query}`);
 }
 
 /** Disponível para adiantar (comissão em aberto − adiantado). */

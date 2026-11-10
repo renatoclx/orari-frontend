@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import {
+  parseCommission,
   serviceFieldOrder,
   validateServiceForm,
 } from "@/components/services/service-validation";
@@ -41,6 +42,45 @@ describe("validateServiceForm", () => {
       price: "10000000000",
     });
 
-    expect(Object.keys(errors)).toEqual(serviceFieldOrder);
+    // A comissão entra na ordem de foco, mas é conferida por parseCommission.
+    expect(Object.keys(errors)).toEqual(
+      serviceFieldOrder.filter((field) => field !== "commission"),
+    );
+  });
+});
+
+describe("parseCommission", () => {
+  const none = { percent: "", cents: "" };
+
+  it("sem tipo: tira a comissão", () => {
+    expect(parseCommission({ type: "NONE", ...none })).toEqual({
+      ok: true,
+      commissionType: null,
+      commissionValue: null,
+    });
+  });
+
+  it("percentual com vírgula, de 0,01 a 100", () => {
+    expect(
+      parseCommission({ type: "PERCENT", percent: "12,5", cents: "" }),
+    ).toMatchObject({ ok: true, commissionValue: 12.5 });
+    for (const bad of ["", "0", "101", "10,555", "abc"]) {
+      expect(
+        parseCommission({ type: "PERCENT", percent: bad, cents: "" }).ok,
+      ).toBe(false);
+    }
+  });
+
+  it("valor fixo em centavos vira reais; zero é recusado", () => {
+    expect(
+      parseCommission({ type: "FIXED", percent: "", cents: "2550" }),
+    ).toMatchObject({
+      ok: true,
+      commissionType: "FIXED",
+      commissionValue: 25.5,
+    });
+    expect(parseCommission({ type: "FIXED", percent: "", cents: "0" }).ok).toBe(
+      false,
+    );
   });
 });

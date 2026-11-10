@@ -2,7 +2,9 @@
 
 import { revalidatePath } from "next/cache";
 import {
+  parseCommission,
   validateServiceForm,
+  type ServiceErrorField,
   type ServiceFormValues,
 } from "@/components/services/service-validation";
 import { ApiError } from "@/services/api";
@@ -21,7 +23,7 @@ import { isUuid } from "@/lib/uuid";
 import type { ServiceInput } from "@/types/service";
 
 /** Campos do formulário de serviço a que um erro pode se referir. */
-export type ServiceField = keyof ServiceFormValues;
+export type ServiceField = ServiceErrorField;
 
 export type ServiceActionResult =
   | { ok: true }
@@ -51,9 +53,30 @@ function parseForm(
     };
   }
 
+  // A comissão só vem no formulário do ADMIN (campo de controle); sem ele,
+  // nada é enviado e a gravada não muda. A API confere de novo (403 e 400).
+  let commission = {};
+  if (data.get("commissionEnabled") === "1") {
+    const parsed = parseCommission({
+      type: formText(data, "commissionType"),
+      percent: formText(data, "commissionPercent"),
+      cents: formText(data, "commissionCents"),
+    });
+    if (!parsed.ok) {
+      return {
+        error: { ok: false, message: parsed.error, field: "commission" },
+      };
+    }
+    commission = {
+      commissionType: parsed.commissionType,
+      commissionValue: parsed.commissionValue,
+    };
+  }
+
   const color = formText(data, "color");
   return {
     input: {
+      ...commission,
       name: values.name,
       description: formText(data, "description") || null,
       // Centavos → reais, com até 2 casas decimais.

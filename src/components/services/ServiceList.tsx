@@ -45,6 +45,8 @@ type ServiceListProps = {
   search: string;
   /** Rodapé fixo do card (paginação). */
   footer: React.ReactNode;
+  /** Só o ADMIN define a comissão no formulário. */
+  canSetCommission: boolean;
 };
 
 // Círculo de 16 px, sem borda, com a cor do serviço (screens/servicos.md).
@@ -192,7 +194,12 @@ function ServiceDetails({ service }: { service: ServiceItem }) {
 }
 
 /** Card da listagem: tabela (computador) ou lista empilhada (celular), com as ações de cada serviço. */
-export function ServiceList({ services, search, footer }: ServiceListProps) {
+export function ServiceList({
+  services,
+  search,
+  footer,
+  canSetCommission,
+}: ServiceListProps) {
   // O serviço fica guardado ao fechar, para o dialog não trocar de título
   // durante a animação de saída.
   const [editing, setEditing] = useState<ServiceItem>();
@@ -372,6 +379,7 @@ export function ServiceList({ services, search, footer }: ServiceListProps) {
         open={editOpen}
         onOpenChange={setEditOpen}
         service={editing}
+        canSetCommission={canSetCommission}
       />
 
       <Dialog

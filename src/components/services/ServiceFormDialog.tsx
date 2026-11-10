@@ -7,7 +7,9 @@ import {
   createServiceAction,
   updateServiceAction,
 } from "@/app/(admin)/service-actions";
+import { CommissionField } from "@/components/services/CommissionField";
 import {
+  parseCommission,
   serviceFieldOrder,
   validateServiceForm,
   type ServiceFormErrors,
@@ -37,6 +39,8 @@ type ServiceFormDialogProps = {
   onOpenChange: (open: boolean) => void;
   /** Presente na alteração; sem isso, é o cadastro. */
   service?: ServiceItem;
+  /** Só o ADMIN define a comissão (a API recusa os demais). */
+  canSetCommission?: boolean;
 };
 
 // "50.00" (reais, texto da API) → "5000" (centavos, o que a máscara guarda).
@@ -49,6 +53,7 @@ const FIELD_IDS = {
   name: "service-name",
   duration: "service-duration",
   price: "service-price",
+  commission: "service-commission-value",
 } as const;
 
 // Dialog de formulário (screen-patterns.md) de cadastro e alteração de serviço.
@@ -58,11 +63,16 @@ export function ServiceFormDialog({
   open,
   onOpenChange,
   service,
+  canSetCommission = false,
 }: ServiceFormDialogProps) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-lg">
-        <ServiceForm service={service} onClose={() => onOpenChange(false)} />
+        <ServiceForm
+          service={service}
+          canSetCommission={canSetCommission}
+          onClose={() => onOpenChange(false)}
+        />
       </DialogContent>
     </Dialog>
   );
@@ -71,9 +81,11 @@ export function ServiceFormDialog({
 // Formulário em si; separado do Dialog para o estado começar limpo a cada abertura.
 function ServiceForm({
   service,
+  canSetCommission,
   onClose,
 }: {
   service?: ServiceItem;
+  canSetCommission: boolean;
   onClose: () => void;
 }) {
   const [errors, setErrors] = useState<ServiceFormErrors>({});
@@ -90,6 +102,14 @@ function ServiceForm({
       duration: String(data.get("duration") ?? ""),
       price: String(data.get("price") ?? ""),
     });
+    if (canSetCommission) {
+      const commission = parseCommission({
+        type: String(data.get("commissionType") ?? ""),
+        percent: String(data.get("commissionPercent") ?? ""),
+        cents: String(data.get("commissionCents") ?? ""),
+      });
+      if (!commission.ok) found.commission = commission.error;
+    }
     setErrors(found);
 
     const firstInvalid = serviceFieldOrder.find((field) => found[field]);
@@ -231,6 +251,15 @@ function ServiceForm({
         />
         <Label htmlFor="service-allows-classes">Aceitar turmas</Label>
       </div>
+
+      {canSetCommission && (
+        <CommissionField
+          id={FIELD_IDS.commission}
+          type={service?.commissionType}
+          value={service?.commissionValue}
+          error={errors.commission}
+        />
+      )}
 
       <ServiceProfessionalsField serviceId={service?.id} />
 

@@ -10,10 +10,15 @@ import { Can } from "@/components/layout/Access";
 type ServicesToolbarProps = {
   /** Termo da busca na URL (?q=). */
   search: string;
+  /** Só o ADMIN define a comissão no formulário. */
+  canSetCommission: boolean;
 };
 
 /** Busca por nome e botão de novo serviço (que abre o dialog de cadastro). */
-export function ServicesToolbar({ search }: ServicesToolbarProps) {
+export function ServicesToolbar({
+  search,
+  canSetCommission,
+}: ServicesToolbarProps) {
   const [creating, setCreating] = useState(false);
 
   return (
@@ -34,7 +39,11 @@ export function ServicesToolbar({ search }: ServicesToolbarProps) {
         </Button>
       </Can>
 
-      <ServiceFormDialog open={creating} onOpenChange={setCreating} />
+      <ServiceFormDialog
+        open={creating}
+        onOpenChange={setCreating}
+        canSetCommission={canSetCommission}
+      />
     </div>
   );
 }

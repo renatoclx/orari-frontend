@@ -31,6 +31,7 @@
 - Duração
 - Cor (que será exibida no agendamento)
 - Aceita turma
+- **Comissão do profissional** (só o ADMIN vê e define)
 - **Profissionais que atendem** (caixas de seleção com os profissionais ativos; busca ao abrir o formulário). O serviço aparece no **portal do cliente** quando tem ao menos um profissional. A lista é gravada depois do serviço, pela rota própria (`PUT /services/:id/professionals`); se a busca falhar, nada é apagado. Se só a lista falhar, o aviso diz que o serviço foi salvo e os profissionais não.
 
 ### Regras específicas
@@ -47,6 +48,13 @@
 - Aceita turma é opcional (desligado por padrão) e libera o serviço no cadastro de
   turmas (`turmas.md`). Desmarcar com turma ativa é recusado pela API (a mensagem
   aparece no toast).
+- Comissão do profissional (2026-11-10): `Select` com **Sem comissão** (padrão),
+  **Percentual** (campo "Percentual (%)", de 0,01 a 100, aceita vírgula) ou
+  **Valor fixo** (campo "Valor por atendimento", máscara R$). O campo de valor
+  muda com o tipo e é obrigatório quando há tipo; o erro aparece no campo.
+  Só o ADMIN vê o bloco (a API recusa e esconde para os demais). O atalho
+  "Novo serviço" da barra de ações não tem o campo: a comissão é definida ao
+  alterar o serviço. Vale para os atendimentos concluídos daí em diante.
 
 ---
 
@@ -72,6 +80,8 @@
   Duração - Preço;
   Cor;
   Aceita turma;
+  Comissão do profissional - Percentual ou Valor por atendimento (só ADMIN);
+  Profissionais que atendem;
 
 ---
 

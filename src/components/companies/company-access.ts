@@ -129,6 +129,12 @@ export const ACCESS_GROUPS: { label: string; features: AccessFeature[] }[] = [
         label: "Financeiro",
         actions: ["view"],
       },
+      // Só leitura; a API exige ver Contratações.
+      {
+        key: "packages-report",
+        label: "Pacotes",
+        actions: ["view"],
+      },
     ],
   },
 ];

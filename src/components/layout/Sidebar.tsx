@@ -218,6 +218,11 @@ const reportsGroup: NavGroup = {
       label: "Financeiro",
       feature: "financial-report",
     },
+    {
+      href: "/relatorios/pacotes",
+      label: "Pacotes",
+      feature: "packages-report",
+    },
   ],
 };
 

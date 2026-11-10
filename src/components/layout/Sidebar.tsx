@@ -223,6 +223,11 @@ const reportsGroup: NavGroup = {
       label: "Pacotes",
       feature: "packages-report",
     },
+    {
+      href: "/relatorios/perfil-do-cliente",
+      label: "Perfil do cliente",
+      feature: "clients-report",
+    },
   ],
 };
 

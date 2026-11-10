@@ -135,6 +135,12 @@ export const ACCESS_GROUPS: { label: string; features: AccessFeature[] }[] = [
         label: "Pacotes",
         actions: ["view"],
       },
+      // Só leitura; a API exige ver Clientes e Agendamentos.
+      {
+        key: "clients-report",
+        label: "Perfil do cliente",
+        actions: ["view"],
+      },
     ],
   },
 ];

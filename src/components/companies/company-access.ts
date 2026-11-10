@@ -61,6 +61,8 @@ export const ACCESS_GROUPS: { label: string; features: AccessFeature[] }[] = [
         label: "Métodos de pagamento",
         actions: ALL_ACTIONS,
       },
+      // Só o ADMIN. Pagar = Edita; cancelar e excluir = Exclui.
+      { key: "payables", label: "Contas a pagar", actions: ALL_ACTIONS },
       // Só o ADMIN usa (contas a pagar).
       {
         key: "expense-categories",

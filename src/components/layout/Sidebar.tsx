@@ -239,6 +239,11 @@ const reportsGroup: NavGroup = {
 
 // Comissões (screens/comissoes.md) e Categorias de despesa (contas a pagar):
 // só o ADMIN, no fim do grupo Financeiro.
+const payablesItem = {
+  href: "/financeiro/contas-a-pagar",
+  label: "Contas a pagar",
+  feature: "payables",
+};
 const adminFinanceItems = [
   { href: "/financeiro/comissoes", label: "Comissões", feature: "commissions" },
   {
@@ -433,11 +438,18 @@ function SidebarNav({
   );
   // Comissões (remuneração) e o que é das contas a pagar entram no grupo
   // Financeiro só para o ADMIN.
-  const withCommissions = navItems.map((entry) =>
-    isAdmin && "children" in entry && entry.label === "Financeiro"
-      ? { ...entry, children: [...entry.children, ...adminFinanceItems] }
-      : entry,
-  );
+  const withCommissions = navItems.map((entry) => {
+    if (!isAdmin || !("children" in entry) || entry.label !== "Financeiro") {
+      return entry;
+    }
+    // Contas a pagar logo abaixo de Contas a receber; o resto no fim.
+    const receivables = entry.children.findIndex(
+      (child) => child.href === "/financeiro",
+    );
+    const children = [...entry.children];
+    children.splice(receivables + 1, 0, payablesItem);
+    return { ...entry, children: [...children, ...adminFinanceItems] };
+  });
   const items = filterMenuByAccess(
     [
       ...(isAdmin ? [dashboardLink] : []),

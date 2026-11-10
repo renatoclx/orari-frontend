@@ -73,8 +73,9 @@ src/
                              contas-a-receber/, agendamentos/, rankings/,
                              financeiro/, pacotes/, perfil-do-cliente/
       dashboard/             Dashboard (só ADMIN): os números dos relatórios
-    (print)/                 versões de impressão dos relatórios (largura A4,
-                             tema claro): relatorios/<relatório>/imprimir/
+    (print)/                 versões de impressão (largura A4, tema claro):
+                             relatorios/<relatório>/imprimir/ e o recibo de
+                             comissão (financeiro/comissoes/recibo/[id])
     (auth)/                  telas públicas (sem sidebar)
       layout.tsx             dois painéis: formulário + painel da marca
       login/                 página e Server Action do login
@@ -120,6 +121,8 @@ src/
                              um relatório por pasta (filtros, cartões, gráficos,
                              listas, página e impressão)
     dashboard/               Dashboard (métricas, comparação, rosca)
+    commissions/             Comissões (filtros, cartões, abas, adiantamentos,
+                             fechamento e recibo)
     <tela>/                  componentes das demais telas (auth/)
   services/                  comunicação com a API e sessão (somente servidor)
   types/                     tipos do domínio, espelhando o backend
@@ -281,6 +284,15 @@ Só leitura e só do ADMIN; cada relatório é uma funcionalidade com só Visual
 - **Componentes compartilhados:** `shared/SummaryCard` (cartões), `rankings/RankingTable` (barras com posição), `clients-report/ShareList` (distribuições sem posição), gráficos Recharts via `ui/chart` com a prop `print` (sem animação).
 - **Dashboard** (`/dashboard`, item próprio no topo do menu): sem rota própria na API. `DashboardPage` chama as rotas dos relatórios que a empresa tem (`canAccess`) e, para a comparação, as mesmas rotas com o período anterior (`previousPeriod`, puro e testado). A rosca de métodos (`PaymentMethodDonut`) dá a cor pela ordem do cadastro de métodos (`payment-method-slices.ts`).
 - **Tokens de gráfico** no `globals.css` (`chart-*`); as regras visuais estão na skill `orari-ui`, "Relatórios e gráficos".
+
+## Comissões
+
+Só do ADMIN (remuneração). A comissão nasce sozinha na API (job na conclusão do atendimento); a tela consulta, lança adiantamentos, fecha e emite o recibo.
+
+- **Regra**: no formulário do serviço (`services/CommissionField`, só para o ADMIN: a página de Serviços passa `canSetCommission`; a Server Action só envia a comissão quando o formulário traz o campo de controle `commissionEnabled`). No profissional, a chave "Recebe comissão" (`PersonForm`, mesmo padrão).
+- **Tela** (`/financeiro/comissoes`, `CommissionsPage`, Server Component): filtros na URL (`commission-filters.ts`), resumo e lista em paralelo; com profissional, abas por link (`?aba=`) para Atendimentos, Adiantamentos e Fechamentos.
+- **Diálogos** (`AdvanceFormDialog`, `CloseCommissionDialog`): Client Components que buscam o disponível ou a prévia por Server Action (`commission-actions.ts`) quando o profissional ou a data mudam; o "buscando" é derivado de qual resposta está guardada (sem `setState` direto no efeito).
+- **Recibo** (`(print)/financeiro/comissoes/recibo/[id]`, `CommissionReceipt`): sai da cópia gravada no fechamento; valor por extenso em `utils/money-in-words.ts` (puro e testado).
 
 ## Configurações da empresa
 

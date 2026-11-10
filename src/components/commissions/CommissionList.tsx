@@ -1,4 +1,7 @@
-import { clientPaidStatus } from "@/components/commissions/commission-filters";
+import {
+  clientPaidStatus,
+  receiptNumber,
+} from "@/components/commissions/commission-filters";
 import { ListCard } from "@/components/shared/ListCard";
 import type { CommissionItem } from "@/types/commission";
 import { formatDateOnly, formatPrice } from "@/utils/format";
@@ -41,6 +44,12 @@ export function CommissionList({
       : status;
   };
 
+  // Em aberto ou o número do fechamento que a quitou.
+  const situation = (item: CommissionItem) =>
+    item.closing
+      ? `Fechado nº ${receiptNumber(item.closing.number)}`
+      : "Em aberto";
+
   return (
     <ListCard
       toolbar={tabs}
@@ -54,6 +63,7 @@ export function CommissionList({
         "Regra",
         "Comissão",
         "Cliente pagou",
+        "Situação",
       ]}
       emptyMessage={
         items.length > 0
@@ -75,6 +85,7 @@ export function CommissionList({
             {formatPrice(item.amount)}
           </td>
           <td className="px-4 py-3 whitespace-nowrap">{paid(item)}</td>
+          <td className="px-4 py-3 whitespace-nowrap">{situation(item)}</td>
         </tr>
       ))}
       cards={items.map((item) => (
@@ -89,7 +100,7 @@ export function CommissionList({
             {service(item)} · {ruleText(item)} de {formatPrice(item.baseAmount)}
           </p>
           <p className="text-sm text-muted-foreground tabular-nums">
-            {day(item)} · Cliente: {paid(item)}
+            {day(item)} · Cliente: {paid(item)} · {situation(item)}
           </p>
         </li>
       ))}

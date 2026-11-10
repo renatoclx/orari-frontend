@@ -101,6 +101,13 @@ Pontos conhecidos e aceitos por enquanto. Revisar quando o contexto mudar.
 - **Rosca com mais de 5 métodos:** do 6º em diante (pela ordem do cadastro) somam em "Outros", mesmo que um deles receba muito.
 - **Modelos de plano a revisar:** a distribuição dos relatórios por modelo é provisória.
 
+## Comissões
+
+- **Percentual por profissional:** hoje só "recebe ou não recebe"; um percentual diferente por profissional (ex.: Camila 50%) fica para quando um cliente pedir.
+- **Atalho "Novo serviço" da barra de ações** não tem o campo de comissão (só a página de Serviços sabe se o usuário é ADMIN); define-se ao alterar.
+- **Texto do recibo** é fixo; um modelo editável pela clínica fica para depois (pedido de 2026-11-10: "depois readaptamos").
+- **Fechamento não vira conta a pagar** ainda: entra quando o Contas a pagar existir.
+
 ## Empresas
 
 - **Usuários do SUPER_ADMIN.** A API exige `companyId` quando o SUPER_ADMIN cria um usuário e lista os usuários de todas as empresas. A tela de Usuários não pede nem filtra por empresa: para o SUPER_ADMIN, o cadastro responde 400 ("companyId é obrigatório") e a lista mistura empresas. O fluxo "Cadastrar administrador" de Empresas já envia a empresa; falta um seletor de empresa na tela de Usuários.

@@ -60,13 +60,10 @@ export const ACCESS_GROUPS: { label: string; features: AccessFeature[] }[] = [
         label: "Métodos de pagamento",
         actions: ALL_ACTIONS,
       },
-      // Só o ADMIN. Cria = lançar adiantamento; Exclui = excluir adiantamento.
-      // A API exige ver Profissionais e Pagamentos.
-      {
-        key: "commissions",
-        label: "Comissões",
-        actions: ["view", "create", "remove"],
-      },
+      // Só o ADMIN. Edita = fechar; Cria = lançar adiantamento; Exclui =
+      // excluir adiantamento ou desfazer fechamento. A API exige ver
+      // Profissionais e Pagamentos.
+      { key: "commissions", label: "Comissões", actions: ALL_ACTIONS },
     ],
   },
   {

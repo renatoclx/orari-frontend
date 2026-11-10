@@ -1,7 +1,12 @@
 import { monthOf } from "@/components/client-portfolio/portfolio-filters";
 import { AdvanceList } from "@/components/commissions/AdvanceList";
+import { CloseCommissionButton } from "@/components/commissions/CloseCommissionButton";
+import { ClosingList } from "@/components/commissions/ClosingList";
 import { CommissionList } from "@/components/commissions/CommissionList";
-import { CommissionTabs } from "@/components/commissions/CommissionTabs";
+import {
+  CommissionTabs,
+  type Tab,
+} from "@/components/commissions/CommissionTabs";
 import { LaunchAdvanceButton } from "@/components/commissions/LaunchAdvanceButton";
 import { CommissionProfessionalList } from "@/components/commissions/CommissionProfessionalList";
 import { CommissionsCards } from "@/components/commissions/CommissionsCards";
@@ -16,9 +21,11 @@ import { TablePagination } from "@/components/shared/TablePagination";
 import { getCurrentUser } from "@/services/auth.service";
 import {
   getCommissionSummary,
+  listClosings,
   listCommissionAdvances,
   listCommissions,
 } from "@/services/commission.service";
+import { listPaymentMethods } from "@/services/payment-method.service";
 import { listPeople } from "@/services/people.service";
 import { MAX_PAGE_SIZE } from "@/utils/fetch-all-pages";
 import { toDateString } from "@/utils/time";
@@ -64,10 +71,12 @@ export async function CommissionsPage({
   };
 
   // Aba do quadro do profissional; a de adiantamentos não depende do período.
-  const tab =
-    searchParams.aba === "adiantamentos" ? "adiantamentos" : "atendimentos";
+  const tab: Tab =
+    searchParams.aba === "adiantamentos" || searchParams.aba === "fechamentos"
+      ? searchParams.aba
+      : "atendimentos";
 
-  const [summary, list, advances] = await Promise.all([
+  const [summary, list, advances, closings, methods] = await Promise.all([
     getCommissionSummary(params),
     professionalId
       ? listCommissions({ ...params, page, limit: PAGE_SIZE })
@@ -75,21 +84,30 @@ export async function CommissionsPage({
     professionalId
       ? listCommissionAdvances(professionalId)
       : Promise.resolve(null),
+    professionalId ? listClosings(professionalId) : Promise.resolve(null),
+    // Métodos ativos, para o pagamento do fechamento.
+    professionalId
+      ? listPaymentMethods({ isActive: true, page: 1, limit: 100 })
+      : Promise.resolve(null),
   ]);
   const professionalName =
     options.find((option) => option.id === professionalId)?.name ?? "";
 
   // Mantém filtros e período; a página volta à primeira ao trocar de aba.
-  const tabHref = (key: "atendimentos" | "adiantamentos") => {
+  const tabHref = (key: Tab) => {
     const next = new URLSearchParams(query);
-    if (key === "adiantamentos") next.set("aba", key);
+    if (key !== "atendimentos") next.set("aba", key);
     return `${COMMISSIONS_PATH}?${next}`;
   };
-  const tabs = list && advances && (
+  const tabs = list && advances && closings && (
     <CommissionTabs
       active={tab}
       hrefFor={tabHref}
-      counts={{ atendimentos: list.total, adiantamentos: advances.length }}
+      counts={{
+        atendimentos: list.total,
+        adiantamentos: advances.length,
+        fechamentos: closings.length,
+      }}
     />
   );
 
@@ -103,11 +121,21 @@ export async function CommissionsPage({
             já foi adiantado e o que falta pagar.
           </p>
         </div>
-        <LaunchAdvanceButton
-          professionals={options}
-          defaultProfessionalId={professionalId}
-          today={today}
-        />
+        <div className="flex w-full flex-wrap gap-2 max-sm:flex-col-reverse sm:w-auto">
+          {/* Fechar só com um profissional escolhido no filtro. */}
+          {professionalId && methods && (
+            <CloseCommissionButton
+              professional={{ id: professionalId, name: professionalName }}
+              methods={methods.items.map(({ id, name }) => ({ id, name }))}
+              today={today}
+            />
+          )}
+          <LaunchAdvanceButton
+            professionals={options}
+            defaultProfessionalId={professionalId}
+            today={today}
+          />
+        </div>
       </div>
       <CommissionsToolbar
         filters={filters}
@@ -116,7 +144,13 @@ export async function CommissionsPage({
       />
       <CommissionsCards summary={summary} />
       <div className="flex min-h-[28rem] flex-1 flex-col">
-        {advances && tab === "adiantamentos" ? (
+        {closings && tab === "fechamentos" ? (
+          <ClosingList
+            closings={closings}
+            professionalName={professionalName}
+            tabs={tabs}
+          />
+        ) : advances && tab === "adiantamentos" ? (
           <AdvanceList
             advances={advances}
             professionalName={professionalName}

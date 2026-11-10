@@ -3,6 +3,10 @@ import "server-only";
 import { apiFetch } from "@/services/api";
 import type { Paginated } from "@/types/api";
 import type {
+  ClosingInput,
+  ClosingItem,
+  ClosingPreview,
+  ClosingReceipt,
   CommissionAdvance,
   CommissionAdvanceInput,
   CommissionItem,
@@ -73,4 +77,40 @@ export function createCommissionAdvance(
 
 export function deleteCommissionAdvance(id: string): Promise<void> {
   return apiFetch<void>(`/commission-advances/${id}`, { method: "DELETE" });
+}
+
+/** O que está em aberto até a data de corte. */
+export function getClosingPreview(
+  professionalId: string,
+  until: string,
+): Promise<ClosingPreview> {
+  const query = new URLSearchParams({ professionalId, until });
+  return apiFetch<ClosingPreview>(`/commission-closings/preview?${query}`);
+}
+
+/** Fecha e devolve o número do recibo. */
+export function createClosing(
+  input: ClosingInput,
+): Promise<{ id: string; number: number }> {
+  return apiFetch<{ id: string; number: number }>("/commission-closings", {
+    method: "POST",
+    body: JSON.stringify(input),
+  });
+}
+
+/** Fechamentos do profissional, do mais recente (inclusive desfeitos). */
+export function listClosings(professionalId: string): Promise<ClosingItem[]> {
+  return apiFetch<ClosingItem[]>(
+    `/commission-closings?professionalId=${encodeURIComponent(professionalId)}`,
+  );
+}
+
+/** Dados do recibo. */
+export function getClosingReceipt(id: string): Promise<ClosingReceipt> {
+  return apiFetch<ClosingReceipt>(`/commission-closings/${id}`);
+}
+
+/** Desfaz o fechamento (só o último do profissional). */
+export async function cancelClosing(id: string): Promise<void> {
+  await apiFetch(`/commission-closings/${id}`, { method: "DELETE" });
 }

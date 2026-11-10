@@ -1,8 +1,12 @@
 import Link from "next/link";
 import { cn } from "cn";
 
+/** Abas do quadro do profissional (o valor vai na URL, ?aba=). */
+export type Tab = "atendimentos" | "adiantamentos" | "fechamentos";
+
 /**
- * Abas do quadro do profissional (Atendimentos | Adiantamentos), por link:
+ * Abas do quadro do profissional (Atendimentos | Adiantamentos |
+ * Fechamentos), por link:
  * a aba fica na URL (?aba=) e a página é renderizada no servidor.
  */
 export function CommissionTabs({
@@ -10,11 +14,11 @@ export function CommissionTabs({
   hrefFor,
   counts,
 }: {
-  active: "atendimentos" | "adiantamentos";
-  hrefFor: (tab: "atendimentos" | "adiantamentos") => string;
-  counts: { atendimentos: number; adiantamentos: number };
+  active: Tab;
+  hrefFor: (tab: Tab) => string;
+  counts: Record<Tab, number>;
 }) {
-  const tab = (key: "atendimentos" | "adiantamentos", label: string) => (
+  const tab = (key: Tab, label: string) => (
     <Link
       href={hrefFor(key)}
       aria-current={active === key ? "page" : undefined}
@@ -35,6 +39,7 @@ export function CommissionTabs({
     >
       {tab("atendimentos", "Atendimentos")}
       {tab("adiantamentos", "Adiantamentos")}
+      {tab("fechamentos", "Fechamentos")}
     </nav>
   );
 }

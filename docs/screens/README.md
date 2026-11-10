@@ -34,6 +34,7 @@ diferente. Em caso de conflito, prevalece o arquivo da tela.
 | [portal-do-cliente.md](portal-do-cliente.md)               | Portal do cliente: regras e busca do app (só ADMIN)       |
 | [mensagens.md](mensagens.md)                               | Mensagens automáticas ao cliente do app (só ADMIN)        |
 | [ajuda.md](ajuda.md)                                       | Ajuda: manuais em PDF (só ADMIN)                          |
+| [comissoes.md](comissoes.md)                               | Comissões: consulta, adiantamentos, fechamento e recibo   |
 | [dashboard.md](dashboard.md)                               | Dashboard: os números dos relatórios (só ADMIN)           |
 | [carteira-clientes.md](carteira-clientes.md)               | Relatório: carteira de clientes por profissional          |
 | [contas-a-receber.md](contas-a-receber.md)                 | Relatório: contas a receber                               |

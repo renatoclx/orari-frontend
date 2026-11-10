@@ -65,3 +65,11 @@ export function clientPaidStatus(base: string, clientPaid: string) {
   if (paid <= 0) return "A receber" as const;
   return paid >= Number(base) ? ("Pago" as const) : ("Parcial" as const);
 }
+
+/** Número do recibo com quatro dígitos: 1 → "0001". */
+export const receiptNumber = (number: number) =>
+  String(number).padStart(4, "0");
+
+/** Endereço do recibo de um fechamento (versão de impressão, aba nova). */
+export const receiptHref = (closingId: string) =>
+  `${COMMISSIONS_PATH}/recibo/${closingId}`;

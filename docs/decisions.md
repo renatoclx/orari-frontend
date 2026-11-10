@@ -146,6 +146,13 @@ regras de cada tela, em `docs/screens/`.
 - **2026-11-10 — Cores categóricas `chart-cat-1..5`** para categorias sem ordem (métodos de pagamento), com a cor presa à entidade (ordem do cadastro), não à posição. _Por quê:_ verde e vermelho já dizem bom e ruim; e a cor não pode mudar quando o ranking muda.
 - **2026-11-10 — Modelo de plano "Agenda"** (só agendamento, com o app do cliente) e relatórios por modelo; empresa nova continua com todos. Empresas de teste em produção são ajustadas à mão (sem migração). Distribuição a revisar.
 
+## Comissão
+
+- **2026-11-10 — Comissão por serviço** (percentual do valor cobrado ou valor fixo), gerada na conclusão do atendimento, também sem o cliente ter pago; cancelado não gera; nada retroativo (`commissionSince`). _Por quê:_ o roteiro de 2026-11-04 e "da implantação em diante".
+- **2026-11-10 — Pacote: total contratado ÷ sessões geradas**, congelado (opção A). _Por quê:_ simples e não mexe no passado.
+- **2026-11-10 — Só o ADMIN define e vê a comissão;** o profissional vinculado a um usuário ADMIN nasce **sem comissão** (o dono que atende). _Por quê:_ é remuneração, e o dono não recebe de si mesmo.
+- **2026-11-10 — Adiantamento até o disponível;** pode ser excluído enquanto não fechado. **Fechamento** de tudo o que está em aberto até a data de corte, com método e data do pagamento, **recibo para assinar** (número sequencial, valor por extenso, detalhamento) e **desfazer só o último** (recibo cancelado, número não volta). _Por quê:_ fechar o mês é o uso comum; o recibo é o comprovante que o profissional assina.
+
 ## Qualidade e testes
 
 - **2026-10-23 — Testes automáticos só de funções puras e de pontos de borda do servidor,** com Vitest (a mesma ferramenta do backend) e `arquivo.spec.ts` ao lado do código. _Por quê:_ é onde está a regra que quebra sem barulho (fuso, arredondamento, disponibilidade de horários); componentes e telas seguem verificados à mão e com `axe-core`. Ponta a ponta (Playwright) fica fora por ora.

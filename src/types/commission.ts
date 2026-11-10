@@ -59,4 +59,54 @@ export type CommissionItem = {
   rate: string;
   amount: string;
   clientPaid: string;
+  /** Fechamento que a quitou; null = em aberto. */
+  closing: { id: string; number: number } | null;
+};
+
+/** O que está em aberto até a data de corte. */
+export type ClosingPreview = {
+  commissions: { count: number; amount: string };
+  advances: { count: number; amount: string };
+  toPay: string;
+};
+
+export type ClosingItem = {
+  id: string;
+  number: number;
+  /** "aaaa-mm-dd". */
+  cutoffDate: string;
+  paidAt: string;
+  paymentMethod: { id: string; name: string };
+  commissionTotal: string;
+  advanceTotal: string;
+  paidAmount: string;
+  appointmentsCount: number;
+  createdBy: { id: string; name: string };
+  createdAt: string;
+  /** Desfeito (recibo cancelado). */
+  cancelledAt: string | null;
+};
+
+export type ClosingReceipt = ClosingItem & {
+  company: { name: string; corporateReason: string; document: string };
+  professional: { id: string; name: string; document: string | null };
+  cancelledBy: { id: string; name: string } | null;
+  details: {
+    commissions: {
+      startAt: string;
+      client: string;
+      service: string;
+      base: string;
+      amount: string;
+    }[];
+    advances: { date: string; note: string | null; amount: string }[];
+  };
+};
+
+/** Corpo do POST /commission-closings. */
+export type ClosingInput = {
+  professionalId: string;
+  until: string;
+  paymentMethodId: string;
+  paidAt: string;
 };

@@ -3,8 +3,8 @@
 ## Objetivo
 
 Mostrar ao dono o que **entrou no caixa** no período: quanto, de onde
-(atendimentos ou pacotes) e por qual método de pagamento. Complementa o
-Contas a receber (o que falta receber) e os Rankings (o faturado).
+(atendimentos ou pacotes) e por qual método de pagamento. Complementa
+a Análise de recebíveis (o que falta receber) e os Rankings (o faturado).
 
 ## Acesso
 

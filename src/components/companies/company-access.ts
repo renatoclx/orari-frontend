@@ -39,6 +39,7 @@ export const ACCESS_GROUPS: { label: string; features: AccessFeature[] }[] = [
       { key: "clients", label: "Clientes", actions: ALL_ACTIONS },
       { key: "employees", label: "Funcionários", actions: ALL_ACTIONS },
       { key: "professionals", label: "Profissionais", actions: ALL_ACTIONS },
+      { key: "suppliers", label: "Fornecedores", actions: ALL_ACTIONS },
       { key: "users", label: "Usuários", actions: ALL_ACTIONS },
       { key: "services", label: "Serviços", actions: ALL_ACTIONS },
     ],
@@ -54,10 +55,16 @@ export const ACCESS_GROUPS: { label: string; features: AccessFeature[] }[] = [
     label: "Financeiro",
     features: [
       { key: "tabs", label: "Comandas", actions: ALL_ACTIONS },
-      { key: "payments", label: "Pagamentos", actions: ALL_ACTIONS },
+      { key: "payments", label: "Contas a receber", actions: ALL_ACTIONS },
       {
         key: "payment-methods",
         label: "Métodos de pagamento",
+        actions: ALL_ACTIONS,
+      },
+      // Só o ADMIN usa (contas a pagar).
+      {
+        key: "expense-categories",
+        label: "Categorias de despesa",
         actions: ALL_ACTIONS,
       },
       // Só o ADMIN. Edita = fechar; Cria = lançar adiantamento; Exclui =
@@ -112,7 +119,7 @@ export const ACCESS_GROUPS: { label: string; features: AccessFeature[] }[] = [
       // Só leitura; a API exige ver Pagamentos e Clientes.
       {
         key: "receivables",
-        label: "Contas a receber",
+        label: "Análise de recebíveis",
         actions: ["view"],
       },
       // Só leitura; a API exige ver Agendamentos.

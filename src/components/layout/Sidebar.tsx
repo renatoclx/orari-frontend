@@ -92,6 +92,11 @@ const navItems: (NavLink | NavGroup)[] = [
         label: "Profissionais",
         feature: "professionals",
       },
+      {
+        href: "/fornecedores",
+        label: "Fornecedores",
+        feature: "suppliers",
+      },
       { href: "/usuarios", label: "Usuários", feature: "users" },
     ],
   },
@@ -118,7 +123,7 @@ const navItems: (NavLink | NavGroup)[] = [
     icon: Wallet,
     children: [
       { href: "/financeiro/comandas", label: "Comandas", feature: "tabs" },
-      { href: "/financeiro", label: "Pagamentos", feature: "payments" },
+      { href: "/financeiro", label: "Contas a receber", feature: "payments" },
       {
         href: "/financeiro/metodos-de-pagamento",
         label: "Métodos de pagamento",
@@ -200,8 +205,8 @@ const reportsGroup: NavGroup = {
       feature: "client-portfolio",
     },
     {
-      href: "/relatorios/contas-a-receber",
-      label: "Contas a receber",
+      href: "/relatorios/analise-de-recebiveis",
+      label: "Análise de recebíveis",
       feature: "receivables",
     },
     {
@@ -232,12 +237,16 @@ const reportsGroup: NavGroup = {
   ],
 };
 
-// Comissões (screens/comissoes.md): só o ADMIN, no fim do grupo Financeiro.
-const commissionsItem = {
-  href: "/financeiro/comissoes",
-  label: "Comissões",
-  feature: "commissions",
-};
+// Comissões (screens/comissoes.md) e Categorias de despesa (contas a pagar):
+// só o ADMIN, no fim do grupo Financeiro.
+const adminFinanceItems = [
+  { href: "/financeiro/comissoes", label: "Comissões", feature: "commissions" },
+  {
+    href: "/financeiro/categorias-de-despesa",
+    label: "Categorias de despesa",
+    feature: "expense-categories",
+  },
+];
 
 // Dashboard (screens/dashboard.md): só o ADMIN, no topo do menu. A página
 // inicial continua sendo a agenda.
@@ -392,7 +401,7 @@ function isActivePath(pathname: string, href: string): boolean {
 }
 
 // Subitem ativo de um grupo: o de caminho mais específico (em
-// /financeiro/metodos-de-pagamento, "Métodos de pagamento", não "Pagamentos").
+// /financeiro/metodos-de-pagamento, "Métodos de pagamento", não "Contas a receber").
 function activeChildHref(
   pathname: string,
   children: { href: string }[],
@@ -422,11 +431,11 @@ function SidebarNav({
   const services = navItems.findIndex(
     (entry) => "href" in entry && entry.href === "/servicos",
   );
-  // Comissões é remuneração do profissional: o item entra no grupo Financeiro
-  // só para o ADMIN.
+  // Comissões (remuneração) e o que é das contas a pagar entram no grupo
+  // Financeiro só para o ADMIN.
   const withCommissions = navItems.map((entry) =>
     isAdmin && "children" in entry && entry.label === "Financeiro"
-      ? { ...entry, children: [...entry.children, commissionsItem] }
+      ? { ...entry, children: [...entry.children, ...adminFinanceItems] }
       : entry,
   );
   const items = filterMenuByAccess(

@@ -33,7 +33,7 @@ const text = (value: string | string[] | undefined) =>
 const date = (value: string | string[] | undefined) =>
   isDateString(text(value)) ? text(value) : "";
 
-// Pagamentos (screens/financeiro.md): renderizada no servidor, com filtros e
+// Contas a receber (antes "Pagamentos"; screens/financeiro.md): renderizada no servidor, com filtros e
 // página pela URL. O resumo e a listagem são buscados juntos.
 export async function PaymentsListPage({
   searchParams,
@@ -95,7 +95,7 @@ export async function PaymentsListPage({
 
   return (
     <div className="flex min-h-0 flex-1 flex-col gap-4">
-      <h1 className="text-2xl font-semibold">Pagamentos</h1>
+      <h1 className="text-2xl font-semibold">Contas a receber</h1>
       <PaymentsSummary summary={summary} filters={filters} />
       <PaymentsToolbar
         filters={filters}

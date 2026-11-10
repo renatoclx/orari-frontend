@@ -12,7 +12,7 @@ const AGING_COLORS = {
 } as const;
 
 /**
- * Atrasados por idade (screens/contas-a-receber.md): uma barra por faixa de
+ * Atrasados por idade (screens/analise-de-recebiveis.md): uma barra por faixa de
  * dias, com o valor e a quantidade escritos ao lado (não depende da cor nem
  * do mouse). A cor escurece com a idade do atraso, do laranja ao vinho.
  */

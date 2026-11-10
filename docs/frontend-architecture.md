@@ -70,7 +70,7 @@ src/
       portal-access-actions.ts  Server Actions do link de acesso e de Confirmar
                              cliente
       relatorios/            relatórios (só ADMIN): carteira-clientes/,
-                             contas-a-receber/, agendamentos/, rankings/,
+                             analise-de-recebiveis/, agendamentos/, rankings/,
                              financeiro/, pacotes/, perfil-do-cliente/
       dashboard/             Dashboard (só ADMIN): os números dos relatórios
     (print)/                 versões de impressão (largura A4, tema claro):

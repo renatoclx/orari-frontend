@@ -34,10 +34,11 @@ diferente. Em caso de conflito, prevalece o arquivo da tela.
 | [portal-do-cliente.md](portal-do-cliente.md)               | Portal do cliente: regras e busca do app (só ADMIN)       |
 | [mensagens.md](mensagens.md)                               | Mensagens automáticas ao cliente do app (só ADMIN)        |
 | [ajuda.md](ajuda.md)                                       | Ajuda: manuais em PDF (só ADMIN)                          |
+| [contas-a-pagar.md](contas-a-pagar.md)                     | Contas a pagar e categorias de despesa (só ADMIN)         |
 | [comissoes.md](comissoes.md)                               | Comissões: consulta, adiantamentos, fechamento e recibo   |
 | [dashboard.md](dashboard.md)                               | Dashboard: os números dos relatórios (só ADMIN)           |
 | [carteira-clientes.md](carteira-clientes.md)               | Relatório: carteira de clientes por profissional          |
-| [contas-a-receber.md](contas-a-receber.md)                 | Relatório: contas a receber                               |
+| [analise-de-recebiveis.md](analise-de-recebiveis.md)       | Relatório: análise de recebíveis (atraso, inadimplência)  |
 | [relatorio-agendamentos.md](relatorio-agendamentos.md)     | Relatório: agendamentos e horários de pico                |
 | [rankings.md](rankings.md)                                 | Relatório: rankings de serviços, profissionais e clientes |
 | [relatorio-financeiro.md](relatorio-financeiro.md)         | Relatório: o que entrou no caixa                          |

@@ -46,7 +46,7 @@ ao relatório completo.
   - **Rankings**: top 5 serviços e top 5 profissionais (concluídos e
     faturado);
   - **Perfil do cliente**: tipo de atendimento e por onde agendam;
-  - **Contas a receber** (atraso por tempo) e **Pacotes** (por pacote): lado a
+  - **Análise de recebíveis** (atraso por tempo) e **Pacotes** (por pacote): lado a
     lado só em telas bem largas (`2xl`).
 
 ## Fora desta etapa

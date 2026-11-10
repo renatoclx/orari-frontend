@@ -18,7 +18,7 @@ import { toDateString } from "@/utils/time";
 const day = (value: string) => formatDateOnly(`${value}T00:00:00Z`);
 
 /**
- * Contas a receber para imprimir (screens/contas-a-receber.md): os mesmos
+ * Análise de recebíveis para imprimir (screens/analise-de-recebiveis.md): os mesmos
  * filtros da tela, com a lista inteira dos clientes com atraso.
  */
 export async function ReceivablesPrintPage({
@@ -49,7 +49,7 @@ export async function ReceivablesPrintPage({
     <>
       <AutoPrint />
       <PrintHeader
-        title="Contas a receber"
+        title="Análise de recebíveis"
         companyName={company.name}
         timeZone={company.timezone}
         details={details}

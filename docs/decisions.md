@@ -141,10 +141,14 @@ regras de cada tela, em `docs/screens/`.
 - **2026-11-09 — Relatórios só do ADMIN, cada um com funcionalidade própria (só Visualiza),** marcados no modelo padrão. _Por quê:_ mostram faturamento; e a venda por versões precisa ligar e desligar cada um.
 - **2026-11-09 — Toda impressão é uma rota própria `(print)/.../imprimir`,** em aba nova e tema claro, com a lista inteira. _Por quê:_ o `window.print` da tela pegaria o tema escuro, a sidebar e só a página atual da lista.
 - **2026-11-10 — Menu Relatórios em um nível só;** ordem feita: Agendamentos, Rankings, Financeiro, Pacotes, Perfil do cliente e Dashboard.
-- **2026-11-10 — Financeiro pela data do pagamento** (o que entrou no caixa); Rankings pelo atendimento concluído (o faturado); Contas a receber pelo vencimento (o que falta). _Por quê:_ três perguntas diferentes sobre dinheiro, sem um relatório repetir o outro.
+- **2026-11-10 — Financeiro pela data do pagamento** (o que entrou no caixa); Rankings pelo atendimento concluído (o faturado); Análise de recebíveis pelo vencimento (o que falta). _Por quê:_ três perguntas diferentes sobre dinheiro, sem um relatório repetir o outro.
 - **2026-11-10 — Dashboard é item próprio no topo da sidebar** (a agenda continua sendo a página inicial), só visual, e **sem API própria:** cada bloco usa a rota do relatório e segue a funcionalidade dele; as métricas comparam com o período anterior. _Por quê:_ o número do Dashboard é sempre o do relatório.
 - **2026-11-10 — Cores categóricas `chart-cat-1..5`** para categorias sem ordem (métodos de pagamento), com a cor presa à entidade (ordem do cadastro), não à posição. _Por quê:_ verde e vermelho já dizem bom e ruim; e a cor não pode mudar quando o ranking muda.
 - **2026-11-10 — Modelo de plano "Agenda"** (só agendamento, com o app do cliente) e relatórios por modelo; empresa nova continua com todos. Empresas de teste em produção são ajustadas à mão (sem migração). Distribuição a revisar.
+
+## Contas a receber e a pagar
+
+- **2026-11-10 — "Pagamentos" passa a se chamar Contas a receber** (menu e tela; rota e funcionalidade iguais), simétrico ao Contas a pagar; o relatório que se chamava "Contas a receber" vira **Análise de recebíveis** (rota `/relatorios/analise-de-recebiveis`). _Por quê:_ a tela operacional fica com o nome simples, e o relatório, que é análise, não disputa o nome.
 
 ## Comissão
 

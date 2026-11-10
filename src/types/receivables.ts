@@ -1,4 +1,4 @@
-// Contas a receber da empresa (screens/contas-a-receber.md).
+// Análise de recebíveis da empresa (screens/analise-de-recebiveis.md).
 
 /** Soma (texto com duas casas) e quantidade de pagamentos. */
 export type ReceivablesTotal = {

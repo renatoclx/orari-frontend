@@ -5,7 +5,7 @@ export function ReceivablesLoading() {
   return (
     <div className="flex min-h-0 flex-1 flex-col gap-4">
       <div className="space-y-1">
-        <h1 className="text-2xl font-semibold">Contas a receber</h1>
+        <h1 className="text-2xl font-semibold">Análise de recebíveis</h1>
         <Skeleton className="h-4 w-72" />
       </div>
       <div className="flex flex-wrap items-center gap-3">

@@ -19,7 +19,7 @@ type ReceivablesToolbarProps = {
 };
 
 /**
- * Filtros do Contas a receber (na URL): o período (recebido e inadimplência)
+ * Filtros da Análise de recebíveis (na URL): o período (recebido e inadimplência)
  * e a busca da lista. No celular fica só a busca; o período é o mês atual.
  */
 export function ReceivablesToolbar({

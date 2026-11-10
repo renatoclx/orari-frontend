@@ -1,18 +1,21 @@
-# Contas a receber
+# Análise de recebíveis
+
+> Até 2026-11-10 se chamava "Contas a receber"; o nome passou para a tela
+> operacional do Financeiro (antes "Pagamentos").
 
 ## Objetivo
 
 Mostrar à clínica o que há para receber, o que está atrasado e há quanto tempo,
-e quem deve. Complementa a tela de Pagamentos (que lista e dá baixa) com a visão
+e quem deve. Complementa a tela **Contas a receber** do Financeiro (que lista e dá baixa) com a visão
 de conjunto.
 
 ## Acesso
 
-- Rota: `/relatorios/contas-a-receber`.
-- Menu: grupo **Relatórios**, item "Contas a receber". Só o **ADMIN**; a API
+- Rota: `/relatorios/analise-de-recebiveis`.
+- Menu: grupo **Relatórios**, item "Análise de recebíveis". Só o **ADMIN**; a API
   também recusa os demais.
 - Funcionalidade em Acessos e limites, só com a ação Visualiza: `receivables`
-  ("Contas a receber"). Nasce desmarcada; exige ver Pagamentos e Clientes. Mais
+  ("Análise de recebíveis"). Nasce desmarcada; exige ver Pagamentos e Clientes. Mais
   tarde fará parte de todos os planos.
 
 ## Regras
@@ -30,7 +33,7 @@ de conjunto.
 
 ## Layout
 
-- Cabeçalho: título "Contas a receber" e descrição curta.
+- Cabeçalho: título "Análise de recebíveis" e descrição curta.
 - Filtros (na URL): **Período** (trocar uma data leva a outra junto) e a busca
   por nome da lista. No celular fica só a busca.
 - Quatro cartões (padrão dos de Pagamentos, `SummaryCard`):

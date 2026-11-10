@@ -1,7 +1,7 @@
-// Filtros do Contas a receber (na URL), comuns ao servidor e ao navegador.
+// Filtros da Análise de recebíveis (na URL), comuns ao servidor e ao navegador.
 import { isDateString } from "@/utils/time";
 
-export const RECEIVABLES_PATH = "/relatorios/contas-a-receber";
+export const RECEIVABLES_PATH = "/relatorios/analise-de-recebiveis";
 
 export type ReceivablesFiltersState = {
   /** "aaaa-mm-dd"; vazias = mês atual. */
@@ -62,7 +62,7 @@ export function receivablesQuery(
   return query;
 }
 
-/** Link para Pagamentos com os atrasados (de um cliente, se informado). */
+/** Link para Contas a receber (Financeiro) com os atrasados (de um cliente, se informado). */
 export function overduePaymentsHref(clientId?: string) {
   const query = new URLSearchParams({ status: "atrasados" });
   if (clientId) query.set("cliente", clientId);

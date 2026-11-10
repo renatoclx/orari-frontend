@@ -26,7 +26,7 @@ type ReceivablesPageProps = {
 };
 
 /**
- * Contas a receber (screens/contas-a-receber.md): renderizada no servidor,
+ * Análise de recebíveis (screens/analise-de-recebiveis.md): renderizada no servidor,
  * com período, busca e página pela URL. Valor inválido na URL é ignorado.
  */
 export async function ReceivablesPage({ searchParams }: ReceivablesPageProps) {
@@ -50,7 +50,7 @@ export async function ReceivablesPage({ searchParams }: ReceivablesPageProps) {
     <div className="-m-1 flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto p-1">
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div className="space-y-1">
-          <h1 className="text-2xl font-semibold">Contas a receber</h1>
+          <h1 className="text-2xl font-semibold">Análise de recebíveis</h1>
           <p className="text-sm text-muted-foreground">
             O que há para receber, o que está atrasado e há quanto tempo.
           </p>

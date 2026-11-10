@@ -1,4 +1,10 @@
-# Clientes, Funcionários e Profissionais
+# Clientes, Funcionários, Profissionais e Fornecedores
+
+> **Fornecedores** (2026-11-10): quarto tipo de pessoa (`SUPPLIER`), favorecido
+> das contas a pagar. Mesmas telas e campos dos demais (`PEOPLE_KINDS`), rota
+> `/fornecedores`, item **Pessoas → Fornecedores** (antes de Usuários) e
+> funcionalidade `suppliers` em Acessos e limites (Cadastros). O documento,
+> como nos demais tipos, é CPF.
 
 ## Listagem
 

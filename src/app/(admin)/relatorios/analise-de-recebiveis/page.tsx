@@ -4,13 +4,13 @@ import { ReceivablesPage } from "@/components/receivables/ReceivablesPage";
 import { requireFeature } from "@/lib/require-feature";
 
 export const metadata: Metadata = {
-  title: "Contas a receber | Orari",
+  title: "Análise de recebíveis | Orari",
 };
 
-// Relatórios → Contas a receber: só o ADMIN, com a funcionalidade no plano.
+// Relatórios → Análise de recebíveis: só o ADMIN, com a funcionalidade no plano.
 export default async function ReceivablesRoute({
   searchParams,
-}: PageProps<"/relatorios/contas-a-receber">) {
+}: PageProps<"/relatorios/analise-de-recebiveis">) {
   const user = await requireFeature("receivables");
   // Números financeiros da empresa: só o ADMIN (a API também recusa os demais).
   if (user.type !== "ADMIN") notFound();

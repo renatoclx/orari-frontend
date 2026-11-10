@@ -73,7 +73,7 @@ function TooltipBody({
 }
 
 /**
- * Mês a mês pelo vencimento (screens/contas-a-receber.md): recebido, a vencer
+ * Mês a mês pelo vencimento (screens/analise-de-recebiveis.md): recebido, a vencer
  * e atrasado empilhados, nos 6 meses até o atual e nos 3 seguintes.
  */
 export function ReceivablesMonthsChart({

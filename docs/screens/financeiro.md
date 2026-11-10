@@ -3,14 +3,18 @@
 O Financeiro tem duas telas, que compartilham a mesma baixa de pagamentos:
 
 1. **Comandas** (`/financeiro/comandas`): fechamento do atendimento, no balcão.
-2. **Pagamentos** (`/financeiro`): todas as cobranças, com filtros e baixa.
+2. **Contas a receber** (`/financeiro`, antes "Pagamentos"): todas as cobranças, com filtros e baixa.
 
-Menu Financeiro, em ordem: Comandas, Pagamentos e Métodos de pagamento
+Menu Financeiro, em ordem: Comandas, Contas a receber e Métodos de pagamento
 (`metodos-pagamento.md`).
 
 ---
 
-## Pagamentos
+## Contas a receber (antes "Pagamentos")
+
+- Título da tela e item do menu: **Contas a receber** (2026-11-10). A rota
+  (`/financeiro`) e a funcionalidade (`payments`, "Contas a receber" em
+  Acessos e limites) não mudaram.
 
 ### Objetivo
 
@@ -102,7 +106,7 @@ dos atendimentos e dos pagamentos que já existem.
   Cancelado e Não compareceu não entram.
 - Todo cliente que **pagou algo hoje** (a comanda paga continua na lista).
 - Cliente com pendência mas sem atendimento hoje **não** tem comanda: ele é
-  cobrado pela tela de Pagamentos.
+  cobrado pela tela Contas a receber.
 
 ### Itens da comanda
 
@@ -155,7 +159,7 @@ Três grupos, nesta ordem:
   pendências anteriores, **desmarcadas**, para o atendente decidir.
 - Total a receber (dos itens marcados), método de pagamento (obrigatório; só os
   ativos) e data do pagamento (padrão hoje), os mesmos campos da baixa em
-  Pagamentos.
+  Contas a receber.
 - Botões: Cancelar e **Finalizar comanda** (desabilitado sem item marcado). A
   baixa é de todos os marcados, tudo ou nada; os desmarcados continuam
   pendentes.
@@ -174,7 +178,7 @@ Três grupos, nesta ordem:
   conciliação (o método de pagamento precisaria de um marcador "aceita
   parcelas"). Decidido em 2026-10-22: fora do MVP.
 - Estorno e cancelamento de pagamento pela tela; exportar a listagem.
-- Contas a receber completo: aging dos atrasados, visão por período.
+- Análise de recebíveis completa: aging dos atrasados, visão por período (feito no relatório Análise de recebíveis).
 
 ---
 

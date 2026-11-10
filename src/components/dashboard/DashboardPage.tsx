@@ -207,8 +207,8 @@ export async function DashboardPage({
             <div className="grid gap-4 2xl:grid-cols-2">
               {receivables && (
                 <DashboardSection
-                  title="Contas a receber"
-                  href="/relatorios/contas-a-receber"
+                  title="Análise de recebíveis"
+                  href="/relatorios/analise-de-recebiveis"
                 >
                   <div className="xl:col-span-2">
                     <ReceivablesAgingChart aging={receivables.aging} />

@@ -4,13 +4,13 @@ import { ReceivablesPrintPage } from "@/components/receivables/ReceivablesPrintP
 import { requireFeature } from "@/lib/require-feature";
 
 export const metadata: Metadata = {
-  title: "Contas a receber (impressão) | Orari",
+  title: "Análise de recebíveis (impressão) | Orari",
 };
 
 // Mesmo acesso da tela: só o ADMIN, com a funcionalidade no plano.
 export default async function ReceivablesPrintRoute({
   searchParams,
-}: PageProps<"/relatorios/contas-a-receber/imprimir">) {
+}: PageProps<"/relatorios/analise-de-recebiveis/imprimir">) {
   const user = await requireFeature("receivables");
   if (user.type !== "ADMIN") notFound();
   return <ReceivablesPrintPage searchParams={await searchParams} />;

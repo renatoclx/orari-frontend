@@ -19,8 +19,8 @@ const percent = new Intl.NumberFormat("pt-BR", {
 });
 
 /**
- * Cartões do resumo (screens/contas-a-receber.md). A receber e Atrasado são
- * atalhos para Pagamentos; recebido e inadimplência valem para o período.
+ * Cartões do resumo (screens/analise-de-recebiveis.md). A receber e Atrasado são
+ * atalhos para Contas a receber (Financeiro); recebido e inadimplência valem para o período.
  */
 export function ReceivablesSummaryCards({
   summary,

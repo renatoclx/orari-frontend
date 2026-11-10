@@ -21,7 +21,7 @@ type ReceivablesDebtorListProps = {
 
 const DAY_MS = 24 * 60 * 60 * 1000;
 
-/** Clientes com atraso (screens/contas-a-receber.md), maior valor primeiro. */
+/** Clientes com atraso (screens/analise-de-recebiveis.md), maior valor primeiro. */
 export function ReceivablesDebtorList({
   debtors,
   filtered,

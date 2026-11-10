@@ -6,7 +6,7 @@ export type ContactType = "MAIN" | "MESSAGE" | "BRANCH";
 export type AddressType = "MAIN" | "MESSAGE" | "BRANCH";
 
 /** Espelha o enum PeopleType do backend. */
-export type PeopleType = "CLIENT" | "EMPLOYEE" | "PROFESSIONAL";
+export type PeopleType = "CLIENT" | "EMPLOYEE" | "PROFESSIONAL" | "SUPPLIER";
 
 /** Contato principal que a listagem de pessoas traz junto de cada item. */
 export type PrincipalContact = {

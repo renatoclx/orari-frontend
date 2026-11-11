@@ -97,8 +97,10 @@ export async function DashboardPage({
     { header: "Faturado", cell: (row: RankingRow) => formatPrice(row.amount) },
   ];
 
+  // relative: os absolutos de dentro (sr-only, dicas dos gráficos) não
+  // esticam a página além da rolagem própria.
   return (
-    <div className="-m-1 flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto p-1">
+    <div className="relative -m-1 flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto p-1">
       <div className="space-y-1">
         <h1 className="text-2xl font-semibold">Dashboard</h1>
         <p className="text-sm text-muted-foreground">

@@ -50,14 +50,16 @@
   <div>
     <p>O menu leva a cada parte do sistema:</p>
     <ul>
+      <li><b>Dashboard</b>: os principais números da clínica.</li>
       <li><b>Agendamentos</b>: a agenda do dia.</li>
       <li><b>Recorrências</b>: horários fixos toda semana.</li>
-      <li><b>Pessoas</b>: clientes e profissionais.</li>
+      <li><b>Pessoas</b>: clientes, funcionários, profissionais e fornecedores.</li>
       <li><b>Serviços</b>: o que a clínica oferece.</li>
       <li><b>Pacotes</b>: planos e contratações.</li>
-      <li><b>Financeiro</b>: comandas, pagamentos e métodos de pagamento.</li>
+      <li><b>Financeiro</b>: comandas, contas a receber e a pagar, métodos de pagamento e comissões.</li>
+      <li><b>Relatórios</b>: os números da clínica por assunto.</li>
     </ul>
-    <p>Os itens com uma seta (<span class="ui">Pessoas</span>, <span class="ui">Pacotes</span>, <span class="ui">Financeiro</span>) abrem uma lista com mais opções. O botão no topo do menu o recolhe, para sobrar mais espaço na tela.</p>
+    <p>Turmas, Anamnese, Portal do cliente, Mensagens e Ajuda têm manuais próprios. Os itens com uma seta (<span class="ui">Pessoas</span>, <span class="ui">Pacotes</span>, <span class="ui">Financeiro</span>, <span class="ui">Relatórios</span>) abrem uma lista com mais opções. Os itens dependem do seu plano. O botão no topo do menu o recolhe, para sobrar mais espaço na tela.</p>
   </div>
 </div>
 
@@ -298,13 +300,13 @@
 <figure><img src="images/24-contratacao-detalhe.png" alt=""><figcaption>Detalhe da contratação.</figcaption></figure>
 <h3>Repor uma sessão em que o cliente faltou</h3>
 <p>Se o cliente faltou a uma sessão do pacote (veja <b>Agenda</b> &rarr; <b>Marcar que o cliente faltou</b>), a sessão pode ser reposta: abra <span class="ui">Ver sessões</span>, e na sessão <b>Não compareceu</b> clique no ícone <span class="ui">Repor sessão</span>. Escolha o novo dia e horário, dentro do período da contratação, e clique em <span class="ui">Repor</span>. A sessão volta a <b>Agendado</b> na nova data, e o total de sessões do pacote não muda.</p>
-<div class="box tip"><b class="t">Dica</b><p>Os atendimentos do pacote aparecem na agenda com o ícone de pacote. Eles não geram cobrança avulsa: o valor já está nas parcelas do pacote. As parcelas são recebidas em <span class="ui">Financeiro</span> &rarr; <span class="ui">Pagamentos</span>.</p></div>
+<div class="box tip"><b class="t">Dica</b><p>Os atendimentos do pacote aparecem na agenda com o ícone de pacote. Eles não geram cobrança avulsa: o valor já está nas parcelas do pacote. As parcelas são recebidas em <span class="ui">Financeiro</span> &rarr; <span class="ui">Contas a receber</span>.</p></div>
 
 <!-- ===== 7 ===== -->
 <h1 class="chapter" data-toc="Financeiro"><span class="num"></span>Financeiro</h1>
 <p class="lead">Receber os atendimentos e acompanhar o que está pago, a vencer ou atrasado.</p>
 
-<p>O menu <span class="ui">Financeiro</span> tem três partes. <b>Comandas</b> é o fechamento no balcão, quando o cliente está na clínica. <b>Pagamentos</b> mostra todas as cobranças. <b>Métodos de pagamento</b> cadastra as formas de pagamento aceitas.</p>
+<p>Neste capítulo, as três partes do menu <span class="ui">Financeiro</span> que recebem dos clientes. <b>Comandas</b> é o fechamento no balcão, quando o cliente está na clínica. <b>Contas a receber</b> mostra todas as cobranças. <b>Métodos de pagamento</b> cadastra as formas de pagamento aceitas. As despesas (<b>Contas a pagar</b>) e as <b>Comissões</b> da equipe têm manuais próprios.</p>
 <div class="box warn"><b class="t">Primeiro, cadastre os métodos</b><p>Para receber qualquer pagamento, é preciso ter ao menos um método de pagamento ativo (Pix, dinheiro, cartão…). Veja a seção “Métodos de pagamento”, mais adiante neste capítulo.</p></div>
 
 <h2>Comandas</h2>
@@ -321,15 +323,15 @@
 <figure class="w55"><img src="images/27-comanda-receber.png" alt=""><figcaption>Comanda de um cliente.</figcaption></figure>
 <div class="box tip"><b class="t">Dica</b><p>Um atendimento mostra “Aguardando conclusão” até terminar. A cobrança dele nasce quando o atendimento é concluído, depois do horário. Sessões de pacote aparecem como “Incluído no pacote”, sem valor a receber.</p></div>
 
-<h2>Pagamentos</h2>
-<p>Em <span class="ui">Financeiro</span> &rarr; <span class="ui">Pagamentos</span> está tudo o que a clínica tem a receber e já recebeu. Os três cartões do topo somam os valores:</p>
+<h2>Contas a receber</h2>
+<p>Em <span class="ui">Financeiro</span> &rarr; <span class="ui">Contas a receber</span> está tudo o que a clínica tem a receber e já recebeu. Os três cartões do topo somam os valores:</p>
 <ul>
   <li><b>Atrasado</b>: venceu antes de hoje e não foi pago.</li>
   <li><b>A vencer</b>: vence de hoje em diante.</li>
   <li><b>Recebido</b>: já foi pago.</li>
 </ul>
 <p>Clique em um cartão para filtrar a lista por ele. Os filtros acima da tabela permitem escolher a situação, o período de vencimento, o cliente e o método.</p>
-<figure><img src="images/28-pagamentos.png" alt=""><figcaption>Lista de pagamentos, com o resumo no topo.</figcaption></figure>
+<figure><img src="images/28-pagamentos.png" alt=""><figcaption>Contas a receber, com o resumo no topo.</figcaption></figure>
 
 <h3>Dar baixa em um pagamento</h3>
 <ol class="steps">
@@ -388,7 +390,7 @@
 <ul>
   <li>Na agenda, o ícone ao lado do nome do profissional troca a coluna exibida.</li>
   <li>O botão com um calendário, no topo, leva a outro dia.</li>
-  <li>Os filtros de tabelas ficam ocultos no celular. Na tela de Pagamentos, não há cartões de resumo: só a lista e o filtro de <b>situação</b> (pendentes, atrasados, pagos...), que continua à mostra.</li>
+  <li>Os filtros de tabelas ficam ocultos no celular. Na tela de Contas a receber, não há cartões de resumo: só a lista e o filtro de <b>situação</b> (pendentes, atrasados, pagos...), que continua à mostra.</li>
   <li>Na agenda, <span class="ui">Novo Agendamento</span> e <span class="ui">Encaixar horário</span> ficam um abaixo do outro, na largura da tela.</li>
   <li>As tabelas viram listas de cartões, inclusive as sessões de uma recorrência e as parcelas e agendas de uma contratação, sem rolagem lateral.</li>
 </ul>
@@ -410,7 +412,7 @@
 <h3>Não consigo cancelar ou remanejar um atendimento.</h3>
 <p>Só é possível antes de o atendimento começar. Atendimentos em andamento, concluídos ou já cancelados não aceitam essas ações.</p>
 <h3>A comanda de um cliente não aparece.</h3>
-<p>Ela aparece para quem tem atendimento hoje, ou pagou algo hoje. Um cliente que só tem pendências antigas é cobrado em <span class="ui">Financeiro</span> &rarr; <span class="ui">Pagamentos</span>.</p>
+<p>Ela aparece para quem tem atendimento hoje, ou pagou algo hoje. Um cliente que só tem pendências antigas é cobrado em <span class="ui">Financeiro</span> &rarr; <span class="ui">Contas a receber</span>.</p>
 <h3>Não consigo dar baixa: não há métodos de pagamento.</h3>
 <p>Cadastre ao menos um método ativo em <span class="ui">Financeiro</span> &rarr; <span class="ui">Métodos de pagamento</span>.</p>
 <h3>Um cliente foi cadastrado errado.</h3>

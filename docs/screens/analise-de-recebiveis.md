@@ -15,7 +15,7 @@ de conjunto.
 - Menu: grupo **Relatórios**, item "Análise de recebíveis". Só o **ADMIN**; a API
   também recusa os demais.
 - Funcionalidade em Acessos e limites, só com a ação Visualiza: `receivables`
-  ("Análise de recebíveis"). Nasce desmarcada; exige ver Pagamentos e Clientes. Mais
+  ("Análise de recebíveis"). Nasce desmarcada; exige ver Contas a receber e Clientes. Mais
   tarde fará parte de todos os planos.
 
 ## Regras
@@ -23,7 +23,7 @@ de conjunto.
 - Tudo sai dos **pagamentos**: atendimento avulso, recorrência e contratação de
   plano. Cancelados e excluídos ficam de fora.
 - **Atrasado**: pendente com vencimento antes de hoje (a mesma regra de
-  Pagamentos), no calendário da empresa.
+  Contas a receber), no calendário da empresa.
 - **Período** (de/até; padrão: o mês atual) vale só para o recebido (pela data
   do pagamento) e a inadimplência. O resto é a situação de hoje.
 - **Inadimplência**: do que venceu no período até ontem, a parte que segue
@@ -36,9 +36,9 @@ de conjunto.
 - Cabeçalho: título "Análise de recebíveis" e descrição curta.
 - Filtros (na URL): **Período** (trocar uma data leva a outra junto) e a busca
   por nome da lista. No celular fica só a busca.
-- Quatro cartões (padrão dos de Pagamentos, `SummaryCard`):
-  - **A receber** (neutro): todo pendente; leva a Pagamentos.
-  - **Atrasado** (vermelho): valor e quantos clientes; leva a Pagamentos
+- Quatro cartões (padrão dos de Contas a receber, `SummaryCard`):
+  - **A receber** (neutro): todo pendente; leva a Contas a receber.
+  - **Atrasado** (vermelho): valor e quantos clientes; leva a Contas a receber
     filtrado em atrasados.
   - **Recebido no período** (verde).
   - **Inadimplência** (vermelho quando há): porcentagem e "R$ x de R$ y".
@@ -53,7 +53,7 @@ de conjunto.
     encostar no vermelho; a dica mostra os valores.
 - Lista dos clientes com atraso, do maior valor para o menor: cliente, valor em
   atraso, quantidade de pagamentos e vencimento mais antigo ("há N dias"). Ações:
-  **Ver pagamentos atrasados** (Pagamentos filtrado pelo cliente) e, para quem
+  **Ver pagamentos atrasados** (Contas a receber filtrado pelo cliente) e, para quem
   tem celular, **WhatsApp** (`wa.me`, sem envio pelo Orari).
 - A página rola como um painel; a lista tem altura mínima e rola por dentro.
 - **Imprimir** (cabeçalho, só no computador): abre numa aba nova a versão de

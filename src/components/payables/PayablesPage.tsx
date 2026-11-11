@@ -138,7 +138,9 @@ export async function PayablesPage({
         payees={payees}
         categories={allCategories}
       />
-      {visibility.block && commissions.length > 0 && (
+      {/* Montado mesmo sem comissões: guarda o diálogo de fechamento aberto
+          depois que o profissional sai do bloco. */}
+      {visibility.block && (
         <OpenCommissions
           commissions={commissions}
           methods={methodOptions}

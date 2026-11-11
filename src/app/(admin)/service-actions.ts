@@ -83,8 +83,12 @@ function parseForm(
       price: values.price ? Number(values.price) / 100 : null,
       duration: Number(values.duration),
       color: HEX_COLOR.test(color) ? color : null,
-      // O Switch só envia o campo quando está ligado ("on").
-      allowsClasses: data.get("allowsClasses") === "on",
+      // Só com Turmas liberadas o campo está na tela (campo de controle
+      // classesEnabled); sem ele, nada vai e o valor gravado não muda. O
+      // Switch só envia o campo quando está ligado ("on").
+      ...(data.get("classesEnabled") === "1" && {
+        allowsClasses: data.get("allowsClasses") === "on",
+      }),
     },
   };
 }

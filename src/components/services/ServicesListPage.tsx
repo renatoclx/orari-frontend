@@ -2,6 +2,7 @@ import { ServiceList } from "@/components/services/ServiceList";
 import { ServicesToolbar } from "@/components/services/ServicesToolbar";
 import { TablePagination } from "@/components/shared/TablePagination";
 import { getCurrentUser } from "@/services/auth.service";
+import { canAccess } from "@/utils/access";
 import { listServices } from "@/services/service.service";
 
 // Itens por página da listagem (a API aceita até 100).
@@ -26,8 +27,9 @@ export async function ServicesListPage({
     getCurrentUser(),
   ]);
   // Comissão é remuneração do profissional: só o ADMIN define (e a API só a
-  // devolve para ele).
-  const canSetCommission = user.type === "ADMIN";
+  // devolve para ele), e só com Comissões liberadas para a empresa.
+  const canSetCommission =
+    user.type === "ADMIN" && canAccess(user.access, "commissions");
 
   return (
     <div className="flex min-h-0 flex-1 flex-col gap-4">

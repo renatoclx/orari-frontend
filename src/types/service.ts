@@ -34,7 +34,8 @@ export type ServiceInput = {
   price: number | null;
   duration: number;
   color: string | null;
-  allowsClasses: boolean;
+  /** Só vai com Turmas liberadas; ausente, o valor gravado não muda. */
+  allowsClasses?: boolean;
   /** Só o ADMIN envia; ausente, a comissão gravada não muda. */
   commissionType?: CommissionType | null;
   commissionValue?: number | null;

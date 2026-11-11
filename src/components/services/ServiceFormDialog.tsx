@@ -7,6 +7,7 @@ import {
   createServiceAction,
   updateServiceAction,
 } from "@/app/(admin)/service-actions";
+import { useCan } from "@/components/layout/Access";
 import { CommissionField } from "@/components/services/CommissionField";
 import {
   parseCommission,
@@ -91,6 +92,8 @@ function ServiceForm({
   const [errors, setErrors] = useState<ServiceFormErrors>({});
   const [pending, startTransition] = useTransition();
   const editing = service !== undefined;
+  // "Aceitar turmas" só faz sentido com Turmas liberadas para a empresa.
+  const showsClasses = useCan("class-groups");
 
   function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -242,15 +245,20 @@ function ServiceForm({
         />
       </FormField>
 
-      {/* Liga o serviço ao cadastro de turmas (vários clientes no mesmo horário). */}
-      <div className="flex items-center justify-center gap-2">
-        <Switch
-          id="service-allows-classes"
-          name="allowsClasses"
-          defaultChecked={service?.allowsClasses ?? false}
-        />
-        <Label htmlFor="service-allows-classes">Aceitar turmas</Label>
-      </div>
+      {/* Liga o serviço ao cadastro de turmas (vários clientes no mesmo
+          horário). Só com Turmas liberadas; o campo de controle diz à action
+          que a caixa estava na tela. */}
+      {showsClasses && (
+        <div className="flex items-center justify-center gap-2">
+          <input type="hidden" name="classesEnabled" value="1" />
+          <Switch
+            id="service-allows-classes"
+            name="allowsClasses"
+            defaultChecked={service?.allowsClasses ?? false}
+          />
+          <Label htmlFor="service-allows-classes">Aceitar turmas</Label>
+        </div>
+      )}
 
       {canSetCommission && (
         <CommissionField

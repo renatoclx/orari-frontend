@@ -150,11 +150,18 @@ function ServiceActions({
 
 // Conteúdo do dialog de visualização.
 function ServiceDetails({ service }: { service: ServiceItem }) {
+  // Sem Turmas liberadas, a linha "Aceita turmas" não faz sentido.
+  const showsClasses = useCan("class-groups");
   const rows: [string, React.ReactNode][] = [
     ["Descrição", service.description],
     ["Preço", service.price && formatPrice(service.price)],
     ["Duração", formatDuration(service.duration)],
-    ["Aceita turmas", service.allowsClasses ? "Sim" : "Não"],
+    ...(showsClasses
+      ? ([["Aceita turmas", service.allowsClasses ? "Sim" : "Não"]] as [
+          string,
+          React.ReactNode,
+        ][])
+      : []),
     [
       "Cor",
       service.color && (

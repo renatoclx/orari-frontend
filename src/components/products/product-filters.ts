@@ -14,6 +14,8 @@ export type ProductFiltersState = {
   supplier: string;
   /** Situação (?status=): "active", "inactive" ou ALL. */
   status: string;
+  /** Estoque (?estoque=baixo): "low" ou ALL. */
+  stock: string;
 };
 
 type SearchParams = Record<string, string | string[] | undefined>;
@@ -32,6 +34,7 @@ export function readProductFilters(
     category: uuid(text(searchParams.categoria)),
     supplier: uuid(text(searchParams.fornecedor)),
     status: status === "active" || status === "inactive" ? status : ALL,
+    stock: text(searchParams.estoque) === "baixo" ? "low" : ALL,
   };
 }
 
@@ -46,6 +49,7 @@ export function productQuery(
   if (next.category !== ALL) query.set("categoria", next.category);
   if (next.supplier !== ALL) query.set("fornecedor", next.supplier);
   if (next.status !== ALL) query.set("status", next.status);
+  if (next.stock !== ALL) query.set("estoque", "baixo");
   return query;
 }
 
@@ -56,5 +60,6 @@ export function productApiFilters(filters: ProductFiltersState) {
     categoryId: filters.category === ALL ? undefined : filters.category,
     supplierId: filters.supplier === ALL ? undefined : filters.supplier,
     isActive: filters.status === ALL ? undefined : filters.status === "active",
+    lowStock: filters.stock === "low" || undefined,
   };
 }

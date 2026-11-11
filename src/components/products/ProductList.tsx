@@ -3,9 +3,11 @@
 import Link from "next/link";
 import { useState, useTransition } from "react";
 import {
+  ArrowDownUp,
   Ban,
   EllipsisVertical,
   Eye,
+  History,
   Pencil,
   RotateCcw,
   Trash2,
@@ -22,6 +24,13 @@ import {
   ProductDetails,
 } from "@/components/products/ProductDetails";
 import { ProductPhoto } from "@/components/products/ProductPhoto";
+import { StockHistoryDialog } from "@/components/products/StockHistoryDialog";
+import {
+  StockMovementDialog,
+  type PurchasePayableContext,
+} from "@/components/products/StockMovementDialog";
+import { isLowStock } from "@/components/products/stock-movements";
+import { Badge } from "@/components/ui/badge";
 import { ConfirmDialog } from "@/components/shared/ConfirmDialog";
 import { Hint } from "@/components/shared/Hint";
 import { ListCard } from "@/components/shared/ListCard";
@@ -39,6 +48,10 @@ import { formatPrice } from "@/utils/format";
 
 type ProductListProps = {
   products: Product[];
+  /** O que a compra precisa para lançar a conta a pagar (`null`: sem a opção). */
+  payable: PurchasePayableContext | null;
+  /** Fuso da empresa, para as datas do histórico. */
+  timeZone: string;
   /** Há busca ou filtro: a lista vazia diz que nada foi encontrado. */
   filtered: boolean;
   /** Rodapé fixo do card (paginação). */
@@ -47,6 +60,8 @@ type ProductListProps = {
 
 type RowHandlers = {
   onView: (product: Product) => void;
+  onMove: (product: Product) => void;
+  onHistory: (product: Product) => void;
   onDeactivate: (product: Product) => void;
   onRestore: (product: Product) => void;
   onDelete: (product: Product) => void;
@@ -54,11 +69,13 @@ type RowHandlers = {
   busy: boolean;
 };
 
-// Coluna Ações (screen-patterns.md): Alterar à vista; Visualizar, Inativar ou
-// Reativar e Excluir no menu de três pontos.
+// Coluna Ações (screen-patterns.md): Alterar e Movimentar estoque (frequente)
+// à vista; Visualizar, Histórico, Inativar ou Reativar e Excluir no menu.
 function ProductActions({
   product,
   onView,
+  onMove,
+  onHistory,
   onDeactivate,
   onRestore,
   onDelete,
@@ -82,6 +99,18 @@ function ProductActions({
           </Button>
         </Hint>
       )}
+      {canEdit && (
+        <Hint label={`Movimentar estoque de ${product.name}`}>
+          <Button
+            variant="ghost"
+            size="icon"
+            aria-label={`Movimentar estoque de ${product.name}`}
+            onClick={() => onMove(product)}
+          >
+            <ArrowDownUp aria-hidden="true" />
+          </Button>
+        </Hint>
+      )}
 
       {/* modal={false}: o menu fecha antes do diálogo abrir, sem travar a página. */}
       <DropdownMenu modal={false}>
@@ -100,6 +129,10 @@ function ProductActions({
           <DropdownMenuItem onSelect={() => onView(product)}>
             <Eye aria-hidden="true" />
             Visualizar
+          </DropdownMenuItem>
+          <DropdownMenuItem onSelect={() => onHistory(product)}>
+            <History aria-hidden="true" />
+            Histórico de estoque
           </DropdownMenuItem>
           {canRemove && (
             <>
@@ -143,6 +176,20 @@ function Prices({ product }: { product: Product }) {
   );
 }
 
+// Estoque atual e, abaixo do mínimo, o selo (o mínimo vai na dica).
+function Stock({ product }: { product: Product }) {
+  return (
+    <div className="flex flex-wrap items-center gap-2 tabular-nums">
+      {product.currentStock}
+      {isLowStock(product) && (
+        <Badge variant="destructive" title={`Mínimo: ${product.minimalStock}`}>
+          Estoque baixo
+        </Badge>
+      )}
+    </div>
+  );
+}
+
 // Foto, nome e SKU: o SKU fica abaixo do nome, em texto menor.
 function NameCell({ product }: { product: Product }) {
   return (
@@ -159,8 +206,19 @@ function NameCell({ product }: { product: Product }) {
 }
 
 /** Card da listagem: tabela (computador) ou lista empilhada (celular). */
-export function ProductList({ products, filtered, footer }: ProductListProps) {
+export function ProductList({
+  products,
+  payable,
+  timeZone,
+  filtered,
+  footer,
+}: ProductListProps) {
   const [viewing, setViewing] = useState<Product | null>(null);
+  // Guardado ao fechar, para o dialog não trocar de conteúdo na animação.
+  const [moving, setMoving] = useState<Product>();
+  const [moveOpen, setMoveOpen] = useState(false);
+  const [history, setHistory] = useState<Product>();
+  const [historyOpen, setHistoryOpen] = useState(false);
   const [deactivating, setDeactivating] = useState<Product | null>(null);
   const [deleting, setDeleting] = useState<Product | null>(null);
   const [pending, startTransition] = useTransition();
@@ -214,6 +272,14 @@ export function ProductList({ products, filtered, footer }: ProductListProps) {
 
   const handlers: RowHandlers = {
     onView: setViewing,
+    onMove: (product) => {
+      setMoving(product);
+      setMoveOpen(true);
+    },
+    onHistory: (product) => {
+      setHistory(product);
+      setHistoryOpen(true);
+    },
     onDeactivate: setDeactivating,
     onRestore: restore,
     onDelete: setDeleting,
@@ -256,7 +322,9 @@ export function ProductList({ products, filtered, footer }: ProductListProps) {
               <MarginValue margin={product.profitMargin} />
             </dd>
             <dt className="text-muted-foreground">Estoque</dt>
-            <dd className="tabular-nums">{product.currentStock}</dd>
+            <dd>
+              <Stock product={product} />
+            </dd>
             <dt className="text-muted-foreground">Status</dt>
             <dd>
               <StatusBadge active={product.isActive} />
@@ -276,7 +344,9 @@ export function ProductList({ products, filtered, footer }: ProductListProps) {
           <td className="px-4 py-3 tabular-nums">
             <MarginValue margin={product.profitMargin} />
           </td>
-          <td className="px-4 py-3 tabular-nums">{product.currentStock}</td>
+          <td className="px-4 py-3">
+            <Stock product={product} />
+          </td>
           <td className="px-4 py-3">
             <StatusBadge active={product.isActive} />
           </td>
@@ -301,6 +371,23 @@ export function ProductList({ products, filtered, footer }: ProductListProps) {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {moving && (
+        <StockMovementDialog
+          open={moveOpen}
+          onOpenChange={setMoveOpen}
+          product={moving}
+          payable={payable}
+        />
+      )}
+      {history && (
+        <StockHistoryDialog
+          open={historyOpen}
+          onOpenChange={setHistoryOpen}
+          product={history}
+          timeZone={timeZone}
+        />
+      )}
 
       <ConfirmDialog
         open={deactivating !== null}

@@ -1,9 +1,7 @@
 "use client";
 
-import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Plus, X } from "lucide-react";
-import { Can } from "@/components/layout/Access";
+import { TriangleAlert, X } from "lucide-react";
 import {
   ALL,
   PRODUCTS_PATH,
@@ -23,8 +21,8 @@ import {
 type Option = { id: string; name: string };
 
 /**
- * Busca (nome ou SKU), filtros de categoria, fornecedor e situação (na URL) e
- * o botão de novo produto. No celular ficam a busca e a situação.
+ * Busca (nome ou SKU), filtros de categoria, fornecedor e situação e o
+ * "Estoque baixo" (na URL). No celular somem categoria e fornecedor.
  */
 export function ProductsToolbar({
   filters,
@@ -114,6 +112,17 @@ export function ProductsToolbar({
         </SelectContent>
       </Select>
 
+      {/* Liga e desliga: mais curto que um select de duas opções. */}
+      <Button
+        variant="outline"
+        aria-pressed={filters.stock === "low"}
+        className="aria-pressed:border-destructive aria-pressed:bg-destructive/5 aria-pressed:text-destructive max-sm:w-full dark:aria-pressed:text-red-400"
+        onClick={() => change({ stock: filters.stock === "low" ? ALL : "low" })}
+      >
+        <TriangleAlert aria-hidden="true" />
+        Estoque baixo
+      </Button>
+
       {hasFilters && (
         <Button
           variant="ghost"
@@ -124,15 +133,6 @@ export function ProductsToolbar({
           Limpar filtros
         </Button>
       )}
-
-      <Can feature="products" action="create">
-        <Button asChild className="w-full sm:ml-auto sm:w-auto">
-          <Link href={`${PRODUCTS_PATH}/novo`}>
-            <Plus aria-hidden="true" />
-            Novo produto
-          </Link>
-        </Button>
-      </Can>
     </div>
   );
 }

@@ -13,12 +13,19 @@ import { failureFrom, type ActionFailure } from "@/lib/action-result";
 import { ApiError } from "@/services/api";
 import {
   createProduct,
+  createStockMovement,
   deleteProduct,
+  listStockMovements,
   removeProductPhoto,
   updateProduct,
   uploadProductPhoto,
 } from "@/services/product.service";
-import type { ProductInput } from "@/types/product";
+import type { Paginated } from "@/types/api";
+import type {
+  ProductInput,
+  StockMovement,
+  StockMovementInput,
+} from "@/types/product";
 
 export type ProductListActionResult = { ok: true } | ActionFailure;
 
@@ -131,7 +138,10 @@ export async function updateProductAction(
   const rejected = invalid(values);
   if (rejected) return rejected;
 
-  const { supplierId, ...input } = toProductInput(values);
+  // O estoque atual não vai: muda só pelas movimentações (a API recusa).
+  const { supplierId, ...product } = toProductInput(values);
+  const input: Partial<ProductInput> = { ...product };
+  delete input.currentStock;
   try {
     await updateProduct(id, {
       ...input,
@@ -143,4 +153,41 @@ export async function updateProductAction(
   const photoFailed = await savePhoto(id, data);
   revalidatePath(PATH);
   return { ok: true, photoFailed };
+}
+
+export type StockMovementActionResult =
+  { ok: true; movement: StockMovement } | ActionFailure<"quantity">;
+
+/**
+ * Movimentar o estoque. Estoque insuficiente (409) e ajuste igual ao saldo
+ * vão para o campo da quantidade; os demais erros, para o aviso.
+ */
+export async function createStockMovementAction(
+  productId: string,
+  input: StockMovementInput,
+): Promise<StockMovementActionResult> {
+  let movement: StockMovement;
+  try {
+    movement = await createStockMovement(productId, input);
+  } catch (error) {
+    const result = failureFrom(error);
+    return {
+      ...result,
+      field: /estoque|saldo/i.test(result.message) ? "quantity" : undefined,
+    };
+  }
+  revalidatePath(PATH);
+  return { ok: true, movement };
+}
+
+/** Histórico do produto (o dialog busca ao abrir e a cada "Carregar mais"). */
+export async function listStockMovementsAction(
+  productId: string,
+  page: number,
+): Promise<{ ok: true; page: Paginated<StockMovement> } | ActionFailure> {
+  try {
+    return { ok: true, page: await listStockMovements(productId, page, 20) };
+  } catch (error) {
+    return failureFrom(error);
+  }
 }

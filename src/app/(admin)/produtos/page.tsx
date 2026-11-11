@@ -13,5 +13,5 @@ export default async function ProductsPage({
 }: PageProps<"/produtos">) {
   const user = await requireFeature("products");
   if (user.type !== "ADMIN") notFound();
-  return <ProductsListPage searchParams={await searchParams} />;
+  return <ProductsListPage searchParams={await searchParams} user={user} />;
 }

@@ -53,3 +53,44 @@ export type ProductInput = {
   minimalStock: number | null;
   maximumStock: number | null;
 };
+
+/** Motivo da movimentação de estoque (o saldo inicial vem do cadastro). */
+export type StockMovementType =
+  "INITIAL" | "PURCHASE" | "INTERNAL_USE" | "LOSS" | "ADJUSTMENT";
+
+/** Tipos lançados à mão no dialog Movimentar estoque. */
+export type ManualMovementType = Exclude<StockMovementType, "INITIAL">;
+
+/** Uma linha do histórico de estoque (GET /products/:id/stock-movements). */
+export type StockMovement = {
+  id: string;
+  type: StockMovementType;
+  /** Variação: positiva na entrada, negativa na saída. */
+  quantity: number;
+  /** Saldo logo depois desta movimentação. */
+  balanceAfter: number;
+  unitCost: string | null;
+  note: string | null;
+  createdAt: string;
+  /** Vazio no saldo de antes do controle de estoque. */
+  createdBy: { id: string; name: string } | null;
+  payable: { id: string; description: string; status: string } | null;
+};
+
+/**
+ * Corpo de POST /products/:id/stock-movements. `quantity`: unidades (1 ou
+ * mais) na entrada e nas saídas; o saldo contado no ajuste.
+ */
+export type StockMovementInput = {
+  type: ManualMovementType;
+  quantity: number;
+  unitCost?: number;
+  note?: string;
+  payable?: {
+    /** Sem ele, o fornecedor do produto; `null`, nenhum. */
+    payeeId?: string | null;
+    categoryId: string;
+    dueDate: string;
+    paid?: { paidAt: string; paymentMethodId: string };
+  };
+};

@@ -386,26 +386,43 @@ export function ProductForm({
                     ["minimalStock", "Mínimo", false],
                     ["maximumStock", "Máximo", false],
                   ] as const
-                ).map(([field, label, required]) => (
-                  <FormField
-                    key={field}
-                    id={fieldId(field)}
-                    label={label}
-                    required={required}
-                    error={errors[field]}
-                  >
-                    <MaskedInput
+                ).map(([field, label, required]) => {
+                  // Na alteração, o atual só muda pelas movimentações.
+                  const locked = editing && field === "currentStock";
+                  return (
+                    <FormField
+                      key={field}
                       id={fieldId(field)}
-                      mask={maskStock}
-                      value={values[field]}
-                      onValueChange={(digits) => set(field, digits)}
-                      inputMode="numeric"
-                      placeholder="0"
-                      aria-invalid={invalid(field)}
-                    />
-                  </FormField>
-                ))}
+                      label={label}
+                      required={required && !locked}
+                      error={errors[field]}
+                    >
+                      <MaskedInput
+                        id={fieldId(field)}
+                        mask={maskStock}
+                        value={values[field]}
+                        onValueChange={(digits) => set(field, digits)}
+                        inputMode="numeric"
+                        placeholder="0"
+                        readOnly={locked}
+                        className={locked ? "bg-muted" : undefined}
+                        aria-describedby={
+                          locked ? "product-stock-hint" : undefined
+                        }
+                        aria-invalid={invalid(field)}
+                      />
+                    </FormField>
+                  );
+                })}
               </div>
+              <p
+                id="product-stock-hint"
+                className="text-sm text-muted-foreground"
+              >
+                {editing
+                  ? "O estoque atual muda pelo Movimentar estoque, na lista de produtos."
+                  : "O estoque atual é o saldo inicial: depois, ele muda pelo Movimentar estoque."}
+              </p>
             </section>
           </div>
         </div>

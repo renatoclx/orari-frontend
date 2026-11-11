@@ -29,6 +29,8 @@ export type CommissionAdvance = {
   /** "aaaa-mm-dd". */
   date: string;
   note: string | null;
+  /** Como foi pago; vazio nos lançados antes de o campo existir. */
+  paymentMethod: { id: string; name: string } | null;
   /** Quem lançou. */
   createdBy: { id: string; name: string };
   createdAt: string;
@@ -41,6 +43,7 @@ export type CommissionAdvanceInput = {
   professionalId: string;
   amount: number;
   date: string;
+  paymentMethodId: string;
   note?: string;
 };
 

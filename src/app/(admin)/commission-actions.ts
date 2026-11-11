@@ -22,6 +22,13 @@ import { isDateString } from "@/utils/time";
 import { toDateString } from "@/utils/time";
 
 const PATH = "/financeiro/comissoes";
+// Adiantamento e fechamento geram (ou desfazem) contas no Contas a pagar.
+const PAYABLES_PATH = "/financeiro/contas-a-pagar";
+
+function revalidateBoth() {
+  revalidatePath(PATH);
+  revalidatePath(PAYABLES_PATH);
+}
 
 export type AdvanceActionResult = { ok: true } | ActionFailure<AdvanceField>;
 
@@ -49,6 +56,7 @@ export async function createAdvanceAction(
     professionalId: formText(data, "professionalId"),
     cents: formText(data, "cents"),
     date: formText(data, "date"),
+    paymentMethodId: formText(data, "paymentMethodId"),
   };
   const errors = validateAdvance(
     values,
@@ -66,6 +74,13 @@ export async function createAdvanceAction(
       message: "Profissional inválido.",
     };
   }
+  if (!isUuid(values.paymentMethodId)) {
+    return {
+      ok: false,
+      field: "paymentMethodId",
+      message: "Método de pagamento inválido.",
+    };
+  }
 
   const note = formText(data, "note").trim();
   try {
@@ -74,6 +89,7 @@ export async function createAdvanceAction(
       // Centavos → reais.
       amount: Number(values.cents) / 100,
       date: values.date,
+      paymentMethodId: values.paymentMethodId,
       ...(note && { note }),
     });
   } catch (error) {
@@ -83,7 +99,7 @@ export async function createAdvanceAction(
       ? { ...failure, field: "cents" }
       : failure;
   }
-  revalidatePath(PATH);
+  revalidateBoth();
   return { ok: true };
 }
 
@@ -97,7 +113,7 @@ export async function deleteAdvanceAction(
   } catch (error) {
     return failureFrom(error);
   }
-  revalidatePath(PATH);
+  revalidateBoth();
   return { ok: true };
 }
 
@@ -164,7 +180,7 @@ export async function createClosingAction(
       paymentMethodId,
       paidAt,
     });
-    revalidatePath(PATH);
+    revalidateBoth();
     return { ok: true, ...closing };
   } catch (error) {
     return failureFrom<ClosingField>(error);
@@ -181,6 +197,6 @@ export async function cancelClosingAction(
   } catch (error) {
     return failureFrom(error);
   }
-  revalidatePath(PATH);
+  revalidateBoth();
   return { ok: true };
 }

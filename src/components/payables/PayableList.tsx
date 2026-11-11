@@ -3,6 +3,7 @@
 import {
   Ban,
   EllipsisVertical,
+  Eye,
   HandCoins,
   Pencil,
   Trash2,
@@ -20,6 +21,7 @@ import {
   PayableFormDialog,
   type PayeeOption,
 } from "@/components/payables/PayableFormDialog";
+import { receiptHref } from "@/components/commissions/commission-filters";
 import { payableTitle } from "@/components/payables/payable-filters";
 import { SettlePayablesDialog } from "@/components/payables/SettlePayablesDialog";
 import { ConfirmDialog } from "@/components/shared/ConfirmDialog";
@@ -138,7 +140,36 @@ export function PayableList({
     );
   }
 
+  // Gerada pela comissão: muda só pela tela Comissões; o fechamento tem recibo.
+  function commissionActions(payable: PayableItem) {
+    const closing = payable.commissionClosing;
+    return (
+      <div className="flex shrink-0 items-center gap-1">
+        {closing && (
+          <Hint label="Ver recibo">
+            <Button variant="ghost" size="icon" asChild>
+              <a
+                href={receiptHref(closing.id)}
+                target="_blank"
+                rel="noopener"
+                aria-label={`Ver recibo de ${payableTitle(payable)}`}
+              >
+                <Eye aria-hidden="true" />
+              </a>
+            </Button>
+          </Hint>
+        )}
+        <span className="text-sm whitespace-nowrap text-muted-foreground">
+          Via Comissões
+        </span>
+      </div>
+    );
+  }
+
   function actions(payable: PayableItem) {
+    if (payable.commissionClosing || payable.commissionAdvanceId) {
+      return commissionActions(payable);
+    }
     const isPending = pendingOnly(payable);
     // Excluir: lançamento errado, pendente ou cancelado (paga não).
     const canDelete = canRemove && payable.status !== "PAID";

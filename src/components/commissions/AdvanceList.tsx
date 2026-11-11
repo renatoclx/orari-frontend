@@ -7,6 +7,7 @@ import { deleteAdvanceAction } from "@/app/(admin)/commission-actions";
 import { useCan } from "@/components/layout/Access";
 import { receiptNumber } from "@/components/commissions/commission-filters";
 import { ConfirmDialog } from "@/components/shared/ConfirmDialog";
+import { EmptyValue } from "@/components/shared/EmptyValue";
 import { Hint } from "@/components/shared/Hint";
 import { ListCard } from "@/components/shared/ListCard";
 import { Button } from "@/components/ui/button";
@@ -75,6 +76,7 @@ export function AdvanceList({
       columns={[
         "Data",
         "Valor",
+        "Método",
         "Observação",
         "Lançado por",
         "Situação",
@@ -90,6 +92,9 @@ export function AdvanceList({
           <td className="px-4 py-3 whitespace-nowrap">{day(advance.date)}</td>
           <td className="px-4 py-3 font-medium whitespace-nowrap">
             {formatPrice(advance.amount)}
+          </td>
+          <td className="px-4 py-3">
+            <EmptyValue>{advance.paymentMethod?.name}</EmptyValue>
           </td>
           <td className="px-4 py-3">{advance.note ?? "--"}</td>
           <td className="px-4 py-3">{advance.createdBy.name}</td>
@@ -107,8 +112,9 @@ export function AdvanceList({
           </div>
           <p className="text-sm">{advance.note ?? "Sem observação"}</p>
           <p className="text-sm text-muted-foreground tabular-nums">
-            {day(advance.date)} · Lançado por {advance.createdBy.name} ·{" "}
-            {situation(advance)}
+            {day(advance.date)}
+            {advance.paymentMethod && ` · ${advance.paymentMethod.name}`} ·
+            Lançado por {advance.createdBy.name} · {situation(advance)}
           </p>
         </li>
       ))}

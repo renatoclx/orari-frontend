@@ -13,6 +13,7 @@ import { Button } from "@/components/ui/button";
 export function LaunchAdvanceButton(props: {
   professionals: { id: string; name: string }[];
   defaultProfessionalId?: string;
+  methods: { id: string; name: string }[];
   today: string;
 }) {
   const [open, setOpen] = useState(false);

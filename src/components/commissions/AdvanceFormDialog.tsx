@@ -41,6 +41,8 @@ type AdvanceFormDialogProps = {
   professionals: { id: string; name: string }[];
   /** Profissional do filtro da tela: o diálogo já abre com ele. */
   defaultProfessionalId?: string;
+  /** Métodos de pagamento ativos: como o adiantamento foi pago. */
+  methods: { id: string; name: string }[];
   /** Hoje no fuso da empresa ("aaaa-mm-dd"): padrão e limite da data. */
   today: string;
 };
@@ -50,6 +52,7 @@ const FIELD_IDS = {
   professionalId: "advance-professional",
   date: "advance-date",
   cents: "advance-amount",
+  paymentMethodId: "advance-method",
 } as const;
 
 /** Lançar adiantamento de comissão (screens/comissoes.md). */
@@ -71,6 +74,7 @@ export function AdvanceFormDialog({
 function AdvanceForm({
   professionals,
   defaultProfessionalId,
+  methods,
   today,
   onClose,
 }: Omit<AdvanceFormDialogProps, "open" | "onOpenChange"> & {
@@ -86,6 +90,7 @@ function AdvanceForm({
     /** Centavos; null se a busca falhou. */
     cents: number | null;
   } | null>(null);
+  const [methodId, setMethodId] = useState("");
   const [errors, setErrors] = useState<AdvanceErrors>({});
   const [pending, startTransition] = useTransition();
   const loadingAvailable =
@@ -116,6 +121,7 @@ function AdvanceForm({
         professionalId,
         cents: String(data.get("cents") ?? ""),
         date: String(data.get("date") ?? ""),
+        paymentMethodId: methodId,
       },
       today,
       available,
@@ -152,7 +158,8 @@ function AdvanceForm({
       <DialogHeader>
         <DialogTitle>Lançar adiantamento</DialogTitle>
         <DialogDescription>
-          O valor é abatido da comissão no fechamento.
+          O valor é abatido da comissão no fechamento e entra como conta paga no
+          Contas a pagar.
         </DialogDescription>
       </DialogHeader>
 
@@ -241,6 +248,41 @@ function AdvanceForm({
               ? `Disponível para adiantar: ${formatPrice(available / 100)}`
               : "Não foi possível buscar o disponível."}
       </p>
+
+      <FormField
+        id={FIELD_IDS.paymentMethodId}
+        label="Método de pagamento"
+        required
+        error={errors.paymentMethodId}
+      >
+        <Select
+          name="paymentMethodId"
+          value={methodId}
+          onValueChange={(value) => {
+            setMethodId(value);
+            setErrors((current) => ({
+              ...current,
+              paymentMethodId: undefined,
+            }));
+          }}
+        >
+          <SelectTrigger
+            id={FIELD_IDS.paymentMethodId}
+            className="w-full"
+            aria-invalid={errors.paymentMethodId ? true : undefined}
+            aria-describedby={describedBy("paymentMethodId")}
+          >
+            <SelectValue placeholder="Escolha" />
+          </SelectTrigger>
+          <SelectContent>
+            {methods.map((method) => (
+              <SelectItem key={method.id} value={method.id}>
+                {method.name}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </FormField>
 
       <FormField id="advance-note" label="Observação">
         <Input

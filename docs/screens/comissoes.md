@@ -28,9 +28,14 @@ falta pagar; fechar (quitar) e emitir o recibo para o profissional assinar.
 - **Em aberto** = ainda não fechado. Adiantado e A pagar contam tudo o que
   está em aberto, **sem depender do período**; o período vale para a comissão
   gerada, o pago pelos clientes e os atendimentos.
-- **Adiantamento**: data até hoje (pode ser passada, nunca futura) e valor até
-  o **disponível para adiantar** (comissão em aberto − já adiantado). Pode ser
-  excluído enquanto não foi fechado.
+- **Adiantamento**: data até hoje (pode ser passada, nunca futura), **método de
+  pagamento** (obrigatório desde 2026-11-10) e valor até o **disponível para
+  adiantar** (comissão em aberto − já adiantado). Pode ser excluído enquanto
+  não foi fechado.
+- **Contas a pagar**: lançar, excluir, fechar e desfazer refletem lá. O
+  adiantamento e o fechamento (pelo valor pago) viram **contas pagas** na
+  categoria Comissões; excluir o adiantamento apaga a conta e desfazer o
+  fechamento a cancela.
 - **Fechamento**: quita **tudo o que está em aberto até a data de corte**
   (atendimentos até o fim desse dia e adiantamentos com data até ela) e
   registra o pagamento (método ativo e data, até hoje). Gera o **recibo** com
@@ -58,7 +63,8 @@ falta pagar; fechar (quitar) e emitir o recibo para o profissional assinar.
     pacote —, base, regra "40%" ou "R$ 15,00 fixo", comissão e cliente pagou,
     do mais recente, 10 por página;
   - **Adiantamentos (N)**: os com data no período (em aberto ou fechados) e
-    os em aberto de qualquer data, com data, valor, observação, lançado por e
+    os em aberto de qualquer data, com data, valor, método ("--" nos antigos),
+    observação, lançado por e
     **Situação** ("Em aberto" ou "Fechado nº 0001"); a lixeira só nos em
     aberto;
   - **Fechamentos (N)**: nº, até, pago em, método, comissões, adiantado e
@@ -69,8 +75,8 @@ falta pagar; fechar (quitar) e emitir o recibo para o profissional assinar.
   0001". No celular, cartões.
 - **Lançar adiantamento** (dialog, `sm:max-w-lg`): Profissional (já vem o do
   filtro) e Data (hoje; nada futuro) lado a lado, Valor (R$) com "Disponível
-  para adiantar: R$ X" embaixo (atualiza ao trocar o profissional) e
-  Observação; erro no próprio campo (ex.: "O valor passa do disponível para
+  para adiantar: R$ X" embaixo (atualiza ao trocar o profissional), **Método
+  de pagamento** (os ativos) e Observação; erro no próprio campo (ex.: "O valor passa do disponível para
   adiantar."). Botões Cancelar e **Lançar** ("Lançando…").
 - **Fechar comissão** (dialog, `sm:max-w-lg`): "Fechar até" (hoje; nada
   futuro), resumo refeito a cada data (Comissões (N atendimentos), −

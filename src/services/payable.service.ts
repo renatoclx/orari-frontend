@@ -4,6 +4,7 @@ import { apiFetch } from "@/services/api";
 import type { Paginated } from "@/types/api";
 import type {
   PayableApiStatus,
+  PayableCommission,
   PayableInput,
   PayableItem,
   PayableSummary,
@@ -32,6 +33,14 @@ export function getPayableSummary(
   return apiFetch<PayableSummary>(
     `/payables/summary${query ? `?${query}` : ""}`,
   );
+}
+
+/** Comissões em aberto por profissional (todas, ou só a do favorecido). */
+export function getPayableCommissions(
+  payeeId?: string,
+): Promise<PayableCommission[]> {
+  const query = payeeId ? `?payeeId=${encodeURIComponent(payeeId)}` : "";
+  return apiFetch<PayableCommission[]>(`/payables/commissions${query}`);
 }
 
 export function listPayables(

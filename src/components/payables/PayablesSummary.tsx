@@ -59,14 +59,19 @@ const CARDS: {
 export function PayablesSummary({
   summary,
   filters,
+  commissionsToPay = 0,
 }: {
   summary: PayableSummary;
   filters: PayableFiltersState;
+  /** Comissões em aberto (reais): somam no "A vencer", sem vencimento. */
+  commissionsToPay?: number;
 }) {
   return (
     <div className="hidden gap-3 sm:grid sm:grid-cols-3">
       {CARDS.map((card) => {
-        const { amount, count } = summary[card.key];
+        const { count } = summary[card.key];
+        const extra = card.key === "upcoming" ? commissionsToPay : 0;
+        const amount = Number(summary[card.key].amount) + extra;
         const active = filters.status === card.filter;
         // Clicar no cartão ativo volta ao padrão (pendentes).
         const query = payableQuery(filters, {
@@ -109,6 +114,7 @@ export function PayablesSummary({
               </span>
               <span className="block text-sm text-muted-foreground tabular-nums">
                 {count} {count === 1 ? "conta" : "contas"}
+                {extra > 0 && ` + ${formatPrice(extra)} de comissões`}
               </span>
             </span>
           </Link>

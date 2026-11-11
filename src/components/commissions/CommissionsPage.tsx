@@ -89,11 +89,10 @@ export async function CommissionsPage({
         })
       : Promise.resolve(null),
     professionalId ? listClosings(professionalId) : Promise.resolve(null),
-    // Métodos ativos, para o pagamento do fechamento.
-    professionalId
-      ? listPaymentMethods({ isActive: true, page: 1, limit: 100 })
-      : Promise.resolve(null),
+    // Métodos ativos: pagamento do fechamento e do adiantamento.
+    listPaymentMethods({ isActive: true, page: 1, limit: 100 }),
   ]);
+  const methodOptions = methods.items.map(({ id, name }) => ({ id, name }));
   const professionalName =
     options.find((option) => option.id === professionalId)?.name ?? "";
 
@@ -127,16 +126,17 @@ export async function CommissionsPage({
         </div>
         <div className="flex w-full flex-wrap gap-2 max-sm:flex-col-reverse sm:w-auto">
           {/* Fechar só com um profissional escolhido no filtro. */}
-          {professionalId && methods && (
+          {professionalId && (
             <CloseCommissionButton
               professional={{ id: professionalId, name: professionalName }}
-              methods={methods.items.map(({ id, name }) => ({ id, name }))}
+              methods={methodOptions}
               today={today}
             />
           )}
           <LaunchAdvanceButton
             professionals={options}
             defaultProfessionalId={professionalId}
+            methods={methodOptions}
             today={today}
           />
         </div>

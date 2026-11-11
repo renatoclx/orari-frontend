@@ -23,6 +23,20 @@ export type PayableItem = {
   createdBy: { id: string; name: string };
   createdAt: string;
   cancelledAt: string | null;
+  /** Gerada pelo fechamento da comissão (o recibo é dele). */
+  commissionClosing: { id: string; number: number } | null;
+  /** Gerada por um adiantamento de comissão. */
+  commissionAdvanceId: string | null;
+};
+
+/** Comissão em aberto de um profissional (linha calculada, não é conta). */
+export type PayableCommission = {
+  id: string;
+  name: string;
+  commission: string;
+  advanced: string;
+  /** Comissão menos adiantado, nunca negativo. */
+  toPay: string;
 };
 
 export type PayableTotal = { count: number; amount: string };

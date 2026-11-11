@@ -2,19 +2,26 @@ import { NewPayableButton } from "@/components/payables/NewPayableButton";
 import { PayableList } from "@/components/payables/PayableList";
 import {
   ALL,
+  commissionVisibility,
   PAYABLE_FILTERS,
   PAYABLES_PATH,
   payableQuery,
   readPayableFilters,
 } from "@/components/payables/payable-filters";
+import { OpenCommissions } from "@/components/payables/OpenCommissions";
 import { PayablesSummary } from "@/components/payables/PayablesSummary";
 import { PayablesToolbar } from "@/components/payables/PayablesToolbar";
 import { TablePagination } from "@/components/shared/TablePagination";
 import { getCurrentUser } from "@/services/auth.service";
 import { listExpenseCategories } from "@/services/expense-category.service";
-import { getPayableSummary, listPayables } from "@/services/payable.service";
+import {
+  getPayableCommissions,
+  getPayableSummary,
+  listPayables,
+} from "@/services/payable.service";
 import { listPaymentMethods } from "@/services/payment-method.service";
 import { listPeople } from "@/services/people.service";
+import { canAccess } from "@/utils/access";
 import { toDateString } from "@/utils/time";
 
 const PAGE_SIZE = 10;
@@ -41,35 +48,42 @@ export async function PayablesPage({
   };
   const api = PAYABLE_FILTERS.find((item) => item.id === filters.status)!.api;
 
-  const [
-    { company },
-    result,
-    summary,
-    suppliers,
-    professionals,
-    categories,
-    methods,
-  ] = await Promise.all([
+  // Primeiro quem é e as categorias: decidem se a comissão em aberto entra.
+  const [user, categories] = await Promise.all([
     getCurrentUser(),
-    listPayables({ ...params, status: api, page, limit: PAGE_SIZE }),
-    getPayableSummary(params),
-    listPeople({
-      type: "SUPPLIER",
-      isActive: true,
-      page: 1,
-      limit: LOOKUP_LIMIT,
-    }),
-    listPeople({
-      type: "PROFESSIONAL",
-      isActive: true,
-      page: 1,
-      limit: LOOKUP_LIMIT,
-    }),
     // Todas: o filtro mostra também as inativas (contas antigas usam).
     listExpenseCategories({ page: 1, limit: LOOKUP_LIMIT }),
-    listPaymentMethods({ isActive: true, page: 1, limit: LOOKUP_LIMIT }),
   ]);
-  const today = toDateString(new Date(), company.timezone);
+  const categoryName = categories.items.find(
+    (category) => category.id === filters.category,
+  )?.name;
+  // Comissões em aberto: só com a funcionalidade e quando o filtro as inclui.
+  const visibility = canAccess(user.access, "commissions")
+    ? commissionVisibility(filters, categoryName)
+    : { cards: false, block: false };
+
+  const [result, summary, suppliers, professionals, methods, commissions] =
+    await Promise.all([
+      listPayables({ ...params, status: api, page, limit: PAGE_SIZE }),
+      getPayableSummary(params),
+      listPeople({
+        type: "SUPPLIER",
+        isActive: true,
+        page: 1,
+        limit: LOOKUP_LIMIT,
+      }),
+      listPeople({
+        type: "PROFESSIONAL",
+        isActive: true,
+        page: 1,
+        limit: LOOKUP_LIMIT,
+      }),
+      listPaymentMethods({ isActive: true, page: 1, limit: LOOKUP_LIMIT }),
+      visibility.cards
+        ? getPayableCommissions(params.payeeId)
+        : Promise.resolve([]),
+    ]);
+  const today = toDateString(new Date(), user.company.timezone);
 
   // Favorecidos: fornecedores (com a categoria principal) e profissionais.
   const payees = [
@@ -91,6 +105,11 @@ export async function PayablesPage({
     .filter((category) => category.deletedAt === null)
     .map(({ id, name }) => ({ id, name }));
   const query = payableQuery(filters);
+  const commissionsToPay = commissions.reduce(
+    (sum, item) => sum + Number(item.toPay),
+    0,
+  );
+  const methodOptions = methods.items.map(({ id, name }) => ({ id, name }));
 
   return (
     <div className="flex min-h-0 flex-1 flex-col gap-4">
@@ -109,12 +128,23 @@ export async function PayablesPage({
           today={today}
         />
       </div>
-      <PayablesSummary summary={summary} filters={filters} />
+      <PayablesSummary
+        summary={summary}
+        filters={filters}
+        commissionsToPay={commissionsToPay}
+      />
       <PayablesToolbar
         filters={filters}
         payees={payees}
         categories={allCategories}
       />
+      {visibility.block && commissions.length > 0 && (
+        <OpenCommissions
+          commissions={commissions}
+          methods={methodOptions}
+          today={today}
+        />
+      )}
       <PayableList
         payables={result.items}
         payees={payees}

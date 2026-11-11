@@ -37,7 +37,21 @@ foi pago.
   "Pagar selecionadas". Por conta: **Pagar**, Alterar e ⋮ (Cancelar,
   Excluir). "Pago em" mostra a data e, abaixo, o método. No celular, cartões.
 
-## Fora desta etapa
+## Comissões
 
-- Comissões em aberto como linha calculada e a conta gerada pelo fechamento
-  (etapa 5).
+- **Comissões em aberto**: bloco acima da tabela, uma linha por profissional
+  (comissão, adiantado, **a pagar** e **Fechar comissão**, que abre o diálogo
+  da tela Comissões). Não é conta: não tem vencimento e se quita pelo
+  fechamento. Aparece com a funcionalidade Comissões, na situação Pendentes, A
+  vencer ou Todas, sem filtro de vencimento e com a categoria Todas ou
+  Comissões.
+- O cartão **A vencer** soma as comissões em aberto ("7 contas + R$ X de
+  comissões").
+- **Contas geradas**: o fechamento ("Comissão nº 0001", pelo valor pago; zero
+  não gera) e o adiantamento ("Adiantamento de comissão") viram contas pagas
+  na categoria Comissões, com o profissional como favorecido. São protegidas:
+  em Ações, "Ver recibo" (`Eye`, só a do fechamento) e "Via Comissões"; mudam
+  só pela tela Comissões (desfazer o fechamento cancela a conta; excluir o
+  adiantamento a apaga).
+- Sem a categoria "Comissões" ativa (renomeada ou inativada), ela é criada de
+  novo.

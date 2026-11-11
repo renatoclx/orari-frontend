@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import {
+  commissionVisibility,
   ALL,
   payableQuery,
   payableTitle,
@@ -45,5 +46,26 @@ describe("filtros do Contas a pagar", () => {
         installments: null,
       }),
     ).toBe("Energia");
+  });
+
+  it("comissão em aberto: sem vencimento no filtro, categoria Todas ou Comissões", () => {
+    const base = readPayableFilters({});
+    expect(commissionVisibility(base, undefined)).toEqual({
+      cards: true,
+      block: true,
+    });
+    // Pagas: soma no cartão, mas não entra na lista.
+    expect(
+      commissionVisibility({ ...base, status: "pagas" }, undefined),
+    ).toEqual({ cards: true, block: false });
+    expect(
+      commissionVisibility({ ...base, category: "c1" }, "Comissões").block,
+    ).toBe(true);
+    expect(
+      commissionVisibility({ ...base, category: "c1" }, "Aluguel"),
+    ).toEqual({ cards: false, block: false });
+    expect(
+      commissionVisibility({ ...base, from: "2026-11-01" }, undefined).cards,
+    ).toBe(false);
   });
 });

@@ -79,3 +79,34 @@ export const payableTitle = (payable: {
   payable.installment && payable.installments
     ? `${payable.description} (${payable.installment}/${payable.installments})`
     : payable.description;
+
+// Situações em que a comissão em aberto aparece na lista (não está paga nem
+// cancelada; sem vencimento, não fica atrasada).
+const COMMISSION_STATUSES: PayableFilterId[] = [
+  "pendentes",
+  "a-vencer",
+  "todas",
+];
+const COMMISSION_CATEGORY = "comissoes";
+const normalize = (name: string) =>
+  name.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase();
+
+/**
+ * Onde as comissões em aberto entram: nos cartões ("A vencer"), sem filtro de
+ * vencimento (elas não têm um) e com a categoria Todas ou "Comissões"; na
+ * lista, além disso, só nas situações acima. O favorecido a API já filtra.
+ */
+export function commissionVisibility(
+  filters: PayableFiltersState,
+  categoryName: string | undefined,
+): { cards: boolean; block: boolean } {
+  const cards =
+    !filters.from &&
+    !filters.to &&
+    (filters.category === ALL ||
+      normalize(categoryName ?? "") === COMMISSION_CATEGORY);
+  return {
+    cards,
+    block: cards && COMMISSION_STATUSES.includes(filters.status),
+  };
+}

@@ -161,6 +161,14 @@ regras de cada tela, em `docs/screens/`.
 - **2026-11-10 — Só o ADMIN define e vê a comissão;** o profissional vinculado a um usuário ADMIN nasce **sem comissão** (o dono que atende). _Por quê:_ é remuneração, e o dono não recebe de si mesmo.
 - **2026-11-10 — Adiantamento até o disponível;** pode ser excluído enquanto não fechado. **Fechamento** de tudo o que está em aberto até a data de corte, com método e data do pagamento, **recibo para assinar** (número sequencial, valor por extenso, detalhamento) e **desfazer só o último** (recibo cancelado, número não volta). _Por quê:_ fechar o mês é o uso comum; o recibo é o comprovante que o profissional assina.
 
+## Produtos, estoque e venda
+
+- **2026-11-11 — Produtos e categorias só do ADMIN**, três funcionalidades fora de todos os modelos (o SUPER_ADMIN libera): Categorias de produto, Produtos e Venda de produtos (que exige Comandas e Produtos). Grupo próprio no menu, abaixo de Serviços. _Por quê:_ é um módulo que nem toda clínica contrata.
+- **2026-11-11 — Formulário de produto em página** (13 campos e foto), como Planos e Pessoas; categorias em dialog. _Por quê:_ o tamanho do formulário.
+- **2026-11-11 — Estoque é o saldo das movimentações:** compra, uso interno, perda, ajuste (pelo saldo contado), venda e venda cancelada; o estoque atual só é informado no cadastro. Saldo negativo é recusado. A compra muda o preço de custo (**último custo**) e pode lançar a conta a pagar (**opcional**). _Por quê:_ histórico confiável e o custo sempre atualizado sem conta de média.
+- **2026-11-11 — Venda na comanda já nesta fase:** vários itens e **um pagamento** (terceira origem do pagamento, sem criar a entidade Comanda); baixa o estoque **ao lançar**; valor sugerido = promocional (editável); **"Nova venda"** para quem só compra; cancela **só a pendente** (o estoque volta); o pagamento da venda é **protegido** (só a baixa pelo Contas a receber); **só o ADMIN vende**. _Por quê:_ cobre o balcão sem a reestruturação de uma comanda gravada.
+- **2026-11-11 — A comanda continua sendo o dia do cliente.** A comanda paga não aceita produto (a compra seguinte é Nova venda e reabre a comanda do dia); o pago do dia fica num bloco recolhível "Recebidos". Gravar o fechamento da comanda no backend (comandas separadas no mesmo dia) foi avaliado e deixado de fora. _Por quê:_ resolve a leitura no balcão sem desestruturar o backend.
+
 ## Qualidade e testes
 
 - **2026-10-23 — Testes automáticos só de funções puras e de pontos de borda do servidor,** com Vitest (a mesma ferramenta do backend) e `arquivo.spec.ts` ao lado do código. _Por quê:_ é onde está a regra que quebra sem barulho (fuso, arredondamento, disponibilidade de horários); componentes e telas seguem verificados à mão e com `axe-core`. Ponta a ponta (Playwright) fica fora por ora.

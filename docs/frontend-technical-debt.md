@@ -57,7 +57,7 @@ Pontos conhecidos e aceitos por enquanto. Revisar quando o contexto mudar.
 - **Busca de clientes do filtro duplicada.** Pagamentos e Contratações usam `useClientSearch`, que ainda tem a mesma lógica do dialog de novo agendamento.
 - **Resumo e lista em chamadas separadas.** Os totais (`/payments/summary`) e a lista (`/payments`) são duas consultas; se um pagamento mudar entre elas, os números podem divergir até a próxima carga.
 - **Pagamento sem cobrança própria na comanda.** Sessões de pacote aparecem como "Incluído no pacote", e o avulso ainda não concluído, como "Aguardando conclusão"; receber antes de concluir (sinal) não existe.
-- **Status da comanda só no frontend.** A regra dos quatro estados (`utils/checkout.ts`) deduz a situação de `appointments[].payment`, `clientPlanId` e dos pagamentos anteriores; o backend poderia devolver um `status` explícito por comanda e a tela deixaria de deduzir.
+- **Status da comanda só no frontend.** A regra dos quatro estados (`utils/checkout.ts`) deduz a situação de `appointments[].payment`, `clientPlanId`, das vendas de hoje e dos pagamentos anteriores; o backend poderia devolver um `status` explícito por comanda e a tela deixaria de deduzir.
 
 ## Anamnese
 
@@ -115,6 +115,15 @@ Pontos conhecidos e aceitos por enquanto. Revisar quando o contexto mudar.
 - **Listas de apoio até 100:** favorecidos (fornecedores e profissionais), categorias e métodos vêm numa página só (`LOOKUP_LIMIT`); o filtro de favorecido é um `Select`, não uma busca.
 - **Comissão em aberto ignora o filtro de vencimento** (some com ele) e não tem data; o "A vencer" a soma sem contar como conta.
 - **Sem saídas nos relatórios:** Caixa, Fluxo de caixa e despesas por categoria ficam para depois; não há impressão nem exportação da tela.
+
+## Produtos, estoque e venda
+
+- **Comanda é o dia do cliente:** duas visitas no mesmo dia ficam na mesma comanda (o pago vai para "Recebidos"); comandas separadas exigiriam gravar o fechamento no backend.
+- **Listas de apoio até 100:** categorias e fornecedores do filtro e do formulário, e as categorias de despesa e métodos da compra, vêm numa página só (`LOOKUP_LIMIT`); a busca de produtos da venda traz até 20.
+- **Erro da API no campo pela mensagem:** `productErrorField` decide o campo pelo texto da mensagem (SKU, categoria, fornecedor...); se a API mudar a frase, o erro volta ao aviso geral.
+- **Sem leitor de código de barras, foto na venda nem desconto:** a venda é por busca de nome ou SKU; desconto, comissão sobre produto, venda sem cadastro e devolução de venda paga ficaram fora.
+- **Movimentação sem data própria:** vale o momento do lançamento (uma compra que chegou ontem é lançada hoje); a conta a pagar tem as datas dela.
+- **Estoque baixo só na tela de produtos:** não há aviso no Dashboard nem notificação.
 
 ## Empresas
 

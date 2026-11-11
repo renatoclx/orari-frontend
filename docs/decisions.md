@@ -149,6 +149,10 @@ regras de cada tela, em `docs/screens/`.
 ## Contas a receber e a pagar
 
 - **2026-11-10 — "Pagamentos" passa a se chamar Contas a receber** (menu e tela; rota e funcionalidade iguais), simétrico ao Contas a pagar; o relatório que se chamava "Contas a receber" vira **Análise de recebíveis** (rota `/relatorios/analise-de-recebiveis`). _Por quê:_ a tela operacional fica com o nome simples, e o relatório, que é análise, não disputa o nome.
+- **2026-11-10 — Fornecedor é um tipo de pessoa** (`SUPPLIER`, os mesmos campos), que aceita **CPF ou CNPJ** e tem uma **categoria principal** opcional (pré-preenche a conta). _Por quê:_ reaproveita as telas de pessoas; o CNPJ só faz sentido nele.
+- **2026-11-10 — Categorias de despesa cadastráveis**, com 9 iniciais em toda empresa. _Por quê:_ cada negócio tem as suas despesas.
+- **2026-11-10 — Contas a pagar só do ADMIN; repetição só "parcelar" e "repetir por N meses"**, uma conta por mês. Valor pago diferente: **altera-se o valor antes de pagar**. Alterar e cancelar valem **só para a conta**; ficam as duas ações, **Cancelar** (histórico) e **Excluir** (lançamento errado; paga não). _Por quê:_ a forma mais simples que cobre o uso comum.
+- **2026-11-10 — Comissão no Contas a pagar:** a comissão em aberto aparece como **linha calculada** por profissional (sem vencimento; soma no "A vencer") e se quita pelo **fechamento**. O fechamento (valor pago) e o **adiantamento** (que passou a pedir o método de pagamento) geram **contas pagas** na categoria Comissões, protegidas; desfazer o fechamento cancela a conta e excluir o adiantamento a apaga. Nada retroativo. _Por quê:_ cada saída de dinheiro entra no dia em que aconteceu, e a comissão continua tendo um lugar só para ser mexida.
 
 ## Comissão
 

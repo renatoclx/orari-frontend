@@ -40,6 +40,9 @@ src/
                              (cadastro, alteração, inativação e reativação)
       payment-actions.ts     Server Action da baixa de pagamentos (um ou vários
                              do mesmo cliente)
+      payable-actions.ts     Server Actions do Contas a pagar (lançar, alterar,
+                             pagar em lote, cancelar e excluir)
+      expense-category-actions.ts Server Actions das categorias de despesa
       location-actions.ts    busca de cidades e consulta de CEP
       page.tsx               Agendamentos ("/"): agenda do dia (?date=)
       servicos/              Serviços: page e loading (cadastro e alteração
@@ -54,8 +57,11 @@ src/
                              [id]/editar/
       usuarios/              Usuários: page e loading (cadastro, alteração e
                              senha em dialog)
-      financeiro/            Financeiro: page (Pagamentos), comandas/ e
-                             metodos-de-pagamento/ (cada um com page e loading)
+      financeiro/            Financeiro: page (Contas a receber), comandas/,
+                             contas-a-pagar/, comissoes/, metodos-de-pagamento/
+                             e categorias-de-despesa/ (cada um com page e
+                             loading)
+      fornecedores/          Fornecedores (mesmas telas de pessoas)
       anamnese/              Anamnese: modelos/ (lista, novo/, [id]/editar/),
                              fichas/ (Fichas preenchidas, nova/) e auditoria/
       clientes/[id]/anamnese/[fichaId]/  ficha completa, acompanhamento/ e
@@ -107,7 +113,10 @@ src/
     users/                   usuários (lista, dialogs de formulário e senha,
                              validação)
     payment-methods/         métodos de pagamento (lista e dialog de formulário)
-    payments/                pagamentos (resumo, filtros, lista, baixa)
+    payments/                contas a receber (resumo, filtros, lista, baixa)
+    payables/                contas a pagar (resumo, filtros, lista, lançar,
+                             pagar, comissões em aberto)
+    expense-categories/      categorias de despesa (lista e dialog)
     checkouts/               comandas do dia (lista e dialog da comanda)
     anamnesis/               anamnese: templates/ (modelos e editor de perguntas),
                              records/ (fichas, acompanhamento, PDF) e audit/
@@ -255,7 +264,7 @@ Módulo de dado de saúde (LGPD). Detalhes e destaques técnicos em `screens/ana
 
 Duas telas, sem entidade nova no backend: a comanda é uma visão montada a partir de atendimentos e pagamentos.
 
-- **Pagamentos** (`/financeiro`): `PaymentsListPage` (Server Component) lê os filtros da URL (`?status=`, `?de=`, `?ate=`, `?cliente=`, `?metodo=`, `?page=`) e busca, em paralelo, a listagem, o resumo, os métodos e os clientes. As situações do filtro e o `paymentQuery`, que monta a URL mantendo só o que não é o padrão, ficam em `payment-filters.ts` (`.ts` comum, usado pelo servidor e pela barra de filtros). Data inválida na URL é ignorada.
+- **Contas a receber** (`/financeiro`, antes "Pagamentos"): `PaymentsListPage` (Server Component) lê os filtros da URL (`?status=`, `?de=`, `?ate=`, `?cliente=`, `?metodo=`, `?page=`) e busca, em paralelo, a listagem, o resumo, os métodos e os clientes. As situações do filtro e o `paymentQuery`, que monta a URL mantendo só o que não é o padrão, ficam em `payment-filters.ts` (`.ts` comum, usado pelo servidor e pela barra de filtros). Data inválida na URL é ignorada.
 - **Resumo:** `GET /payments/summary` devolve atrasado, a vencer e recebido, respeitando cliente e vencimento mas não a situação. Cada cartão é um link que aplica a situação; o cartão ativo desfaz o filtro. No celular a barra de filtros some e só os cartões filtram.
 - **Baixa:** `PaymentList` (Client Component) guarda a seleção (só pagamentos pendentes de um cliente por vez, que é a exigência da API) e abre o `SettlePaymentsDialog`. O método e a data do pagamento (`SettleFields`) são compartilhados com a comanda. `settlePaymentsAction` grava com `PATCH /payments/settle` (tudo ou nada); uma data passada vai ao meio-dia do fuso da empresa, para não virar o dia anterior, e a data futura é recusada.
 - **Atendimento e contratação:** o ícone de olho abre o mesmo `AppointmentDetailsDialog` da agenda, só para consulta (`getAppointmentDetailsAction`); pagamento de pacote abre `ClientPlanDialog`.
@@ -293,6 +302,14 @@ Só do ADMIN (remuneração). A comissão nasce sozinha na API (job na conclusã
 - **Tela** (`/financeiro/comissoes`, `CommissionsPage`, Server Component): filtros na URL (`commission-filters.ts`), resumo e lista em paralelo; com profissional, abas por link (`?aba=`) para Atendimentos, Adiantamentos e Fechamentos.
 - **Diálogos** (`AdvanceFormDialog`, `CloseCommissionDialog`): Client Components que buscam o disponível ou a prévia por Server Action (`commission-actions.ts`) quando o profissional ou a data mudam; o "buscando" é derivado de qual resposta está guardada (sem `setState` direto no efeito).
 - **Recibo** (`(print)/financeiro/comissoes/recibo/[id]`, `CommissionReceipt`): sai da cópia gravada no fechamento; valor por extenso em `utils/money-in-words.ts` (puro e testado).
+
+## Contas a pagar
+
+Só do ADMIN. Fornecedor é um tipo de pessoa (`SUPPLIER`, mesmas telas de `people/`, com CPF ou CNPJ e categoria principal); as categorias de despesa seguem o cadastro dos métodos de pagamento.
+
+- **Tela** (`/financeiro/contas-a-pagar`, `PayablesPage`, Server Component): filtros na URL (`payable-filters.ts`: situação, vencimento, favorecido e categoria). Primeiro busca o usuário e as categorias (decidem se a comissão em aberto entra, `commissionVisibility`, puro e testado); depois, em paralelo, lista, resumo, favorecidos, métodos e comissões em aberto.
+- **Lista** (`PayableList`, Client Component): seleção das pendentes para pagar em lote (`SettlePayablesDialog`, que reaproveita `SettleFields` do Contas a receber); lançar e alterar no mesmo `PayableFormDialog` (repetição: parcelar ou repetir por N meses; "Já está paga").
+- **Comissão**: a API gera contas pagas no adiantamento e no fechamento (protegidas: a lista mostra "Ver recibo" e "Via Comissões" no lugar das ações). O bloco `OpenCommissions` é linha calculada (`GET /payables/commissions`) e reaproveita o `CloseCommissionButton`; as ações de comissão revalidam as duas telas.
 
 ## Configurações da empresa
 

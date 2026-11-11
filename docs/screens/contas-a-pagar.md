@@ -55,3 +55,27 @@ foi pago.
   adiantamento a apaga).
 - Sem a categoria "Comissões" ativa (renomeada ou inativada), ela é criada de
   novo.
+
+## Categorias de despesa
+
+### Acesso
+
+- Rota: `/financeiro/categorias-de-despesa`.
+- Menu: grupo **Financeiro**, item "Categorias de despesa" (o último), só para
+  o **ADMIN**; a API também recusa os demais.
+- Funcionalidade em Acessos e limites: `expense-categories` ("Categorias de
+  despesa", grupo Financeiro), com todas as ações; fora do modelo Agenda.
+
+### Regras
+
+- Mesmo cadastro dos métodos de pagamento (`metodos-pagamento.md`): só o nome,
+  único entre as ativas (sem diferenciar maiúsculas e acentos); não se exclui,
+  inativa-se e reativa-se.
+- Toda empresa já começa com **Aluguel, Energia, Água, Internet e telefone,
+  Produtos, Comissões, Salários, Impostos e Outros**, todas editáveis.
+
+### Layout
+
+- Igual ao de Métodos de pagamento: título, busca, **Nova categoria**, lista
+  (Nome, Status, Ações: Alterar e Inativar; inativa só Reativar) e o dialog
+  com o campo **Nome** ("Ex.: Aluguel").

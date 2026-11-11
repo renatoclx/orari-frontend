@@ -106,7 +106,15 @@ Pontos conhecidos e aceitos por enquanto. Revisar quando o contexto mudar.
 - **Percentual por profissional:** hoje só "recebe ou não recebe"; um percentual diferente por profissional (ex.: Camila 50%) fica para quando um cliente pedir.
 - **Atalho "Novo serviço" da barra de ações** não tem o campo de comissão (só a página de Serviços sabe se o usuário é ADMIN); define-se ao alterar.
 - **Texto do recibo** é fixo; um modelo editável pela clínica fica para depois (pedido de 2026-11-10: "depois readaptamos").
-- **Fechamento não vira conta a pagar** ainda: entra quando o Contas a pagar existir.
+- **Adiantamentos antigos sem método:** os lançados antes de 2026-11-10 mostram "--" e não geraram conta paga; os fechamentos antigos também não (nada retroativo).
+
+## Contas a pagar
+
+- **Série não se altera de uma vez:** alterar e cancelar valem para uma conta; mudar o aluguel de todos os meses é conta a conta.
+- **Sem comprovante anexado** (boleto, nota) nem juros e multa automáticos; valor diferente é alterar antes de pagar.
+- **Listas de apoio até 100:** favorecidos (fornecedores e profissionais), categorias e métodos vêm numa página só (`LOOKUP_LIMIT`); o filtro de favorecido é um `Select`, não uma busca.
+- **Comissão em aberto ignora o filtro de vencimento** (some com ele) e não tem data; o "A vencer" a soma sem contar como conta.
+- **Sem saídas nos relatórios:** Caixa, Fluxo de caixa e despesas por categoria ficam para depois; não há impressão nem exportação da tela.
 
 ## Empresas
 

@@ -1,0 +1,166 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<title>Manual de Contas a pagar — Orari</title>
+<link rel="stylesheet" href="manual.css">
+<style>
+  /* Cabeçalho das páginas: o manual.css traz o do manual do administrador. */
+  @page { @top-left { content: "Orari · Manual de Contas a pagar"; } }
+</style>
+</head>
+<body>
+
+<!-- ===== Capa ===== -->
+<section class="cover">
+  <img class="logo" src="assets/logo-white.svg" alt="Orari">
+  <div class="spacer"></div>
+  <div class="bar"></div>
+  <div class="kicker">Manual de Contas a pagar</div>
+  <h1>As despesas da clínica em dia, sem planilha</h1>
+  <p>Guia para o administrador: fornecedores, categorias de despesa, contas que se repetem ou são parceladas, pagamento em lote e as comissões da equipe.</p>
+  <div class="foot">As telas deste manual usam dados fictícios do “Studio Aurora”.</div>
+</section>
+
+<!-- ===== Sumário ===== -->
+<section class="toc">
+  <h2>Sumário</h2>
+  <ol id="toc"></ol>
+  <div class="intro">
+    <b>Como usar este manual.</b> Comece por “Antes de começar”. Fornecedores e categorias são opcionais, mas deixam o lançamento mais rápido. Os quadros azuis trazem dicas; os amarelos, avisos importantes. Os nomes de botões e campos aparecem <span class="ui">assim</span>, como na tela.
+  </div>
+</section>
+
+<!-- ===== 1 ===== -->
+<h1 class="chapter" data-toc="Antes de começar"><span class="num"></span>Antes de começar</h1>
+<p class="lead">O que fica onde.</p>
+
+<ul>
+  <li><span class="ui">Financeiro</span> &rarr; <span class="ui">Contas a pagar</span>: as despesas da clínica, logo abaixo de <span class="ui">Contas a receber</span> (o que os clientes devem).</li>
+  <li><span class="ui">Pessoas</span> &rarr; <span class="ui">Fornecedores</span>: para quem a clínica paga.</li>
+  <li><span class="ui">Financeiro</span> &rarr; <span class="ui">Categorias de despesa</span>: os tipos de despesa (Aluguel, Energia…).</li>
+</ul>
+<p>Tudo isso é só do <b>administrador</b> e precisa estar liberado no seu plano.</p>
+<div class="box tip"><b class="t">Métodos de pagamento</b><p>Para marcar uma conta como paga, é preciso ter ao menos um método de pagamento ativo (<span class="ui">Financeiro</span> &rarr; <span class="ui">Métodos de pagamento</span>). São os mesmos do Contas a receber.</p></div>
+
+<!-- ===== 2 ===== -->
+<h1 class="chapter" data-toc="Fornecedores"><span class="num"></span>Fornecedores</h1>
+<p class="lead">Quem recebe da clínica: imobiliária, distribuidora, internet…</p>
+
+<figure><img src="images/f01-fornecedores.png" alt=""><figcaption>Pessoas &rarr; Fornecedores.</figcaption></figure>
+<p>O cadastro é o mesmo de clientes e profissionais (nome, contato, endereços), com duas diferenças, em <span class="ui">Mais informações</span>:</p>
+<ul>
+  <li><b>CPF/CNPJ</b>: o fornecedor aceita CPF (11 dígitos) ou CNPJ (14 dígitos).</li>
+  <li><b>Categoria principal</b> (opcional): ao escolher o fornecedor numa conta nova, a categoria já vem preenchida.</li>
+</ul>
+<figure><img src="images/f02-fornecedor.png" alt=""><figcaption>Fornecedor com CNPJ e categoria principal.</figcaption></figure>
+
+<!-- ===== 3 ===== -->
+<h1 class="chapter" data-toc="Categorias de despesa"><span class="num"></span>Categorias de despesa</h1>
+<p class="lead">Para saber com o que a clínica gasta.</p>
+
+<figure><img src="images/f03-categorias.png" alt=""><figcaption>Financeiro &rarr; Categorias de despesa.</figcaption></figure>
+<ul>
+  <li>Sua clínica já começa com <b>Aluguel, Energia, Água, Internet e telefone, Produtos, Comissões, Salários, Impostos e Outros</b>. Todas podem ser renomeadas.</li>
+  <li><span class="ui">Nova categoria</span> cria outra. O nome não pode repetir (“Aluguel” e “aluguel” são a mesma).</li>
+  <li>Para deixar de usar, <span class="ui">Inativar</span>: ela some das contas novas, e as contas antigas continuam com ela. <span class="ui">Reativar</span> a traz de volta.</li>
+</ul>
+<div class="box warn"><b class="t">Categoria Comissões</b><p>As contas geradas pelas comissões vão para a categoria “Comissões”. Se ela for renomeada ou inativada, o Orari cria outra “Comissões” na próxima vez.</p></div>
+
+<!-- ===== 4 ===== -->
+<h1 class="chapter" data-toc="A tela Contas a pagar"><span class="num"></span>A tela Contas a pagar</h1>
+<p class="lead">O que vence, o que atrasou e o que já foi pago.</p>
+
+<figure><img src="images/f04-contas.png" alt=""><figcaption>Financeiro &rarr; Contas a pagar.</figcaption></figure>
+<ul>
+  <li><b>Atrasado</b>: venceu antes de hoje e não foi pago.</li>
+  <li><b>A vencer</b>: vence de hoje em diante. Soma também as comissões em aberto da equipe (“+ R$ 176,00 de comissões”), que não têm vencimento.</li>
+  <li><b>Pago</b>: as contas já pagas.</li>
+</ul>
+<p>Clique em um cartão para filtrar a lista; clique de novo para voltar. Os filtros permitem escolher a situação (Pendentes, Atrasadas, A vencer, Pagas, Canceladas ou Todas), o período de vencimento, o favorecido e a categoria.</p>
+
+<!-- ===== 5 ===== -->
+<h1 class="chapter" data-toc="Lançar uma conta"><span class="num"></span>Lançar uma conta</h1>
+<p class="lead">Uma vez, todo mês ou parcelada.</p>
+
+<ol class="steps">
+  <li>Clique em <span class="ui">Nova conta a pagar</span>.</li>
+  <li>Preencha a <b>descrição</b>, o <b>favorecido</b> (opcional: fornecedor ou profissional), a <b>categoria</b>, o <b>valor</b> e o <b>vencimento</b>.</li>
+  <li>Em <span class="ui">Repetição</span>, escolha:
+    <ul>
+      <li><b>Não repete</b>: uma conta só;</li>
+      <li><b>Parcelar</b>: o valor total é dividido em parcelas mensais (R$ 100 em 3 vezes = 33,33 + 33,33 + 33,34);</li>
+      <li><b>Repetir</b>: o mesmo valor todo mês (aluguel, internet), pelo número de meses escolhido.</li>
+      <li>Uma conta que vence no dia 31 cai no último dia dos meses mais curtos e volta ao dia 31 nos meses que têm.</li>
+    </ul>
+  </li>
+  <li>Clique em <span class="ui">Cadastrar</span>. Cada mês vira uma conta, com o número da parcela no nome (“Aluguel (2/12)”).</li>
+</ol>
+<figure class="w55"><img src="images/f05-nova-conta.png" alt=""><figcaption>Nova conta parcelada em 3 vezes.</figcaption></figure>
+<div class="box tip"><b class="t">Conta que já foi paga</b><p>Para registrar uma despesa que você já pagou, ligue <span class="ui">Já está paga</span> e informe o método e a data do pagamento. Só vale para conta sem repetição.</p></div>
+
+<!-- ===== 6 ===== -->
+<h1 class="chapter" data-toc="Pagar"><span class="num"></span>Pagar</h1>
+<p class="lead">Uma conta ou várias de uma vez.</p>
+
+<ol class="steps">
+  <li>Na linha da conta, clique em <span class="ui">Pagar</span>.</li>
+  <li>Escolha o <b>método de pagamento</b>. A <b>data do pagamento</b> vem com a de hoje; se pagou antes, escolha a data certa (não pode ser futura).</li>
+  <li>Clique em <span class="ui">Confirmar pagamento</span>.</li>
+</ol>
+<figure class="w55"><img src="images/f06-pagar.png" alt=""><figcaption>Pagar uma conta.</figcaption></figure>
+
+<h2>Várias de uma vez</h2>
+<p>Marque as caixas de seleção das contas pendentes. Uma barra no topo mostra quantas estão marcadas e o total; clique em <span class="ui">Pagar selecionadas</span>. Todas ficam pagas com o mesmo método e a mesma data, ou nenhuma.</p>
+<figure class="w70"><img src="images/f07-lote.png" alt=""><figcaption>Duas contas selecionadas.</figcaption></figure>
+<div class="box warn"><b class="t">Valor diferente (juros, desconto)</b><p>Antes de pagar, use <span class="ui">Alterar</span> (lápis) e corrija o valor da conta. Depois pague normalmente.</p></div>
+
+<!-- ===== 7 ===== -->
+<h1 class="chapter" data-toc="Alterar, cancelar e excluir"><span class="num"></span>Alterar, cancelar e excluir</h1>
+<p class="lead">Só a conta escolhida muda; as outras da repetição ficam como estão.</p>
+
+<div class="side">
+  <figure style="width:48mm"><img src="images/f08-mais-acoes.png" alt=""></figure>
+  <div>
+    <ul>
+      <li><b>Alterar</b> (lápis): corrige descrição, favorecido, categoria, valor, vencimento ou observação de uma conta <b>pendente</b>.</li>
+      <li><b>Cancelar</b> (no menu de três pontos): a conta deixa de ser cobrada e fica no histórico, em <span class="ui">Canceladas</span>. Use quando a despesa não vai mais acontecer.</li>
+      <li><b>Excluir</b>: apaga a conta. Use para um lançamento errado. Conta paga não pode ser excluída.</li>
+    </ul>
+  </div>
+</div>
+<div class="box tip"><b class="t">Mudou o aluguel?</b><p>Alterar e cancelar valem para uma conta de cada vez. Para um novo valor nos próximos meses, altere conta a conta, ou cancele as restantes e lance uma nova repetição.</p></div>
+
+<!-- ===== 8 ===== -->
+<h1 class="chapter" data-toc="Comissões da equipe"><span class="num"></span>Comissões da equipe</h1>
+<p class="lead">As comissões aparecem aqui, e o dinheiro que sai para a equipe vira conta paga.</p>
+
+<h2>Comissões em aberto</h2>
+<p>Acima da lista, o bloco <b>Comissões em aberto</b> mostra, por profissional, a comissão gerada, o já adiantado e o <b>a pagar</b> (veja a imagem do capítulo 4). Não é uma conta: não tem vencimento e se quita pelo <span class="ui">Fechar comissão</span>, que abre o mesmo fechamento da tela Comissões (Manual de Comissões).</p>
+<p>O bloco aparece com a situação Pendentes, A vencer ou Todas, sem filtro de vencimento e com a categoria Todas ou Comissões.</p>
+
+<h2>Contas geradas pela comissão</h2>
+<figure class="w70"><img src="images/f09-contas-comissao.png" alt=""><figcaption>A conta paga de um fechamento de comissão.</figcaption></figure>
+<ul>
+  <li>Cada <b>adiantamento</b> vira uma conta paga “Adiantamento de comissão”, na data e com o método do adiantamento.</li>
+  <li>Cada <b>fechamento</b> vira uma conta paga “Comissão nº 0001”, pelo valor pago (comissão menos adiantamentos).</li>
+  <li>Essas contas mostram <span class="ui">Via Comissões</span> e, no fechamento, o olho que abre o recibo. Elas não se alteram aqui: <b>desfazer o fechamento</b> cancela a conta, e <b>excluir o adiantamento</b> a apaga, na tela Comissões.</li>
+</ul>
+
+<!-- ===== 9 ===== -->
+<h1 class="chapter" data-toc="Dúvidas comuns"><span class="num"></span>Dúvidas comuns</h1>
+<p class="lead">Respostas rápidas para as situações mais frequentes.</p>
+
+<h3>Não consigo pôr CNPJ no cadastro.</h3>
+<p>Só o fornecedor aceita CNPJ. Clientes, profissionais e funcionários têm CPF.</p>
+<h3>O fornecedor não aparece no favorecido.</h3>
+<p>Ele precisa estar ativo. Fornecedores inativos não aparecem nas contas novas.</p>
+<h3>Paguei uma conta por engano.</h3>
+<p>Nesta versão, a conta paga não pode ser alterada, cancelada nem excluída. Confira o método e a data antes de confirmar o pagamento.</p>
+<h3>Não consigo alterar a conta da comissão.</h3>
+<p>Ela muda só pela tela Comissões: desfaça o fechamento ou exclua o adiantamento lá.</p>
+<h3>As comissões em aberto sumiram da lista.</h3>
+<p>Confira os filtros: elas não aparecem com vencimento escolhido, em Pagas ou Canceladas, nem com outra categoria que não Comissões.</p>
+
+</body>
+</html>

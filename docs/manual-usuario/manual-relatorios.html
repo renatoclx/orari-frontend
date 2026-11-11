@@ -1,0 +1,203 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<title>Manual de Relatórios e Dashboard — Orari</title>
+<link rel="stylesheet" href="manual.css">
+<style>
+  /* Cabeçalho das páginas: o manual.css traz o do manual do administrador. */
+  @page { @top-left { content: "Orari · Manual de Relatórios e Dashboard"; } }
+  /* Telas inteiras dos relatórios são altas: quase a página toda, para
+     os números continuarem legíveis. */
+  figure.tall img { max-height: 205mm; }
+</style>
+</head>
+<body>
+
+<!-- ===== Capa ===== -->
+<section class="cover">
+  <img class="logo" src="assets/logo-white.svg" alt="Orari">
+  <div class="spacer"></div>
+  <div class="bar"></div>
+  <div class="kicker">Manual de Relatórios e Dashboard</div>
+  <h1>Os números da sua clínica, em poucos cliques</h1>
+  <p>Guia para o administrador: o Dashboard e os sete relatórios — o que cada número quer dizer, como filtrar e como imprimir.</p>
+  <div class="foot">As telas deste manual usam dados fictícios da “Clínica Bem-Estar”, com o período de outubro de 2026.</div>
+</section>
+
+<!-- ===== Sumário ===== -->
+<section class="toc">
+  <h2>Sumário</h2>
+  <ol id="toc"></ol>
+  <div class="intro">
+    <b>Como usar este manual.</b> Comece por “Antes de começar”, que explica o período, os filtros e a impressão, comuns a todos os relatórios. Depois vá direto ao relatório que precisa. Os quadros azuis trazem dicas; os amarelos, avisos importantes. Os nomes de botões e campos aparecem <span class="ui">assim</span>, como na tela.
+  </div>
+</section>
+
+<!-- ===== 1 ===== -->
+<h1 class="chapter" data-toc="Antes de começar"><span class="num"></span>Antes de começar</h1>
+<p class="lead">Onde ficam os relatórios e o que eles têm em comum.</p>
+
+<div class="side">
+  <figure class="flat" style="width:42mm"><img src="images/r01-menu-relatorios.png" alt=""></figure>
+  <div>
+    <p>O <span class="ui">Dashboard</span> fica no topo do menu. Os relatórios ficam no grupo <span class="ui">Relatórios</span>:</p>
+    <ul>
+      <li><b>Carteira de clientes</b>: os clientes de cada profissional.</li>
+      <li><b>Análise de recebíveis</b>: o que falta receber e o atraso.</li>
+      <li><b>Agendamentos</b>: agendado, concluído, faltas e horários de pico.</li>
+      <li><b>Rankings</b>: os serviços, profissionais e clientes que mais movimentaram.</li>
+      <li><b>Financeiro</b>: o que entrou no caixa.</li>
+      <li><b>Pacotes</b>: contratações novas, ativas e terminando.</li>
+      <li><b>Perfil do cliente</b>: quem são e como agendam seus clientes.</li>
+    </ul>
+  </div>
+</div>
+
+<h2>Quem pode ver</h2>
+<p>Os relatórios e o Dashboard são só do <b>administrador</b>. Cada relatório precisa estar liberado no seu plano: os que não estão não aparecem no menu, e o Dashboard mostra só os blocos dos relatórios liberados.</p>
+
+<h2>Período e filtros</h2>
+<ul>
+  <li>O <b>período</b> começa no mês atual. Escolha as datas de início e fim nos dois campos de data; trocar uma pode ajustar a outra.</li>
+  <li>Alguns relatórios têm filtros próprios (profissional, método, ordem). <span class="ui">Limpar filtros</span> volta ao padrão.</li>
+  <li>Os filtros ficam no endereço da página: dá para guardar nos favoritos ou mandar o link para outra pessoa da equipe com acesso.</li>
+</ul>
+<div class="box tip"><b class="t">Situação de hoje</b><p>Alguns números não dependem do período, porque mostram como as coisas estão <b>hoje</b>: “Clientes ativos hoje”, “Em atraso hoje”, “Ativas hoje”, “Terminando em 30 dias”. O texto do cartão sempre diz quando é assim.</p></div>
+
+<h2>Imprimir</h2>
+<p>No computador, os relatórios têm o botão <span class="ui">Imprimir</span>, no canto de cima. Ele abre uma aba nova com a versão para papel (A4, sempre no tema claro), com os mesmos filtros e as listas inteiras, e já chama a impressão. Para salvar em PDF, escolha “Salvar como PDF” como impressora.</p>
+
+<h2>Gráficos</h2>
+<p>Passe o mouse (ou toque, no celular) numa barra para ver os valores daquele dia. As cores são sempre as mesmas: <b>verde</b> para o que já entrou ou foi concluído, <b>índigo</b> para o que ainda vai acontecer e <b>vermelho</b> para atraso e falta.</p>
+
+<!-- ===== 2 ===== -->
+<h1 class="chapter" data-toc="Dashboard"><span class="num"></span>Dashboard</h1>
+<p class="lead">Os principais números numa tela só, comparados com o período anterior.</p>
+
+<figure class="tall"><img src="images/r02-dashboard.png" alt=""><figcaption>Dashboard de outubro.</figcaption></figure>
+
+<ul>
+  <li><b>Recebido</b>, <b>Atendimentos concluídos</b>, <b>Taxa de falta</b> e <b>Clientes novos</b> vêm com a comparação: um mês inteiro é comparado com o mês anterior; outro período, com os dias logo antes, do mesmo tamanho (“+12% vs. mês anterior”). Sem nada no período anterior, o cartão avisa: “Nada no mês anterior para comparar”.</li>
+  <li><b>Clientes ativos hoje</b> e <b>Em atraso hoje</b> são a situação de hoje, sem comparação.</li>
+  <li>Abaixo, um grupo por relatório (Financeiro, Agendamentos, Rankings, Perfil do cliente, Análise de recebíveis e Pacotes), com os gráficos principais. <span class="ui">Ver relatório</span> abre o relatório completo com o mesmo período.</li>
+  <li>A rosca <b>Por método de pagamento</b> mostra a parte de cada método no recebido. A cor segue o método, não a posição: o PIX tem sempre a mesma cor.</li>
+</ul>
+<div class="box tip"><b class="t">Os números batem</b><p>O Dashboard usa os mesmos cálculos dos relatórios. Se um número parecer estranho, clique em <span class="ui">Ver relatório</span> para ver o detalhe.</p></div>
+
+<!-- ===== 3 ===== -->
+<h1 class="chapter" data-toc="Carteira de clientes"><span class="num"></span>Carteira de clientes</h1>
+<p class="lead">Quem cada profissional atende, quem está voltando e quem sumiu.</p>
+
+<figure class="tall"><img src="images/r03-carteira.png" alt=""><figcaption>Carteira de clientes de um profissional.</figcaption></figure>
+
+<ul>
+  <li>Escolha o <b>profissional</b> no primeiro filtro. Um cliente entra na carteira dele quando tem ao menos um agendamento não cancelado com ele; o mesmo cliente pode estar na carteira de mais de um profissional.</li>
+  <li><b>Situação</b> de cada cliente, em relação a esse profissional:
+    <ul>
+      <li><b>Novo</b>: o primeiro atendimento concluído com ele foi no período;</li>
+      <li><b>Ativo</b>: atendido nos últimos 60 dias ou com horário marcado;</li>
+      <li><b>Sem retorno</b>: o último atendimento tem mais de 60 dias e não há nada marcado.</li>
+    </ul>
+  </li>
+  <li><b>Faturado</b> é a soma dos atendimentos concluídos no período, dividida em recebido e pendente. Sessões de pacote contam na quantidade, sem valor (o pagamento é da contratação).</li>
+</ul>
+<div class="box tip"><b class="t">Quem procurar</b><p>Filtre por <span class="ui">Sem retorno</span> para ver quem deixou de vir e chamar pelo WhatsApp.</p></div>
+
+<!-- ===== 4 ===== -->
+<h1 class="chapter" data-toc="Análise de recebíveis"><span class="num"></span>Análise de recebíveis</h1>
+<p class="lead">O que falta receber, o que está atrasado e há quanto tempo.</p>
+
+<figure class="tall"><img src="images/r04-recebiveis.png" alt=""><figcaption>Análise de recebíveis.</figcaption></figure>
+
+<ul>
+  <li><b>A receber</b> e <b>Atrasado</b> são a situação de hoje; clicar neles abre o <span class="ui">Contas a receber</span> já filtrado.</li>
+  <li><b>Recebido no período</b> e <b>Inadimplência</b> seguem o período. A inadimplência é a parte do que venceu no período (até ontem) que continua sem pagamento.</li>
+  <li><b>Atrasados por tempo de atraso</b> separa o atraso em faixas (1 a 30, 31 a 60, 61 a 90 e mais de 90 dias); a cor escurece com a idade.</li>
+  <li><b>Mês a mês</b> mostra seis meses para trás e três para a frente, pelo vencimento: recebido, a vencer e atrasado.</li>
+  <li>A lista mostra os clientes com atraso, do maior valor para o menor, com o atalho para os pagamentos atrasados e para o WhatsApp.</li>
+</ul>
+
+<!-- ===== 5 ===== -->
+<h1 class="chapter" data-toc="Agendamentos"><span class="num"></span>Agendamentos</h1>
+<p class="lead">Quanto foi agendado, concluído, faltado e cancelado, e os horários mais procurados.</p>
+
+<figure class="tall"><img src="images/r05-agendamentos.png" alt=""><figcaption>Relatório de agendamentos.</figcaption></figure>
+
+<ul>
+  <li>Conta pelo dia de início do agendamento. Pode filtrar por profissional.</li>
+  <li><b>Taxa de falta</b> = faltas ÷ (concluídos + faltas): só o que já deveria ter acontecido. <b>Cancelados</b> aparecem em % de todos os agendamentos.</li>
+  <li><b>Horários de pico</b> cruza o dia da semana com a hora de início: quanto mais forte a cor, mais agendamentos. Ajuda a decidir horários de equipe e promoções.</li>
+  <li>As tabelas <b>Por profissional</b> e <b>Por serviço</b> trazem os mesmos números separados.</li>
+</ul>
+
+<!-- ===== 6 ===== -->
+<h1 class="chapter" data-toc="Rankings"><span class="num"></span>Rankings</h1>
+<p class="lead">Os serviços, profissionais e clientes que mais movimentaram o período.</p>
+
+<figure class="tall"><img src="images/r06-rankings.png" alt=""><figcaption>Rankings.</figcaption></figure>
+
+<ul>
+  <li>Considera os atendimentos <b>concluídos</b>. <b>Faturado</b> soma os pagamentos desses atendimentos, recebidos ou não.</li>
+  <li>O filtro <span class="ui">Ordem</span> troca entre faturamento e quantidade.</li>
+  <li>A tela mostra os 10 primeiros de cada lista; a impressão traz as listas inteiras.</li>
+  <li>Nos clientes, a coluna <b>Em pacotes</b> soma os pacotes contratados no período.</li>
+</ul>
+
+<!-- ===== 7 ===== -->
+<h1 class="chapter" data-toc="Financeiro"><span class="num"></span>Financeiro</h1>
+<p class="lead">O que entrou no caixa, pela data do pagamento.</p>
+
+<figure class="tall"><img src="images/r07-financeiro.png" alt=""><figcaption>Relatório financeiro.</figcaption></figure>
+
+<ul>
+  <li>Só pagamentos <b>recebidos</b>, pela data em que foram pagos (não pelo vencimento).</li>
+  <li>Os cartões separam o recebido de <b>atendimentos</b> e de <b>pacotes</b>, e mostram o <b>ticket médio</b> por pagamento.</li>
+  <li><b>Por método de pagamento</b> mostra quanto entrou em cada forma; o filtro de método deixa o relatório inteiro só com ele.</li>
+  <li>O <b>Extrato</b> lista cada pagamento recebido, do mais recente para o mais antigo.</li>
+</ul>
+<div class="box warn"><b class="t">Só as entradas</b><p>Este relatório mostra o que <b>entrou</b>. As despesas estão em <span class="ui">Financeiro</span> &rarr; <span class="ui">Contas a pagar</span> (Manual de Contas a pagar).</p></div>
+
+<!-- ===== 8 ===== -->
+<h1 class="chapter" data-toc="Pacotes"><span class="num"></span>Pacotes</h1>
+<p class="lead">Contratações que entraram, saíram e estão para terminar.</p>
+
+<figure class="tall"><img src="images/r08-pacotes.png" alt=""><figcaption>Relatório de pacotes.</figcaption></figure>
+
+<ul>
+  <li><b>Contratações novas</b> e <b>Canceladas</b> seguem o período; <b>Ativas hoje</b> é a situação de hoje.</li>
+  <li><b>Por pacote</b> mostra quais pacotes vendem mais, pelo valor contratado.</li>
+  <li><b>Terminando em 30 dias</b> lista quem está perto do fim e ainda não renovou, com as sessões já feitas e o atalho do WhatsApp: é a lista para oferecer a renovação.</li>
+</ul>
+
+<!-- ===== 9 ===== -->
+<h1 class="chapter" data-toc="Perfil do cliente"><span class="num"></span>Perfil do cliente</h1>
+<p class="lead">Quantos clientes estão voltando, como agendam, o que consomem e quem faz aniversário.</p>
+
+<figure class="tall"><img src="images/r09-perfil.png" alt=""><figcaption>Perfil do cliente.</figcaption></figure>
+
+<ul>
+  <li><b>Clientes ativos</b> (atendidos nos últimos 60 dias ou com horário marcado), <b>Novos no período</b>, <b>Sem retorno</b> (mais de 60 dias, sem nada marcado) e <b>Frequência média</b> (atendimentos por cliente atendido).</li>
+  <li><b>Tipo de atendimento</b>: avulso, recorrência, pacote ou turma. Um cliente pode ter mais de um tipo.</li>
+  <li><b>Por onde agendam</b>: pela clínica ou pelo app do cliente.</li>
+  <li><b>Faixa etária</b> e <b>Cidades</b> saem do cadastro (data de nascimento e endereço principal). Cadastros sem esses dados aparecem como “Não informado”.</li>
+  <li><b>Aniversariantes do período</b>, com o atalho do WhatsApp para dar os parabéns.</li>
+</ul>
+
+<!-- ===== 10 ===== -->
+<h1 class="chapter" data-toc="Dúvidas comuns"><span class="num"></span>Dúvidas comuns</h1>
+<p class="lead">Respostas rápidas para as situações mais frequentes.</p>
+
+<h3>Não vejo o menu Relatórios (ou um relatório).</h3>
+<p>Os relatórios são só do administrador e precisam estar no seu plano. Fale com o suporte do Orari para liberar.</p>
+<h3>O faturado dos Rankings é diferente do recebido do Financeiro.</h3>
+<p>São contas diferentes: os Rankings somam os atendimentos concluídos no período (pagos ou não); o Financeiro soma o que foi pago no período, pela data do pagamento.</p>
+<h3>Sessões de pacote aparecem sem valor.</h3>
+<p>O valor do pacote é cobrado nas parcelas da contratação, não em cada sessão. As sessões contam na quantidade.</p>
+<h3>A faixa etária está quase toda em “Não informado”.</h3>
+<p>Preencha a data de nascimento no cadastro dos clientes (Pessoas &rarr; Clientes &rarr; Alterar &rarr; Mais informações).</p>
+<h3>A impressão saiu escura ou cortada.</h3>
+<p>A versão de impressão é sempre clara. Se cortar, confira na janela de impressão o papel A4 e a escala “Padrão”.</p>
+
+</body>
+</html>

@@ -34,3 +34,20 @@ com capturas de tela de uma clínica fictícia ("Clínica Bem-Estar").
    - PDFs: `node build.mjs manual-portal`, `manual-app` e `manual-mensagens`.
 
 O sumário é numerado pelo `build.mjs` em duas passadas. Textos: `manual.html`.
+
+9. Manuais de Relatórios e Dashboard, de Comissões e de Contas a pagar
+   (`manual-relatorios.pdf`, `manual-comissoes.pdf`, `manual-contas-a-pagar.pdf`):
+   - **Relatórios** e as imagens 28, 29 e 33 do manual do administrador:
+     `node scripts/cap-11-relatorios.mjs`, na Clínica Bem-Estar, período de
+     outubro de 2026. **Só leitura** (abre telas e fecha os diálogos sem salvar).
+   - **Comissões e Contas a pagar**: `node scripts/cap-12-comissoes-contas.mjs`, no
+     Studio Aurora. Antes: comissões **em aberto** de um profissional (o roteiro usa
+     a Camila Rocha), fornecedores com nomes de demonstração (CNPJ e categoria
+     principal) e clientes com nomes fictícios em todas as telas. O roteiro
+     **grava um fechamento** (para a "Comissão fechada", o recibo e a conta
+     gerada); depois, apague o fechamento, a conta paga dele e o que foi criado
+     para as capturas, e volte os nomes como estavam.
+   - O recorte do menu ⋮ (`f08-mais-acoes.png`) sai pelo Playwright, com clique
+     real: pelo CDP o menu abre no canto da tela.
+   - PDFs: `node build.mjs manual-relatorios`, `manual-comissoes` e
+     `manual-contas-a-pagar`; copie-os para `public/manuais/`.

@@ -14,7 +14,7 @@ export const MANUALS: Manual[] = [
   {
     title: "Manual do administrador",
     description:
-      "Primeiros passos, agenda, pessoas, serviços, recorrências, pacotes e financeiro.",
+      "Primeiros passos, agenda, pessoas, serviços, recorrências, pacotes, comandas e contas a receber.",
     file: "/manuais/manual-administrador.pdf",
   },
   {
@@ -46,5 +46,23 @@ export const MANUALS: Manual[] = [
     description:
       "Mensagens automáticas, os dados do cliente no texto e o envio a todos.",
     file: "/manuais/manual-mensagens.pdf",
+  },
+  {
+    title: "Manual de Relatórios e Dashboard",
+    description:
+      "O Dashboard e os sete relatórios: o que cada número quer dizer, filtros e impressão.",
+    file: "/manuais/manual-relatorios.pdf",
+  },
+  {
+    title: "Manual de Comissões",
+    description:
+      "Comissão no serviço, acompanhamento, adiantamentos, fechamento e recibo.",
+    file: "/manuais/manual-comissoes.pdf",
+  },
+  {
+    title: "Manual de Contas a pagar",
+    description:
+      "Fornecedores, categorias, contas parceladas ou repetidas, pagamento e comissões.",
+    file: "/manuais/manual-contas-a-pagar.pdf",
   },
 ];

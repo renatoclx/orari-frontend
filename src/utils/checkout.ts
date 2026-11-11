@@ -16,7 +16,7 @@ export type CheckoutState = "open" | "awaiting" | "paid" | "package";
  * só do frontend: a API não devolve um status por comanda.
  */
 export function checkoutState(checkout: CheckoutItem): CheckoutState {
-  const { appointments, previousPayments } = checkout;
+  const { appointments, previousPayments, productSales } = checkout;
 
   if (Number(checkout.todayPending) + Number(checkout.previousPending) > 0) {
     return "open";
@@ -26,7 +26,9 @@ export function checkoutState(checkout: CheckoutItem): CheckoutState {
   // Comanda sem nada (não deveria existir) também cai aqui: neutra, sem botão
   // de receber, e nunca "Paga".
   const awaiting =
-    appointments.length === 0 && previousPayments.length === 0
+    appointments.length === 0 &&
+    previousPayments.length === 0 &&
+    productSales.length === 0
       ? true
       : appointments.some(
           (appointment) =>
@@ -37,7 +39,9 @@ export function checkoutState(checkout: CheckoutItem): CheckoutState {
   const hasPaid =
     appointments.some(
       (appointment) => appointment.payment?.status === "PAID",
-    ) || previousPayments.some((payment) => payment.status === "PAID");
+    ) ||
+    previousPayments.some((payment) => payment.status === "PAID") ||
+    productSales.some((sale) => sale.payment?.status === "PAID");
   if (hasPaid) return "paid";
 
   // Sobrou só sessão de pacote.

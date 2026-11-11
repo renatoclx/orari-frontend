@@ -86,6 +86,13 @@ export const ACCESS_GROUPS: { label: string; features: AccessFeature[] }[] = [
       },
       // Só o ADMIN. A API exige ver Categorias de produto.
       { key: "products", label: "Produtos", actions: ALL_ACTIONS },
+      // Venda na comanda (só o ADMIN vende): Cria = vender; Exclui = cancelar
+      // a venda pendente; não há alteração. A API exige Comandas e Produtos.
+      {
+        key: "product-sales",
+        label: "Venda de produtos",
+        actions: ["view", "create", "remove"],
+      },
     ],
   },
   {
@@ -249,7 +256,7 @@ const CLASS_KEYS = ["class-groups"];
 const PORTAL_KEYS = ["client-portal", "messages"];
 // Produtos também ficam fora de todos os modelos: o SUPER_ADMIN libera a quem
 // contratar (backend: DEFAULT_OFF).
-const PRODUCT_KEYS = ["product-categories", "products"];
+const PRODUCT_KEYS = ["product-categories", "products", "product-sales"];
 // Relatórios por versão (a revisar): os da agenda em todas; os do dinheiro a
 // partir do Essencial; os demais a partir do Profissional.
 const FULL_REPORT_KEYS = [

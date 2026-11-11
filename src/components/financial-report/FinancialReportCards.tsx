@@ -1,4 +1,10 @@
-import { CalendarCheck, Package, Receipt, Wallet } from "lucide-react";
+import {
+  CalendarCheck,
+  Package,
+  Receipt,
+  ShoppingBag,
+  Wallet,
+} from "lucide-react";
 import {
   SummaryCardContent as Card,
   summaryCardClass as cardClass,
@@ -14,9 +20,18 @@ const average = ({ count, amount }: ReceivedTotal) =>
   count > 0 ? formatPrice(Number(amount) / count) : "--";
 
 /** Cartões do relatório financeiro (screens/relatorio-financeiro.md). */
-export function FinancialReportCards({ report }: { report: FinancialReport }) {
+export function FinancialReportCards({
+  report,
+  products,
+}: {
+  report: FinancialReport;
+  /** Mostra o cartão de Produtos (venda na comanda). */
+  products: boolean;
+}) {
   return (
-    <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
+    <div
+      className={`grid grid-cols-2 gap-3 ${products ? "lg:grid-cols-5" : "lg:grid-cols-4"}`}
+    >
       <div className={cardClass}>
         <Card
           icon={Wallet}
@@ -53,6 +68,17 @@ export function FinancialReportCards({ report }: { report: FinancialReport }) {
           tone="neutral"
         />
       </div>
+      {products && (
+        <div className={cardClass}>
+          <Card
+            icon={ShoppingBag}
+            label="Produtos"
+            value={formatPrice(report.products.amount)}
+            detail={payments(report.products.count)}
+            tone="neutral"
+          />
+        </div>
+      )}
     </div>
   );
 }

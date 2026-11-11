@@ -7,12 +7,14 @@ import {
   financialReportParams,
   financialReportQuery,
   readFinancialReportFilters,
+  showsProducts,
 } from "@/components/financial-report/financial-report-filters";
 import { FinancialReportToolbar } from "@/components/financial-report/FinancialReportToolbar";
 import { ReceivedPaymentList } from "@/components/financial-report/ReceivedPaymentList";
 import { PrintButton } from "@/components/shared/PrintButton";
 import { TablePagination } from "@/components/shared/TablePagination";
 import { getCurrentUser } from "@/services/auth.service";
+import { canAccess } from "@/utils/access";
 import {
   getFinancialReport,
   listReceivedPayments,
@@ -34,7 +36,7 @@ export async function FinancialReportPage({
   searchParams: Record<string, string | string[] | undefined>;
 }) {
   // Ativos e inativos: um método inativo pode ter recebido no período.
-  const [{ company }, methods] = await Promise.all([
+  const [{ company, access }, methods] = await Promise.all([
     getCurrentUser(),
     fetchAllPages((page, limit) => listPaymentMethods({ page, limit })),
   ]);
@@ -55,6 +57,9 @@ export async function FinancialReportPage({
 
   // relative: os absolutos de dentro (sr-only, dicas dos gráficos) não
   // esticam a página além da rolagem própria.
+  // Produtos aparece para quem vende (ou já recebeu venda no período).
+  const products = showsProducts(report, canAccess(access, "product-sales"));
+
   return (
     <div className="relative -m-1 flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto p-1">
       <div className="flex flex-wrap items-start justify-between gap-3">
@@ -74,9 +79,9 @@ export async function FinancialReportPage({
         month={month}
         methods={options}
       />
-      <FinancialReportCards report={report} />
+      <FinancialReportCards report={report} products={products} />
       <div className="grid gap-3 xl:grid-cols-2">
-        <FinancialPeriodChart series={report.series} />
+        <FinancialPeriodChart series={report.series} products={products} />
         <FinancialMethodTable methods={report.byMethod} />
       </div>
       {/* Com os gráficos, a página rola como um painel; o extrato mantém uma

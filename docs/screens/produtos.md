@@ -64,6 +64,9 @@ categorias que os agrupam.
   tipo, a data e quem lançou, a variação e o saldo, o custo, a conta e a
   observação; "Carregar mais".
 
-## Fora desta etapa
+## Venda
 
-- Venda de produto na comanda (etapas 3 e 4).
+A venda é feita na comanda (ver `financeiro.md`, "Venda de produtos"): tira os
+produtos do estoque ao lançar (movimentação "Venda"), e cancelar a venda
+pendente devolve (movimentação "Venda cancelada"); as duas aparecem no
+Histórico de estoque.

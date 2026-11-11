@@ -119,10 +119,14 @@ describe("modelos de plano", () => {
     }
   });
 
-  it("Produtos e Categorias de produto em nenhum modelo (liberados empresa por empresa)", () => {
+  it("Produtos, Categorias e Venda de produtos em nenhum modelo (liberados empresa por empresa)", () => {
     for (const key of ["agenda", "essential", "professional", "complete"]) {
       const { matrix } = template(key);
-      for (const feature of ["product-categories", "products"]) {
+      for (const feature of [
+        "product-categories",
+        "products",
+        "product-sales",
+      ]) {
         expect(matrix[feature]).toEqual({
           view: false,
           edit: false,

@@ -1,7 +1,7 @@
 // Relatório financeiro: o que entrou no caixa (screens/relatorio-financeiro.md).
 
-/** Origem do pagamento: atendimento ou contratação de pacote. */
-export type ReceivedOrigin = "appointment" | "package";
+/** Origem do pagamento: atendimento, contratação de pacote ou venda de produtos. */
+export type ReceivedOrigin = "appointment" | "package" | "product";
 
 /** Valores em texto com duas casas. */
 export type ReceivedTotal = { count: number; amount: string };
@@ -11,6 +11,7 @@ export type FinancialReportPoint = {
   date: string;
   appointments: string;
   packages: string;
+  products: string;
 };
 
 export type FinancialReportMethod = ReceivedTotal & {
@@ -25,6 +26,7 @@ export type FinancialReport = {
   received: ReceivedTotal;
   appointments: ReceivedTotal;
   packages: ReceivedTotal;
+  products: ReceivedTotal;
   series: { unit: "day" | "week"; points: FinancialReportPoint[] };
   byMethod: FinancialReportMethod[];
 };
@@ -34,7 +36,7 @@ export type ReceivedItem = {
   paidAt: string;
   amount: string;
   origin: ReceivedOrigin;
-  /** Serviço do atendimento ou nome do pacote. */
+  /** Serviço do atendimento, nome do pacote ou os produtos vendidos. */
   description: string;
   client: { id: string; name: string };
   method: { id: string; name: string } | null;

@@ -29,6 +29,7 @@ function checkout(
   appointments: CheckoutAppointment[],
   options: {
     previousPayments?: PreviousPayment[];
+    productSales?: CheckoutItem["productSales"];
     todayPending?: string;
     previousPending?: string;
   } = {},
@@ -36,12 +37,41 @@ function checkout(
   return {
     client: { id: "c1", name: "Camila" },
     appointments,
+    productSales: options.productSales ?? [],
     previousPayments: options.previousPayments ?? [],
     todayPending: options.todayPending ?? "0.00",
     previousPending: options.previousPending ?? "0.00",
     paidToday: "0.00",
   };
 }
+
+// Venda de produtos de hoje, com o pagamento na situação pedida.
+const sale = (status: "PENDING" | "PAID") =>
+  ({
+    id: "sale-1",
+    createdAt: "2026-10-23T15:00:00.000Z",
+    items: [],
+    payment: { id: "pay-1", status },
+  }) as unknown as CheckoutItem["productSales"][number];
+
+describe("checkoutState com venda de produtos", () => {
+  it("só a venda paga: comanda paga (não fica aguardando)", () => {
+    expect(checkoutState(checkout([], { productSales: [sale("PAID")] }))).toBe(
+      "paid",
+    );
+  });
+
+  it("venda pendente: comanda aberta", () => {
+    expect(
+      checkoutState(
+        checkout([], {
+          productSales: [sale("PENDING")],
+          todayPending: "50.00",
+        }),
+      ),
+    ).toBe("open");
+  });
+});
 
 describe("checkoutState", () => {
   it("atendimento de hoje sem pagamento aguarda conclusão (não é Paga)", () => {

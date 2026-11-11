@@ -10,15 +10,27 @@ import type { FinancialReport } from "@/types/financial-report";
 import { formatPrice } from "@/utils/format";
 
 // Tokens de gráfico validados (globals.css): o mesmo par índigo/verde do
-// relatório de agendamentos, que já passou na checagem de daltonismo.
+// relatório de agendamentos, que já passou na checagem de daltonismo. Produtos
+// usa o laranja da paleta categórica.
 const config = {
   appointments: { label: "Atendimentos", color: "var(--chart-info)" },
   packages: { label: "Pacotes", color: "var(--chart-positive)" },
+  products: { label: "Produtos", color: "var(--chart-cat-2)" },
 } satisfies ChartConfig;
-const KEYS = ["appointments", "packages"] as const;
+type Key = keyof typeof config;
+// Com Produtos, o índigo fica no meio da pilha: no escuro, verde e laranja
+// lado a lado se confundem para quem tem deuteranopia (ΔE 4,5).
+const BASE_KEYS: Key[] = ["appointments", "packages"];
+const WITH_PRODUCTS: Key[] = ["packages", "appointments", "products"];
 
 // O Recharts precisa de números; a API manda texto com duas casas.
-type Row = { date: string; appointments: number; packages: number };
+type Row = {
+  date: string;
+  appointments: number;
+  packages: number;
+  products: number;
+};
+const rowTotal = (row: Row) => row.appointments + row.packages + row.products;
 
 // "05/11" a partir de "2026-11-05".
 const shortDate = (date: string) => `${date.slice(8, 10)}/${date.slice(5, 7)}`;
@@ -35,10 +47,12 @@ function TooltipBody({
   active,
   payload,
   unit,
+  keys,
 }: {
   active?: boolean;
   payload?: { payload: Row }[];
   unit: "day" | "week";
+  keys: Key[];
 }) {
   const row = payload?.[0]?.payload;
   if (!active || !row) return null;
@@ -49,7 +63,7 @@ function TooltipBody({
           ? `Semana de ${shortDate(row.date)}`
           : shortDate(row.date)}
       </p>
-      {KEYS.map((key) => (
+      {keys.map((key) => (
         <p key={key} className="flex items-center justify-between gap-4">
           <span className="flex items-center gap-1.5 text-muted-foreground">
             <span
@@ -67,7 +81,7 @@ function TooltipBody({
       <p className="flex justify-between gap-4 border-t border-border pt-1.5">
         <span className="text-muted-foreground">Total</span>
         <span className="font-medium tabular-nums">
-          {formatPrice(row.appointments + row.packages)}
+          {formatPrice(rowTotal(row))}
         </span>
       </p>
     </div>
@@ -75,23 +89,28 @@ function TooltipBody({
 }
 
 /**
- * Recebido por dia (ou semana, em período longo), com atendimentos e pacotes
- * empilhados.
+ * Recebido por dia (ou semana, em período longo), com atendimentos, pacotes e
+ * (quando a empresa vende) produtos empilhados.
  */
 export function FinancialPeriodChart({
   series,
+  products = false,
   print = false,
 }: {
   series: FinancialReport["series"];
+  /** Mostra a série de Produtos (venda na comanda). */
+  products?: boolean;
   /** Versão de impressão: sem animação (a folha sai com as barras inteiras). */
   print?: boolean;
 }) {
+  const keys = products ? WITH_PRODUCTS : BASE_KEYS;
   const rows: Row[] = series.points.map((point) => ({
     date: point.date,
     appointments: Number(point.appointments),
     packages: Number(point.packages),
+    products: Number(point.products ?? 0),
   }));
-  const empty = rows.every((row) => row.appointments + row.packages === 0);
+  const empty = rows.every((row) => rowTotal(row) === 0);
 
   return (
     <section
@@ -142,9 +161,9 @@ export function FinancialPeriodChart({
             />
             <ChartTooltip
               cursor={{ fill: "var(--muted)" }}
-              content={<TooltipBody unit={series.unit} />}
+              content={<TooltipBody unit={series.unit} keys={keys} />}
             />
-            {KEYS.map((key, index) => (
+            {keys.map((key, index) => (
               <Bar
                 key={key}
                 dataKey={key}
@@ -155,7 +174,7 @@ export function FinancialPeriodChart({
                 maxBarSize={32}
                 isAnimationActive={!print}
                 // O arredondado fica só na ponta da pilha.
-                radius={index === KEYS.length - 1 ? [4, 4, 0, 0] : 0}
+                radius={index === keys.length - 1 ? [4, 4, 0, 0] : 0}
               />
             ))}
           </BarChart>
@@ -163,7 +182,7 @@ export function FinancialPeriodChart({
       )}
       {!empty && (
         <ul className="flex flex-wrap justify-center gap-x-4 gap-y-1 text-xs text-muted-foreground">
-          {KEYS.map((key) => (
+          {keys.map((key) => (
             <li
               key={key}
               className="flex items-center gap-1.5 whitespace-nowrap"

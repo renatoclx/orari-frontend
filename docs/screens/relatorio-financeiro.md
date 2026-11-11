@@ -30,14 +30,19 @@ a Análise de recebíveis (o que falta receber) e os Rankings (o faturado).
   **Período** (padrão: mês atual). No celular fica só o método.
 - Quatro cartões (`SummaryCard`): **Recebido** (verde, com a quantidade de
   pagamentos), **Ticket médio** (por pagamento), **Atendimentos** e
-  **Pacotes** (valor e quantidade de cada origem).
+  **Pacotes** (valor e quantidade de cada origem). Um quinto, **Produtos**,
+  aparece para quem vende (funcionalidade "Venda de produtos") ou teve venda no
+  período (`showsProducts`); o mesmo vale para a série no gráfico e no Dashboard.
 - Lado a lado em telas largas (`xl`), empilhados abaixo disso:
   - **Recebido no período**: por dia (até 62 dias) ou semana, barras
     empilhadas de Atendimentos (índigo) e Pacotes (verde), com o total na dica.
+    Com Produtos (laranja, `chart-cat-2`), a pilha é Pacotes, Atendimentos e
+    Produtos: o índigo no meio separa o verde do laranja, que se confundem no
+    escuro para quem tem deuteranopia.
   - **Por método de pagamento**: a tabela dos Rankings (posição e barra
     proporcional ao valor), com pagamentos, recebido e % do recebido.
-- **Extrato**: data, cliente, origem ("Atendimento · serviço" ou
-  "Pacote · nome"), método e valor, do mais recente para o mais antigo,
+- **Extrato**: data, cliente, origem ("Atendimento · serviço",
+  "Pacote · nome" ou "Venda · produtos"), método e valor, do mais recente para o mais antigo,
   paginado (10 por página). No celular, cartões.
 - **Imprimir**: mesma versão de impressão dos demais relatórios, com o extrato
   inteiro a partir da segunda folha.

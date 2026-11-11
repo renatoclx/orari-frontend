@@ -94,3 +94,21 @@ export type StockMovementInput = {
     paid?: { paidAt: string; paymentMethodId: string };
   };
 };
+
+/** Produto na busca da comanda (GET /product-sales/products). */
+export type SaleProduct = {
+  id: string;
+  name: string;
+  sku: string | null;
+  photoUrl: string | null;
+  measureUnit: ProductUnit | null;
+  salePrice: string;
+  promotionalPrice: string | null;
+  currentStock: number;
+};
+
+/** Corpo de POST /product-sales: o cliente e os itens (valor em reais). */
+export type ProductSaleInput = {
+  clientId: string;
+  items: { productId: string; quantity: number; unitPrice: number }[];
+};

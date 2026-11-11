@@ -72,7 +72,17 @@ export function financialReportParams(filters: FinancialReportFilters) {
 export const ORIGIN_LABELS = {
   appointment: "Atendimento",
   package: "Pacote",
+  product: "Venda",
 } as const;
+
+/**
+ * Mostra Produtos (cartão e série) quando a empresa vende ou já recebeu venda
+ * no período: quem não vende não ganha um "R$ 0,00" a mais.
+ */
+export const showsProducts = (
+  report: { products: { count: number } },
+  canSell: boolean,
+) => canSell || report.products.count > 0;
 
 /** Linha do pagamento sem método. */
 export const NO_METHOD_LABEL = "Sem método";

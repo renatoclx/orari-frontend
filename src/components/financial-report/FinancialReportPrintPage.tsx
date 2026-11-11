@@ -6,6 +6,7 @@ import {
   NO_METHOD_LABEL,
   financialReportParams,
   readFinancialReportFilters,
+  showsProducts,
 } from "@/components/financial-report/financial-report-filters";
 import {
   originText,
@@ -15,6 +16,7 @@ import { AutoPrint } from "@/components/shared/AutoPrint";
 import { PrintHeader } from "@/components/shared/PrintHeader";
 import { PrintTable } from "@/components/shared/PrintTable";
 import { getCurrentUser } from "@/services/auth.service";
+import { canAccess } from "@/utils/access";
 import {
   getFinancialReport,
   listReceivedPayments,
@@ -35,7 +37,7 @@ export async function FinancialReportPrintPage({
 }: {
   searchParams: Record<string, string | string[] | undefined>;
 }) {
-  const [{ company }, methods] = await Promise.all([
+  const [{ company, access }, methods] = await Promise.all([
     getCurrentUser(),
     fetchAllPages((page, limit) => listPaymentMethods({ page, limit })),
   ]);
@@ -54,6 +56,9 @@ export async function FinancialReportPrintPage({
     ),
   ]);
 
+  // Produtos aparece para quem vende (ou já recebeu venda no período).
+  const products = showsProducts(report, canAccess(access, "product-sales"));
+
   return (
     <>
       <AutoPrint />
@@ -66,9 +71,13 @@ export async function FinancialReportPrintPage({
           `Período (data do pagamento): ${day(filters.from || month.from)} a ${day(filters.to || month.to)}`,
         ]}
       />
-      <FinancialReportCards report={report} />
+      <FinancialReportCards report={report} products={products} />
       <div className="grid gap-3">
-        <FinancialPeriodChart series={report.series} print />
+        <FinancialPeriodChart
+          series={report.series}
+          products={products}
+          print
+        />
         <FinancialMethodTable methods={report.byMethod} />
       </div>
       <section className="space-y-2 print:break-before-page">

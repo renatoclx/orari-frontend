@@ -27,7 +27,7 @@ diferente. Em caso de conflito, prevalece o arquivo da tela.
 | [pacotes.md](pacotes.md)                                   | Planos e contratações                                     |
 | [usuarios.md](usuarios.md)                                 | Usuários (acesso ao sistema)                              |
 | [metodos-pagamento.md](metodos-pagamento.md)               | Métodos de pagamento                                      |
-| [financeiro.md](financeiro.md)                             | Contas a receber e Comandas                               |
+| [financeiro.md](financeiro.md)                             | Contas a receber, Comandas e venda de produtos            |
 | [empresas.md](empresas.md)                                 | Empresas (só SUPER_ADMIN)                                 |
 | [anamnese.md](anamnese.md)                                 | Anamnese: modelos, fichas, PDF e auditoria                |
 | [turmas.md](turmas.md)                                     | Turmas fixas (só ADMIN)                                   |
@@ -35,6 +35,7 @@ diferente. Em caso de conflito, prevalece o arquivo da tela.
 | [mensagens.md](mensagens.md)                               | Mensagens automáticas ao cliente do app (só ADMIN)        |
 | [ajuda.md](ajuda.md)                                       | Ajuda: manuais em PDF (só ADMIN)                          |
 | [contas-a-pagar.md](contas-a-pagar.md)                     | Contas a pagar, comissões e categorias de despesa (ADMIN) |
+| [produtos.md](produtos.md)                                 | Produtos, categorias e estoque (só ADMIN)                 |
 | [comissoes.md](comissoes.md)                               | Comissões: consulta, adiantamentos, fechamento e recibo   |
 | [dashboard.md](dashboard.md)                               | Dashboard: os números dos relatórios (só ADMIN)           |
 | [carteira-clientes.md](carteira-clientes.md)               | Relatório: carteira de clientes por profissional          |

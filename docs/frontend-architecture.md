@@ -43,6 +43,13 @@ src/
       payable-actions.ts     Server Actions do Contas a pagar (lançar, alterar,
                              pagar em lote, cancelar e excluir)
       expense-category-actions.ts Server Actions das categorias de despesa
+      product-category-actions.ts Server Actions das categorias de produto
+                             (cadastro, renomear, inativar e reativar)
+      product-actions.ts     Server Actions de produtos (cadastro e alteração com
+                             foto, inativar, excluir, movimentar estoque e
+                             histórico)
+      product-sale-actions.ts Server Actions da venda na comanda (busca de
+                             produtos, lançar e cancelar)
       location-actions.ts    busca de cidades e consulta de CEP
       page.tsx               Agendamentos ("/"): agenda do dia (?date=)
       servicos/              Serviços: page e loading (cadastro e alteração
@@ -62,6 +69,8 @@ src/
                              e categorias-de-despesa/ (cada um com page e
                              loading)
       fornecedores/          Fornecedores (mesmas telas de pessoas)
+      produtos/              Produtos (só ADMIN): page, loading, novo/,
+                             [id]/editar/ e categorias/
       anamnese/              Anamnese: modelos/ (lista, novo/, [id]/editar/),
                              fichas/ (Fichas preenchidas, nova/) e auditoria/
       clientes/[id]/anamnese/[fichaId]/  ficha completa, acompanhamento/ e
@@ -118,6 +127,11 @@ src/
                              pagar, comissões em aberto)
     expense-categories/      categorias de despesa (lista e dialog)
     checkouts/               comandas do dia (lista e dialog da comanda)
+    product-categories/      categorias de produto (lista, filtros, dialog)
+    products/                produtos (lista, filtros, formulário, Visualizar,
+                             Movimentar estoque, Histórico; regras puras em
+                             product-*.ts e stock-movements.ts)
+    product-sales/           venda na comanda (dialog da venda, Nova venda)
     anamnesis/               anamnese: templates/ (modelos e editor de perguntas),
                              records/ (fichas, acompanhamento, PDF) e audit/
                              (auditoria); AnamnesisAccessProvider (acesso)
@@ -268,8 +282,17 @@ Duas telas, sem entidade nova no backend: a comanda é uma visão montada a part
 - **Resumo:** `GET /payments/summary` devolve atrasado, a vencer e recebido, respeitando cliente e vencimento mas não a situação. Cada cartão é um link que aplica a situação; o cartão ativo desfaz o filtro. No celular a barra de filtros some e só os cartões filtram.
 - **Baixa:** `PaymentList` (Client Component) guarda a seleção (só pagamentos pendentes de um cliente por vez, que é a exigência da API) e abre o `SettlePaymentsDialog`. O método e a data do pagamento (`SettleFields`) são compartilhados com a comanda. `settlePaymentsAction` grava com `PATCH /payments/settle` (tudo ou nada); uma data passada vai ao meio-dia do fuso da empresa, para não virar o dia anterior, e a data futura é recusada.
 - **Atendimento e contratação:** o ícone de olho abre o mesmo `AppointmentDetailsDialog` da agenda, só para consulta (`getAppointmentDetailsAction`); pagamento de pacote abre `ClientPlanDialog`.
-- **Comandas** (`/financeiro/comandas`): `GET /payments/checkouts` parte das visitas do dia (clientes com atendimento hoje ou que pagaram hoje) e devolve, por cliente, os atendimentos de hoje, as pendências anteriores e os totais. `CheckoutList` mostra aberta ou paga; `CheckoutDialog` tem as seções "Atendimentos de hoje", "Pendências anteriores" e "Pagos hoje" e dá baixa nos itens marcados. Os da visita começam marcados e as pendências, não; a comanda paga abre só para consulta.
+- **Comandas** (`/financeiro/comandas`): `GET /payments/checkouts` parte das visitas do dia (clientes com atendimento hoje, que compraram hoje ou que pagaram hoje) e devolve, por cliente, os atendimentos e as vendas de hoje, as pendências anteriores e os totais. `CheckoutList` mostra aberta ou paga; `CheckoutDialog` mostra em aberto "Atendimentos de hoje", "Produtos" e "Pendências anteriores", com o pago do dia no bloco recolhível "Recebidos", e dá baixa nos itens marcados. Os de hoje começam marcados e as pendências, não; a comanda paga abre só para consulta (e não aceita produto: a compra seguinte é uma Nova venda).
 - Soma de valores sempre em centavos inteiros, para não acumular erro de ponto flutuante. Depois da baixa, `revalidatePath` recarrega as duas telas.
+
+## Produtos, estoque e venda
+
+Só do ADMIN; três funcionalidades em Acessos e limites (`product-categories`, `products`, `product-sales`), fora de todos os modelos.
+
+- **Cadastro** (`/produtos`, `/produtos/categorias`): o padrão das listagens, com filtros na URL (`product-filters.ts`, comum ao servidor e à barra; "Estoque baixo" é um botão liga e desliga). O formulário é página (`ProductFormPage` + `ProductForm`): a foto e os valores (em JSON) vão num `FormData` à Server Action, que valida de novo (`product-validation.ts`), salva e envia a foto pela rota própria. O fornecedor só vai quando muda; os erros da API voltam ao campo (`productErrorField`).
+- **Estoque:** o estoque atual é o saldo das movimentações (API). `StockMovementDialog` lança compra (com conta a pagar opcional, só com o Contas a pagar no plano; a página decide no servidor e busca categorias e métodos só nesse caso), uso interno, perda e ajuste, com a prévia do saldo (`stock-movements.ts`). `StockHistoryDialog` busca por Server Action ao abrir. Na alteração do produto, o estoque é só leitura e não é enviado.
+- **Venda na comanda:** o pagamento ganhou a terceira origem (`productSale`); `describePayment` a descreve em todas as telas. `CheckoutsListPage` calcula no servidor se o usuário vende e cancela (ADMIN + `product-sales`) e passa por props. `ProductSaleDialog` (busca, carrinho em `utils/sale.ts`) fica **fora do `<form>` da comanda**: o envio de um form filho, mesmo em portal, sobe pela árvore do React até o pai. O `key` do formulário da comanda inclui as vendas, para a venda nova já vir marcada; o pago do dia fica no bloco recolhível "Recebidos".
+- **Relatório financeiro e Dashboard:** cartão e série de Produtos quando a empresa vende ou teve venda no período (`showsProducts`).
 
 ## Empresas (SUPER_ADMIN)
 

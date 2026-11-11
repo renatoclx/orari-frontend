@@ -76,6 +76,26 @@ export const ACCESS_GROUPS: { label: string; features: AccessFeature[] }[] = [
     ],
   },
   {
+    label: "Produtos",
+    features: [
+      // Só o ADMIN. Exclui/Inativa = inativar (não há exclusão de categoria).
+      {
+        key: "product-categories",
+        label: "Categorias de produto",
+        actions: ALL_ACTIONS,
+      },
+      // Só o ADMIN. A API exige ver Categorias de produto.
+      { key: "products", label: "Produtos", actions: ALL_ACTIONS },
+      // Venda na comanda (só o ADMIN vende): Cria = vender; Exclui = cancelar
+      // a venda pendente; não há alteração. A API exige Comandas e Produtos.
+      {
+        key: "product-sales",
+        label: "Venda de produtos",
+        actions: ["view", "create", "remove"],
+      },
+    ],
+  },
+  {
     label: "Anamnese",
     features: [
       { key: "anamnesis", label: "Fichas", actions: ALL_ACTIONS },
@@ -234,6 +254,9 @@ const CLASS_KEYS = ["class-groups"];
 // Portal do cliente e Mensagens ficam fora de todos os modelos por enquanto: o
 // SUPER_ADMIN libera empresa por empresa (backend: migração client_portal_off).
 const PORTAL_KEYS = ["client-portal", "messages"];
+// Produtos também ficam fora de todos os modelos: o SUPER_ADMIN libera a quem
+// contratar (backend: DEFAULT_OFF).
+const PRODUCT_KEYS = ["product-categories", "products", "product-sales"];
 // Relatórios por versão (a revisar): os da agenda em todas; os do dinheiro a
 // partir do Essencial; os demais a partir do Profissional.
 const FULL_REPORT_KEYS = [
@@ -284,6 +307,7 @@ export const ACCESS_TEMPLATES: AccessTemplate[] = [
         !ANAMNESIS_KEYS.includes(key) &&
         !CLASS_KEYS.includes(key) &&
         !PORTAL_KEYS.includes(key) &&
+        !PRODUCT_KEYS.includes(key) &&
         !FULL_REPORT_KEYS.includes(key),
     ),
     admins: 1,
@@ -293,14 +317,19 @@ export const ACCESS_TEMPLATES: AccessTemplate[] = [
     key: "professional",
     label: "Profissional",
     matrix: matrixWith(
-      (key) => !CLASS_KEYS.includes(key) && !PORTAL_KEYS.includes(key),
+      (key) =>
+        !CLASS_KEYS.includes(key) &&
+        !PORTAL_KEYS.includes(key) &&
+        !PRODUCT_KEYS.includes(key),
     ),
     admins: 1,
   },
   {
     key: "complete",
     label: "Completo",
-    matrix: matrixWith((key) => !PORTAL_KEYS.includes(key)),
+    matrix: matrixWith(
+      (key) => !PORTAL_KEYS.includes(key) && !PRODUCT_KEYS.includes(key),
+    ),
     admins: 2,
   },
 ];

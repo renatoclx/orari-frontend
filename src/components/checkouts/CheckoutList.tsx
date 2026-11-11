@@ -21,6 +21,9 @@ type CheckoutListProps = {
   timeZone: string;
   /** Hoje no fuso da empresa, "aaaa-mm-dd". */
   today: string;
+  /** Pode lançar e cancelar venda de produtos (só ADMIN com a funcionalidade). */
+  canSell: boolean;
+  canCancelSale: boolean;
   /** Rodapé fixo do card (paginação). */
   footer: React.ReactNode;
 };
@@ -86,6 +89,8 @@ export function CheckoutList({
   search,
   timeZone,
   today,
+  canSell,
+  canCancelSale,
   footer,
 }: CheckoutListProps) {
   // A comanda fica guardada ao fechar, para o dialog não mudar de conteúdo
@@ -199,6 +204,8 @@ export function CheckoutList({
         methods={methods}
         timeZone={timeZone}
         today={today}
+        canSell={canSell}
+        canCancelSale={canCancelSale}
       />
     </div>
   );

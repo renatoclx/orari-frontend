@@ -53,8 +53,10 @@ a vencer. É também onde se dá a baixa.
   - Vencimento ("--" quando não há);
   - Cliente (link para o histórico dele);
   - Descrição, pela origem: atendimento ("Serviço · dia às hora", com o ícone de
-    recorrência quando vier de uma) ou pacote ("Pacote X · parcela" ou
-    "pagamento integral", com o ícone de pacote);
+    recorrência quando vier de uma), pacote ("Pacote X · parcela" ou
+    "pagamento integral", com o ícone de pacote) ou venda de produtos ("Venda:
+    Sérum, Faixa (2)", com o ícone de sacola). O pagamento da venda só se
+    recebe aqui: alterar ou cancelar é pela venda, na comanda;
   - Valor;
   - Status: Pendente, Atrasado, Pago ou Cancelado;
   - Pago em: data e método ("--" enquanto não pago);
@@ -105,6 +107,7 @@ dos atendimentos e dos pagamentos que já existem.
   Confirmado, Em andamento ou Concluído, mesmo que o pagamento ainda não exista.
   Cancelado e Não compareceu não entram.
 - Todo cliente que **pagou algo hoje** (a comanda paga continua na lista).
+- Todo cliente que **comprou produtos hoje** (venda não cancelada).
 - Cliente com pendência mas sem atendimento hoje **não** tem comanda: ele é
   cobrado pela tela Contas a receber.
 
@@ -127,8 +130,18 @@ Três grupos, nesta ordem:
    pagamentos atrasados, parcela de pacote que vence hoje ou já venceu e pacote
    integral pendente (com ou sem vencimento). Cada uma mostra o vencimento e a
    etiqueta Atrasado. Pagamentos a vencer (futuros) não entram.
-3. **Pagos hoje**: o que já foi recebido hoje fora dos atendimentos de hoje, só
-   leitura, com o método.
+3. **Recebidos** (bloco recolhível): tudo o que já foi pago hoje, sejam
+   atendimentos de hoje, vendas ou outros pagamentos, com o método. Com o
+   cabeçalho "N itens, R$ total". Vem fechado quando há algo em aberto e
+   aberto quando a comanda está toda paga.
+
+Entre os atendimentos e as pendências, a seção **Produtos** (com a
+funcionalidade "Venda de produtos"): uma linha por venda de hoje, com os
+produtos ("Sérum, Faixa (2)"), o horário, o selo Paga e o método quando
+recebida, e o valor (a paga vai para "Recebidos"). A pendente começa **marcada** e, para quem pode, tem
+**Cancelar venda** (`Ban`, com confirmação: o pagamento fica cancelado e os
+produtos voltam ao estoque). A venda pendente de outro dia entra nas pendências
+anteriores.
 
 ### Listagem
 
@@ -154,7 +167,8 @@ Três grupos, nesta ordem:
 ### Dialog da comanda
 
 - Título "Comanda de [cliente]", a data e um link para o histórico do cliente.
-- Seções "Atendimentos de hoje", "Pendências anteriores" e "Pagos hoje".
+- Seções "Atendimentos de hoje", "Produtos" e "Pendências anteriores", só com
+  o que está em aberto, e o bloco "Recebidos" (o que já foi pago hoje).
 - Itens pendentes têm caixa de seleção: os da visita começam **marcados** e as
   pendências anteriores, **desmarcadas**, para o atendente decidir.
 - Total a receber (dos itens marcados), método de pagamento (obrigatório; só os
@@ -164,6 +178,25 @@ Três grupos, nesta ordem:
   baixa é de todos os marcados, tudo ou nada; os desmarcados continuam
   pendentes.
 - Na comanda paga, o dialog é só leitura (sem seleção, método ou botão de baixa).
+- Sem atendimento hoje (só venda), a seção "Atendimentos de hoje" não aparece.
+
+### Venda de produtos
+
+- Só o **ADMIN** com "Venda de produtos" (Cria para vender, Exclui para
+  cancelar) vê os botões; a página calcula a permissão no servidor.
+- **Adicionar produto** (dentro da comanda, `Plus`): abre a venda para o cliente
+  da comanda. **Não aparece na comanda paga**: ela está fechada, e o que vier
+  depois é uma Nova venda.
+- **Nova venda** (ao lado do título da tela, `Plus`): para quem só vem comprar;
+  escolhe o cliente na busca. Depois de uma comanda paga, a compra nova também
+  vai por aqui e reabre a comanda do dia (a comanda é o dia do cliente, não um
+  registro), com a venda nova pendente e a anterior paga.
+- **Dialog da venda**: busca de produtos ativos por nome ou SKU (preço, aviso de
+  promoção e estoque; "Sem estoque" desabilita), a lista "Nesta venda" com
+  quantidade, valor por unidade (vem o promocional, se houver; pode mudar),
+  subtotal e remover, e o total. Quantidade acima do estoque é barrada na
+  linha. **Lançar venda** (`ShoppingBag`): a venda entra na comanda de hoje como
+  pendente, já marcada para receber.
 
 ---
 
@@ -172,7 +205,8 @@ Três grupos, nesta ordem:
 - Sinal parcial antes do atendimento (exige mais de um pagamento por
   atendimento).
 - Vários métodos na mesma comanda (ex.: dinheiro + cartão), desconto, gorjeta,
-  produtos, troco e caixa: exigem a entidade Comanda no backend.
+  troco e caixa: exigem a entidade Comanda no backend. (A venda de produtos não
+  exigiu: é uma origem própria do pagamento.)
 - Recibo ou impressão da comanda.
 - **Parcelamento no cartão**, taxas por método e valor líquido, junto com a
   conciliação (o método de pagamento precisaria de um marcador "aceita

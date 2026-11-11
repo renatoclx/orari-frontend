@@ -12,6 +12,7 @@ import { DashboardSection } from "@/components/dashboard/DashboardSection";
 import { DashboardToolbar } from "@/components/dashboard/DashboardToolbar";
 import { PaymentMethodDonut } from "@/components/dashboard/PaymentMethodDonut";
 import { FinancialPeriodChart } from "@/components/financial-report/FinancialPeriodChart";
+import { showsProducts } from "@/components/financial-report/financial-report-filters";
 import { PackagesPlanTable } from "@/components/packages-report/PackagesPlanTable";
 import { RankingTable } from "@/components/rankings/RankingTable";
 import { ReceivablesAgingChart } from "@/components/receivables/ReceivablesAgingChart";
@@ -139,7 +140,10 @@ export async function DashboardPage({
 
           {financial && (
             <DashboardSection title="Financeiro" href="/relatorios/financeiro">
-              <FinancialPeriodChart series={financial.series} />
+              <FinancialPeriodChart
+                series={financial.series}
+                products={showsProducts(financial, can("product-sales"))}
+              />
               <PaymentMethodDonut
                 methods={financial.byMethod}
                 total={financial.received.amount}

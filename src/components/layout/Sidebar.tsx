@@ -15,6 +15,7 @@ import {
   PanelLeftClose,
   PanelLeftOpen,
   Repeat,
+  ShoppingBag,
   Smartphone,
   Users,
   UsersRound,
@@ -167,6 +168,21 @@ const classGroupsLink: NavLink = {
   label: "Turmas",
   icon: UsersRound,
   feature: "class-groups",
+};
+
+// Produtos (screens/produtos.md): só o ADMIN; o grupo entra logo depois de
+// Serviços, o outro catálogo do que a clínica vende.
+const productsGroup: NavGroup = {
+  label: "Produtos",
+  icon: ShoppingBag,
+  children: [
+    { href: "/produtos", label: "Produtos", feature: "products" },
+    {
+      href: "/produtos/categorias",
+      label: "Categorias",
+      feature: "product-categories",
+    },
+  ],
 };
 
 // Portal do cliente (screens/portal-do-cliente.md): só o ADMIN; o item fica
@@ -454,7 +470,7 @@ function SidebarNav({
     [
       ...(isAdmin ? [dashboardLink] : []),
       ...withCommissions.slice(0, services + 1),
-      ...(isAdmin ? [classGroupsLink] : []),
+      ...(isAdmin ? [productsGroup, classGroupsLink] : []),
       ...withCommissions.slice(services + 1),
       ...(isAdmin ? [reportsGroup] : []),
       ...(isAdmin

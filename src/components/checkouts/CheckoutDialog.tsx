@@ -5,6 +5,7 @@ import { useState, useTransition } from "react";
 import {
   Ban,
   Check,
+  ChevronDown,
   Package,
   Plus,
   Repeat,
@@ -22,6 +23,11 @@ import { ConfirmDialog } from "@/components/shared/ConfirmDialog";
 import { Hint } from "@/components/shared/Hint";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@/components/ui/collapsible";
 import {
   Dialog,
   DialogContent,
@@ -164,6 +170,31 @@ function CheckoutForm({
   const salePending = checkout.productSales.flatMap((sale) =>
     sale.payment?.status === "PENDING" ? [sale.payment] : [],
   );
+  // Em aberto × recebidos: o pago hoje vai para o bloco "Recebidos".
+  const isPaid = (payment: { status: string } | null) =>
+    payment?.status === "PAID";
+  const openAppointments = checkout.appointments.filter(
+    (appointment) => !isPaid(appointment.payment),
+  );
+  const paidAppointments = checkout.appointments.filter((appointment) =>
+    isPaid(appointment.payment),
+  );
+  const openSales = checkout.productSales.filter(
+    (sale) => !isPaid(sale.payment),
+  );
+  const paidSales = checkout.productSales.filter((sale) =>
+    isPaid(sale.payment),
+  );
+  const hasOpen =
+    openAppointments.length + openSales.length + previousPending.length > 0;
+  const receivedCount =
+    paidAppointments.length + paidSales.length + previousPaid.length;
+  // Em centavos, como o total a receber.
+  const receivedTotal = [
+    ...paidAppointments.map((appointment) => appointment.payment!.amount),
+    ...paidSales.map((sale) => sale.payment!.amount),
+    ...previousPaid.map((payment) => payment.amount),
+  ].reduce((sum, amount) => sum + cents(amount), 0);
   // Avulsos ainda não concluídos que já podem ser recebidos (preço do serviço).
   const ahead = checkout.appointments.filter(receivableAhead);
   // Comanda paga: nada a receber, o dialog é só consulta.
@@ -274,6 +305,119 @@ function CheckoutForm({
   // Sem espaço (celular), o selo e o valor descem para a linha de baixo.
   const row = "flex flex-wrap items-center gap-x-3 gap-y-1 px-3 py-2 text-sm";
 
+  // Linhas reaproveitadas nas seções em aberto e no bloco "Recebidos".
+  const appointmentRow = (appointment: CheckoutAppointment) => {
+    const { payment } = appointment;
+    const Icon = appointment.clientPlanId
+      ? Package
+      : appointment.recurringAppointmentId
+        ? Repeat
+        : null;
+    const when = `${appointment.service.name} às ${toTimeString(appointment.startAt, timeZone)}`;
+    const canAhead = receivableAhead(appointment);
+    // Avulso sem preço: o valor só nasce na conclusão (lançado depois).
+    const noPrice =
+      !payment &&
+      !appointment.clientPlanId &&
+      appointment.service.price === null;
+    return (
+      <li key={appointment.id} className={row}>
+        {payment?.status === "PENDING" && !readOnly ? (
+          checkbox(payment.id, `Receber ${when}`)
+        ) : canAhead && !readOnly ? (
+          checkbox(appointment.id, `Receber antes da conclusão ${when}`)
+        ) : (
+          <span className="size-4 shrink-0 max-sm:hidden" aria-hidden="true" />
+        )}
+        <span className="min-w-40 flex-1">
+          <span className="inline-flex items-center gap-1.5">
+            {Icon && (
+              <Icon
+                className="size-4 text-muted-foreground"
+                aria-hidden="true"
+              />
+            )}
+            {appointment.service.name} ·{" "}
+            {toTimeString(appointment.startAt, timeZone)}
+          </span>
+          <span className="block text-xs text-muted-foreground">
+            com {appointment.professional.name}
+            {noPrice && " · sem preço: receba após a conclusão"}
+          </span>
+        </span>
+        <VisitState appointment={appointment} />
+        {payment ? (
+          <span className="tabular-nums">{formatPrice(payment.amount)}</span>
+        ) : (
+          canAhead && (
+            <span className="tabular-nums">
+              {formatPrice(appointment.service.price!)}
+            </span>
+          )
+        )}
+      </li>
+    );
+  };
+  const saleRow = (sale: CheckoutProductSale) => {
+    const { payment } = sale;
+    const description = saleDescription(sale.items);
+    return (
+      <li key={sale.id} className={row}>
+        {payment?.status === "PENDING" && !readOnly ? (
+          checkbox(payment.id, `Receber a venda ${description}`)
+        ) : (
+          <span className="size-4 shrink-0 max-sm:hidden" aria-hidden="true" />
+        )}
+        <span className="min-w-40 flex-1">
+          <span className="inline-flex items-center gap-1.5">
+            <ShoppingBag
+              className="size-4 shrink-0 text-muted-foreground"
+              aria-hidden="true"
+            />
+            {description}
+          </span>
+          <span className="block text-xs text-muted-foreground">
+            Venda às {toTimeString(sale.createdAt, timeZone)}
+          </span>
+        </span>
+        <SaleState sale={sale} />
+        {payment && (
+          <span className="tabular-nums">{formatPrice(payment.amount)}</span>
+        )}
+        {canCancelSale && payment?.status === "PENDING" && (
+          <Hint label={`Cancelar a venda ${description}`}>
+            <Button
+              type="button"
+              variant="ghost"
+              size="icon"
+              aria-label={`Cancelar a venda ${description}`}
+              onClick={() => setCancelling(sale)}
+            >
+              <Ban aria-hidden="true" />
+            </Button>
+          </Hint>
+        )}
+      </li>
+    );
+  };
+  const paidRow = (payment: CheckoutItem["previousPayments"][number]) => (
+    <li key={payment.id} className={row}>
+      <span className="size-4 shrink-0" aria-hidden="true" />
+      <span className="min-w-40 flex-1">
+        <PaymentDescription payment={payment} timeZone={timeZone} />
+        <span className="block text-xs text-muted-foreground">
+          {payment.paidAt &&
+            formatDateOnly(
+              `${toDateString(new Date(payment.paidAt), timeZone)}T00:00:00Z`,
+            )}
+          {payment.paymentMethod && ` · ${payment.paymentMethod.name}`}
+        </span>
+      </span>
+      <PaymentBadge payment={payment} feminine={false} />
+      <span className="tabular-nums">{formatPrice(payment.amount)}</span>
+    </li>
+  );
+
   return (
     <>
       <form noValidate onSubmit={handleSubmit} className="space-y-4">
@@ -291,121 +435,14 @@ function CheckoutForm({
         </DialogHeader>
 
         <div className="max-h-[50vh] space-y-4 overflow-auto">
-          {checkout.appointments.length > 0 && (
+          {openAppointments.length > 0 && (
             <Section title="Atendimentos de hoje">
-              {checkout.appointments.map((appointment) => {
-                const { payment } = appointment;
-                const Icon = appointment.clientPlanId
-                  ? Package
-                  : appointment.recurringAppointmentId
-                    ? Repeat
-                    : null;
-                const when = `${appointment.service.name} às ${toTimeString(appointment.startAt, timeZone)}`;
-                const canAhead = receivableAhead(appointment);
-                // Avulso sem preço: o valor só nasce na conclusão (lançado depois).
-                const noPrice =
-                  !payment &&
-                  !appointment.clientPlanId &&
-                  appointment.service.price === null;
-                return (
-                  <li key={appointment.id} className={row}>
-                    {payment?.status === "PENDING" && !readOnly ? (
-                      checkbox(payment.id, `Receber ${when}`)
-                    ) : canAhead && !readOnly ? (
-                      checkbox(
-                        appointment.id,
-                        `Receber antes da conclusão ${when}`,
-                      )
-                    ) : (
-                      <span
-                        className="size-4 shrink-0 max-sm:hidden"
-                        aria-hidden="true"
-                      />
-                    )}
-                    <span className="min-w-40 flex-1">
-                      <span className="inline-flex items-center gap-1.5">
-                        {Icon && (
-                          <Icon
-                            className="size-4 text-muted-foreground"
-                            aria-hidden="true"
-                          />
-                        )}
-                        {appointment.service.name} ·{" "}
-                        {toTimeString(appointment.startAt, timeZone)}
-                      </span>
-                      <span className="block text-xs text-muted-foreground">
-                        com {appointment.professional.name}
-                        {noPrice && " · sem preço: receba após a conclusão"}
-                      </span>
-                    </span>
-                    <VisitState appointment={appointment} />
-                    {payment ? (
-                      <span className="tabular-nums">
-                        {formatPrice(payment.amount)}
-                      </span>
-                    ) : (
-                      canAhead && (
-                        <span className="tabular-nums">
-                          {formatPrice(appointment.service.price!)}
-                        </span>
-                      )
-                    )}
-                  </li>
-                );
-              })}
+              {openAppointments.map(appointmentRow)}
             </Section>
           )}
 
-          {checkout.productSales.length > 0 && (
-            <Section title="Produtos">
-              {checkout.productSales.map((sale) => {
-                const { payment } = sale;
-                const description = saleDescription(sale.items);
-                return (
-                  <li key={sale.id} className={row}>
-                    {payment?.status === "PENDING" && !readOnly ? (
-                      checkbox(payment.id, `Receber a venda ${description}`)
-                    ) : (
-                      <span
-                        className="size-4 shrink-0 max-sm:hidden"
-                        aria-hidden="true"
-                      />
-                    )}
-                    <span className="min-w-40 flex-1">
-                      <span className="inline-flex items-center gap-1.5">
-                        <ShoppingBag
-                          className="size-4 shrink-0 text-muted-foreground"
-                          aria-hidden="true"
-                        />
-                        {description}
-                      </span>
-                      <span className="block text-xs text-muted-foreground">
-                        Venda às {toTimeString(sale.createdAt, timeZone)}
-                      </span>
-                    </span>
-                    <SaleState sale={sale} />
-                    {payment && (
-                      <span className="tabular-nums">
-                        {formatPrice(payment.amount)}
-                      </span>
-                    )}
-                    {canCancelSale && payment?.status === "PENDING" && (
-                      <Hint label={`Cancelar a venda ${description}`}>
-                        <Button
-                          type="button"
-                          variant="ghost"
-                          size="icon"
-                          aria-label={`Cancelar a venda ${description}`}
-                          onClick={() => setCancelling(sale)}
-                        >
-                          <Ban aria-hidden="true" />
-                        </Button>
-                      </Hint>
-                    )}
-                  </li>
-                );
-              })}
-            </Section>
+          {openSales.length > 0 && (
+            <Section title="Produtos">{openSales.map(saleRow)}</Section>
           )}
 
           {/* Comanda paga está fechada: o que vier depois é uma Nova venda. */}
@@ -448,29 +485,29 @@ function CheckoutForm({
             </Section>
           )}
 
-          {previousPaid.length > 0 && (
-            <Section title="Pagos hoje">
-              {previousPaid.map((payment) => (
-                <li key={payment.id} className={row}>
-                  <span className="size-4 shrink-0" aria-hidden="true" />
-                  <span className="min-w-40 flex-1">
-                    <PaymentDescription payment={payment} timeZone={timeZone} />
-                    <span className="block text-xs text-muted-foreground">
-                      {payment.paidAt &&
-                        formatDateOnly(
-                          `${toDateString(new Date(payment.paidAt), timeZone)}T00:00:00Z`,
-                        )}
-                      {payment.paymentMethod &&
-                        ` · ${payment.paymentMethod.name}`}
-                    </span>
-                  </span>
-                  <PaymentBadge payment={payment} feminine={false} />
-                  <span className="tabular-nums">
-                    {formatPrice(payment.amount)}
-                  </span>
-                </li>
-              ))}
-            </Section>
+          {/* O que já foi pago hoje fica recolhido quando há algo em aberto: a
+              comanda mostra o que importa agora. Toda paga, ele vem aberto. */}
+          {receivedCount > 0 && (
+            <Collapsible defaultOpen={!hasOpen} className="space-y-1">
+              <CollapsibleTrigger className="group flex w-full items-center justify-between gap-2 rounded-control text-sm">
+                <span className="font-medium">Recebidos</span>
+                <span className="inline-flex items-center gap-2 text-muted-foreground tabular-nums">
+                  {receivedCount} {receivedCount === 1 ? "item" : "itens"},{" "}
+                  {formatPrice(receivedTotal / 100)}
+                  <ChevronDown
+                    className="size-4 group-data-[state=open]:rotate-180 motion-safe:transition-transform"
+                    aria-hidden="true"
+                  />
+                </span>
+              </CollapsibleTrigger>
+              <CollapsibleContent>
+                <ul className="divide-y divide-border rounded-control border border-border">
+                  {paidAppointments.map(appointmentRow)}
+                  {paidSales.map(saleRow)}
+                  {previousPaid.map(paidRow)}
+                </ul>
+              </CollapsibleContent>
+            </Collapsible>
           )}
         </div>
 

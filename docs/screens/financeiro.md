@@ -130,13 +130,15 @@ Três grupos, nesta ordem:
    pagamentos atrasados, parcela de pacote que vence hoje ou já venceu e pacote
    integral pendente (com ou sem vencimento). Cada uma mostra o vencimento e a
    etiqueta Atrasado. Pagamentos a vencer (futuros) não entram.
-3. **Pagos hoje**: o que já foi recebido hoje fora dos atendimentos de hoje, só
-   leitura, com o método.
+3. **Recebidos** (bloco recolhível): tudo o que já foi pago hoje, sejam
+   atendimentos de hoje, vendas ou outros pagamentos, com o método. Com o
+   cabeçalho "N itens, R$ total". Vem fechado quando há algo em aberto e
+   aberto quando a comanda está toda paga.
 
 Entre os atendimentos e as pendências, a seção **Produtos** (com a
 funcionalidade "Venda de produtos"): uma linha por venda de hoje, com os
 produtos ("Sérum, Faixa (2)"), o horário, o selo Paga e o método quando
-recebida, e o valor. A pendente começa **marcada** e, para quem pode, tem
+recebida, e o valor (a paga vai para "Recebidos"). A pendente começa **marcada** e, para quem pode, tem
 **Cancelar venda** (`Ban`, com confirmação: o pagamento fica cancelado e os
 produtos voltam ao estoque). A venda pendente de outro dia entra nas pendências
 anteriores.
@@ -165,7 +167,8 @@ anteriores.
 ### Dialog da comanda
 
 - Título "Comanda de [cliente]", a data e um link para o histórico do cliente.
-- Seções "Atendimentos de hoje", "Pendências anteriores" e "Pagos hoje".
+- Seções "Atendimentos de hoje", "Produtos" e "Pendências anteriores", só com
+  o que está em aberto, e o bloco "Recebidos" (o que já foi pago hoje).
 - Itens pendentes têm caixa de seleção: os da visita começam **marcados** e as
   pendências anteriores, **desmarcadas**, para o atendente decidir.
 - Total a receber (dos itens marcados), método de pagamento (obrigatório; só os

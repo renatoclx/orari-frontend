@@ -4,18 +4,23 @@ import { placeInitials } from "@/components/client-app/client-app";
 type PlaceAvatarProps = {
   name: string;
   logoUrl: string | null;
-  size?: "md" | "lg";
+  size?: "md" | "lg" | "xl";
 };
 
 // Logo do estabelecimento em círculo; sem logo, as iniciais do nome.
 export function PlaceAvatar({ name, logoUrl, size = "md" }: PlaceAvatarProps) {
-  const box = size === "lg" ? "size-16 text-lg" : "size-10 text-sm";
+  const box = {
+    md: "size-10 text-sm",
+    lg: "size-16 text-lg",
+    // Últimos acessos do Início: o logo é o destaque.
+    xl: "size-20 text-xl",
+  }[size];
   return logoUrl ? (
     <Image
       src={logoUrl}
       alt={`Logo de ${name}`}
-      width={64}
-      height={64}
+      width={80}
+      height={80}
       unoptimized
       className={`${box} shrink-0 rounded-full bg-card object-contain`}
     />

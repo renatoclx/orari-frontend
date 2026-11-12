@@ -81,7 +81,7 @@ export default async function AppHomePage({ searchParams }: PageProps<"/app">) {
 
       <AppTips />
 
-      <RecentPlaces places={recentPlaces(places, [...upcoming, ...past])} />
+      <RecentPlaces places={recentPlaces(places, upcoming, past)} />
     </>
   );
 }

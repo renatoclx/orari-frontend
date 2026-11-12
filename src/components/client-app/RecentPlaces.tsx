@@ -12,9 +12,15 @@ export function RecentPlaces({ places }: { places: AppPlace[] }) {
     <section className="space-y-3">
       <h2 className="font-semibold">Últimos acessos</h2>
       {places.length > 0 ? (
-        <ul className="-mx-5 flex [scrollbar-width:none] gap-4 overflow-x-auto px-5 pt-1 pb-2 [&::-webkit-scrollbar]:hidden">
+        // A lista é um container: cada local ocupa (largura - 3 espaços) / 3,5,
+        // então em qualquer celular aparecem 3 locais e meio, a pista de que
+        // a lista rola.
+        <ul className="@container -mx-5 flex [scrollbar-width:none] gap-3 overflow-x-auto px-5 pt-1 pb-2 [&::-webkit-scrollbar]:hidden">
           {places.map((place) => (
-            <li key={place.slug} className="w-24 shrink-0">
+            <li
+              key={place.slug}
+              className="w-[calc((100cqw-2.25rem)/3.5)] shrink-0"
+            >
               <Link
                 href={`/app/local/${place.slug}`}
                 className="flex flex-col items-center gap-2 text-center"
@@ -23,7 +29,7 @@ export function RecentPlaces({ places }: { places: AppPlace[] }) {
                   <PlaceAvatar
                     name={place.name}
                     logoUrl={place.logoUrl}
-                    size="xl"
+                    size="lg"
                   />
                 </span>
                 <span className="line-clamp-2 text-sm">{place.name}</span>

@@ -72,7 +72,7 @@ export function AppTips() {
     <section
       aria-roledescription="carrossel"
       aria-label="Dicas do app"
-      className="space-y-3"
+      className="space-y-2"
     >
       <ul
         ref={list}
@@ -90,16 +90,17 @@ export function AppTips() {
             >
               <Link
                 href={tip.href}
-                className="relative flex h-40 flex-col justify-end overflow-hidden rounded-card bg-gradient-to-br from-primary/35 via-card to-card p-5"
+                // Baixo o bastante para o Início caber numa tela do iPhone.
+                className="relative flex h-32 flex-col justify-end overflow-hidden rounded-card bg-gradient-to-br from-primary/35 via-card to-card p-4"
               >
                 <Icon
-                  className="absolute top-4 right-4 size-14 text-primary/70"
+                  className="absolute top-4 right-4 size-12 text-primary/70"
                   aria-hidden="true"
                 />
                 <span className="max-w-[75%] text-lg leading-snug font-bold">
                   {tip.title}
                 </span>
-                <span className="max-w-[85%] text-sm text-muted-foreground">
+                <span className="line-clamp-2 max-w-[85%] text-sm text-muted-foreground">
                   {tip.text}
                 </span>
               </Link>

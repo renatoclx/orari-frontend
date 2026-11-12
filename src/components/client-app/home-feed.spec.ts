@@ -69,23 +69,43 @@ describe("featuredAppointment", () => {
 });
 
 describe("recentPlaces", () => {
-  it("ordena pelo agendamento mais recente; sem agendamento vai para o fim", () => {
+  it("marcados primeiro (o mais próximo antes), depois o passado mais recente, por fim os sem agendamento", () => {
     const places = [
       place("sem"),
-      place("antigo"),
-      place("recente"),
+      place("passado-antigo"),
+      place("longe"),
+      place("amanha"),
+      place("passado-recente"),
       place("nunca"),
     ];
-    const result = recentPlaces(places, [
-      appointment("1", "2026-10-01T15:00:00Z", "antigo"),
-      appointment("2", "2026-11-20T15:00:00Z", "recente"),
-      appointment("3", "2026-09-01T15:00:00Z", "antigo"),
-    ]);
+    const result = recentPlaces(
+      places,
+      [
+        appointment("1", "2026-11-18T15:00:00Z", "longe"),
+        appointment("2", "2026-11-13T15:00:00Z", "amanha"),
+        appointment("3", "2026-11-20T15:00:00Z", "amanha"),
+      ],
+      [
+        appointment("4", "2026-10-01T15:00:00Z", "passado-antigo"),
+        appointment("5", "2026-11-05T15:00:00Z", "passado-recente"),
+      ],
+    );
     expect(result.map((item) => item.slug)).toEqual([
-      "recente",
-      "antigo",
+      "amanha",
+      "longe",
+      "passado-recente",
+      "passado-antigo",
       "sem",
       "nunca",
     ]);
+  });
+
+  it("cancelado não conta", () => {
+    const result = recentPlaces(
+      [place("a"), place("b")],
+      [appointment("1", "2026-11-13T15:00:00Z", "b", "CANCELLED")],
+      [appointment("2", "2026-11-01T15:00:00Z", "a")],
+    );
+    expect(result.map((item) => item.slug)).toEqual(["a", "b"]);
   });
 });

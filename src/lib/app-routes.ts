@@ -51,6 +51,7 @@ export function appSessionKind(cookies: {
 // etapa nova do app do profissional acrescenta as suas aqui.
 const PROFESSIONAL_PATHS = new Set([
   "/app",
+  "/app/agenda",
   "/app/menu",
   "/app/menu/senha",
   "/app/sessao-encerrada",

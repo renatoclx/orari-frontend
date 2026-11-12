@@ -22,10 +22,11 @@ const CLIENT_TABS: Tab[] = [
   { href: "/app/menu", label: "Menu", icon: UserRound, also: "/app/menu/" },
 ];
 
-// O profissional vê as abas dele; Agenda, Clientes e Comissões entram nas
-// próximas etapas (e em `proRouteAllowed`, lib/app-routes.ts).
+// O profissional vê as abas dele; Clientes e Comissões entram nas próximas
+// etapas (e em `proRouteAllowed`, lib/app-routes.ts).
 const PROFESSIONAL_TABS: Tab[] = [
   { href: "/app", label: "Início", icon: House },
+  { href: "/app/agenda", label: "Agenda", icon: CalendarDays },
   { href: "/app/menu", label: "Menu", icon: UserRound, also: "/app/menu/" },
 ];
 

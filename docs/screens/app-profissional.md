@@ -10,11 +10,19 @@ Mesmo PWA do cliente (`/app`); muda o que aparece conforme quem entrou. Só cons
 
 ## Navegação
 
-- Barra de baixo com **Início** e **Menu**. Rotas de cliente (Buscar, Agendamentos, página de estabelecimento, dados, avisos, pacotes) voltam ao Início.
+- Barra de baixo com **Início**, **Agenda** e **Menu**. Rotas de cliente (Buscar, Agendamentos, página de estabelecimento, dados, avisos, pacotes) voltam ao Início.
 
 ## Início (`/app`)
 
 - Saudação com o nome, a data, a clínica e o vínculo ("Profissional: <nome>"), com o texto de que ali ficarão agenda, clientes e comissões (as telas virão nas próximas etapas).
+
+## Agenda (`/app/agenda`)
+
+- Lista do dia, só dos atendimentos dele (a API usa o vínculo do usuário). Cabeçalho com o dia por extenso ("Hoje", "Amanhã" ou "Ontem" quando for o caso), setas de dia anterior e próximo, o seletor de data do aparelho e o botão **Hoje** (só fora do dia atual). O dia vai na URL (`?dia=AAAA-MM-DD`); valor inválido vale como hoje. Resumo: "N atendimentos" (sem os cancelados) ou "Nenhum atendimento".
+- Cada atendimento é um cartão: horário, cliente, serviço, cor do serviço na borda e o status (ícone e nome), como na agenda da clínica. Cancelado, falta e concluído ficam esmaecidos; cancelado com o nome riscado.
+- **Turma:** um cartão por sessão ("Turma · 3/4", vagas ocupadas), com "Sessão cancelada" quando a clínica a cancelou. **Bloqueio** de horário da clínica: linha tracejada "Horário bloqueado".
+- Tocar no cartão abre os detalhes **no próprio cartão** (as janelas de diálogo da clínica ficam fora da área escura do app): horário, serviço com duração e preço, origem (Encaixe, Pacote ou Recorrente) e observação; na turma, os alunos com a situação. Sem pagamento. Só consulta.
+- Dia sem atendimentos: "Dia livre".
 
 ## Menu (`/app/menu`)
 
@@ -22,4 +30,4 @@ Mesmo PWA do cliente (`/app`); muda o que aparece conforme quem entrou. Só cons
 
 ## Pendências
 
-- Agenda, Meus clientes (só os dele; telefone e preço do serviço, sem status de pagamento e sem anamnese), Comissões (só leitura) e fechamento do módulo.
+- Resumo do dia no Início (no fechamento do módulo), Meus clientes (só os dele; telefone e preço do serviço, sem status de pagamento e sem anamnese), Comissões (só leitura) e fechamento do módulo.

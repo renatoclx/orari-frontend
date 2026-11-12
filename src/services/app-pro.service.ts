@@ -3,6 +3,7 @@ import "server-only";
 import { cache } from "react";
 import { proFetch } from "@/services/app-pro-api";
 import type { CurrentUser } from "@/types/auth";
+import type { ProfessionalAgenda } from "@/types/professional-app";
 
 // Rotas da API usadas pelo app do profissional (screens/app-profissional.md).
 
@@ -22,4 +23,12 @@ export function changeProfessionalPassword(input: {
     method: "PATCH",
     body: JSON.stringify(input),
   });
+}
+
+/** Agenda do dia (AAAA-MM-DD, no relógio da clínica); sem o dia, hoje. */
+export function getProfessionalAgenda(
+  day?: string,
+): Promise<ProfessionalAgenda> {
+  const query = day ? `?day=${encodeURIComponent(day)}` : "";
+  return proFetch<ProfessionalAgenda>(`/professional-app/agenda${query}`);
 }

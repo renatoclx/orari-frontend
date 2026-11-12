@@ -64,10 +64,11 @@ describe("appSessionKind", () => {
 });
 
 describe("proRouteAllowed", () => {
-  it("abre o Início, o Menu, a troca de senha e as rotas de apoio", () => {
+  it("abre o Início, a Agenda, o Menu, a troca de senha e as rotas de apoio", () => {
     for (const path of [
       "/app",
       "/app/",
+      "/app/agenda",
       "/app/menu",
       "/app/menu/senha",
       "/app/sessao-encerrada",

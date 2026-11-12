@@ -127,6 +127,20 @@ describe("buildEntries", () => {
     expect(session.cancelled).toBe(false);
   });
 
+  it("o atendimento avulso carrega o id do cliente, para levar à ficha", () => {
+    const [entry] = buildEntries(
+      {
+        day: "2026-11-12",
+        appointments: [
+          appointment({ id: "a", startAt: "2026-11-12T12:00:00.000Z" }),
+        ],
+        blocks: [],
+      },
+      TZ,
+    );
+    expect(entry).toMatchObject({ kind: "appointment", clientId: "c-a" });
+  });
+
   it("diz a origem: pacote, recorrente ou encaixe", () => {
     const agenda: ProfessionalAgenda = {
       day: "2026-11-12",

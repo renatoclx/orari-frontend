@@ -42,6 +42,12 @@ export const MANUALS: Manual[] = [
     file: "/manuais/manual-app.pdf",
   },
   {
+    title: "Manual do app do profissional",
+    description:
+      "Para enviar aos profissionais: entrar, Início, agenda, clientes, comissões e recibo.",
+    file: "/manuais/manual-app-profissional.pdf",
+  },
+  {
     title: "Manual de Mensagens",
     description:
       "Mensagens automáticas, os dados do cliente no texto e o envio a todos.",

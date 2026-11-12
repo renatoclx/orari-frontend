@@ -100,7 +100,8 @@ src/
       (publico)/             entrar, criar-conta, acesso/[token] (link da clínica)
       (conta)/               Início, buscar/, agendamentos/, local/[slug]/ (e
                              agendar/), menu/ (dados/, pacotes/, recorrencias/,
-                             senha/)
+                             senha/); do profissional: agenda/, clientes/ (e
+                             [id]/), comissoes/ (fechamentos/ e [id]/)
       actions.ts             Server Actions do app
       error.tsx, not-found.tsx  telas de erro e 404 do próprio app
       manifest.webmanifest/  Route Handler do manifesto (instalar no celular)
@@ -139,6 +140,8 @@ src/
     client-portal/           tela Portal do cliente (formulário e regras)
     portal-access/           Acesso ao portal (QR + WhatsApp) e Confirmar cliente
     client-app/              telas e regras puras do app do cliente
+    professional-app/        telas e regras puras do app do profissional (Início,
+                             agenda, clientes, comissões); o app é o mesmo /app
     client-portfolio/, receivables/, appointment-report/, rankings/,
     financial-report/, packages-report/, clients-report/
                              um relatório por pasta (filtros, cartões, gráficos,

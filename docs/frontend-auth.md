@@ -153,6 +153,22 @@ O app do cliente (`screens/app-cliente.md`) tem uma sessão **separada** da clí
 - **Sem renovação:** o token do app dura 90 dias e não tem refresh; vencido, o cliente entra de novo (ou usa um link novo da clínica).
 - **Sair** (`appLogoutAction`): revoga a sessão na API (se a API falhar, sai do mesmo jeito) e apaga o cookie.
 
+## App do profissional (`/app`): o mesmo app, outra sessão
+
+O profissional (usuário do tipo `PROFESSIONAL`, só app; `screens/app-profissional.md`) entra pelo **mesmo formulário** do cliente, com o **telefone**. A Server Action tenta primeiro o telefone como profissional (`POST /auth/professional/login`) e depois como cliente, com a mesma mensagem de erro; se a pessoa for as duas coisas com a mesma senha, entra como profissional.
+
+| | Clínica | App do cliente | App do profissional |
+|---|---|---|---|
+| Cookie | `orari_access` e `orari_refresh` | `orari_app` | `orari_app_pro` e `orari_app_pro_refresh` (JWT, como a clínica, mas **cookies próprios**) |
+| Gravar e apagar | `services/session.ts` | `services/app-session.ts` | `services/app-session.ts` (`setAppProSession`) |
+| Chamadas à API | `apiFetch` | `appFetch` | `proFetch` (`services/app-pro-api.ts`): só o token do app do profissional |
+| Renovação | proxy | não há | proxy (`refreshOnce`, compartilhado entre as requisições) |
+
+- **Uma sessão por vez:** entrar como profissional apaga a de cliente e o contrário também. `appSessionKind` diz quem está entrado (o profissional vence se os dois cookies aparecerem, por ser o mais restrito).
+- **Rotas:** `proRouteAllowed` (`lib/app-routes.ts`) lista o que ele abre (Início, agenda, clientes, comissões, menu); as telas do cliente voltam ao Início. As páginas ainda conferem a sessão e, em comissões, a funcionalidade `commissions`.
+- **A barreira de verdade é a API:** o `PROFESSIONAL` só acessa as rotas marcadas `@ProfessionalApp()` (nega por padrão; ver `docs/business-rules/empresa-e-acesso.md` do backend). O frontend não decide acesso.
+- **Isolamento da clínica:** o login do sistema web recusa esse tipo (confere o tipo antes de gravar cookies e revoga o refresh) e o layout do painel o leva ao app. Os cookies do app nunca servem ao painel.
+
 ## Limitações conhecidas
 
 Ver `frontend-technical-debt.md`.

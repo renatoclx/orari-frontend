@@ -63,6 +63,7 @@ export type AgendaEntry =
       key: string;
       start: string;
       end: string;
+      clientId: string;
       clientName: string;
       serviceName: string;
       serviceColor: string | null;
@@ -133,6 +134,7 @@ export function buildEntries(
         key: appointment.id,
         start: timeOf(appointment.startAt, timeZone),
         end: timeOf(appointment.endAt, timeZone),
+        clientId: appointment.client.id,
         clientName: appointment.client.name,
         serviceName: appointment.service.name,
         serviceColor: appointment.service.color,

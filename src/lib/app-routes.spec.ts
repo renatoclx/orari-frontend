@@ -1,5 +1,10 @@
 import { describe, expect, it } from "vitest";
-import { appRouteKind, safeReturnPath } from "@/lib/app-routes";
+import {
+  appRouteKind,
+  appSessionKind,
+  proRouteAllowed,
+  safeReturnPath,
+} from "@/lib/app-routes";
 
 describe("appRouteKind", () => {
   it("fora do app: null (inclusive o que só começa com /app)", () => {
@@ -34,5 +39,57 @@ describe("safeReturnPath", () => {
     expect(safeReturnPath("//outro.site")).toBeUndefined();
     expect(safeReturnPath("/clientes")).toBeUndefined();
     expect(safeReturnPath(undefined)).toBeUndefined();
+  });
+});
+
+describe("appSessionKind", () => {
+  it("sem nenhum cookie, ninguém entrou", () => {
+    expect(appSessionKind({})).toBeNull();
+  });
+
+  it("o cookie da conta é o cliente", () => {
+    expect(appSessionKind({ clientToken: "t" })).toBe("client");
+  });
+
+  it("o acesso ou a renovação do usuário são o profissional (a renovação sozinha basta: o proxy renova o acesso)", () => {
+    expect(appSessionKind({ proAccess: "a" })).toBe("professional");
+    expect(appSessionKind({ proRefresh: "r" })).toBe("professional");
+  });
+
+  it("com os dois, vale o profissional, que é o mais restrito", () => {
+    expect(appSessionKind({ clientToken: "t", proRefresh: "r" })).toBe(
+      "professional",
+    );
+  });
+});
+
+describe("proRouteAllowed", () => {
+  it("abre o Início, o Menu, a troca de senha e as rotas de apoio", () => {
+    for (const path of [
+      "/app",
+      "/app/",
+      "/app/menu",
+      "/app/menu/senha",
+      "/app/sessao-encerrada",
+      "/app/manifest.webmanifest",
+    ]) {
+      expect(proRouteAllowed(path)).toBe(true);
+    }
+  });
+
+  it("não abre as telas do cliente", () => {
+    for (const path of [
+      "/app/buscar",
+      "/app/agendamentos",
+      "/app/local/studio-aurora",
+      "/app/local/studio-aurora/agendar",
+      "/app/menu/dados",
+      "/app/menu/pacotes",
+      "/app/menu/recorrencias",
+      "/app/menu/avisos",
+      "/app/acesso/abc",
+    ]) {
+      expect(proRouteAllowed(path)).toBe(false);
+    }
   });
 });

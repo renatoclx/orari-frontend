@@ -36,6 +36,8 @@ const userTypeLabels: Record<UserType, string> = {
   SUPER_ADMIN: "Super administrador",
   ADMIN: "Administrador",
   USER: "Usuário",
+  // Entra só pelo app (PWA), nunca pelo sistema web.
+  PROFESSIONAL: "Profissional (só app)",
 };
 
 /** "ADMIN" → "Administrador" */

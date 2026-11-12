@@ -14,6 +14,7 @@ App que o **cliente** usa para agendar nos seus estabelecimentos (rota `/app`). 
 - Link **Criar conta** e a dica: "Esqueceu a senha? Peça ao estabelecimento um novo link de acesso: com ele, você cria uma senha nova."
 - Avisos: "Sua sessão terminou. Entre de novo." (`?expirou=1`) e "Você saiu do app." (`?saiu=1`).
 - Já entrado: vai para o Início.
+- **Login único:** o mesmo formulário serve ao profissional. A Server Action tenta primeiro o telefone como profissional, depois como cliente; a mensagem de erro é a mesma nos dois casos. Se a mesma pessoa for profissional e cliente com a mesma senha, entra como profissional. Veja [app-profissional.md](app-profissional.md).
 
 ### Criar conta (`/app/criar-conta`)
 
@@ -45,8 +46,8 @@ Mensagens de confirmação (faixa ciano) somem sozinhas em 5 segundos; as de err
 - **Card do agendamento** (logo do local, nome, serviço, "Qui, 12/11 às 08:00, com profissional" no relógio da clínica): o **Próximo agendamento** (o mais próximo de todos os estabelecimentos; a seta leva a Agendamentos); sem nenhum marcado, o **Último agendamento** (sem os cancelados; tocar abre a página do local), com **Agendar de novo** numa linha própria. Sem agendamento nenhum, o card não aparece.
 - **Convite para os avisos** (com os avisos ligados no servidor), enquanto não estão ativados neste aparelho: "Receba lembretes dos seus horários", "Ative os avisos e saiba antes de cada agendamento." e **Ativar avisos** (ativado: "Avisos ativados. Você vai receber os lembretes dos seus horários."). No iPhone pelo Safari: "No iPhone, os avisos chegam pelo app instalado na tela de início." e **Ver como instalar** (leva a Avisos). O **X** fecha o convite neste aparelho; com os avisos bloqueados, não aparece.
 - Depois de agendar (`?agendado=1`): "Agendamento confirmado. Ele aparece abaixo, em Próximo agendamento."
-- **Dicas do app** (carrossel): quatro banners do Orari, sem fotos (gradiente na cor do app e um ícone), cada um levando à tela dele: Buscar, Avisos, Pacotes e Recorrências. Troca pelo arrasto ou pelos pontos, sem passar sozinho.
-- **Últimos acessos**: os locais da conta em linha, com o logo grande (ou as iniciais) num anel ciano e o nome embaixo, do agendamento mais recente para o mais antigo (os sem agendamento no fim); tocar abre a página do estabelecimento. Sem nenhum: "Você ainda não tem estabelecimentos. Encontre um em Buscar ou peça o link de acesso ao seu estabelecimento."
+- **Dicas do app** (carrossel): quatro banners do Orari, sem fotos (gradiente na cor do app e um ícone), cada um levando à tela dele: Buscar, Avisos, Pacotes e Recorrências. Troca pelo arrasto ou pelos pontos, sem passar sozinho. Baixas o bastante para o Início caber numa tela do iPhone.
+- **Últimos acessos**: os locais da conta em linha, com o logo (ou as iniciais) num anel ciano e o nome embaixo. Primeiro os locais com agendamento marcado (o mais próximo antes), depois os demais, do último atendimento para o mais antigo; os sem agendamento no fim (cancelados não contam). Sempre aparecem três locais e meio, a pista de que a lista rola; tocar abre a página do estabelecimento. Sem nenhum: "Você ainda não tem estabelecimentos. Encontre um em Buscar ou peça o link de acesso ao seu estabelecimento."
 
 ### Buscar (`/app/buscar`)
 

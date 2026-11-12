@@ -165,16 +165,14 @@ export function usePushDevice(publicKey: string) {
       );
       const subscription = await step(
         "subscribe",
-        registration.pushManager
-          .getSubscription()
-          .then(
-            (existing) =>
-              existing ??
-              registration.pushManager.subscribe({
-                userVisibleOnly: true,
-                applicationServerKey: urlBase64ToUint8Array(publicKey),
-              }),
-          ),
+        registration.pushManager.getSubscription().then(
+          (existing) =>
+            existing ??
+            registration.pushManager.subscribe({
+              userVisibleOnly: true,
+              applicationServerKey: urlBase64ToUint8Array(publicKey),
+            }),
+        ),
       );
       const result = await step(
         "save",

@@ -28,21 +28,41 @@ export function featuredAppointment(
 }
 
 /**
- * "Últimos acessos": os locais da conta, do agendamento mais recente (marcado
- * ou passado) para o mais antigo; os sem agendamento vão para o fim, na ordem
- * em que a API os devolveu.
+ * "Últimos acessos", na ordem em que o cliente vai usar os locais: primeiro os
+ * com agendamento marcado (o mais próximo antes); depois os demais, do último
+ * atendimento para o mais antigo; por fim os sem agendamento, na ordem em que
+ * a API os devolveu. Cancelados não contam.
  */
 export function recentPlaces(
   places: AppPlace[],
-  appointments: AppAppointment[],
+  upcoming: AppAppointment[],
+  past: AppAppointment[],
 ): AppPlace[] {
+  const active = (list: AppAppointment[]) =>
+    list.filter((appointment) => appointment.status !== "CANCELLED");
+  const soonest = new Map<string, number>();
+  for (const appointment of active(upcoming)) {
+    const slug = appointment.place.slug;
+    soonest.set(
+      slug,
+      Math.min(soonest.get(slug) ?? Infinity, time(appointment)),
+    );
+  }
   const latest = new Map<string, number>();
-  for (const appointment of appointments) {
+  for (const appointment of active(past)) {
     const slug = appointment.place.slug;
     latest.set(slug, Math.max(latest.get(slug) ?? 0, time(appointment)));
   }
+  // Grupo 0: marcado (mais próximo antes); 1: passado (mais recente antes);
+  // 2: sem agendamento (ordem da API).
+  const rank = (slug: string, index: number): [number, number] =>
+    soonest.has(slug)
+      ? [0, soonest.get(slug)!]
+      : latest.has(slug)
+        ? [1, -latest.get(slug)!]
+        : [2, index];
   return places
-    .map((place, index) => ({ place, index, at: latest.get(place.slug) ?? 0 }))
-    .sort((a, b) => b.at - a.at || a.index - b.index)
+    .map((place, index) => ({ place, key: rank(place.slug, index) }))
+    .sort((a, b) => a.key[0] - b.key[0] || a.key[1] - b.key[1])
     .map(({ place }) => place);
 }

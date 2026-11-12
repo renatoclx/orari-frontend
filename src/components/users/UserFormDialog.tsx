@@ -21,7 +21,9 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { MaskedInput } from "@/components/shared/MaskedInput";
 import { Input } from "@/components/ui/input";
+import { maskPhone } from "@/utils/masks";
 import {
   Select,
   SelectContent,
@@ -98,6 +100,7 @@ function UserForm({
     passwordConfirmation: "",
     linkType: user?.people?.type ?? "",
     peopleId: user?.peopleId ?? "",
+    phone: user?.phone ? maskPhone(user.phone) : "",
   });
   const [errors, setErrors] = useState<UserFormErrors>({});
   const [pending, startTransition] = useTransition();
@@ -111,6 +114,7 @@ function UserForm({
   // O vínculo vale para ADMIN e USER (o SUPER_ADMIN não se vincula) e não existe
   // no cadastro do administrador de uma empresa nova (ainda sem profissionais).
   const canLink = !forCompany && values.type !== "SUPER_ADMIN";
+  const onlyApp = values.type === "PROFESSIONAL";
   const linkType = values.linkType;
   // Pessoa vinculada que ficou inativa não vem na lista: continua visível.
   const personOptions = linkType ? linkOptions[linkType] : [];
@@ -129,10 +133,22 @@ function UserForm({
       | "type"
       | "password"
       | "passwordConfirmation"
-      | "peopleId",
+      | "peopleId"
+      | "phone",
     value: string,
   ) {
-    setValues((current) => ({ ...current, [field]: value }));
+    setValues((current) => ({
+      ...current,
+      [field]: value,
+      // Só de app é sempre de um profissional: a função já vem escolhida (e a
+      // pessoa de um funcionário, que ficou da escolha anterior, é limpa).
+      ...(field === "type" &&
+        value === "PROFESSIONAL" &&
+        current.linkType !== "PROFESSIONAL" && {
+          linkType: "PROFESSIONAL" as const,
+          peopleId: "",
+        }),
+    }));
     setErrors((current) => ({ ...current, [field]: undefined }));
   }
 
@@ -264,6 +280,7 @@ function UserForm({
         <>
           <FormField id={ids("linkType")} label="Função">
             <Select
+              disabled={onlyApp}
               value={values.linkType || NO_LINK}
               onValueChange={(next) =>
                 setValues((current) => ({
@@ -284,8 +301,9 @@ function UserForm({
               </SelectContent>
             </Select>
             <p className="text-xs text-muted-foreground">
-              Vincule ao cadastro de um profissional (acesso às fichas de
-              anamnese) ou de um funcionário, como a recepção.
+              {onlyApp
+                ? "O usuário só de app é sempre de um profissional: ele entra pelo aplicativo e vê a agenda, os clientes e as comissões dele."
+                : "Vincule ao cadastro de um profissional (acesso às fichas de anamnese) ou de um funcionário, como a recepção."}
             </p>
           </FormField>
           {linkType && (
@@ -319,6 +337,31 @@ function UserForm({
             </FormField>
           )}
         </>
+      )}
+
+      {/* O usuário só de app entra no aplicativo pelo telefone, como o cliente. */}
+      {onlyApp && (
+        <FormField
+          id={ids("phone")}
+          label="Telefone de acesso ao app"
+          required
+          error={errors.phone}
+        >
+          <MaskedInput
+            id={ids("phone")}
+            mask={maskPhone}
+            value={values.phone}
+            onValueChange={(digits) => set("phone", digits)}
+            inputMode="tel"
+            autoComplete="off"
+            placeholder="(00) 00000-0000"
+            aria-invalid={errors.phone ? true : undefined}
+          />
+          <p className="text-xs text-muted-foreground">
+            É com este telefone e a senha abaixo que o profissional entra no
+            aplicativo.
+          </p>
+        </FormField>
       )}
 
       {!editing && (

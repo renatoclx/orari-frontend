@@ -7,6 +7,7 @@ import type {
   ProfessionalAgenda,
   ProfessionalClientDetail,
   ProfessionalClientsPage,
+  ProfessionalHome,
   ProfessionalClosingsPage,
   ProfessionalClosingReceipt,
   ProfessionalCommissionsPage,
@@ -99,4 +100,9 @@ export function getProfessionalClosing(
   return proFetch<ProfessionalClosingReceipt>(
     `/professional-app/commission-closings/${encodeURIComponent(id)}`,
   );
+}
+
+/** O Início: hoje, a semana, o mês e os próximos agendamentos dele. */
+export function getProfessionalHome(): Promise<ProfessionalHome> {
+  return proFetch<ProfessionalHome>("/professional-app/home");
 }

@@ -153,3 +153,33 @@ export type ProfessionalClosingReceipt = ProfessionalClosing & {
     advances: { date: string; note: string | null; amount: string }[];
   };
 };
+
+/** Um atendimento do Início (a turma vem sem cliente: são vários alunos). */
+export type ProfessionalHomeAppointment = {
+  startAt: string;
+  endAt: string;
+  clientName: string | null;
+  serviceName: string;
+  isClass: boolean;
+};
+
+/** O Início do profissional: hoje, a semana, o mês e os próximos. */
+export type ProfessionalHome = {
+  today: {
+    total: number;
+    remaining: number;
+    next: (ProfessionalHomeAppointment & { inProgress: boolean }) | null;
+  };
+  /** Segunda a domingo da semana de hoje (AAAA-MM-DD), sem os cancelados. */
+  week: { date: string; count: number }[];
+  month: {
+    /** AAAA-MM. */
+    month: string;
+    completed: number;
+    noShow: number;
+    cancelled: number;
+    clients: number;
+    previousCompleted: number;
+  };
+  upcoming: ProfessionalHomeAppointment[];
+};

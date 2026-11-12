@@ -14,7 +14,13 @@ Mesmo PWA do cliente (`/app`); muda o que aparece conforme quem entrou. Só cons
 
 ## Início (`/app`)
 
-- Saudação com o nome, a data, a clínica e o vínculo ("Profissional: <nome>"), com o texto de que ali ficarão agenda, clientes e comissões (as telas virão nas próximas etapas).
+- Saudação com o nome, a data, a clínica e o vínculo. Cadastro de profissional inativado: "Seu acesso está suspenso. Fale com a clínica." e nada mais. Os blocos, de cima para baixo (uma chamada só à API, `GET /professional-app/home`):
+  1. **Hoje**: "N atendimentos" (ou "Dia livre") e quantos faltam; o **próximo** (horário, cliente ou "Turma", serviço) ou, se houver, o que está **em andamento**; botão **Agenda**.
+  2. **Esta semana**: gráfico de barras (segunda a domingo) com o número sobre cada barra, o total da semana, legenda ("Já passou" em cor cheia, "Agendado" em tom claro) e o dia de hoje destacado. Cada barra leva à Agenda daquele dia. Feito em CSS, na cor primária, sem biblioteca; leitor de tela recebe a descrição em texto ("seg 9: 1; ter 10: 2…").
+  3. **Mês**: Concluídos (com "+N que no mês anterior", só quando o mês anterior teve concluídos), Clientes atendidos, Faltas e Cancelados.
+  4. **Comissão** (só se a clínica usa comissões e ele recebe): comissão do mês e a receber; leva a Comissões. Se a chamada falhar, o Início abre sem ele.
+  5. **Próximos agendamentos**: os 3 seguintes depois de hoje, cada um com o dia, a hora e o cliente ou a turma; leva à Agenda do dia.
+- Conta como na Agenda: a turma é um atendimento por sessão e o cancelado não entra. **Faltas e cancelados** contam marcações (cada aluno da turma é uma); **Clientes atendidos** são clientes distintos com atendimento concluído no mês.
 
 ## Agenda (`/app/agenda`)
 
@@ -52,4 +58,4 @@ Mesmo PWA do cliente (`/app`); muda o que aparece conforme quem entrou. Só cons
 
 ## Pendências
 
-- Resumo do dia no Início e link da Agenda para a ficha do cliente (no fechamento do módulo), Comissões (só leitura) e fechamento do módulo.
+- Link da Agenda para a ficha do cliente e o fechamento do módulo (docs transversais, manual e teste em escala).

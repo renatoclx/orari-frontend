@@ -5,12 +5,16 @@ import { Ban, ChevronDown, Package, Repeat, UsersRound } from "lucide-react";
 import { APPOINTMENT_STATUS } from "@/components/agenda/appointment-status";
 import { Badge } from "@/components/ui/badge";
 import { formatDuration, formatPrice } from "@/utils/format";
-import type { AgendaEntry, AgendaOrigin } from "./professional-agenda";
+import {
+  ORIGIN_LABEL,
+  type AgendaEntry,
+  type AgendaOrigin,
+} from "./professional-agenda";
 
-const ORIGIN: Record<AgendaOrigin, { label: string; icon?: typeof Repeat }> = {
-  overbooking: { label: "Encaixe" },
-  package: { label: "Pacote", icon: Package },
-  recurring: { label: "Recorrente", icon: Repeat },
+// Ícone de cada origem (o encaixe não tem); o texto vem de ORIGIN_LABEL.
+const ORIGIN_ICON: Partial<Record<AgendaOrigin, typeof Repeat>> = {
+  package: Package,
+  recurring: Repeat,
 };
 
 // Cor do serviço na borda e como fundo suave, como o bloco da agenda da clínica.
@@ -50,8 +54,8 @@ export function AgendaEntryCard({ entry }: { entry: AgendaEntry }) {
   const faded = isClass
     ? entry.cancelled
     : ["CANCELLED", "NO_SHOW", "COMPLETED"].includes(entry.status);
-  const origin = !isClass && entry.origin ? ORIGIN[entry.origin] : undefined;
-  const OriginIcon = origin?.icon;
+  const origin = !isClass ? entry.origin : null;
+  const OriginIcon = origin ? ORIGIN_ICON[origin] : undefined;
   const title = isClass ? entry.serviceName : entry.clientName;
   const subtitle = isClass
     ? `Turma · ${entry.occupied}/${entry.capacity}`
@@ -123,7 +127,7 @@ export function AgendaEntryCard({ entry }: { entry: AgendaEntry }) {
                   {OriginIcon && (
                     <OriginIcon className="size-3" aria-hidden="true" />
                   )}
-                  {origin.label}
+                  {ORIGIN_LABEL[origin]}
                 </Badge>
               )}
               {entry.note && (

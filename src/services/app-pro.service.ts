@@ -3,7 +3,11 @@ import "server-only";
 import { cache } from "react";
 import { proFetch } from "@/services/app-pro-api";
 import type { CurrentUser } from "@/types/auth";
-import type { ProfessionalAgenda } from "@/types/professional-app";
+import type {
+  ProfessionalAgenda,
+  ProfessionalClientDetail,
+  ProfessionalClientsPage,
+} from "@/types/professional-app";
 
 // Rotas da API usadas pelo app do profissional (screens/app-profissional.md).
 
@@ -31,4 +35,25 @@ export function getProfessionalAgenda(
 ): Promise<ProfessionalAgenda> {
   const query = day ? `?day=${encodeURIComponent(day)}` : "";
   return proFetch<ProfessionalAgenda>(`/professional-app/agenda${query}`);
+}
+
+/** Clientes dele, em ordem alfabética (20 por página); `search` filtra pelo nome. */
+export function listProfessionalClients(
+  page: number,
+  search?: string,
+): Promise<ProfessionalClientsPage> {
+  const params = new URLSearchParams({ page: String(page) });
+  if (search) params.set("search", search);
+  return proFetch<ProfessionalClientsPage>(
+    `/professional-app/clients?${params}`,
+  );
+}
+
+/** A ficha de um cliente dele; cliente de outro profissional dá 404 (`ApiError`). */
+export function getProfessionalClient(
+  id: string,
+): Promise<ProfessionalClientDetail> {
+  return proFetch<ProfessionalClientDetail>(
+    `/professional-app/clients/${encodeURIComponent(id)}`,
+  );
 }

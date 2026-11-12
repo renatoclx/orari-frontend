@@ -42,3 +42,40 @@ export type ProfessionalAgenda = {
   appointments: ProfessionalAgendaAppointment[];
   blocks: ProfessionalAgendaBlock[];
 };
+
+/** Um cliente da carteira do profissional, como a lista o mostra. */
+export type ProfessionalClient = {
+  id: string;
+  name: string;
+  photoUrl: string | null;
+  /** Celular do contato principal (só dígitos). */
+  phone: string | null;
+  lastCompleted: { startAt: string; serviceName: string } | null;
+  nextAt: string | null;
+};
+
+export type ProfessionalClientsPage = {
+  items: ProfessionalClient[];
+  total: number;
+  page: number;
+  limit: number;
+};
+
+/** Um atendimento do histórico do cliente com o profissional. */
+export type ProfessionalClientAppointment = {
+  id: string;
+  startAt: string;
+  endAt: string;
+  status: AppointmentStatus;
+  note: string | null;
+  overBooking: boolean;
+  /** Aluno de uma sessão de turma. */
+  inClass: boolean;
+  service: ProfessionalAgendaAppointment["service"];
+  recurrence: { isPackage: boolean } | null;
+};
+
+export type ProfessionalClientDetail = ProfessionalClient & {
+  /** Os atendimentos mais recentes, do mais novo ao mais antigo. */
+  history: ProfessionalClientAppointment[];
+};

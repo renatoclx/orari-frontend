@@ -10,7 +10,7 @@ Mesmo PWA do cliente (`/app`); muda o que aparece conforme quem entrou. Só cons
 
 ## Navegação
 
-- Barra de baixo com **Início**, **Agenda** e **Menu**. Rotas de cliente (Buscar, Agendamentos, página de estabelecimento, dados, avisos, pacotes) voltam ao Início.
+- Barra de baixo com **Início**, **Agenda**, **Clientes** e **Menu**. Rotas de cliente (Buscar, Agendamentos, página de estabelecimento, dados, avisos, pacotes) voltam ao Início.
 
 ## Início (`/app`)
 
@@ -24,10 +24,22 @@ Mesmo PWA do cliente (`/app`); muda o que aparece conforme quem entrou. Só cons
 - Tocar no cartão abre os detalhes **no próprio cartão** (as janelas de diálogo da clínica ficam fora da área escura do app): horário, serviço com duração e preço, origem (Encaixe, Pacote ou Recorrente) e observação; na turma, os alunos com a situação. Sem pagamento. Só consulta.
 - Dia sem atendimentos: "Dia livre".
 
+## Clientes (`/app/clientes`)
+
+- Só os clientes dele: ativos, com ao menos um agendamento não cancelado com ele (a regra da Carteira de clientes). Ordem alfabética, busca pelo nome durante a digitação (`?q=`), 20 por página (`?pagina=`, com Anterior e Próxima; valor inválido vale 1) e a contagem ("12 clientes").
+- Cada cartão: avatar (foto ou iniciais), nome, telefone e, em uma linha, o **próximo** agendamento ou, sem ele, o **último** atendimento concluído; sem nenhum dos dois, "Sem atendimento concluído". Toca e abre a ficha.
+- Vazio: "Nenhum cliente ainda" (aparecem depois do primeiro agendamento) ou, na busca, "Nenhum cliente encontrado".
+
+### Ficha do cliente (`/app/clientes/<id>`)
+
+- Foto, nome e telefone formatado; os botões **Ligar** (`tel:`) e **WhatsApp** (`wa.me`) só quando o telefone tem DDD e número; sem telefone, "Sem telefone cadastrado".
+- Último atendimento e próximo; abaixo, **Atendimentos**: os 50 mais recentes dele com esse cliente, do mais novo ao mais antigo, com data e hora, status (ícone e nome), serviço, duração e preço, selos de **Turma**, **Pacote**, **Recorrente** ou **Encaixe** e a observação. Cancelado e falta ficam esmaecidos.
+- Sem pagamento, anamnese, e-mail, CPF nem endereço. Cliente que não é dele (ou id inválido): página "Não encontramos esta página", com "Voltar ao Início".
+
 ## Menu (`/app/menu`)
 
 - Nome, telefone formatado e clínica; **Alterar senha** (senha atual, nova e confirmação; continua entrado, com aviso) e **Sair**.
 
 ## Pendências
 
-- Resumo do dia no Início (no fechamento do módulo), Meus clientes (só os dele; telefone e preço do serviço, sem status de pagamento e sem anamnese), Comissões (só leitura) e fechamento do módulo.
+- Resumo do dia no Início e link da Agenda para a ficha do cliente (no fechamento do módulo), Comissões (só leitura) e fechamento do módulo.

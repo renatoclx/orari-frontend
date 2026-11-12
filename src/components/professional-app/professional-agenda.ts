@@ -88,9 +88,18 @@ export type AgendaEntry =
     }
   | { kind: "block"; key: string; start: string; end: string };
 
-function originOf(
-  appointment: ProfessionalAgenda["appointments"][number],
-): AgendaOrigin | null {
+/** Rótulo de cada origem, o mesmo na agenda e no histórico do cliente. */
+export const ORIGIN_LABEL: Record<AgendaOrigin, string> = {
+  overbooking: "Encaixe",
+  package: "Pacote",
+  recurring: "Recorrente",
+};
+
+/** Origem do atendimento: pacote, recorrência, encaixe ou avulso (nulo). */
+export function originOf(appointment: {
+  recurrence: { isPackage: boolean } | null;
+  overBooking: boolean;
+}): AgendaOrigin | null {
   if (appointment.recurrence)
     return appointment.recurrence.isPackage ? "package" : "recurring";
   return appointment.overBooking ? "overbooking" : null;

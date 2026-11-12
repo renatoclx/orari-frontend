@@ -13,15 +13,19 @@ import {
 // Abas do app, como no AppBarber: a barra é do app inteiro, não de um local.
 // `also`: outras rotas em que a aba fica marcada (a página de um
 // estabelecimento faz parte de Buscar; a troca de senha, do Menu).
-const TABS: {
-  href: string;
-  label: string;
-  icon: LucideIcon;
-  also?: string;
-}[] = [
+type Tab = { href: string; label: string; icon: LucideIcon; also?: string };
+
+const CLIENT_TABS: Tab[] = [
   { href: "/app", label: "Início", icon: House },
   { href: "/app/buscar", label: "Buscar", icon: Search, also: "/app/local/" },
   { href: "/app/agendamentos", label: "Agendamentos", icon: CalendarDays },
+  { href: "/app/menu", label: "Menu", icon: UserRound, also: "/app/menu/" },
+];
+
+// O profissional vê as abas dele; Agenda, Clientes e Comissões entram nas
+// próximas etapas (e em `proRouteAllowed`, lib/app-routes.ts).
+const PROFESSIONAL_TABS: Tab[] = [
+  { href: "/app", label: "Início", icon: House },
   { href: "/app/menu", label: "Menu", icon: UserRound, also: "/app/menu/" },
 ];
 
@@ -37,8 +41,16 @@ export const BOTTOM_NAV_OFFSET =
  * `hasUnread`: avisos não lidos, um ponto na aba Menu (some na tela Avisos,
  * que os marca como lidos).
  */
-export function AppBottomNav({ hasUnread }: { hasUnread: boolean }) {
+export function AppBottomNav({
+  hasUnread,
+  kind = "client",
+}: {
+  hasUnread: boolean;
+  /** Quem entrou: cada um tem as suas abas. */
+  kind?: "client" | "professional";
+}) {
   const pathname = usePathname();
+  const TABS = kind === "professional" ? PROFESSIONAL_TABS : CLIENT_TABS;
   const showDot = hasUnread && pathname !== "/app/menu/avisos";
   return (
     <nav

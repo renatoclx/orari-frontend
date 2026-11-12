@@ -13,7 +13,9 @@ import {
 } from "lucide-react";
 import { appLogoutAction } from "@/app/app/actions";
 import { AppFormMessage } from "@/components/client-app/AppFormMessage";
+import { ProfessionalMenu } from "@/components/professional-app/ProfessionalMenu";
 import { getAccount } from "@/services/app-account.service";
+import { getAppSessionKind } from "@/services/app-session";
 import { getProfile } from "@/services/app-profile.service";
 import { formatPhone, getInitials } from "@/utils/format";
 
@@ -70,6 +72,10 @@ export default async function AppMenuPage({
   searchParams,
 }: PageProps<"/app/menu">) {
   const { senha, dados } = await searchParams;
+  // Quem entrou como profissional vê o Menu dele.
+  if ((await getAppSessionKind()) === "professional") {
+    return <ProfessionalMenu senhaTrocada={Boolean(senha)} />;
+  }
   const [profile, { unreadMessages }] = await Promise.all([
     getProfile(),
     getAccount(),

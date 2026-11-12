@@ -51,8 +51,8 @@ export async function UsersListPage({ searchParams }: UsersListPageProps) {
   // Só o SUPER_ADMIN atribui SUPER_ADMIN (o backend também confere).
   const typeOptions: UserType[] =
     currentUser.type === "SUPER_ADMIN"
-      ? ["SUPER_ADMIN", "ADMIN", "USER"]
-      : ["ADMIN", "USER"];
+      ? ["SUPER_ADMIN", "ADMIN", "USER", "PROFESSIONAL"]
+      : ["ADMIN", "USER", "PROFESSIONAL"];
 
   return (
     <div className="flex min-h-0 flex-1 flex-col gap-4">

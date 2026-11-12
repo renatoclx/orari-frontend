@@ -9,6 +9,8 @@ export type UserListItem = {
   id: string;
   name: string;
   email: string;
+  /** Telefone de login no app (só o usuário profissional); nulo nos demais. */
+  phone: string | null;
   type: UserType;
   /** Pessoa vinculada (profissional ou funcionário); nulo = sem vínculo. */
   peopleId: string | null;
@@ -29,6 +31,8 @@ export type CreateUserInput = {
   companyId?: string;
   /** Pessoa (profissional ou funcionário) que o usuário representa; sem ela, não há vínculo. */
   peopleId?: string;
+  /** Só dígitos (DDD + número): o login do usuário profissional no app. */
+  phone?: string;
 };
 
 // Corpo de PATCH /users/:id: só o que mudar. A senha tem rota própria.
@@ -38,6 +42,8 @@ export type UpdateUserInput = Partial<{
   type: UserType;
   /** `null` desfaz o vínculo com o profissional. */
   peopleId: string | null;
+  /** Só dígitos; só do usuário profissional (os demais tipos não têm). */
+  phone: string;
 }>;
 
 // Corpo de PATCH /users/:id/password para troca de Senha

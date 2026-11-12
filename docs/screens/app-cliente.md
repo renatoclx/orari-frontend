@@ -14,6 +14,7 @@ App que o **cliente** usa para agendar nos seus estabelecimentos (rota `/app`). 
 - Link **Criar conta** e a dica: "Esqueceu a senha? Peça ao estabelecimento um novo link de acesso: com ele, você cria uma senha nova."
 - Avisos: "Sua sessão terminou. Entre de novo." (`?expirou=1`) e "Você saiu do app." (`?saiu=1`).
 - Já entrado: vai para o Início.
+- **Login único:** o mesmo formulário serve ao profissional. A Server Action tenta primeiro o telefone como profissional, depois como cliente; a mensagem de erro é a mesma nos dois casos. Se a mesma pessoa for profissional e cliente com a mesma senha, entra como profissional. Veja [app-profissional.md](app-profissional.md).
 
 ### Criar conta (`/app/criar-conta`)
 

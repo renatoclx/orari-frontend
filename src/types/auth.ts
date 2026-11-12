@@ -9,13 +9,15 @@ export type AuthTokens = {
 import type { FeatureAccessEntry } from "@/types/company-access";
 
 /** Espelha o enum UserType do backend. */
-export type UserType = "SUPER_ADMIN" | "ADMIN" | "USER";
+export type UserType = "SUPER_ADMIN" | "ADMIN" | "USER" | "PROFESSIONAL";
 
 /** Resposta de GET /auth/me: quem está logado e em qual empresa. */
 export type CurrentUser = {
   id: string;
   name: string;
   email: string;
+  /** Telefone de login do usuário só de app (profissional); nulo nos demais. */
+  phone: string | null;
   type: UserType;
   /** Profissional vinculado ao usuário (ativo); nulo sem vínculo. Dá acesso à anamnese. */
   professional: { id: string; name: string } | null;

@@ -1,14 +1,21 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import {
   firstName,
   newPasswordErrors,
   phoneError,
 } from "@/components/client-app/client-app";
+import { FORWARDED_FOR_HEADER, clientIpFrom } from "@/lib/client-ip";
 import { safeReturnPath } from "@/lib/app-routes";
 import { ApiError } from "@/services/api";
+import {
+  changeProfessionalPassword,
+  getProfessionalMe,
+} from "@/services/app-pro.service";
+import * as authService from "@/services/auth.service";
 import {
   changeAccountPassword,
   loginAccount,
@@ -39,8 +46,12 @@ import {
 import { toDateString } from "@/utils/time";
 import { isDateString } from "@/utils/time";
 import {
+  clearAppProSession,
   clearAppSession,
+  getAppProRefreshToken,
+  getAppSessionKind,
   getAppToken,
+  setAppProSession,
   setAppSession,
 } from "@/services/app-session";
 import { onlyDigits } from "@/utils/masks";
@@ -71,7 +82,13 @@ const text = (formData: FormData, name: string) =>
 const hasErrors = (errors: AppFormState["fieldErrors"]) =>
   Object.values(errors).some(Boolean);
 
-/** Entrar com telefone e senha. */
+/**
+ * Entra no app com telefone e senha, o mesmo formulário do cliente e do
+ * profissional. O telefone pode ser de um usuário profissional (acesso dado
+ * pela clínica) ou de uma conta de cliente: tenta o profissional primeiro e,
+ * se a API não o reconhecer, o cliente. A mensagem de erro é a mesma nos dois
+ * casos (não revela de quem é o telefone).
+ */
 export async function appLoginAction(
   _previous: AppFormState | undefined,
   formData: FormData,
@@ -84,6 +101,12 @@ export async function appLoginAction(
   };
   const values = { phone };
   if (hasErrors(fieldErrors)) return { values, fieldErrors };
+
+  const professional = await loginProfessional(onlyDigits(phone), password);
+  if (professional === "entered") redirect("/app");
+  if (professional !== "unknown") {
+    return { values, fieldErrors: {}, message: professional };
+  }
 
   try {
     await setAppSession(
@@ -181,8 +204,38 @@ export async function appAccessLinkAction(
   redirect("/app");
 }
 
-/** Sair do app neste aparelho. */
+/**
+ * Tenta entrar como profissional (usuário só de app) pelo telefone. Devolve
+ * "entered" (cookies gravados), "unknown" (a API não reconhece o telefone com
+ * essa senha: segue para o login de cliente) ou a mensagem de um erro que não
+ * é de credencial (ex.: tentativas demais), que vale para os dois casos.
+ */
+async function loginProfessional(
+  phone: string,
+  password: string,
+): Promise<"entered" | "unknown" | string> {
+  const clientIp = clientIpFrom((await headers()).get(FORWARDED_FOR_HEADER));
+  try {
+    await setAppProSession(
+      await authService.loginProfessional(phone, password, clientIp),
+    );
+    return "entered";
+  } catch (error) {
+    if (!(error instanceof ApiError)) throw error;
+    return error.status === 401 ? "unknown" : error.message;
+  }
+}
+
+/** Sair do app (cliente ou profissional), só deste aparelho. */
 export async function appLogoutAction(): Promise<void> {
+  if ((await getAppSessionKind()) === "professional") {
+    const refreshToken = await getAppProRefreshToken();
+    if (refreshToken) {
+      await authService.logout(refreshToken).catch(() => undefined);
+    }
+    await clearAppProSession();
+    redirect("/app/entrar?saiu=1");
+  }
   try {
     await logoutAccount();
   } catch {
@@ -298,6 +351,57 @@ export async function appChangePasswordAction(
       };
     }
     return { values: {}, fieldErrors: {}, message: error.message };
+  }
+  redirect("/app/menu?senha=1");
+}
+
+/**
+ * Troca a senha do profissional (Menu → Segurança). A API encerra todas as
+ * sessões dele, inclusive esta: entra de novo com a senha nova para este
+ * aparelho continuar entrado (os outros saem).
+ */
+export async function appProChangePasswordAction(
+  _previous: AppFormState | undefined,
+  formData: FormData,
+): Promise<AppFormState> {
+  const currentPassword = text(formData, "currentPassword");
+  const newPassword = text(formData, "password");
+  const newPasswordConfirmation = text(formData, "passwordConfirmation");
+  const fieldErrors = {
+    currentPassword: currentPassword ? undefined : "Informe a senha atual.",
+    ...newPasswordErrors(newPassword, newPasswordConfirmation),
+  };
+  if (hasErrors(fieldErrors)) return { values: {}, fieldErrors };
+
+  const { phone } = await getProfessionalMe();
+  try {
+    await changeProfessionalPassword({
+      currentPassword,
+      newPassword,
+      newPasswordConfirmation,
+    });
+  } catch (error) {
+    if (!(error instanceof ApiError)) throw error;
+    if (error.status === 400 && /senha atual/i.test(error.message)) {
+      return {
+        values: {},
+        fieldErrors: { currentPassword: "Senha atual incorreta." },
+      };
+    }
+    return { values: {}, fieldErrors: {}, message: error.message };
+  }
+
+  try {
+    const clientIp = clientIpFrom((await headers()).get(FORWARDED_FOR_HEADER));
+    // Sem o telefone (não deveria acontecer), só pede para entrar de novo.
+    if (!phone) redirect("/app/entrar?expirou=1");
+    await setAppProSession(
+      await authService.loginProfessional(phone, newPassword, clientIp),
+    );
+  } catch (error) {
+    if (!(error instanceof ApiError)) throw error;
+    // A senha foi trocada; só não deu para continuar entrado.
+    redirect("/app/entrar?expirou=1");
   }
   redirect("/app/menu?senha=1");
 }

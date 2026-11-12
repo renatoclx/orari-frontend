@@ -127,6 +127,13 @@ export const ACCESS_GROUPS: { label: string; features: AccessFeature[] }[] = [
       },
       // Mensagens automáticas ao cliente do app; a API exige o Portal do cliente.
       { key: "messages", label: "Mensagens", actions: ["view", "edit"] },
+      // App do profissional (PWA, só leitura): a agenda, os clientes e as
+      // comissões dele. Vem em todos os planos; a API exige ver Agendamentos.
+      {
+        key: "professional-app",
+        label: "App do profissional",
+        actions: ["view"],
+      },
     ],
   },
   {
@@ -277,6 +284,7 @@ const AGENDA_KEYS = [
   "services",
   "settings",
   "client-portal",
+  "professional-app",
   "appointments-report",
   "dashboard",
 ];

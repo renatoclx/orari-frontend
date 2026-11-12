@@ -3,6 +3,7 @@ import { AppFormMessage } from "@/components/client-app/AppFormMessage";
 import { AppTips } from "@/components/client-app/AppTips";
 import { FeaturedAppointmentCard } from "@/components/client-app/FeaturedAppointmentCard";
 import { PushInvite } from "@/components/client-app/PushInvite";
+import { ProfessionalHome } from "@/components/professional-app/ProfessionalHome";
 import { RecentPlaces } from "@/components/client-app/RecentPlaces";
 import { SearchShortcut } from "@/components/client-app/SearchShortcut";
 import {
@@ -20,6 +21,7 @@ import {
 } from "@/services/app-account.service";
 import { ApiError } from "@/services/api";
 import { getPushInfo } from "@/services/app-push.service";
+import { getAppSessionKind } from "@/services/app-session";
 
 export const metadata: Metadata = { title: "Início" };
 
@@ -30,6 +32,10 @@ export const metadata: Metadata = { title: "Início" };
  * acessos.
  */
 export default async function AppHomePage({ searchParams }: PageProps<"/app">) {
+  // Quem entrou como profissional vê o Início dele (a rota e o app são os mesmos).
+  if ((await getAppSessionKind()) === "professional") {
+    return <ProfessionalHome />;
+  }
   const { bemVindo, agendado } = await searchParams;
   const [{ account, places }, { upcoming, past }, pushInfo] = await Promise.all(
     [

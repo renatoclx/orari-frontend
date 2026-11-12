@@ -1,10 +1,14 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 // vi.mock sobe para o topo do arquivo: o que ele usa precisa nascer com vi.hoisted.
-const { loginMock, headersMock } = vi.hoisted(() => ({
-  loginMock: vi.fn(),
-  headersMock: vi.fn(),
-}));
+const { loginMock, logoutMock, userMock, setSessionMock, headersMock } =
+  vi.hoisted(() => ({
+    loginMock: vi.fn(),
+    logoutMock: vi.fn(),
+    userMock: vi.fn(),
+    setSessionMock: vi.fn(),
+    headersMock: vi.fn(),
+  }));
 
 vi.mock("next/headers", () => ({ headers: () => headersMock() }));
 vi.mock("next/navigation", () => ({
@@ -13,8 +17,12 @@ vi.mock("next/navigation", () => ({
     throw new Error(`REDIRECT:${path}`);
   },
 }));
-vi.mock("@/services/auth.service", () => ({ login: loginMock }));
-vi.mock("@/services/session", () => ({ setSession: vi.fn() }));
+vi.mock("@/services/auth.service", () => ({
+  login: loginMock,
+  logout: logoutMock,
+  fetchUserByToken: userMock,
+}));
+vi.mock("@/services/session", () => ({ setSession: setSessionMock }));
 // O tipo de erro da API vem do apiFetch, que importa "server-only" e o Next.
 vi.mock("@/services/api", () => ({
   ApiError: class ApiError extends Error {
@@ -40,7 +48,24 @@ describe("login (Server Action)", () => {
   beforeEach(() => {
     loginMock.mockReset();
     loginMock.mockResolvedValue({ accessToken: "a", refreshToken: "r" });
+    logoutMock.mockReset();
+    logoutMock.mockResolvedValue(undefined);
+    userMock.mockReset();
+    userMock.mockResolvedValue({ type: "ADMIN" });
+    setSessionMock.mockReset();
     headersMock.mockReset();
+  });
+
+  it("o profissional (só app) não entra pelo web: nada é gravado e o refresh token é revogado", async () => {
+    headersMock.mockResolvedValue(new Headers());
+    userMock.mockResolvedValue({ type: "PROFESSIONAL" });
+
+    const result = await login(undefined, form("pro@b.com", "12345678"));
+
+    expect(result.message).toContain("aplicativo");
+    expect(setSessionMock).not.toHaveBeenCalled();
+    expect(logoutMock).toHaveBeenCalledWith("r");
+    expect(userMock).toHaveBeenCalledWith("a");
   });
 
   it("repassa à API o IP que o Caddy colocou no x-forwarded-for", async () => {

@@ -36,10 +36,13 @@
 - E-mail
 - Tipo de Usuário
 - Função (Nenhuma, Profissional ou Funcionário) e, escolhida, a pessoa (Profissional ou Funcionário)
+- Telefone (só no tipo Profissional)
 - Senha
 - Confirme a senha
 
 ### Regras Específicas
+
+- Tipo **Profissional** (só app): mostra a Função fixa em Profissional, a pessoa obrigatória e o **Telefone** obrigatório (10 ou 11 dígitos, com máscara), que é o login no app. Telefone repetido: 409 no campo. Esse tipo não entra no sistema web e não conta no limite de administradores.
 
 - Nome obrigatório;
 - E-mail obrigatório;

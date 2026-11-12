@@ -10,6 +10,7 @@ import {
   type UserFormValues,
 } from "@/components/users/user-validation";
 import { failureFrom, type ActionFailure } from "@/lib/action-result";
+import { onlyDigits } from "@/utils/masks";
 import { ApiError } from "@/services/api";
 import {
   createUser,
@@ -36,9 +37,9 @@ function firstError(errors: UserFormErrors): UserActionResult | null {
 // A API responde 409 tanto para e-mail repetido quanto para pessoa já
 // vinculada: a mensagem diz qual, e o erro vai para o campo certo.
 function conflictField(error: unknown): UserField {
-  return error instanceof ApiError && /vinculad/i.test(error.message)
-    ? "peopleId"
-    : "email";
+  if (!(error instanceof ApiError)) return "email";
+  if (/telefone/i.test(error.message)) return "phone";
+  return /vinculad/i.test(error.message) ? "peopleId" : "email";
 }
 
 /**
@@ -62,6 +63,10 @@ export async function createUserAction(
       type: values.type as UserType,
       ...(companyId && { companyId }),
       ...(linkApplies(values) && { peopleId: values.peopleId }),
+      // O login do usuário só de app no aplicativo (só dígitos).
+      ...(values.type === "PROFESSIONAL" && {
+        phone: onlyDigits(values.phone),
+      }),
     });
   } catch (error) {
     return failureFrom(error, conflictField(error));
@@ -75,7 +80,7 @@ export async function updateUserAction(
   id: string,
   values: Pick<
     UserFormValues,
-    "name" | "email" | "type" | "linkType" | "peopleId"
+    "name" | "email" | "type" | "linkType" | "peopleId" | "phone"
   >,
 ): Promise<UserActionResult> {
   const invalid = firstError(validateUpdateUserForm(values));
@@ -88,6 +93,10 @@ export async function updateUserAction(
       type: values.type as UserType,
       // `null` desfaz o vínculo (desligou o interruptor ou virou SUPER_ADMIN).
       peopleId: linkApplies(values) ? values.peopleId : null,
+      // Sair do tipo só de app apaga o telefone na API; aqui só vai o dele.
+      ...(values.type === "PROFESSIONAL" && {
+        phone: onlyDigits(values.phone),
+      }),
     });
   } catch (error) {
     return failureFrom(error, conflictField(error));

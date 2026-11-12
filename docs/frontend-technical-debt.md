@@ -140,6 +140,16 @@ Pontos conhecidos e aceitos por enquanto. Revisar quando o contexto mudar.
 - **Clientes duplicados:** quem já era cliente e entrou sozinho pela busca fica com 2 cadastros; falta juntar.
 - **Busca só por nome;** geolocalização no futuro.
 
+## App do profissional
+
+- **Sem teste de fumaça de `/app`:** `e2e/smoke.e2e.ts` cobre só o painel da clínica. As telas do app (cliente e profissional) foram verificadas por roteiros de navegador (Playwright) que não estão no repositório. Para entrar no CI, o smoke precisaria de um segundo login (profissional) e de dados de teste.
+- **Só consulta:** o profissional não confirma, remaneja nem marca falta; avisos push, anamnese e status de pagamento do cliente ficam fora por decisão (ver `decisions.md`).
+- **Esqueci a senha:** não há recuperação pelo app; a clínica redefine a senha no cadastro do usuário.
+- **"Não encontrado" com status 200:** a ficha do cliente e o recibo, ao não achar o registro, mostram a página de erro, mas o Next já respondeu 200 por causa do `loading.tsx` (carregamento progressivo). Só a aparência importa ao usuário; seria preciso tirar o `loading.tsx` para o 404 real.
+- **Início conta em memória:** a API traz os agendamentos da semana e dos dois meses (até 5.000) e agrupa no servidor; para um profissional com volume muito alto, o certo seria agregar no banco.
+- **Fechamentos paginados no service:** a API corta a página depois de buscar todos os fechamentos dele (poucos por período); a consulta do ADMIN não tem paginação.
+- **Cenários de borda:** verificados no Studio Aurora em 2026-11-12 (profissional sem comissão, fechamento desfeito, empresa sem `commissions`, cadastro inativado e tempo de resposta: 7 a 12 ms de mediana nas seis rotas; 40 requisições simultâneas do Início sem falha; o cálculo do Início com 5.000 linhas leva ~40 ms). Não há teste automático de tela para eles (ver o smoke acima).
+
 ## Acessibilidade
 
 Auditoria da Etapa 9 (2026-10-22): `axe-core` em todas as rotas e em 11 diálogos e menus, sem achados de contraste, nomes ou marcos. Restos aceitos:

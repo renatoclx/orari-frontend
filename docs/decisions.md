@@ -169,6 +169,18 @@ regras de cada tela, em `docs/screens/`.
 - **2026-11-11 — Venda na comanda já nesta fase:** vários itens e **um pagamento** (terceira origem do pagamento, sem criar a entidade Comanda); baixa o estoque **ao lançar**; valor sugerido = promocional (editável); **"Nova venda"** para quem só compra; cancela **só a pendente** (o estoque volta); o pagamento da venda é **protegido** (só a baixa pelo Contas a receber); **só o ADMIN vende**. _Por quê:_ cobre o balcão sem a reestruturação de uma comanda gravada.
 - **2026-11-11 — A comanda continua sendo o dia do cliente.** A comanda paga não aceita produto (a compra seguinte é Nova venda e reabre a comanda do dia); o pago do dia fica num bloco recolhível "Recebidos". Gravar o fechamento da comanda no backend (comandas separadas no mesmo dia) foi avaliado e deixado de fora. _Por quê:_ resolve a leitura no balcão sem desestruturar o backend.
 
+## App do profissional
+
+- **2026-11-12 — O profissional usa o mesmo PWA (`/app`), com sessão e abas próprias,** em vez de um app novo. _Por quê:_ reaproveita a instalação, o visual, o login e a infraestrutura; o custo de manutenção é um só.
+- **2026-11-12 — Entra pelo telefone, e o app tenta profissional antes de cliente,** com uma mensagem de erro única. _Por quê:_ é o que o profissional já usa no dia a dia e não revela se a conta existe; a ambiguidade (mesma pessoa, mesma senha) favorece o mais restrito.
+- **2026-11-12 — O acesso é negado por padrão na API (`@ProfessionalApp()` + guard global).** _Por quê:_ havia 22 controllers sem `@Roles`, liberados a qualquer usuário logado; um perfil novo herdaria tudo. Lista exata fixada em teste.
+- **2026-11-12 — Só consulta:** agenda, clientes, comissões e Início; sem alterar agendamentos, sem anamnese e sem status de pagamento dos clientes. Cliente só os dele (telefone sim; e-mail, CPF e endereço não).
+- **2026-11-12 — Funcionalidade `professional-app` em todos os planos; `commissions` exigida para a aba Comissões.** O SUPER_ADMIN pode desligar cada uma por empresa.
+- **2026-11-12 — Detalhes abrem no próprio cartão, não em diálogo,** e os avisos ficam na tela. _Por quê:_ as janelas da clínica ficam fora da área escura do app (mesma razão do app do cliente).
+- **2026-11-12 — Listas de 10 por página (`?pagina=`), filtros na URL (`?q=`, `?dia=`, `?mes=`);** o recibo mostra os 10 primeiros atendimentos e "Ver todos", porque é um documento.
+- **2026-11-12 — Gráfico da semana em CSS, sem biblioteca,** de segunda a domingo, uma série na cor primária; o que passou em cor cheia e o agendado em tom claro. _Por quê:_ é uma barra por dia; uma biblioteca pesaria no PWA.
+- **2026-11-12 — A turma é um atendimento por sessão nas contagens (agenda, Início);** faltas e cancelados contam marcações.
+
 ## Qualidade e testes
 
 - **2026-10-23 — Testes automáticos só de funções puras e de pontos de borda do servidor,** com Vitest (a mesma ferramenta do backend) e `arquivo.spec.ts` ao lado do código. _Por quê:_ é onde está a regra que quebra sem barulho (fuso, arredondamento, disponibilidade de horários); componentes e telas seguem verificados à mão e com `axe-core`. Ponta a ponta (Playwright) fica fora por ora.

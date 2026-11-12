@@ -79,3 +79,107 @@ export type ProfessionalClientDetail = ProfessionalClient & {
   /** Os atendimentos mais recentes, do mais novo ao mais antigo. */
   history: ProfessionalClientAppointment[];
 };
+
+/** Resumo do mês das comissões dele (valores em texto, duas casas). */
+export type ProfessionalCommissionSummary = {
+  /** AAAA-MM. */
+  month: string;
+  /** Falso para quem não recebe comissão (ex.: o dono que atende). */
+  receivesCommission: boolean;
+  count: number;
+  base: string;
+  amount: string;
+  /** Adiantado e a receber: em aberto, sem depender do mês. */
+  advanced: string;
+  toPay: string;
+};
+
+export type ProfessionalCommission = {
+  id: string;
+  startAt: string;
+  clientName: string;
+  serviceName: string;
+  /** Sessão de pacote: a base é a parte da contratação. */
+  fromPackage: boolean;
+  baseAmount: string;
+  type: "PERCENT" | "FIXED";
+  /** Percentual (30.00) ou valor fixo da regra no dia da geração. */
+  rate: string;
+  amount: string;
+  /** Número do fechamento que a quitou; nulo = em aberto. */
+  closingNumber: number | null;
+};
+
+export type ProfessionalCommissionsPage = {
+  items: ProfessionalCommission[];
+  total: number;
+  page: number;
+  limit: number;
+};
+
+export type ProfessionalClosing = {
+  id: string;
+  number: number;
+  /** AAAA-MM-DD. */
+  cutoffDate: string;
+  paidAt: string;
+  paymentMethod: { name: string };
+  commissionTotal: string;
+  advanceTotal: string;
+  paidAmount: string;
+  appointmentsCount: number;
+  /** Preenchido nos fechamentos desfeitos. */
+  cancelledAt: string | null;
+};
+
+export type ProfessionalClosingsPage = {
+  items: ProfessionalClosing[];
+  total: number;
+  page: number;
+  limit: number;
+};
+
+export type ProfessionalClosingReceipt = ProfessionalClosing & {
+  company: { name: string; corporateReason: string; document: string };
+  professional: { name: string; document: string | null };
+  details: {
+    commissions: {
+      startAt: string;
+      client: string;
+      service: string;
+      base: string;
+      amount: string;
+    }[];
+    advances: { date: string; note: string | null; amount: string }[];
+  };
+};
+
+/** Um atendimento do Início (a turma vem sem cliente: são vários alunos). */
+export type ProfessionalHomeAppointment = {
+  startAt: string;
+  endAt: string;
+  clientName: string | null;
+  serviceName: string;
+  isClass: boolean;
+};
+
+/** O Início do profissional: hoje, a semana, o mês e os próximos. */
+export type ProfessionalHome = {
+  today: {
+    total: number;
+    remaining: number;
+    next: (ProfessionalHomeAppointment & { inProgress: boolean }) | null;
+  };
+  /** Segunda a domingo da semana de hoje (AAAA-MM-DD), sem os cancelados. */
+  week: { date: string; count: number }[];
+  month: {
+    /** AAAA-MM. */
+    month: string;
+    completed: number;
+    noShow: number;
+    cancelled: number;
+    clients: number;
+    previousCompleted: number;
+  };
+  upcoming: ProfessionalHomeAppointment[];
+};

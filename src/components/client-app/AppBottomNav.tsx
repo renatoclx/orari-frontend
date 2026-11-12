@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
   CalendarDays,
+  HandCoins,
   House,
   Search,
   UserRound,
@@ -23,8 +24,7 @@ const CLIENT_TABS: Tab[] = [
   { href: "/app/menu", label: "Menu", icon: UserRound, also: "/app/menu/" },
 ];
 
-// O profissional vê as abas dele; Comissões entra na próxima
-// etapa (e em `proRouteAllowed`, lib/app-routes.ts).
+// O profissional vê as abas dele (e as rotas em `proRouteAllowed`, lib/app-routes.ts).
 const PROFESSIONAL_TABS: Tab[] = [
   { href: "/app", label: "Início", icon: House },
   { href: "/app/agenda", label: "Agenda", icon: CalendarDays },
@@ -36,6 +36,14 @@ const PROFESSIONAL_TABS: Tab[] = [
   },
   { href: "/app/menu", label: "Menu", icon: UserRound, also: "/app/menu/" },
 ];
+
+// Entra antes do Menu, só para a clínica que usa comissões no plano.
+const COMMISSIONS_TAB: Tab = {
+  href: "/app/comissoes",
+  label: "Comissões",
+  icon: HandCoins,
+  also: "/app/comissoes/",
+};
 
 /**
  * Altura da barra (64 px dos itens + 1 px da borda), sem a área do gesto do
@@ -52,13 +60,25 @@ export const BOTTOM_NAV_OFFSET =
 export function AppBottomNav({
   hasUnread,
   kind = "client",
+  showCommissions = false,
 }: {
   hasUnread: boolean;
   /** Quem entrou: cada um tem as suas abas. */
   kind?: "client" | "professional";
+  /** Profissional de empresa com a funcionalidade Comissões. */
+  showCommissions?: boolean;
 }) {
   const pathname = usePathname();
-  const TABS = kind === "professional" ? PROFESSIONAL_TABS : CLIENT_TABS;
+  const TABS =
+    kind === "professional"
+      ? showCommissions
+        ? [
+            ...PROFESSIONAL_TABS.slice(0, -1),
+            COMMISSIONS_TAB,
+            PROFESSIONAL_TABS.at(-1)!,
+          ]
+        : PROFESSIONAL_TABS
+      : CLIENT_TABS;
   const showDot = hasUnread && pathname !== "/app/menu/avisos";
   return (
     <nav

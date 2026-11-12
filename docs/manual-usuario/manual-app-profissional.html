@@ -1,0 +1,143 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<title>Manual do app do profissional — Orari</title>
+<link rel="stylesheet" href="manual.css">
+<style>
+  /* Cabeçalho das páginas: o manual.css traz o do manual do administrador. */
+  @page { @top-left { content: "Orari · Manual do app do profissional"; } }
+  /* Capturas do celular: estreitas e altas, lado a lado. */
+  .row figure img { max-height: 120mm; }
+</style>
+</head>
+<body>
+
+<!-- ===== Capa ===== -->
+<section class="cover">
+  <img class="logo" src="assets/logo-white.svg" alt="Orari">
+  <div class="spacer"></div>
+  <div class="bar"></div>
+  <div class="kicker">Manual do app do profissional</div>
+  <h1>Sua agenda, seus clientes e suas comissões no celular</h1>
+  <p>Como entrar no app do Orari, acompanhar o seu dia, consultar os seus clientes e ver o que você tem a receber.</p>
+  <div class="foot">As telas deste manual usam dados fictícios: a profissional “Camila Rocha” e o “Studio Aurora”.</div>
+</section>
+
+<!-- ===== Sumário (os números de página são preenchidos pelo build) ===== -->
+<section class="toc">
+  <h2>Sumário</h2>
+  <ol id="toc"></ol>
+  <div class="intro">
+    <b>Como usar este manual.</b> Comece por entrar no app; depois, consulte o capítulo do que quiser ver. Os quadros azuis trazem dicas; os amarelos, avisos importantes. Os nomes de botões e abas aparecem em destaque. No app, você <b>consulta</b> as suas informações: quem altera agendamentos e cadastros é a clínica.
+  </div>
+</section>
+
+<!-- ===== 1 ===== -->
+<h1 class="chapter" data-toc="Entrar no app"><span class="num"></span>Entrar no app</h1>
+<p class="lead">Com o telefone e a senha que a clínica cadastrou para você.</p>
+
+<p>O app do Orari não fica na App Store nem na Play Store: ele é instalado pelo navegador. Abra o endereço <b>app.orariapp.com.br/app</b> que a clínica enviou. No iPhone, use o <b>Safari</b> e toque em <span class="ui">Compartilhar</span> &rarr; <span class="ui">Adicionar à Tela de Início</span>. No Android, use o <b>Chrome</b> e toque em <span class="ui">Instalar app</span>. Depois, abra o Orari pelo ícone.</p>
+<ol class="steps">
+  <li>Na tela <span class="ui">Entrar</span>, informe o <b>telefone com DDD</b> que a clínica cadastrou para você.</li>
+  <li>Digite a <b>senha</b> que a clínica passou.</li>
+  <li>Toque em <span class="ui">Entrar</span>.</li>
+</ol>
+<figure class="w40"><img src="images/pro-01-entrar.png" alt=""><figcaption>A tela de entrada é a mesma dos clientes: o app reconhece que você é profissional.</figcaption></figure>
+<div class="box tip"><b class="t">Dica</b><p>Troque a senha que a clínica passou em <span class="ui">Menu</span> &rarr; <span class="ui">Alterar senha</span>. Ao trocar, os outros aparelhos saem da sua conta e este continua entrado.</p></div>
+
+<!-- ===== 2 ===== -->
+<h1 class="chapter" data-toc="Início"><span class="num"></span>Início</h1>
+<p class="lead">O seu dia, a sua semana e o seu mês numa tela só.</p>
+
+<p>O <span class="ui">Início</span> reúne, de cima para baixo:</p>
+<ul>
+  <li><b>Hoje</b>: quantos atendimentos você tem, quantos ainda faltam e o <b>próximo</b> (ou o que está em andamento). O botão <span class="ui">Agenda</span> abre o seu dia.</li>
+  <li><b>Esta semana</b>: um gráfico com os atendimentos de cada dia, de segunda a domingo. As barras em cor cheia são os dias que já passaram; as de tom mais claro, o que ainda está agendado. Toque numa barra para abrir a agenda daquele dia.</li>
+  <li><b>O mês</b>: atendimentos <b>concluídos</b> (com a comparação ao mês anterior), <b>clientes atendidos</b>, <b>faltas</b> e <b>cancelados</b>.</li>
+  <li><b>Comissão</b>: a comissão do mês e o que você tem a receber, se a clínica usa comissões. Toque para abrir os detalhes.</li>
+  <li><b>Próximos agendamentos</b>: os três seguintes depois de hoje.</li>
+</ul>
+<div class="row">
+  <figure><img src="images/pro-02-inicio.png" alt=""><figcaption>Hoje e o gráfico da semana.</figcaption></figure>
+  <figure><img src="images/pro-03-inicio-semana.png" alt=""><figcaption>O mês, a comissão e os próximos agendamentos.</figcaption></figure>
+</div>
+<div class="box tip"><b class="t">Como os atendimentos são contados</b><p>Uma <b>turma</b> conta como um atendimento por sessão, qualquer que seja o número de alunos. Os cancelados não entram na contagem do dia nem da semana. <b>Faltas</b> e <b>cancelados</b> do mês contam cada marcação (cada aluno da turma é uma).</p></div>
+
+<!-- ===== 3 ===== -->
+<h1 class="chapter" data-toc="Agenda"><span class="num"></span>Agenda</h1>
+<p class="lead">Os seus atendimentos, dia a dia.</p>
+
+<p>Na aba <span class="ui">Agenda</span>, a lista mostra só os <b>seus</b> atendimentos do dia, em ordem de horário. Cada um traz o horário, o cliente, o serviço (na cor dele) e a situação: Agendado, Confirmado, Em andamento, Concluído, Cancelado ou Não compareceu.</p>
+<ul>
+  <li>Use as <b>setas</b> para ir ao dia anterior ou ao próximo, o ícone de calendário para <b>escolher uma data</b> e <span class="ui">Hoje</span> para voltar ao dia atual.</li>
+  <li>As <b>turmas</b> aparecem num cartão só ("Turma · 4/4": vagas ocupadas). Os <b>horários bloqueados</b> pela clínica aparecem tracejados.</li>
+  <li>Cancelados e faltas ficam esmaecidos. Dia sem atendimentos: <b>Dia livre</b>.</li>
+</ul>
+<div class="row">
+  <figure><img src="images/pro-04-agenda.png" alt=""><figcaption>A agenda do dia.</figcaption></figure>
+  <figure><img src="images/pro-05-agenda-detalhe.png" alt=""><figcaption>Toque no cartão para ver os detalhes.</figcaption></figure>
+  <figure><img src="images/pro-06-agenda-turma.png" alt=""><figcaption>Numa turma, os alunos e a situação de cada um.</figcaption></figure>
+</div>
+<p>Ao tocar num atendimento, o cartão abre com o <b>serviço, a duração, o preço</b>, a origem (<b>Encaixe</b>, <b>Pacote</b> ou <b>Recorrente</b>) e a observação. O botão <span class="ui">Ver cliente</span> abre a ficha dele.</p>
+<div class="box warn"><b class="t">Só consulta</b><p>Pelo app, você não confirma, remarca nem cancela atendimentos. Para qualquer mudança, fale com a clínica.</p></div>
+
+<!-- ===== 4 ===== -->
+<h1 class="chapter" data-toc="Clientes"><span class="num"></span>Clientes</h1>
+<p class="lead">Os clientes que você atende, com telefone e histórico.</p>
+
+<p>A aba <span class="ui">Clientes</span> lista, em ordem alfabética, os clientes que têm ao menos um agendamento <b>com você</b> (os cancelados não contam). Cada cartão mostra o nome, o telefone e o próximo agendamento ou, sem ele, o último atendimento. A lista tem <b>10 clientes por página</b>; para achar alguém, digite o nome na <b>busca</b> (acentos e maiúsculas não importam).</p>
+<div class="row">
+  <figure><img src="images/pro-07-clientes.png" alt=""><figcaption>A lista de clientes.</figcaption></figure>
+  <figure><img src="images/pro-08-cliente-ficha.png" alt=""><figcaption>A ficha do cliente.</figcaption></figure>
+</div>
+<p>Na <b>ficha</b>, os botões <span class="ui">Ligar</span> e <span class="ui">WhatsApp</span> abrem o contato direto, e abaixo ficam o último atendimento, o próximo e o histórico dos <b>seus</b> atendimentos com esse cliente (os 50 mais recentes), com data, serviço, preço e situação.</p>
+<div class="box warn"><b class="t">Privacidade</b><p>Você vê apenas os clientes que atende e só o telefone deles. O app não mostra pagamentos, ficha de anamnese, e-mail, CPF nem endereço.</p></div>
+
+<!-- ===== 5 ===== -->
+<h1 class="chapter" data-toc="Comissões"><span class="num"></span>Comissões</h1>
+<p class="lead">O que você produziu, o que já foi adiantado e o que falta receber.</p>
+
+<p>A aba <span class="ui">Comissões</span> só aparece se a clínica usa comissões. Use as setas para trocar o <b>mês</b>; o mês vale pela data do atendimento.</p>
+<ul>
+  <li><b>Comissão do mês</b>: o valor e quantos atendimentos o geraram.</li>
+  <li><b>Adiantado</b> e <b>A receber</b>: o que ainda não foi fechado pela clínica, somando todos os meses. O a receber é a sua comissão em aberto menos o que a clínica já adiantou.</li>
+  <li>A <b>lista do mês</b>, com 10 por página: cliente, data, serviço, a regra ("40% de R$ 10,00" ou "Valor fixo"; "Sessão de pacote" quando é o caso) e o valor. O selo diz se a comissão já foi quitada num <b>fechamento</b> ou está <b>em aberto</b>.</li>
+</ul>
+<div class="row">
+  <figure><img src="images/pro-09-comissoes.png" alt=""><figcaption>As comissões do mês.</figcaption></figure>
+  <figure><img src="images/pro-10-fechamentos.png" alt=""><figcaption>Os fechamentos.</figcaption></figure>
+  <figure><img src="images/pro-11-recibo.png" alt=""><figcaption>O recibo.</figcaption></figure>
+</div>
+
+<h2>Fechamentos e recibo</h2>
+<p>Quando a clínica fecha a sua comissão, ela paga o valor combinado e gera um <b>recibo numerado</b>. Toque em <span class="ui">Fechamentos</span> para ver todos, do mais novo ao mais antigo. No recibo você confere a data do pagamento, o método, as comissões, os adiantamentos descontados, o <b>valor pago</b> e cada atendimento (com a base de cálculo). Se houver mais de 10 atendimentos, o botão <span class="ui">Ver todos os atendimentos</span> abre o restante.</p>
+<div class="box tip"><b class="t">Fechamento desfeito</b><p>Se a clínica desfizer um fechamento, o recibo continua na lista, marcado como <b>Desfeito</b>, e o número dele não volta. As comissões voltam a ficar em aberto.</p></div>
+<div class="box warn"><b class="t">Você não recebe comissão?</b><p>Se a clínica não registra comissão para o seu cadastro, a aba mostra “Você não recebe comissão”. Em caso de dúvida, fale com a clínica.</p></div>
+
+<!-- ===== 6 ===== -->
+<h1 class="chapter" data-toc="Menu e senha"><span class="num"></span>Menu e senha</h1>
+<p class="lead">Seus dados de acesso, a troca da senha e a saída.</p>
+
+<p>Em <span class="ui">Menu</span>, você vê o seu nome, o telefone de acesso e a clínica. Toque em <span class="ui">Alterar senha</span>, informe a senha atual e a nova duas vezes. Para sair, toque em <span class="ui">Sair</span>.</p>
+<figure class="w40"><img src="images/pro-12-menu.png" alt=""><figcaption>O Menu.</figcaption></figure>
+
+<!-- ===== 7 ===== -->
+<h1 class="chapter" data-toc="Dúvidas comuns"><span class="num"></span>Dúvidas comuns</h1>
+<p class="lead">Respostas rápidas para as situações mais frequentes.</p>
+
+<h3>Esqueci a minha senha.</h3>
+<p>Peça à clínica para redefinir. O administrador troca a sua senha no cadastro de usuários e passa uma nova; depois, troque-a em Menu → Alterar senha.</p>
+<h3>Meu telefone ou senha não entram.</h3>
+<p>Confira o telefone com DDD (o mesmo que a clínica cadastrou) e a senha. Depois de várias tentativas seguidas, espere um minuto. Se continuar, peça à clínica para conferir o seu cadastro.</p>
+<h3>Aparece “Seu acesso está suspenso”.</h3>
+<p>O seu cadastro de profissional foi inativado pela clínica. Fale com ela; o acesso volta quando o cadastro for reativado.</p>
+<h3>Não vejo a aba Comissões.</h3>
+<p>Ela só existe quando a clínica usa comissões no plano do Orari. Pergunte ao administrador.</p>
+<h3>Um cliente que atendo não aparece em Clientes.</h3>
+<p>A lista mostra quem tem ao menos um agendamento <b>com você</b>, não cancelado, e que está ativo. Confirme com a clínica se o agendamento foi marcado no seu nome.</p>
+<h3>Os números do Início não batem com o que eu esperava.</h3>
+<p>Turmas contam uma vez por sessão e os cancelados ficam fora da contagem do dia e da semana. O mês considera os atendimentos concluídos pelo horário em que aconteceram.</p>
+
+</body>
+</html>

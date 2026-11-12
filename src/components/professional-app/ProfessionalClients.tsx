@@ -1,15 +1,12 @@
-import Link from "next/link";
-import { ChevronLeft, ChevronRight, SearchX, Users } from "lucide-react";
+import { SearchX, Users } from "lucide-react";
 import { ListSearch } from "@/components/shared/ListSearch";
 import {
   getProfessionalMe,
   listProfessionalClients,
 } from "@/services/app-pro.service";
+import { AppPagination } from "./AppPagination";
 import { ClientCard } from "./ClientCard";
 import { pageCount } from "./professional-clients";
-
-const PAGE_LINK =
-  "flex h-10 items-center gap-2 rounded-control border border-border bg-card px-3 text-sm font-medium";
 
 /**
  * Aba Clientes do profissional (screens/app-profissional.md): só os clientes
@@ -60,32 +57,7 @@ export async function ProfessionalClients({
               />
             ))}
           </ul>
-          {pages > 1 && (
-            <nav
-              aria-label="Páginas"
-              className="flex items-center justify-between gap-3"
-            >
-              {page > 1 ? (
-                <Link href={href(page - 1)} className={PAGE_LINK}>
-                  <ChevronLeft className="size-4" aria-hidden="true" />
-                  Anterior
-                </Link>
-              ) : (
-                <span />
-              )}
-              <span className="text-sm text-muted-foreground">
-                Página {page} de {pages}
-              </span>
-              {page < pages ? (
-                <Link href={href(page + 1)} className={PAGE_LINK}>
-                  Próxima
-                  <ChevronRight className="size-4" aria-hidden="true" />
-                </Link>
-              ) : (
-                <span />
-              )}
-            </nav>
-          )}
+          <AppPagination page={page} pages={pages} href={href} />
         </>
       ) : (
         <div className="flex flex-col items-center gap-2 py-10 text-center">

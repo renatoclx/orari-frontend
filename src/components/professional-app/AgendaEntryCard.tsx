@@ -1,7 +1,15 @@
 "use client";
 
 import { useState } from "react";
-import { Ban, ChevronDown, Package, Repeat, UsersRound } from "lucide-react";
+import Link from "next/link";
+import {
+  Ban,
+  ChevronDown,
+  Package,
+  Repeat,
+  UserRound,
+  UsersRound,
+} from "lucide-react";
 import { APPOINTMENT_STATUS } from "@/components/agenda/appointment-status";
 import { Badge } from "@/components/ui/badge";
 import { formatDuration, formatPrice } from "@/utils/format";
@@ -114,6 +122,14 @@ export function AgendaEntryCard({ entry }: { entry: AgendaEntry }) {
           </p>
           {entry.kind === "appointment" ? (
             <>
+              {/* A ficha do cliente (telefone e histórico dele com o profissional). */}
+              <Link
+                href={`/app/clientes/${entry.clientId}`}
+                className="flex h-10 items-center gap-2 rounded-control border border-border px-3 font-medium"
+              >
+                <UserRound className="size-4" aria-hidden="true" />
+                Ver cliente
+              </Link>
               <p>
                 <span className="font-medium">{entry.serviceName}</span>
                 <span className="text-muted-foreground">

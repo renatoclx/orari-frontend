@@ -7,6 +7,10 @@ import type {
   ProfessionalAgenda,
   ProfessionalClientDetail,
   ProfessionalClientsPage,
+  ProfessionalClosingsPage,
+  ProfessionalClosingReceipt,
+  ProfessionalCommissionsPage,
+  ProfessionalCommissionSummary,
 } from "@/types/professional-app";
 
 // Rotas da API usadas pelo app do profissional (screens/app-profissional.md).
@@ -55,5 +59,44 @@ export function getProfessionalClient(
 ): Promise<ProfessionalClientDetail> {
   return proFetch<ProfessionalClientDetail>(
     `/professional-app/clients/${encodeURIComponent(id)}`,
+  );
+}
+
+/** Resumo do mês (AAAA-MM; sem ele, o atual) das comissões dele. */
+export function getProfessionalCommissionSummary(
+  month?: string,
+): Promise<ProfessionalCommissionSummary> {
+  const query = month ? `?month=${encodeURIComponent(month)}` : "";
+  return proFetch<ProfessionalCommissionSummary>(
+    `/professional-app/commissions/summary${query}`,
+  );
+}
+
+/** As comissões do mês, atendimento a atendimento (20 por página). */
+export function listProfessionalCommissions(
+  month: string,
+  page: number,
+): Promise<ProfessionalCommissionsPage> {
+  const params = new URLSearchParams({ month, page: String(page) });
+  return proFetch<ProfessionalCommissionsPage>(
+    `/professional-app/commissions?${params}`,
+  );
+}
+
+/** Os fechamentos dele, do número maior para o menor, 10 por página (os desfeitos, marcados). */
+export function listProfessionalClosings(
+  page: number,
+): Promise<ProfessionalClosingsPage> {
+  return proFetch<ProfessionalClosingsPage>(
+    `/professional-app/commission-closings?page=${page}`,
+  );
+}
+
+/** O recibo de um fechamento dele; de outro profissional dá 404 (`ApiError`). */
+export function getProfessionalClosing(
+  id: string,
+): Promise<ProfessionalClosingReceipt> {
+  return proFetch<ProfessionalClosingReceipt>(
+    `/professional-app/commission-closings/${encodeURIComponent(id)}`,
   );
 }

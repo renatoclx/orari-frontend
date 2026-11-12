@@ -1,6 +1,8 @@
 import { AppBottomNav } from "@/components/client-app/AppBottomNav";
 import { getAccount } from "@/services/app-account.service";
+import { getProfessionalMe } from "@/services/app-pro.service";
 import { getAppSessionKind } from "@/services/app-session";
+import { canAccess } from "@/utils/access";
 
 // Telas de quem entrou no app: o conteúdo rola e a barra fica embaixo.
 export default async function AccountAppLayout({
@@ -12,13 +14,21 @@ export default async function AccountAppLayout({
   // Menu). Só o cliente tem avisos.
   const unreadMessages =
     kind === "client" ? (await getAccount()).unreadMessages : 0;
+  // A aba Comissões só existe para a clínica que as usa (funcionalidade do plano).
+  const showCommissions =
+    kind === "professional" &&
+    canAccess((await getProfessionalMe()).access, "commissions");
   return (
     <div className="flex flex-1 flex-col">
       {/* Margem lateral de 20 px: no celular, o conteúdo não encosta na borda. */}
       <main className="flex flex-1 flex-col gap-6 px-5 pt-8 pb-6">
         {children}
       </main>
-      <AppBottomNav hasUnread={unreadMessages > 0} kind={kind} />
+      <AppBottomNav
+        hasUnread={unreadMessages > 0}
+        kind={kind}
+        showCommissions={showCommissions}
+      />
     </div>
   );
 }

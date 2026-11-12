@@ -53,6 +53,7 @@ const PROFESSIONAL_PATHS = new Set([
   "/app",
   "/app/agenda",
   "/app/clientes",
+  "/app/comissoes",
   "/app/menu",
   "/app/menu/senha",
   "/app/sessao-encerrada",
@@ -62,8 +63,13 @@ const PROFESSIONAL_PATHS = new Set([
 /** O profissional pode abrir este caminho do app? Os demais voltam ao Início. */
 export function proRouteAllowed(pathname: string): boolean {
   const path = pathname.replace(/\/$/, "") || "/app";
-  // A ficha de um cliente é /app/clientes/<id>.
-  return PROFESSIONAL_PATHS.has(path) || path.startsWith("/app/clientes/");
+  // A ficha de um cliente é /app/clientes/<id>; os fechamentos e o recibo ficam
+  // sob /app/comissoes/.
+  return (
+    PROFESSIONAL_PATHS.has(path) ||
+    path.startsWith("/app/clientes/") ||
+    path.startsWith("/app/comissoes/")
+  );
 }
 
 /**

@@ -73,10 +73,12 @@ export async function ProfessionalNotifications({
             <MarkAllReadButton
               action={appProMarkAllReadAction}
               disabled={result.unread === 0}
+              app
             />
             <ClearNotificationsButton
               action={appProClearAction}
               disabled={false}
+              app
             />
           </div>
           <NotificationList

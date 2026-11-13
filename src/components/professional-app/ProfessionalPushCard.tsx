@@ -168,7 +168,7 @@ function Device({
             variant="outline"
             onClick={() => void disable()}
             disabled={busy}
-            className="h-11"
+            className="h-12 w-full text-base"
           >
             <BellOff aria-hidden="true" />
             Desativar

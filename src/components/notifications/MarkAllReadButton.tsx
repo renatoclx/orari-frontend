@@ -10,15 +10,19 @@ import { announceNotificationsChanged } from "./useUnreadCount";
 export function MarkAllReadButton({
   action,
   disabled,
+  app = false,
 }: {
   action: () => Promise<void>;
   disabled: boolean;
+  /** No app: o botão ocupa a largura do bloco (h-12, texto de 16 px). */
+  app?: boolean;
 }) {
   const router = useRouter();
   const [pending, startTransition] = useTransition();
   return (
     <Button
       variant="outline"
+      className={app ? "h-12 w-full text-base" : undefined}
       disabled={disabled || pending}
       onClick={() =>
         startTransition(async () => {

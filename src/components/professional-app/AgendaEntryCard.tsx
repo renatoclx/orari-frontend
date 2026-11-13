@@ -125,7 +125,7 @@ export function AgendaEntryCard({ entry }: { entry: AgendaEntry }) {
               {/* A ficha do cliente (telefone e histórico dele com o profissional). */}
               <Link
                 href={`/app/clientes/${entry.clientId}`}
-                className="flex h-10 items-center gap-2 rounded-control border border-border px-3 font-medium"
+                className="flex h-12 items-center justify-center gap-2 rounded-control border border-border text-base font-medium"
               >
                 <UserRound className="size-4" aria-hidden="true" />
                 Ver cliente

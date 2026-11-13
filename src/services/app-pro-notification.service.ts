@@ -7,6 +7,7 @@ import type {
   NotificationPreference,
   NotificationPreferences,
   NotificationsPage,
+  UnreadInfo,
 } from "@/types/notification";
 
 // Notificações do profissional no app (backend: /notifications), com o token
@@ -22,15 +23,12 @@ export function listProNotifications(
 }
 
 /**
- * Quantas não lidas: o número do sino. O `cache` evita repetir a chamada quando
+ * O número do sino e quando chegou a mais nova. O `cache` evita repetir a chamada quando
  * o layout e o Início pedem o número na mesma requisição.
  */
-export const getProUnreadCount = cache(async (): Promise<number> => {
-  const { unread } = await proFetch<{ unread: number }>(
-    "/notifications/unread-count",
-  );
-  return unread;
-});
+export const getProUnreadInfo = cache(() =>
+  proFetch<UnreadInfo>("/notifications/unread-count"),
+);
 
 export function markProNotificationRead(id: string): Promise<void> {
   return proFetch<void>(`/notifications/${encodeURIComponent(id)}/read`, {
@@ -72,4 +70,9 @@ export function deleteProPushSubscription(endpoint: string): Promise<void> {
     method: "DELETE",
     body: JSON.stringify({ endpoint }),
   });
+}
+
+/** Limpa a caixa: some da lista e do contador. */
+export function clearProNotifications(): Promise<void> {
+  return proFetch<void>("/notifications", { method: "DELETE" });
 }

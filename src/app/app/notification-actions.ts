@@ -2,15 +2,16 @@
 
 import { ApiError } from "@/services/api";
 import {
+  clearProNotifications,
   deleteProPushSubscription,
-  getProUnreadCount,
+  getProUnreadInfo,
   markAllProNotificationsRead,
   markProNotificationRead,
   saveProNotificationPreferences,
   saveProPushSubscription,
 } from "@/services/app-pro-notification.service";
 import type { PushSubscriptionJson } from "@/types/client-app";
-import type { NotificationPreference } from "@/types/notification";
+import type { NotificationPreference, UnreadInfo } from "@/types/notification";
 
 // Server Actions das notificações do profissional no app.
 
@@ -20,9 +21,9 @@ const isText = (value: unknown, max: number): value is string =>
   typeof value === "string" && value.length > 0 && value.length <= max;
 
 /** O número do sino; nulo se a API não respondeu (o sino mantém o anterior). */
-export async function appProUnreadAction(): Promise<number | null> {
+export async function appProUnreadAction(): Promise<UnreadInfo | null> {
   try {
-    return await getProUnreadCount();
+    return await getProUnreadInfo();
   } catch (error) {
     if (error instanceof ApiError && error.status !== 401) return null;
     throw error;
@@ -103,4 +104,13 @@ export async function appProPushUnsubscribeAction(
     return { ok: false, message: error.message };
   }
   return { ok: true };
+}
+
+/** Limpa a caixa do profissional. */
+export async function appProClearAction(): Promise<void> {
+  try {
+    await clearProNotifications();
+  } catch (error) {
+    if (!(error instanceof ApiError)) throw error;
+  }
 }

@@ -3,7 +3,7 @@ import { getAccount } from "@/services/app-account.service";
 import { ProfessionalBellBar } from "@/components/professional-app/ProfessionalBell";
 import { ApiError } from "@/services/api";
 import { getProfessionalMe } from "@/services/app-pro.service";
-import { getProUnreadCount } from "@/services/app-pro-notification.service";
+import { getProUnreadInfo } from "@/services/app-pro-notification.service";
 import { getAppSessionKind } from "@/services/app-session";
 import { canAccess } from "@/utils/access";
 
@@ -25,10 +25,13 @@ export default async function AccountAppLayout({
   // API falhar só aqui, a tela abre sem número (o sino confere de novo depois).
   const unreadNotices =
     kind === "professional"
-      ? await getProUnreadCount().catch((error: unknown) => {
-          if (error instanceof ApiError) return 0;
-          throw error;
-        })
+      ? await getProUnreadInfo().then(
+          ({ unread }) => unread,
+          (error: unknown) => {
+            if (error instanceof ApiError) return 0;
+            throw error;
+          },
+        )
       : 0;
   return (
     <div className="flex flex-1 flex-col">

@@ -8,7 +8,7 @@ import {
   getProfessionalMe,
 } from "@/services/app-pro.service";
 import { canAccess } from "@/utils/access";
-import { getProUnreadCount } from "@/services/app-pro-notification.service";
+import { getProUnreadInfo } from "@/services/app-pro-notification.service";
 import { HomeCommission } from "./HomeCommission";
 import { HomeMonth } from "./HomeMonth";
 import { HomeToday } from "./HomeToday";
@@ -26,10 +26,13 @@ export async function ProfessionalHome() {
   const me = await getProfessionalMe();
   const timeZone = me.company.timezone;
   // O sino fica na linha da saudação; se a API falhar só nele, abre sem número.
-  const unread = await getProUnreadCount().catch((error: unknown) => {
-    if (error instanceof ApiError) return 0;
-    throw error;
-  });
+  const unread = await getProUnreadInfo().then(
+    (info) => info.unread,
+    (error: unknown) => {
+      if (error instanceof ApiError) return 0;
+      throw error;
+    },
+  );
 
   return (
     <>

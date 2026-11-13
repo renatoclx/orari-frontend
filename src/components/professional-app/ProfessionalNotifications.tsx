@@ -1,9 +1,11 @@
 import Link from "next/link";
 import { BellOff } from "lucide-react";
 import {
+  appProClearAction,
   appProMarkAllReadAction,
   appProMarkReadAction,
 } from "@/app/app/notification-actions";
+import { ClearNotificationsButton } from "@/components/notifications/ClearNotificationsButton";
 import { MarkAllReadButton } from "@/components/notifications/MarkAllReadButton";
 import { NotificationList } from "@/components/notifications/NotificationList";
 import { listProNotifications } from "@/services/app-pro-notification.service";
@@ -67,10 +69,16 @@ export async function ProfessionalNotifications({
 
       {result.items.length > 0 ? (
         <>
-          <MarkAllReadButton
-            action={appProMarkAllReadAction}
-            disabled={result.unread === 0}
-          />
+          <div className="space-y-3">
+            <MarkAllReadButton
+              action={appProMarkAllReadAction}
+              disabled={result.unread === 0}
+            />
+            <ClearNotificationsButton
+              action={appProClearAction}
+              disabled={false}
+            />
+          </div>
           <NotificationList
             items={result.items}
             markRead={appProMarkReadAction}

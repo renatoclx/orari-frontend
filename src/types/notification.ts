@@ -35,3 +35,9 @@ export type NotificationPreferences = {
   publicKey: string | null;
   preferences: NotificationPreference[];
 };
+
+/** O número do sino e quando chegou a notificação mais nova (nulo sem nenhuma). */
+export type UnreadInfo = {
+  unread: number;
+  latestAt: string | null;
+};

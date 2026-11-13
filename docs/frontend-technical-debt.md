@@ -152,7 +152,7 @@ Pontos conhecidos e aceitos por enquanto. Revisar quando o contexto mudar.
 
 ## Notificações
 
-- **Sem tempo real:** o número do sino é conferido a cada minuto, ao voltar para a aba e ao ler; um aviso novo pode levar até 1 minuto para aparecer (SSE ou WebSocket resolveria).
+- **Sem tempo real:** o número do sino é conferido a cada 30 segundos, ao voltar para a aba e ao ler; um aviso novo (e o toast do painel) pode levar até 30 s para aparecer (SSE ou WebSocket resolveria).
 - **Push só no app do profissional:** o painel da clínica tem o sino e a caixa, mas não recebe push no navegador (falta um service worker próprio do painel).
 - **Sem "Testar" no aviso do profissional:** o app do cliente tem o botão de teste; o do profissional ainda não (falta a rota no backend).
 - **Card de push duplicado:** o `ProfessionalPushCard` repete os estados do `PushDeviceCard` (instalar no iPhone, bloqueado, desligado, ligado). Unificar num componente só quando houver uma terceira tela de push.

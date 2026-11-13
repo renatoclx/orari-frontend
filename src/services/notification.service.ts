@@ -1,7 +1,7 @@
 import "server-only";
 
 import { apiFetch } from "@/services/api";
-import type { NotificationsPage } from "@/types/notification";
+import type { NotificationsPage, UnreadInfo } from "@/types/notification";
 
 // Notificações do usuário do painel (backend: /notifications). Cada um só lê e
 // altera as próprias.
@@ -16,12 +16,9 @@ export function listNotifications(
   return apiFetch<NotificationsPage>(`/notifications?${params}`);
 }
 
-/** Quantas não lidas: o número do sino. */
-export async function getUnreadCount(): Promise<number> {
-  const { unread } = await apiFetch<{ unread: number }>(
-    "/notifications/unread-count",
-  );
-  return unread;
+/** O número do sino e quando chegou a notificação mais nova. */
+export function getUnreadInfo(): Promise<UnreadInfo> {
+  return apiFetch<UnreadInfo>("/notifications/unread-count");
 }
 
 export function markNotificationRead(id: string): Promise<void> {
@@ -32,4 +29,9 @@ export function markNotificationRead(id: string): Promise<void> {
 
 export function markAllNotificationsRead(): Promise<void> {
   return apiFetch<void>("/notifications/read-all", { method: "PATCH" });
+}
+
+/** Limpa a caixa: some da lista e do contador. */
+export function clearNotifications(): Promise<void> {
+  return apiFetch<void>("/notifications", { method: "DELETE" });
 }

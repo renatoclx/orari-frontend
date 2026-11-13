@@ -2,20 +2,21 @@
 
 import { ApiError } from "@/services/api";
 import {
-  getUnreadCount,
+  clearNotifications,
+  getUnreadInfo,
   listNotifications,
   markAllNotificationsRead,
   markNotificationRead,
 } from "@/services/notification.service";
-import type { NotificationsPage } from "@/types/notification";
+import type { NotificationsPage, UnreadInfo } from "@/types/notification";
 
 // Server Actions do sino do painel. O navegador não fala com a API (o token
 // fica no cookie do servidor): o sino chama estas ações.
 
-/** O número do sino; nulo se a API não respondeu (o sino mantém o anterior). */
-export async function unreadCountAction(): Promise<number | null> {
+/** O número do sino e a notificação mais nova; nulo se a API não respondeu (o sino mantém o anterior). */
+export async function unreadCountAction(): Promise<UnreadInfo | null> {
   try {
-    return await getUnreadCount();
+    return await getUnreadInfo();
   } catch (error) {
     if (error instanceof ApiError && error.status !== 401) return null;
     throw error;
@@ -45,6 +46,15 @@ export async function markNotificationReadAction(id: string): Promise<void> {
 export async function markAllNotificationsReadAction(): Promise<void> {
   try {
     await markAllNotificationsRead();
+  } catch (error) {
+    if (!(error instanceof ApiError)) throw error;
+  }
+}
+
+/** Limpa a caixa do usuário. */
+export async function clearNotificationsAction(): Promise<void> {
+  try {
+    await clearNotifications();
   } catch (error) {
     if (!(error instanceof ApiError)) throw error;
   }

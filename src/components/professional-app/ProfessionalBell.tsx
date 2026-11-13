@@ -14,7 +14,7 @@ import { useUnreadCount } from "@/components/notifications/useUnreadCount";
  * O sino do app do profissional (screens/app-profissional.md): só o ícone, com
  * o número de não lidas numa marca vermelha, e leva à página Avisos. `initial`
  * vem do servidor (o número já certo na primeira tela); depois o sino confere
- * sozinho a cada minuto e ao voltar para o app.
+ * sozinho a cada 30 segundos e ao voltar para o app.
  */
 export function ProfessionalBell({ initial }: { initial: number }) {
   const { count } = useUnreadCount(appProUnreadAction, initial);

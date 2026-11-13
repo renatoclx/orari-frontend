@@ -1,10 +1,12 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Bell, CheckCheck } from "lucide-react";
+import { toast } from "sonner";
 import {
+  clearNotificationsAction,
   markAllNotificationsReadAction,
   markNotificationReadAction,
   recentNotificationsAction,
@@ -17,6 +19,7 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import type { AppNotification } from "@/types/notification";
+import { ClearNotificationsButton } from "./ClearNotificationsButton";
 import { NotificationItem } from "./NotificationItem";
 import { badgeText, bellLabel } from "./notification-format";
 import { useUnreadCount } from "./useUnreadCount";
@@ -28,10 +31,52 @@ import { useUnreadCount } from "./useUnreadCount";
  */
 export function NotificationBell() {
   const router = useRouter();
-  const { count, setCount, refresh } = useUnreadCount(unreadCountAction);
+  const { count, latestAt, setCount, refresh } =
+    useUnreadCount(unreadCountAction);
   const [open, setOpen] = useState(false);
   const [items, setItems] = useState<AppNotification[] | null>(null);
   const [failed, setFailed] = useState(false);
+  // A notificação mais nova que o painel já viu (indefinida até a primeira resposta).
+  const seenRef = useRef<string | null | undefined>(undefined);
+
+  // Chegou notificação nova com o painel aberto: aparece no toaster, além de
+  // contar na lista. A primeira resposta só fixa o ponto de partida: o que já
+  // estava lá não vira aviso. Quem compara é a data da mais nova, e não o
+  // número: ler uma e chegar outra no mesmo intervalo também conta.
+  useEffect(() => {
+    if (latestAt === undefined) return;
+    const seen = seenRef.current;
+    seenRef.current = latestAt;
+    if (seen === undefined || latestAt === null) return;
+    if (seen !== null && latestAt <= seen) return;
+    void announceNew(seen);
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- só reage à data da mais nova
+  }, [latestAt]);
+
+  async function announceNew(since: string | null) {
+    const page = await recentNotificationsAction();
+    if (!page) return;
+    const fresh = page.items.filter(
+      (item) =>
+        item.readAt === null && (since === null || item.createdAt > since),
+    );
+    for (const item of fresh.slice(0, 3)) {
+      toast.info(item.title, {
+        description: item.body,
+        duration: 10_000,
+        action: { label: "Abrir", onClick: () => void openItem(item) },
+      });
+    }
+    // Muitas de uma vez: um aviso só para o resto, em vez de uma pilha.
+    if (fresh.length > 3) {
+      toast.info(`Mais ${fresh.length - 3} notificações novas`, {
+        action: {
+          label: "Ver todas",
+          onClick: () => router.push("/notificacoes"),
+        },
+      });
+    }
+  }
 
   // Ao abrir, busca as últimas (e confere o número junto).
   async function load() {
@@ -132,7 +177,7 @@ export function NotificationBell() {
           ))}
         </div>
 
-        <div className="border-t border-border p-2">
+        <div className="space-y-2 border-t border-border p-2">
           <Link
             href="/notificacoes"
             onClick={() => setOpen(false)}
@@ -140,6 +185,15 @@ export function NotificationBell() {
           >
             Ver todas
           </Link>
+          <ClearNotificationsButton
+            action={clearNotificationsAction}
+            disabled={items === null || items.length === 0}
+            onCleared={() => {
+              setItems([]);
+              setCount(0);
+            }}
+            fullWidth
+          />
         </div>
       </PopoverContent>
     </Popover>

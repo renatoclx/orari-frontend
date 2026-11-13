@@ -1,12 +1,14 @@
 import Link from "next/link";
 import { BellOff } from "lucide-react";
 import {
+  clearNotificationsAction,
   markAllNotificationsReadAction,
   markNotificationReadAction,
 } from "@/app/(admin)/notification-actions";
 import { AppPagination } from "@/components/professional-app/AppPagination";
 import { pageCount } from "@/components/professional-app/professional-clients";
 import { listNotifications } from "@/services/notification.service";
+import { ClearNotificationsButton } from "./ClearNotificationsButton";
 import { MarkAllReadButton } from "./MarkAllReadButton";
 import { NotificationList } from "./NotificationList";
 
@@ -44,10 +46,16 @@ export async function NotificationsPage({
             O que aconteceu na clínica e pede a sua atenção.
           </p>
         </div>
-        <MarkAllReadButton
-          action={markAllNotificationsReadAction}
-          disabled={result.unread === 0}
-        />
+        <div className="flex flex-wrap items-start gap-2">
+          <MarkAllReadButton
+            action={markAllNotificationsReadAction}
+            disabled={result.unread === 0}
+          />
+          <ClearNotificationsButton
+            action={clearNotificationsAction}
+            disabled={result.items.length === 0}
+          />
+        </div>
       </div>
 
       <nav

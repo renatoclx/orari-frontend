@@ -42,5 +42,5 @@ export const CATEGORY_HINT: Record<NotificationCategory, string> = {
   APPOINTMENT: "Quando o cliente marca ou cancela um horário pelo app.",
 };
 
-/** Intervalo da conferência do número do sino (a cada minuto). */
-export const POLL_MS = 60_000;
+/** Intervalo da conferência do número do sino (a cada 30 segundos). */
+export const POLL_MS = 30_000;

@@ -54,4 +54,4 @@ export const CATEGORY_HINT: Record<NotificationCategory, string> = {
 };
 
 /** Intervalo da conferência do número do sino (a cada 30 segundos). */
-export const POLL_MS = 30_000;
+export const POLL_MS = 15_000;

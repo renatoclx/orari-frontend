@@ -6,6 +6,7 @@
 
 ### Estrutura da tela
 
+- **Atualização automática:** a agenda renderiza de novo a cada 60 segundos (só com a aba visível e sem diálogo aberto) e quando chega notificação de agendamento (ver `notificacoes.md`), para mostrar o que entrou pelo celular ou por outro administrador. Filtros e rolagem não mudam.
 - Título: "Agendamentos".
 - Barra superior:
   - Botões "Dia anterior", "Próximo dia" e "Hoje".

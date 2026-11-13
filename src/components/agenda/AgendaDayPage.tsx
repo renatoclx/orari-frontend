@@ -1,3 +1,4 @@
+import { AutoRefresh } from "@/components/layout/AutoRefresh";
 import Link from "next/link";
 import { blockRangesOfDay } from "@/components/agenda-blocks/agenda-block";
 import { AgendaToolbar } from "@/components/agenda/AgendaToolbar";
@@ -118,6 +119,8 @@ export async function AgendaDayPage({ searchParams }: AgendaDayPageProps) {
 
   return (
     <div className="flex min-h-0 flex-1 flex-col gap-4">
+      {/* Mostra o que entrou por outros lugares (ex.: o celular do cliente). */}
+      <AutoRefresh />
       <h1 className="text-2xl font-semibold">Agendamentos</h1>
       {professionals.length === 0 ? (
         <>

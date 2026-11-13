@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { CalendarPlus } from "lucide-react";
 import { AppFormMessage } from "@/components/client-app/AppFormMessage";
 import { JoinPlaceButton } from "@/components/client-app/JoinPlaceButton";
 import { PlaceAvatar } from "@/components/client-app/PlaceAvatar";
@@ -80,16 +79,7 @@ export default async function PlacePage({
             </Link>
           </Button>
         </div>
-      ) : isClient ? (
-        services.length > 0 && (
-          <Button asChild className="h-12 w-full text-base">
-            <Link href={`${here}/agendar`}>
-              <CalendarPlus aria-hidden="true" />
-              Agendar
-            </Link>
-          </Button>
-        )
-      ) : (
+      ) : isClient ? null : (
         <>
           <div className="space-y-2">
             <p className="text-center text-sm text-muted-foreground">
@@ -102,14 +92,12 @@ export default async function PlacePage({
       )}
 
       <section className="space-y-2">
-        <h2 className="font-semibold">Serviços</h2>
+        {/* O cliente agenda tocando no serviço: o título diz isso, no lugar do botão. */}
+        <h2 className={isClient ? "text-lg font-semibold" : "font-semibold"}>
+          {isClient ? "Escolha um serviço para agendar" : "Serviços"}
+        </h2>
         {services.length > 0 ? (
           <>
-            {isClient && (
-              <p className="text-sm text-muted-foreground">
-                Toque em um serviço para agendar.
-              </p>
-            )}
             <PlaceServiceList
               services={services}
               bookingHref={isClient ? `${here}/agendar` : undefined}

@@ -147,7 +147,7 @@ export function BookingFlow({
         <h2 className="font-semibold">1 · Escolha o serviço</h2>
         {/* Linhas de lista: a seta mostra que dá para tocar; o escolhido ganha o
             visto e um fundo suave, sem virar um bloco cheio como um botão. */}
-        <ul className="divide-y divide-border overflow-hidden rounded-card border border-border bg-card">
+        <ul className="space-y-3">
           {services.map((item) => {
             const selected = item.id === serviceId;
             return (
@@ -156,10 +156,10 @@ export function BookingFlow({
                   type="button"
                   aria-pressed={selected}
                   onClick={() => chooseService(item.id)}
-                  className={`flex w-full items-center gap-3 px-4 py-3.5 text-left transition-colors ${
+                  className={`flex w-full items-center gap-3 rounded-card border px-4 py-4 text-left transition-colors ${
                     selected
-                      ? "bg-primary/10 shadow-[inset_3px_0_0_var(--primary)]"
-                      : "hover:bg-muted/50 active:bg-muted"
+                      ? "border-primary bg-primary/10"
+                      : "border-border bg-card hover:bg-muted/50 active:bg-muted"
                   }`}
                 >
                   <span className="min-w-0 flex-1">

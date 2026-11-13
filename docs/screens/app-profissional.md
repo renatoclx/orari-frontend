@@ -4,7 +4,7 @@ Mesmo PWA do cliente (`/app`); muda o que aparece conforme quem entrou. Só cons
 
 ## Entrar
 
-- Pelo formulário de `/app/entrar`, com **telefone** e senha (veja [app-cliente.md](app-cliente.md)). O usuário é do tipo Profissional ([usuarios.md](usuarios.md)).
+- Pelo formulário de `/app/entrar`, com **telefone ou e-mail** e senha (veja [app-cliente.md](app-cliente.md)). O usuário é do tipo Profissional ([usuarios.md](usuarios.md)).
 - Sessão em cookies próprios (`orari_app_pro`, `orari_app_pro_refresh`), nunca os da clínica; o proxy renova o acesso vencido. Uma sessão por vez: entrar como profissional encerra a de cliente, e o contrário também.
 - O sistema web recusa esse usuário, e quem tenta abrir o painel é levado ao app.
 
@@ -15,6 +15,7 @@ Mesmo PWA do cliente (`/app`); muda o que aparece conforme quem entrou. Só cons
 ## Início (`/app`)
 
 - Saudação com o nome, a data, a clínica e o vínculo. Cadastro de profissional inativado: "Seu acesso está suspenso. Fale com a clínica." e nada mais. Os blocos, de cima para baixo (uma chamada só à API, `GET /professional-app/home`):
+  0. **Boas-vindas** (só até dispensar): no primeiro acesso, cartão "Boas-vindas ao Orari!" no topo do Início (o que o app mostra e o convite para os avisos), com **Ativar avisos no celular** (leva a Menu → Avisos no celular) e **Agora não** (esconde o cartão, só para ele), os dois na largura do cartão. Uma notificação de boas-vindas também chega ao sino. Ao ativar o push pela primeira vez, o aparelho recebe "Avisos ativados".
   1. **Hoje**: "N atendimentos" (ou "Dia livre") e quantos faltam; o **próximo** (horário, cliente ou "Turma", serviço) ou, se houver, o que está **em andamento**; botão **Agenda**.
   2. **Esta semana**: gráfico de barras (segunda a domingo) com o número sobre cada barra, o total da semana, legenda ("Já passou" em cor cheia, "Agendado" em tom claro) e o dia de hoje destacado. Cada barra leva à Agenda daquele dia. Feito em CSS, na cor primária, sem biblioteca; leitor de tela recebe a descrição em texto ("seg 9: 1; ter 10: 2…").
   3. **Mês**: Concluídos (com "+N que no mês anterior", só quando o mês anterior teve concluídos), Clientes atendidos, Faltas e Cancelados.
@@ -52,9 +53,18 @@ Mesmo PWA do cliente (`/app`); muda o que aparece conforme quem entrou. Só cons
 - **Fechamentos** (`/app/comissoes/fechamentos`), 10 por página: "Recibo nº 0001", data e método do pagamento e o valor pago; o desfeito vem esmaecido com "Desfeito" (o número não volta). Vazio: "Nenhum fechamento ainda".
 - **Recibo** (`/app/comissoes/fechamentos/<id>`): empresa e CPF/CNPJ, profissional, "Atendimentos até", pago em, comissões, adiantamentos, **valor pago**, os atendimentos (os 10 primeiros e **Ver todos os atendimentos**, que abre os demais; o recibo é um documento, não se divide em páginas) e os adiantamentos. Sem os nomes de quem fechou. O de outro profissional (ou id inválido): "não encontrado".
 
+## Avisos e o sino (`/app/avisos`)
+
+- **Notificação nova com o app aberto:** aparece no toaster do rodapé (título, texto e **Abrir**; até 3, mais "Mais N notificações novas" com **Ver todas**), e agendamento novo atualiza a agenda aberta.
+- **Sino só com o ícone** (sem moldura de botão), à direita, em todas as telas do app (só o profissional): no **Início** fica na linha da saudação ("Olá Camila"); nas demais, numa linha própria no topo. Leva a **Avisos** e mostra a **marca vermelha** do número de não lidas ("99+" a partir de 100; o nome acessível diz quantas). O número já vem certo na primeira tela e é conferido a cada 30 segundos e ao voltar ao app. Leva a **Avisos**.
+- **Avisos:** título, filtro **Todas** / **Não lidas (N)** (`?filtro=nao-lidas`), **Marcar todas como lidas**, **Limpar notificações** (a confirmação aparece ali mesmo, sem diálogo: "Limpar todas as notificações?" com Limpar e Manter; tira tudo da lista e do contador) e a lista de 10 por página (`?pagina=`). Tocar num aviso marca como lida e abre o destino (ex.: a Agenda do dia do horário). Vazio: "Nenhum aviso ainda" ou "Nenhum aviso não lido: você está em dia".
+- **Avisos no celular** é um item do **Menu** (`/app/menu/notificacoes`, "Avisos no celular: Ative neste aparelho e escolha o que chega"), e não fica dentro dos Avisos: a página Avisos é só a caixa. Nele: ativar e desativar o push **neste aparelho** (mesmos estados do app do cliente: instalar no iPhone, navegador sem suporte, bloqueado, desligado e ligado) e **um interruptor por categoria** do que também vira push: **Agendamentos** (o que o cliente e a clínica fazem nos horários dele), **Lembretes** (30 minutos antes de cada atendimento) e **Resumo da manhã** (às 7h30, nos dias com atendimentos). A caixa recebe tudo; só o push tem interruptor. Sem a chave do push no servidor, o card avisa que os avisos no celular não estão disponíveis.
+- **O que chega:** o cliente marca ou cancela um horário **seu** pelo app; a clínica marca, remarca ou cancela (a turma cancelada, uma vez só); o lembrete de 30 min antes (uma vez por sessão, nas turmas) e o resumo da manhã. A clínica liga, desliga e edita o texto do lembrete e do resumo em Mensagens → Automáticas. O texto da caixa tem os nomes; o do push é genérico ("Horário marcado para 16/11 às 08:00"), sem o nome do cliente.
+- **Sair** limpa o aviso do aparelho na API antes de encerrar (se demorar mais de 3 s, sai mesmo assim), para quem entrar depois nele não receber o que é desta conta.
+
 ## Menu (`/app/menu`)
 
-- Nome, telefone formatado e clínica; **Alterar senha** (senha atual, nova e confirmação; continua entrado, com aviso) e **Sair**.
+- Nome, telefone formatado e clínica; **Avisos no celular** (ativar o push neste aparelho e as preferências); **Alterar senha** (senha atual, nova e confirmação; continua entrado, com aviso) e **Sair**.
 
 ## Pendências
 

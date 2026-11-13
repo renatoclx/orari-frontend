@@ -1,8 +1,8 @@
+import { AppNotice } from "@/components/client-app/AppNotice";
 import Link from "next/link";
-import { ChevronRight, LockKeyhole, LogOut } from "lucide-react";
-import { appLogoutAction } from "@/app/app/actions";
-import { AppFormMessage } from "@/components/client-app/AppFormMessage";
+import { BellRing, ChevronRight, LockKeyhole, LogOut } from "lucide-react";
 import { getProfessionalMe } from "@/services/app-pro.service";
+import { ProfessionalLogoutForm } from "./ProfessionalLogoutForm";
 import { formatPhone, getInitials } from "@/utils/format";
 
 // Mesma linha do menu do cliente: ícone, título, explicação e seta.
@@ -42,12 +42,26 @@ export async function ProfessionalMenu({
       </header>
 
       {senhaTrocada && (
-        <AppFormMessage tone="info">
-          Senha trocada. Os outros aparelhos saíram da sua conta.
-        </AppFormMessage>
+        <AppNotice
+          param="senha"
+          message="Senha trocada. Os outros aparelhos saíram da sua conta."
+        />
       )}
 
       <nav aria-label="Opções da conta" className="border-t border-border">
+        <Link href="/app/menu/notificacoes" className={rowClass}>
+          <BellRing className="size-6 shrink-0" aria-hidden="true" />
+          <span className="min-w-0 flex-1 space-y-0.5">
+            <span className="block font-medium">Avisos no celular</span>
+            <span className="block text-sm text-muted-foreground">
+              Ative neste aparelho e escolha o que chega
+            </span>
+          </span>
+          <ChevronRight
+            className="size-5 shrink-0 text-muted-foreground"
+            aria-hidden="true"
+          />
+        </Link>
         <Link href="/app/menu/senha" className={rowClass}>
           <LockKeyhole className="size-6 shrink-0" aria-hidden="true" />
           <span className="min-w-0 flex-1 space-y-0.5">
@@ -61,7 +75,7 @@ export async function ProfessionalMenu({
             aria-hidden="true"
           />
         </Link>
-        <form action={appLogoutAction}>
+        <ProfessionalLogoutForm>
           <button type="submit" className={`${rowClass} cursor-pointer`}>
             <LogOut className="size-6 shrink-0" aria-hidden="true" />
             <span className="min-w-0 flex-1 space-y-0.5">
@@ -71,7 +85,7 @@ export async function ProfessionalMenu({
               </span>
             </span>
           </button>
-        </form>
+        </ProfessionalLogoutForm>
       </nav>
     </>
   );

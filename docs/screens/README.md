@@ -46,6 +46,7 @@ diferente. Em caso de conflito, prevalece o arquivo da tela.
 | [relatorio-pacotes.md](relatorio-pacotes.md)               | Relatório: contratações de pacote                         |
 | [relatorio-perfil-cliente.md](relatorio-perfil-cliente.md) | Relatório: perfil do cliente e aniversariantes            |
 | [app-cliente.md](app-cliente.md)                           | App do cliente (`/app`): entrar, buscar, agendar, Menu    |
+| [notificacoes.md](notificacoes.md)                         | O sino e a página Notificações (caixa do usuário)         |
 | [app-profissional.md](app-profissional.md)                 | App do profissional (`/app`): Início, Agenda, Clientes, Comissões |
 
 ## Convenções

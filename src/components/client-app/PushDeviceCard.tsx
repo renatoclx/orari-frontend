@@ -1,5 +1,6 @@
 "use client";
 
+import { toast } from "sonner";
 import { useState, useTransition } from "react";
 import { BellOff, BellRing, Send, Share } from "lucide-react";
 import { appPushPreferencesAction, appPushTestAction } from "@/app/app/actions";
@@ -47,7 +48,6 @@ export function PushDeviceCard({
     usePushDevice(publicKey);
   const [prefs, setPrefs] = useState(preferences);
   const [prefsError, setPrefsError] = useState<string>();
-  const [testMessage, setTestMessage] = useState<string>();
   const [testing, startTest] = useTransition();
 
   function changePreference(patch: Partial<PushPreferences>) {
@@ -65,12 +65,11 @@ export function PushDeviceCard({
   }
 
   function sendTest() {
-    setTestMessage(undefined);
     startTest(async () => {
       const result = await appPushTestAction();
-      setTestMessage(
-        result.ok ? testResultMessage(result.devices) : result.message,
-      );
+      // O resultado vem no toaster do rodapé, sem empurrar o cartão.
+      if (result.ok) toast.info(testResultMessage(result.devices));
+      else toast.error(result.message);
     });
   }
 
@@ -161,9 +160,6 @@ export function PushDeviceCard({
               Desativar
             </Button>
           </div>
-          {testMessage && (
-            <AppFormMessage tone="info">{testMessage}</AppFormMessage>
-          )}
         </div>
       )}
 

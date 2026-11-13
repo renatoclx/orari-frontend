@@ -25,6 +25,16 @@ ao relatório completo.
   anterior"); a taxa de falta em pontos percentuais. Sem nada no anterior:
   "Nada no … para comparar"; valor igual: "Igual ao …".
 
+## Primeiros passos
+
+Fora do Dashboard: a orientação da clínica nova não é dado do período. Vive num **dialog** ("Primeiros passos", `OnboardingDialog`), só para o **ADMIN**.
+
+- **Como abre:** pela notificação de boas-vindas (leva a `/dashboard?passos=1`) e, enquanto faltar passo e a lista não estiver dispensada, pelo item **Primeiros passos** no rodapé do sino. O `OnboardingDialogHost`, no layout do painel, lê `?passos=1` em qualquer tela, abre o dialog e tira o parâmetro ao fechar.
+- **Conteúdo:** busca os passos ao abrir ("Buscando…", "Tentar de novo"); o progresso ("3 de 6 concluídos" e a barra) e os passos, cada um um link para a tela certa (o link fecha o dialog). Rodapé: **Dispensar** (só para quem clicou) e **Fechar**.
+- **Passos:** Defina o horário de funcionamento e Coloque a logo da clínica (`/configuracoes`), Cadastre um serviço (`/servicos`), um profissional (`/profissionais/novo`) e um cliente (`/clientes/novo`), Faça o primeiro agendamento (`/`) e, **opcional** (fora do progresso), Ligue o portal do cliente (`/portal-do-cliente`). Só entram os que o plano libera. Feito: círculo marcado e título riscado; falta: círculo vazio e seta. Cada passo sai dos dados da clínica: nada a marcar.
+- O item do sino some quando os obrigatórios estão feitos (o opcional não segura) ou com Dispensar.
+- O resumo das pendências do dia (a pagar, atrasadas, a receber, comandas e aniversariantes) **não** fica no Dashboard: chega pela notificação da manhã (Mensagens → Ao administrador).
+
 ## Layout
 
 - Título, descrição (com "mês anterior" ou "período anterior") e o filtro de

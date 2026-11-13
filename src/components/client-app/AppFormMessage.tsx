@@ -7,10 +7,10 @@ import { CircleAlert, Info } from "lucide-react";
 const VISIBLE_MS = 5000;
 const FADE_MS = 300;
 
-// Aviso dentro da tela do app (o app não usa os toasts da clínica: eles ficam
-// fora da área escura). `info` para confirmações, que somem sozinhas como um
-// toast (`persistent` mantém as que explicam uma regra); `error` para recusas,
-// que ficam até o cliente corrigir.
+// Aviso dentro da tela do app. As confirmações simples (agendado, senha trocada…)
+// vão para o toaster do rodapé (AppNotice); este serve às recusas (`error`, que
+// ficam até o cliente corrigir) e às mensagens que explicam uma regra
+// (`info` com `persistent`).
 export function AppFormMessage({
   tone = "error",
   persistent = false,

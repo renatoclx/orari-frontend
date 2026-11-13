@@ -150,6 +150,14 @@ Pontos conhecidos e aceitos por enquanto. Revisar quando o contexto mudar.
 - **Fechamentos paginados no service:** a API corta a página depois de buscar todos os fechamentos dele (poucos por período); a consulta do ADMIN não tem paginação.
 - **Cenários de borda:** verificados no Studio Aurora em 2026-11-12 (profissional sem comissão, fechamento desfeito, empresa sem `commissions`, cadastro inativado e tempo de resposta: 7 a 12 ms de mediana nas seis rotas; 40 requisições simultâneas do Início sem falha; o cálculo do Início com 5.000 linhas leva ~40 ms). Não há teste automático de tela para eles (ver o smoke acima).
 
+## Notificações
+
+- **Sem tempo real:** o número do sino é conferido a cada 15 segundos, ao voltar para a aba e ao ler; um aviso novo (e o toast do painel) pode levar até 15 s para aparecer; a agenda também se atualiza a cada 60 s (SSE ou WebSocket resolveria).
+- **Push só no app do profissional:** o painel da clínica tem o sino e a caixa, mas não recebe push no navegador (falta um service worker próprio do painel).
+- **Sem "Testar" no aviso do profissional:** o app do cliente tem o botão de teste; o do profissional ainda não (falta a rota no backend).
+- **Card de push duplicado:** o `ProfessionalPushCard` repete os estados do `PushDeviceCard` (instalar no iPhone, bloqueado, desligado, ligado). Unificar num componente só quando houver uma terceira tela de push.
+- **Sem teste de tela:** o sino e as páginas foram verificados no navegador (Playwright, fora do repositório); só as regras puras têm spec.
+
 ## Acessibilidade
 
 Auditoria da Etapa 9 (2026-10-22): `axe-core` em todas as rotas e em 11 diálogos e menus, sem achados de contraste, nomes ou marcos. Restos aceitos:

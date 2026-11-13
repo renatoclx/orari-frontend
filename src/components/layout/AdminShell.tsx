@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { Suspense, useState } from "react";
 import { AnamnesisAccessProvider } from "@/components/anamnesis/AnamnesisAccessProvider";
 import { AccessProvider } from "@/components/layout/Access";
 import { ActionBar } from "@/components/layout/ActionBar";
@@ -8,6 +8,7 @@ import { Header } from "@/components/layout/Header";
 import { Sidebar } from "@/components/layout/Sidebar";
 import { WelcomeToast } from "@/components/layout/WelcomeToast";
 import { SIDEBAR_COOKIE } from "@/components/layout/sidebar-cookie";
+import { OnboardingDialogHost } from "@/components/onboarding/OnboardingDialogHost";
 import { anamnesisAccess } from "@/utils/anamnesis-access";
 import { canAccess } from "@/utils/access";
 import type { CurrentUser } from "@/types/auth";
@@ -73,6 +74,12 @@ export function AdminShell({
 
           <ActionBar timeZone={user.company.timezone} />
           <WelcomeToast userName={user.name} />
+          {/* Primeiros passos: só o ADMIN; abre por ?passos=1 (notificação). */}
+          {user.type === "ADMIN" && (
+            <Suspense>
+              <OnboardingDialogHost />
+            </Suspense>
+          )}
         </div>
       </AnamnesisAccessProvider>
     </AccessProvider>

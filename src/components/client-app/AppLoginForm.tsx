@@ -8,8 +8,8 @@ import { AppFormMessage } from "@/components/client-app/AppFormMessage";
 import { Button } from "@/components/ui/button";
 
 /**
- * Entrar no app (screens/app-cliente.md e app-profissional.md): telefone e
- * senha. O mesmo formulário serve ao cliente e ao profissional; quem o telefone
+ * Entrar no app (screens/app-cliente.md e app-profissional.md): telefone ou
+ * e-mail (o e-mail é só do profissional) e senha. O mesmo formulário serve ao cliente e ao profissional; quem o telefone
  * identifica é decidido na hora de entrar.
  */
 export function AppLoginForm({
@@ -24,12 +24,12 @@ export function AppLoginForm({
       {returnTo && <input type="hidden" name="voltar" value={returnTo} />}
       {state?.message && <AppFormMessage>{state.message}</AppFormMessage>}
       <AppField
-        name="phone"
-        label="Telefone"
-        type="tel"
-        autoComplete="tel"
-        defaultValue={state?.values.phone}
-        error={state?.fieldErrors.phone}
+        name="login"
+        label="Telefone ou e-mail"
+        type="login"
+        autoComplete="username"
+        defaultValue={state?.values.login}
+        error={state?.fieldErrors.login}
       />
       <AppField
         name="password"

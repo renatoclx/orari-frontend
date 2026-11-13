@@ -185,13 +185,16 @@ const productsGroup: NavGroup = {
   ],
 };
 
-// Portal do cliente (screens/portal-do-cliente.md): só o ADMIN; o item fica
-// por último, logo antes da Ajuda.
-const clientPortalLink: NavLink = {
-  href: "/portal-do-cliente",
+// Portal do cliente (screens/portal-do-cliente.md): só o ADMIN; o grupo fica
+// por último, logo antes da Ajuda. "Portal" é a tela das regras do app do cliente;
+// "Avisos no celular" (screens/notificacoes.md) não depende de plano.
+const clientPortalGroup: NavGroup = {
   label: "Portal do cliente",
   icon: Smartphone,
-  feature: "client-portal",
+  children: [
+    { href: "/portal-do-cliente", label: "Portal", feature: "client-portal" },
+    { href: "/avisos-no-celular", label: "Avisos no celular" },
+  ],
 };
 
 // Mensagens (screens/mensagens.md): só o ADMIN, com Mensagens no plano; logo
@@ -200,9 +203,15 @@ const messagesGroup: NavGroup = {
   label: "Mensagens",
   icon: MessageSquareText,
   children: [
+    { href: "/mensagens/clientes", label: "Ao cliente", feature: "messages" },
     {
-      href: "/mensagens/automaticas",
-      label: "Automáticas",
+      href: "/mensagens/profissionais",
+      label: "Ao profissional",
+      feature: "messages",
+    },
+    {
+      href: "/mensagens/administradores",
+      label: "Ao administrador",
       feature: "messages",
     },
     { href: "/mensagens/enviar", label: "Enviar", feature: "messages" },
@@ -478,7 +487,7 @@ function SidebarNav({
         : canAccessAnamnesis
           ? [clientRecordsLink]
           : []),
-      ...(isAdmin ? [clientPortalLink, messagesGroup, helpLink] : []),
+      ...(isAdmin ? [clientPortalGroup, messagesGroup, helpLink] : []),
       ...(isSuperAdmin ? superAdminItems : []),
     ],
     access,

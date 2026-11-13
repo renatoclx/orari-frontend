@@ -181,6 +181,43 @@ regras de cada tela, em `docs/screens/`.
 - **2026-11-12 — Gráfico da semana em CSS, sem biblioteca,** de segunda a domingo, uma série na cor primária; o que passou em cor cheia e o agendado em tom claro. _Por quê:_ é uma barra por dia; uma biblioteca pesaria no PWA.
 - **2026-11-12 — A turma é um atendimento por sessão nas contagens (agenda, Início);** faltas e cancelados contam marcações.
 
+## Notificações
+
+- **2026-11-13 — Uma caixa por usuário, com sino e contador (marca vermelha),** no cabeçalho do painel e no topo do app do profissional. _Por quê:_ o push é o toque no ombro; o que fica gravado é o que vale, e o contador diz o que falta ler. Referência: Mercado Livre e redes sociais.
+- **2026-11-13 — A caixa recebe tudo; só o push tem interruptor.** _Por quê:_ nada se perde, e o interruptor controla só a interrupção.
+- **2026-11-13 — O push é genérico, sem o nome do cliente,** e a caixa leva os nomes. _Por quê:_ a tela bloqueada do celular é pública.
+- **2026-11-13 — Contador por consulta a cada 30 segundos, ao voltar para a aba e ao ler** (evento da janela), sem tempo real. A notificação nova aparece também no **toaster do painel** (a conferência devolve a data da mais nova, e o painel compara com a que já viu).
+- **2026-11-13 — Limpar notificações tira da lista e do contador, mas a linha fica** (`clearedAt`): a chave de deduplicação continua valendo e um evento repetido não volta a avisar. A confirmação é no próprio lugar, sem diálogo (vale no sino, no painel e no app). _Por quê:_ simples e confiável; SSE fica para depois.
+- **2026-11-13 — O push só no app do profissional por enquanto;** o painel tem a caixa e o sino, sem service worker. _Por quê:_ o service worker do app já existe (escopo `/app/`); o do painel é um passo à parte.
+- **2026-11-13 — Um único despachante no backend** para toda fonte de aviso (cliente no app, depois resumo do dia, boas-vindas, jobs; o WhatsApp entra como canal). _Por quê:_ quem avisa não precisa saber de canal.
+
+## Avisos ao profissional e menu
+
+- **2026-11-13 — Lembrete (30 min antes, fixo) e resumo da manhã (7h30, fixo) são situações de Mensagens → Automáticas,** com liga/desliga e texto editável pela clínica, valendo para todos os profissionais; cada um ainda tem o interruptor de push dele. _Por quê:_ a clínica já configura as mensagens ali; o profissional controla só o que o interrompe.
+- **2026-11-13 — Uma sessão de turma é um lembrete só,** e a turma cancelada, um aviso só. _Por quê:_ o profissional chega à sessão uma vez; um aviso por aluno seria ruído.
+- **2026-11-13 — O profissional recebe o que a clínica faz nos horários dele** (marcou, remarcou, cancelou); quem faz a ação não é avisado. O texto da caixa leva o cliente; o do push não.
+- **2026-11-13 — Sem entrada nova no menu lateral: "Portal do cliente" vira grupo** (Portal e Avisos no celular). _Por quê:_ regra do usuário: configurações novas entram como submenu. "Avisos no celular" do painel só tem as preferências por categoria; o push no painel (service worker próprio) fica para depois.
+
+## Resumo de pendências e Mensagens por destinatário
+
+- **2026-11-13 — Mensagens → Automáticas foi dividida por quem recebe** (Ao cliente, Ao profissional, Ao administrador), cada uma uma página e um subitem. _Por quê:_ a tela única estava sobrecarregada e ia crescer; o PUT já aceita só as situações enviadas, então a divisão não mudou a API. O endereço antigo redireciona.
+- **2026-11-13 — O resumo de pendências do administrador é uma situação de Mensagens** (liga/desliga, texto, hora de 7h a 10h e itens), com push genérico e a caixa com o detalhe. Dia sem número não manda nada; só entram os itens que o plano libera.
+- **2026-11-13 — "Comandas" no resumo são as comandas do dia** (clientes com atendimento hoje, a regra da tela Comandas), porque o que está em aberto de dias anteriores já entra em "Recebimentos atrasados".
+- **2026-11-13 — "Pendências de hoje" saiu do Dashboard** (ele volta a ser só os números do período): o resumo do dia chega pela notificação da manhã. O bloco e a rota `GET /pending-summary` foram apagados.
+
+## Boas-vindas
+
+- **2026-11-13 — Boas-vindas no primeiro acesso, uma vez por usuário,** gravadas de forma atômica (`welcomedAt`) antes de enviar. Quem já existia não recebe. Sem interruptor de preferência.
+- **2026-11-13 — "Primeiros passos" num dialog, fora do Dashboard** (informação que não é dos números do período). Abre pela notificação de boas-vindas (`?passos=1`) e, enquanto faltar passo, por um item no rodapé do sino. Calculada dos dados da clínica, com Dispensar por usuário; o portal do cliente é opcional. **Os avisos no celular não entram na lista do ADMIN** porque o painel ainda não recebe push.
+- **2026-11-13 — Cartão de boas-vindas no Início do profissional,** com convite para ativar os avisos e "Agora não". Boas-vindas ao cliente do app (mensagem da clínica) **ficam para depois**: ele já vê "Conta criada".
+
+## Atualização da agenda e login do app
+
+- **2026-11-13 — A agenda se atualiza sozinha:** a cada 60 s (aba visível, sem diálogo aberto) e quando chega notificação de agendamento; a conferência do sino passa de 30 para 15 s. Tempo real (SSE) fica como dívida.
+- **2026-11-13 — O app (cliente e profissional) tem toaster no rodapé,** acima da barra de abas, para as confirmações e para a notificação nova com o app aberto. As confirmações deixam de ser blocos na página (que empurravam o conteúdo); erros e avisos de regra continuam na tela. O toaster da clínica não aparece no `/app`.
+- **2026-11-13 — Lista de serviços do app em linhas com seta:** para o cliente do local cada linha abre o Agendar com o serviço escolhido; para quem não é cliente, só informação. O escolhido ganha visto e fundo suave, não um bloco cheio.
+- **2026-11-13 — O profissional entra no app por telefone ou e-mail** (campo único "Telefone ou e-mail", máscara só para número); o e-mail não serve ao cliente. O painel web é recusado pela própria API (403 no `POST /auth/login`).
+
 ## Qualidade e testes
 
 - **2026-10-23 — Testes automáticos só de funções puras e de pontos de borda do servidor,** com Vitest (a mesma ferramenta do backend) e `arquivo.spec.ts` ao lado do código. _Por quê:_ é onde está a regra que quebra sem barulho (fuso, arredondamento, disponibilidade de horários); componentes e telas seguem verificados à mão e com `axe-core`. Ponta a ponta (Playwright) fica fora por ora.

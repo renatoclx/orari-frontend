@@ -6,7 +6,9 @@ import { redirect } from "next/navigation";
 import {
   firstName,
   newPasswordErrors,
+  isEmailLogin,
   phoneError,
+  loginError,
 } from "@/components/client-app/client-app";
 import { FORWARDED_FOR_HEADER, clientIpFrom } from "@/lib/client-ip";
 import { safeReturnPath } from "@/lib/app-routes";
@@ -83,40 +85,54 @@ const hasErrors = (errors: AppFormState["fieldErrors"]) =>
   Object.values(errors).some(Boolean);
 
 /**
- * Entra no app com telefone e senha, o mesmo formulário do cliente e do
- * profissional. O telefone pode ser de um usuário profissional (acesso dado
- * pela clínica) ou de uma conta de cliente: tenta o profissional primeiro e,
- * se a API não o reconhecer, o cliente. A mensagem de erro é a mesma nos dois
- * casos (não revela de quem é o telefone).
+ * Entra no app com telefone ou e-mail e senha, o mesmo formulário do cliente e
+ * do profissional. O profissional (acesso dado pela clínica) entra pelos dois;
+ * o cliente, só pelo telefone: tenta o profissional primeiro e, se a API não o
+ * reconhecer, e o login for um telefone, o cliente. A mensagem de erro é a
+ * mesma em todos os casos (não revela de quem é o telefone ou o e-mail).
  */
 export async function appLoginAction(
   _previous: AppFormState | undefined,
   formData: FormData,
 ): Promise<AppFormState> {
-  const phone = text(formData, "phone");
+  const login = text(formData, "login").trim();
   const password = text(formData, "password");
   const fieldErrors = {
-    phone: phoneError(phone),
+    login: loginError(login),
     password: password ? undefined : "Informe sua senha.",
   };
-  const values = { phone };
+  const values = { login };
   if (hasErrors(fieldErrors)) return { values, fieldErrors };
 
-  const professional = await loginProfessional(onlyDigits(phone), password);
+  const byEmail = isEmailLogin(login);
+  const professional = await loginProfessional(
+    byEmail ? login : onlyDigits(login),
+    password,
+  );
   if (professional === "entered") redirect("/app");
   if (professional !== "unknown") {
     return { values, fieldErrors: {}, message: professional };
   }
+  // E-mail: só o profissional tem; o cliente entra pelo telefone.
+  if (byEmail) {
+    return {
+      values,
+      fieldErrors: {},
+      message: "Telefone, e-mail ou senha incorretos.",
+    };
+  }
 
   try {
     await setAppSession(
-      await loginAccount({ phone: onlyDigits(phone), password }),
+      await loginAccount({ phone: onlyDigits(login), password }),
     );
   } catch (error) {
     if (!(error instanceof ApiError)) throw error;
     // Genérica de propósito: não revela se o telefone tem conta.
     const message =
-      error.status === 401 ? "Telefone ou senha incorretos." : error.message;
+      error.status === 401
+        ? "Telefone, e-mail ou senha incorretos."
+        : error.message;
     return { values, fieldErrors: {}, message };
   }
   // Fora do try: o redirect lança um erro especial do Next. Veio da página de
@@ -205,19 +221,19 @@ export async function appAccessLinkAction(
 }
 
 /**
- * Tenta entrar como profissional (usuário só de app) pelo telefone. Devolve
+ * Tenta entrar como profissional (usuário só de app) pelo telefone ou e-mail. Devolve
  * "entered" (cookies gravados), "unknown" (a API não reconhece o telefone com
  * essa senha: segue para o login de cliente) ou a mensagem de um erro que não
  * é de credencial (ex.: tentativas demais), que vale para os dois casos.
  */
 async function loginProfessional(
-  phone: string,
+  login: string,
   password: string,
 ): Promise<"entered" | "unknown" | string> {
   const clientIp = clientIpFrom((await headers()).get(FORWARDED_FOR_HEADER));
   try {
     await setAppProSession(
-      await authService.loginProfessional(phone, password, clientIp),
+      await authService.loginProfessional(login, password, clientIp),
     );
     return "entered";
   } catch (error) {
@@ -373,7 +389,8 @@ export async function appProChangePasswordAction(
   };
   if (hasErrors(fieldErrors)) return { values: {}, fieldErrors };
 
-  const { phone } = await getProfessionalMe();
+  // O e-mail todo usuário tem (o telefone é opcional): serve para entrar de novo.
+  const { email } = await getProfessionalMe();
   try {
     await changeProfessionalPassword({
       currentPassword,
@@ -393,10 +410,8 @@ export async function appProChangePasswordAction(
 
   try {
     const clientIp = clientIpFrom((await headers()).get(FORWARDED_FOR_HEADER));
-    // Sem o telefone (não deveria acontecer), só pede para entrar de novo.
-    if (!phone) redirect("/app/entrar?expirou=1");
     await setAppProSession(
-      await authService.loginProfessional(phone, newPassword, clientIp),
+      await authService.loginProfessional(email, newPassword, clientIp),
     );
   } catch (error) {
     if (!(error instanceof ApiError)) throw error;

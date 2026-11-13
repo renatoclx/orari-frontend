@@ -8,11 +8,15 @@ import {
   getProfessionalMe,
 } from "@/services/app-pro.service";
 import { canAccess } from "@/utils/access";
+import { getProUnreadInfo } from "@/services/app-pro-notification.service";
+import { getProWelcome } from "@/services/app-pro-welcome.service";
 import { HomeCommission } from "./HomeCommission";
+import { HomeWelcome } from "./HomeWelcome";
 import { HomeMonth } from "./HomeMonth";
 import { HomeToday } from "./HomeToday";
 import { HomeUpcoming } from "./HomeUpcoming";
 import { HomeWeekChart } from "./HomeWeekChart";
+import { ProfessionalBell } from "./ProfessionalBell";
 import { todayIn } from "./professional-agenda";
 
 /**
@@ -23,26 +27,40 @@ import { todayIn } from "./professional-agenda";
 export async function ProfessionalHome() {
   const me = await getProfessionalMe();
   const timeZone = me.company.timezone;
+  // O sino fica na linha da saudação; se a API falhar só nele, abre sem número.
+  const unread = await getProUnreadInfo().then(
+    (info) => info.unread,
+    (error: unknown) => {
+      if (error instanceof ApiError) return 0;
+      throw error;
+    },
+  );
 
   return (
     <>
-      <header>
-        <h1 className="text-2xl font-semibold">
-          Olá <span className="text-primary">{firstName(me.name)}</span>
-        </h1>
-        <p className="text-sm text-muted-foreground">
-          {greetingDate(new Date(), timeZone)}
-        </p>
-        <p className="mt-1 flex items-center gap-2 text-sm text-muted-foreground">
-          <Building2 className="size-4 shrink-0" aria-hidden="true" />
-          {me.company.name}
-          {me.professional && (
-            <>
-              <UserRound className="ml-2 size-4 shrink-0" aria-hidden="true" />
-              {me.professional.name}
-            </>
-          )}
-        </p>
+      <header className="flex items-start justify-between gap-3">
+        <div className="min-w-0">
+          <h1 className="text-2xl font-semibold">
+            Olá <span className="text-primary">{firstName(me.name)}</span>
+          </h1>
+          <p className="text-sm text-muted-foreground">
+            {greetingDate(new Date(), timeZone)}
+          </p>
+          <p className="mt-1 flex items-center gap-2 text-sm text-muted-foreground">
+            <Building2 className="size-4 shrink-0" aria-hidden="true" />
+            {me.company.name}
+            {me.professional && (
+              <>
+                <UserRound
+                  className="ml-2 size-4 shrink-0"
+                  aria-hidden="true"
+                />
+                {me.professional.name}
+              </>
+            )}
+          </p>
+        </div>
+        <ProfessionalBell initial={unread} />
       </header>
 
       {me.professional ? (
@@ -68,7 +86,7 @@ async function HomeContent({
   timeZone: string;
   showCommission: boolean;
 }) {
-  const [home, commission] = await Promise.all([
+  const [home, commission, welcome] = await Promise.all([
     getProfessionalHome(),
     // A comissão é um extra do Início: se falhar só nela, a tela abre sem o cartão.
     showCommission
@@ -77,10 +95,16 @@ async function HomeContent({
           throw error;
         })
       : null,
+    // As boas-vindas são um extra: se a API falhar só nelas, o Início abre sem o cartão.
+    getProWelcome().catch((error: unknown) => {
+      if (error instanceof ApiError) return { dismissed: true };
+      throw error;
+    }),
   ]);
 
   return (
     <>
+      {!welcome.dismissed && <HomeWelcome />}
       <HomeToday today={home.today} timeZone={timeZone} />
       <HomeWeekChart week={home.week} today={todayIn(timeZone)} />
       <HomeMonth month={home.month} />

@@ -1,5 +1,6 @@
 "use client";
 
+import { toast } from "sonner";
 import { useState, useSyncExternalStore } from "react";
 import Link from "next/link";
 import { BellRing, X } from "lucide-react";
@@ -44,13 +45,8 @@ export function PushInvite({ publicKey }: { publicKey: string }) {
     }
   }
 
-  if (enabled) {
-    return (
-      <AppFormMessage tone="info">
-        Avisos ativados. Você vai receber os lembretes dos seus horários.
-      </AppFormMessage>
-    );
-  }
+  // Ativado: o convite some e o toaster do rodapé confirma.
+  if (enabled) return null;
   if (stored || closed) return null;
   if (situation !== "off" && situation !== "install-ios") return null;
 
@@ -91,7 +87,15 @@ export function PushInvite({ publicKey }: { publicKey: string }) {
         <Button
           type="button"
           disabled={busy}
-          onClick={() => void enable().then((ok) => ok && setEnabled(true))}
+          onClick={() =>
+            void enable().then((ok) => {
+              if (!ok) return;
+              toast.info(
+                "Avisos ativados. Você vai receber os lembretes dos seus horários.",
+              );
+              setEnabled(true);
+            })
+          }
           className="h-11 w-full"
         >
           {busy ? "Ativando…" : "Ativar avisos"}

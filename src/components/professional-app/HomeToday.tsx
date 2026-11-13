@@ -18,7 +18,7 @@ export function HomeToday({
   const { total, remaining, next } = today;
   return (
     <section className="space-y-3 rounded-card border border-border bg-card p-4">
-      <div className="flex items-start justify-between gap-3">
+      <div>
         <div>
           <h2 className="text-sm text-muted-foreground">Hoje</h2>
           <p className="text-2xl font-semibold">
@@ -34,13 +34,6 @@ export function HomeToday({
             </p>
           )}
         </div>
-        <Link
-          href="/app/agenda"
-          className="flex h-10 shrink-0 items-center gap-2 rounded-control border border-border px-3 text-sm font-medium"
-        >
-          <CalendarDays className="size-4" aria-hidden="true" />
-          Agenda
-        </Link>
       </div>
 
       {next && (
@@ -72,6 +65,15 @@ export function HomeToday({
           <p className="text-muted-foreground">{next.serviceName}</p>
         </div>
       )}
+
+      {/* O botão ocupa a largura do card (regra dos botões do app). */}
+      <Link
+        href="/app/agenda"
+        className="flex h-12 w-full items-center justify-center gap-2 rounded-control border border-border text-base font-medium"
+      >
+        <CalendarDays className="size-5" aria-hidden="true" />
+        Abrir a agenda
+      </Link>
     </section>
   );
 }

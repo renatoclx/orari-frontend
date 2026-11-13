@@ -24,7 +24,7 @@ type AutoMessagesFormProps = {
   notice: React.ReactNode;
 };
 
-/** As seis situações da tela Mensagens → Automáticas (screens/mensagens.md). */
+/** As situações de uma página de Mensagens (screens/mensagens.md). */
 export function AutoMessagesForm({
   messages,
   editable,

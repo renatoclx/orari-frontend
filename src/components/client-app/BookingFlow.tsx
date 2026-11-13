@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect, useState, useTransition } from "react";
-import { CalendarCheck, Clock } from "lucide-react";
+import { useEffect, useRef, useState, useTransition } from "react";
+import { CalendarCheck, Check, ChevronRight } from "lucide-react";
 import { appAvailabilityAction, appBookAction } from "@/app/app/actions";
 import { AppFormMessage } from "@/components/client-app/AppFormMessage";
 import { BOTTOM_NAV_OFFSET } from "@/components/client-app/AppBottomNav";
@@ -22,6 +22,8 @@ import { formatDuration, formatPrice } from "@/utils/format";
 type BookingFlowProps = {
   slug: string;
   services: PlaceService[];
+  /** Serviço já escolhido (vindo da lista da página do local). */
+  initialServiceId?: string;
   /** Hoje, no relógio da clínica (aaaa-mm-dd). */
   today: string;
   /** Até quantos dias à frente a clínica deixa agendar. */
@@ -46,11 +48,18 @@ const choiceClass = (selected: boolean) =>
 export function BookingFlow({
   slug,
   services,
+  initialServiceId,
   today,
   maxDaysAhead,
 }: BookingFlowProps) {
-  const [serviceId, setServiceId] = useState<string>();
-  const [professionalId, setProfessionalId] = useState<string>();
+  const initial = services.find((item) => item.id === initialServiceId);
+  const [serviceId, setServiceId] = useState<string | undefined>(initial?.id);
+  // Um profissional só: já vem escolhido.
+  const [professionalId, setProfessionalId] = useState<string | undefined>(
+    initial?.professionals.length === 1
+      ? initial.professionals[0].id
+      : undefined,
+  );
   const [date, setDate] = useState(today);
   const [slots, setSlots] = useState<Slot[]>();
   const [slot, setSlot] = useState<Slot>();
@@ -74,6 +83,26 @@ export function BookingFlow({
     setSlot(undefined);
     setMessage(undefined);
   }
+
+  // Escolheu: leva à vista o próximo passo (as etapas aparecem abaixo da dobra).
+  // Não roda na abertura, mesmo com o serviço vindo da URL.
+  const opened = useRef(false);
+  useEffect(() => {
+    if (!opened.current) {
+      opened.current = true;
+      return;
+    }
+    const target = !serviceId
+      ? null
+      : professionalId
+        ? "booking-day"
+        : "booking-professional";
+    if (!target) return;
+    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)");
+    document
+      .getElementById(target)
+      ?.scrollIntoView({ behavior: reduce.matches ? "auto" : "smooth" });
+  }, [serviceId, professionalId]);
 
   // Busca os horários quando serviço, profissional e dia estão escolhidos.
   useEffect(() => {
@@ -115,37 +144,56 @@ export function BookingFlow({
       {message && <AppFormMessage>{message}</AppFormMessage>}
 
       <section className="space-y-2">
-        <h2 className="font-semibold">Serviço</h2>
-        <ul className="space-y-2">
-          {services.map((item) => (
-            <li key={item.id}>
-              <button
-                type="button"
-                aria-pressed={item.id === serviceId}
-                onClick={() => chooseService(item.id)}
-                className={`${choiceClass(item.id === serviceId)} w-full p-3`}
-              >
-                <span className="block font-medium">{item.name}</span>
-                <span
-                  className={`flex items-center gap-1.5 text-sm tabular-nums ${
-                    item.id === serviceId
-                      ? "text-primary-foreground/85"
-                      : "text-muted-foreground"
+        <h2 className="font-semibold">1 · Escolha o serviço</h2>
+        {/* Linhas de lista: a seta mostra que dá para tocar; o escolhido ganha o
+            visto e um fundo suave, sem virar um bloco cheio como um botão. */}
+        <ul className="divide-y divide-border overflow-hidden rounded-card border border-border bg-card">
+          {services.map((item) => {
+            const selected = item.id === serviceId;
+            return (
+              <li key={item.id}>
+                <button
+                  type="button"
+                  aria-pressed={selected}
+                  onClick={() => chooseService(item.id)}
+                  className={`flex w-full items-center gap-3 px-4 py-3.5 text-left transition-colors ${
+                    selected
+                      ? "bg-primary/10 shadow-[inset_3px_0_0_var(--primary)]"
+                      : "hover:bg-muted/50 active:bg-muted"
                   }`}
                 >
-                  <Clock className="size-4" aria-hidden="true" />
-                  {formatDuration(item.duration)}
-                  {item.price !== null && ` · ${formatPrice(item.price)}`}
-                </span>
-              </button>
-            </li>
-          ))}
+                  <span className="min-w-0 flex-1">
+                    <span className="block font-medium">{item.name}</span>
+                    <span className="block text-sm text-muted-foreground tabular-nums">
+                      {formatDuration(item.duration)}
+                    </span>
+                  </span>
+                  {item.price !== null && (
+                    <span className="shrink-0 font-semibold tabular-nums">
+                      {formatPrice(item.price)}
+                    </span>
+                  )}
+                  {selected ? (
+                    <span className="flex size-6 shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground">
+                      <Check className="size-4" aria-hidden="true" />
+                      <span className="sr-only">Escolhido</span>
+                    </span>
+                  ) : (
+                    <ChevronRight
+                      className="size-5 shrink-0 text-primary"
+                      aria-hidden="true"
+                    />
+                  )}
+                </button>
+              </li>
+            );
+          })}
         </ul>
       </section>
 
       {service && (
-        <section className="space-y-2">
-          <h2 className="font-semibold">Profissional</h2>
+        <section id="booking-professional" className="scroll-mt-4 space-y-2">
+          <h2 className="font-semibold">2 · Profissional</h2>
           <div className="flex flex-wrap gap-2">
             {service.professionals.map((person) => (
               <button
@@ -166,8 +214,8 @@ export function BookingFlow({
       )}
 
       {service && professionalId && (
-        <section className="space-y-2">
-          <h2 className="font-semibold">Dia</h2>
+        <section id="booking-day" className="scroll-mt-4 space-y-2">
+          <h2 className="font-semibold">3 · Dia</h2>
           {/* Faixa que rola de lado, como no AppBarber. */}
           <div className="-mx-5 flex gap-2 overflow-x-auto px-5 pb-1">
             {days.map((day) => {
@@ -199,7 +247,7 @@ export function BookingFlow({
       {service && professionalId && (
         <section className="space-y-3" aria-live="polite">
           <h2 className="font-semibold">
-            Horário{" "}
+            4 · Horário{" "}
             <span className="font-normal text-muted-foreground">
               · {longDate(date)}
             </span>

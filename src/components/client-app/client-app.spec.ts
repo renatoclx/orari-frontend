@@ -8,6 +8,8 @@ import {
   firstName,
   greetingDate,
   newPasswordErrors,
+  isEmailLogin,
+  loginError,
   phoneError,
   placeInitials,
 } from "@/components/client-app/client-app";
@@ -104,5 +106,23 @@ describe("dias para agendar", () => {
       month: "nov",
     });
     expect(longDate("2026-11-12")).toBe("quinta, 12 de novembro");
+  });
+});
+
+describe("loginError", () => {
+  it("aceita telefone com DDD ou e-mail", () => {
+    expect(loginError("(31) 99000-1111")).toBeUndefined();
+    expect(loginError("pro@clinica.com")).toBeUndefined();
+  });
+
+  it("recusa vazio, e-mail inválido e telefone incompleto", () => {
+    expect(loginError("")).toBe("Informe o telefone ou o e-mail.");
+    expect(loginError("pro@clinica")).toBe("Informe um e-mail válido.");
+    expect(loginError("3199")).toContain("10 ou 11 dígitos");
+  });
+
+  it("com @ é e-mail", () => {
+    expect(isEmailLogin("a@b.com")).toBe(true);
+    expect(isEmailLogin("31990001111")).toBe(false);
   });
 });

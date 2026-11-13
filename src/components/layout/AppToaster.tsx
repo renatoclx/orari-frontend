@@ -1,6 +1,7 @@
 "use client";
 
 import { useSyncExternalStore } from "react";
+import { usePathname } from "next/navigation";
 import { Toaster } from "@/components/ui/sonner";
 
 // Mesmo ponto de corte do `md` do Tailwind.
@@ -16,11 +17,16 @@ function subscribe(onChange: () => void) {
 // Toasts da aplicação: canto superior direito no computador e rodapé
 // centralizado no celular, com cor e ícone próprios por tipo (richColors).
 export function AppToaster() {
+  const pathname = usePathname();
   const isMobile = useSyncExternalStore(
     subscribe,
     () => window.matchMedia(MOBILE_QUERY).matches,
     () => false,
   );
+
+  // O app do cliente e do profissional tem o toaster dele, na área escura e no
+  // rodapé (client-app/AppToaster): dois mostrariam o mesmo aviso duas vezes.
+  if (pathname === "/app" || pathname.startsWith("/app/")) return null;
 
   return (
     <Toaster

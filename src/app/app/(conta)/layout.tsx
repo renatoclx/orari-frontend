@@ -1,4 +1,6 @@
 import { AppBottomNav } from "@/components/client-app/AppBottomNav";
+import { AppNewNoticeToasts } from "@/components/client-app/AppNewNoticeToasts";
+import { AppToaster } from "@/components/client-app/AppToaster";
 import { getAccount } from "@/services/app-account.service";
 import { ProfessionalBellBar } from "@/components/professional-app/ProfessionalBell";
 import { ApiError } from "@/services/api";
@@ -42,6 +44,9 @@ export default async function AccountAppLayout({
         )}
         {children}
       </main>
+      {/* Avisos de confirmação e de notificação nova, no rodapé, acima das abas. */}
+      <AppToaster withNav />
+      <AppNewNoticeToasts kind={kind} />
       <AppBottomNav
         hasUnread={unreadMessages > 0}
         kind={kind}

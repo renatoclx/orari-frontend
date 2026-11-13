@@ -4,7 +4,7 @@ Mesmo PWA do cliente (`/app`); muda o que aparece conforme quem entrou. Só cons
 
 ## Entrar
 
-- Pelo formulário de `/app/entrar`, com **telefone** e senha (veja [app-cliente.md](app-cliente.md)). O usuário é do tipo Profissional ([usuarios.md](usuarios.md)).
+- Pelo formulário de `/app/entrar`, com **telefone ou e-mail** e senha (veja [app-cliente.md](app-cliente.md)). O usuário é do tipo Profissional ([usuarios.md](usuarios.md)).
 - Sessão em cookies próprios (`orari_app_pro`, `orari_app_pro_refresh`), nunca os da clínica; o proxy renova o acesso vencido. Uma sessão por vez: entrar como profissional encerra a de cliente, e o contrário também.
 - O sistema web recusa esse usuário, e quem tenta abrir o painel é levado ao app.
 
@@ -55,6 +55,7 @@ Mesmo PWA do cliente (`/app`); muda o que aparece conforme quem entrou. Só cons
 
 ## Avisos e o sino (`/app/avisos`)
 
+- **Notificação nova com o app aberto:** aparece no toaster do rodapé (título, texto e **Abrir**; até 3, mais "Mais N notificações novas" com **Ver todas**), e agendamento novo atualiza a agenda aberta.
 - **Sino só com o ícone** (sem moldura de botão), à direita, em todas as telas do app (só o profissional): no **Início** fica na linha da saudação ("Olá Camila"); nas demais, numa linha própria no topo. Leva a **Avisos** e mostra a **marca vermelha** do número de não lidas ("99+" a partir de 100; o nome acessível diz quantas). O número já vem certo na primeira tela e é conferido a cada 30 segundos e ao voltar ao app. Leva a **Avisos**.
 - **Avisos:** título, filtro **Todas** / **Não lidas (N)** (`?filtro=nao-lidas`), **Marcar todas como lidas**, **Limpar notificações** (a confirmação aparece ali mesmo, sem diálogo: "Limpar todas as notificações?" com Limpar e Manter; tira tudo da lista e do contador) e a lista de 10 por página (`?pagina=`). Tocar num aviso marca como lida e abre o destino (ex.: a Agenda do dia do horário). Vazio: "Nenhum aviso ainda" ou "Nenhum aviso não lido: você está em dia".
 - **Avisos no celular** é um item do **Menu** (`/app/menu/notificacoes`, "Avisos no celular: Ative neste aparelho e escolha o que chega"), e não fica dentro dos Avisos: a página Avisos é só a caixa. Nele: ativar e desativar o push **neste aparelho** (mesmos estados do app do cliente: instalar no iPhone, navegador sem suporte, bloqueado, desligado e ligado) e **um interruptor por categoria** do que também vira push: **Agendamentos** (o que o cliente e a clínica fazem nos horários dele), **Lembretes** (30 minutos antes de cada atendimento) e **Resumo da manhã** (às 7h30, nos dias com atendimentos). A caixa recebe tudo; só o push tem interruptor. Sem a chave do push no servidor, o card avisa que os avisos no celular não estão disponíveis.

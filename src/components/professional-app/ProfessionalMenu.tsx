@@ -1,6 +1,6 @@
+import { AppNotice } from "@/components/client-app/AppNotice";
 import Link from "next/link";
 import { BellRing, ChevronRight, LockKeyhole, LogOut } from "lucide-react";
-import { AppFormMessage } from "@/components/client-app/AppFormMessage";
 import { getProfessionalMe } from "@/services/app-pro.service";
 import { ProfessionalLogoutForm } from "./ProfessionalLogoutForm";
 import { formatPhone, getInitials } from "@/utils/format";
@@ -42,9 +42,10 @@ export async function ProfessionalMenu({
       </header>
 
       {senhaTrocada && (
-        <AppFormMessage tone="info">
-          Senha trocada. Os outros aparelhos saíram da sua conta.
-        </AppFormMessage>
+        <AppNotice
+          param="senha"
+          message="Senha trocada. Os outros aparelhos saíram da sua conta."
+        />
       )}
 
       <nav aria-label="Opções da conta" className="border-t border-border">

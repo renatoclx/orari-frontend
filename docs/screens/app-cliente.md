@@ -8,8 +8,8 @@ App que o **cliente** usa para agendar nos seus estabelecimentos (rota `/app`). 
 
 ### Entrar (`/app/entrar`)
 
-- **Telefone** (com máscara) e **Senha**; botão **Entrar**.
-- Erro: "Telefone ou senha incorretos." (a mesma mensagem com ou sem conta).
+- **Telefone ou e-mail** e **Senha**; botão **Entrar**. A máscara de telefone vale enquanto só houver números; com letra ou `@` o campo vira texto livre. O **e-mail é só do profissional**; o cliente entra pelo telefone.
+- Erro: "Telefone, e-mail ou senha incorretos." (a mesma mensagem com ou sem conta).
 - `?voltar=<caminho do app>` (vindo da página de um estabelecimento): depois de entrar, volta para ela; o link Criar conta leva o mesmo `voltar`. Só caminhos de `/app/` são aceitos.
 - Link **Criar conta** e a dica: "Esqueceu a senha? Peça ao estabelecimento um novo link de acesso: com ele, você cria uma senha nova."
 - Avisos: "Sua sessão terminou. Entre de novo." (`?expirou=1`) e "Você saiu do app." (`?saiu=1`).
@@ -37,7 +37,7 @@ O link que a clínica gera (lista de Clientes, ícone de QR code; `pessoas.md`).
 
 Barra de navegação embaixo, do app inteiro: **Início**, **Buscar** (marcada também na página de um estabelecimento), **Agendamentos** e **Menu** (marcada também nas telas abertas por ele). Com aviso não lido, um ponto ciano na aba Menu (some na tela Avisos).
 
-Mensagens de confirmação (faixa ciano) somem sozinhas em 5 segundos; as de erro ficam até o cliente corrigir. Exceção: "Pronto, você agora é cliente de…", que explica o limite de agendamentos e fica na tela.
+**Toaster do app, no rodapé** (logo acima da barra de abas; o toaster da clínica não aparece no `/app`): as confirmações (Agendamento confirmado, Conta criada, Senha trocada, Dados salvos, Você saiu do app, Sua sessão terminou, Avisos ativados, resultado do Testar) e a **notificação nova com o app aberto**, com **Abrir**. Cliente: a caixa de Avisos; profissional: o destino da notificação (e agendamento novo atualiza a agenda aberta). O app confere a cada 15 s. Os erros ficam na tela, até o cliente corrigir, e "Pronto, você agora é cliente de…", que explica o limite de agendamentos, também.
 
 ### Início (`/app`)
 
@@ -58,7 +58,7 @@ Mensagens de confirmação (faixa ciano) somem sozinhas em 5 segundos; as de err
 ### Página do estabelecimento (`/app/local/<subdomínio>`)
 
 - É o **Endereço no app** que a clínica divulga: abre **com ou sem** a conta.
-- Topo: logo (ou iniciais), nome e "segmento · cidade". Embaixo, os **Serviços** que aparecem no app (com profissional ligado): nome, duração, preço e descrição.
+- Topo: logo (ou iniciais), nome e "segmento · cidade". Embaixo, os **Serviços** que aparecem no app (com profissional ligado): nome, duração, preço e descrição, numa lista de linhas. **Para o cliente do local**, cada linha é um link para o Agendar com o serviço já escolhido (`?servico=`), com **seta** à direita e a dica "Toque em um serviço para agendar."; **para quem ainda não é cliente** (ou sem conta), as linhas são só informação, sem seta e sem toque.
 - **Sem a conta:** "Entre ou crie sua conta para agendar aqui." e os botões **Entrar** e **Criar conta** (voltam para esta página).
 - **Com a conta, sem ser cliente:** "Você ainda não é cliente daqui. Ao entrar, o estabelecimento recebe o seu nome e telefone." e **Entrar neste estabelecimento**: cria um cadastro novo na clínica, **não confirmado** (até 2 agendamentos futuros até a clínica confirmar; `pessoas.md`). Depois: "Pronto, você agora é cliente de …".
 - **Já cliente:** o botão **Agendar** (se há serviços no app) e a vitrine.
@@ -123,11 +123,11 @@ Mensagens de confirmação (faixa ciano) somem sozinhas em 5 segundos; as de err
 - Só para quem já é cliente do estabelecimento: sem a conta, vai a Entrar e volta; sem ser cliente, volta à página do estabelecimento.
 - Topo: "‹ <estabelecimento>" (volta à página dele) e o título **Agendar**.
 - Uma página só, que se completa conforme as escolhas (mudar uma apaga as que dependem dela):
-  1. **Serviço**: cartões com nome, duração e preço.
+  1. **Escolha o serviço**: linhas de uma lista num quadro só (nome, duração, preço e uma **seta** à direita, que mostra que dá para tocar). O escolhido ganha o visto e um fundo suave com uma faixa à esquerda, sem virar um bloco cheio. Vindo da página do local (`?servico=<id>`), já vem escolhido; um id que não existe é ignorado. Ao escolher, a tela rola até o passo seguinte. Os passos têm número (1 · serviço, 2 · profissional, 3 · dia, 4 · horário).
   2. **Profissional**: quem atende o serviço; com um só, já vem escolhido.
   3. **Dia**: faixa que rola de lado (dia da semana, número e mês), de hoje até os **dias à frente** da clínica (no máximo 60). Começa em hoje.
   4. **Horário · <dia por extenso>**: os horários livres do dia, calculados no servidor com as regras da clínica (antecedência, janelas, compromissos e turmas), agrupados em **Manhã**, **Tarde** e **Noite** (com a quantidade), 3 por linha, com contorno azul; o escolhido fica preenchido. Sem horário: "Nenhum horário livre neste dia. Escolha outro dia."
-- Escolha de serviço, profissional, dia e horário: contorno e, escolhido, preenchido em azul (`aria-pressed`).
+- Profissional, dia e horário: botões de escolha com contorno e, escolhido, preenchido em azul (`aria-pressed`); o serviço usa a lista acima.
 - **Confirmar <dia>, <dd/mm> às <hh:mm>**: preso embaixo, logo acima da barra de navegação. Agendado: Início com o aviso.
 - Recusas da API aparecem no topo: horário que deixou de estar livre (e os horários são buscados de novo) e o limite do cliente não confirmado ("Até o estabelecimento confirmar o seu cadastro, você pode ter no máximo 2 agendamentos futuros.").
 - Só avulsos: recorrências, pacotes e turmas continuam sendo marcados pela clínica.

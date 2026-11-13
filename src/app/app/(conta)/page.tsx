@@ -1,5 +1,5 @@
+import { AppNotice } from "@/components/client-app/AppNotice";
 import type { Metadata } from "next";
-import { AppFormMessage } from "@/components/client-app/AppFormMessage";
 import { AppTips } from "@/components/client-app/AppTips";
 import { FeaturedAppointmentCard } from "@/components/client-app/FeaturedAppointmentCard";
 import { PushInvite } from "@/components/client-app/PushInvite";
@@ -69,15 +69,17 @@ export default async function AppHomePage({ searchParams }: PageProps<"/app">) {
       <SearchShortcut />
 
       {agendado && (
-        <AppFormMessage tone="info">
-          Agendamento confirmado. Ele aparece abaixo, em Próximo agendamento.
-        </AppFormMessage>
+        <AppNotice
+          param="agendado"
+          message="Agendamento confirmado. Ele aparece em Próximo agendamento."
+        />
       )}
 
       {bemVindo && (
-        <AppFormMessage tone="info">
-          Conta criada. Boas-vindas ao Orari!
-        </AppFormMessage>
+        <AppNotice
+          param="bemVindo"
+          message="Conta criada. Boas-vindas ao Orari!"
+        />
       )}
 
       {featured && <FeaturedAppointmentCard featured={featured} />}

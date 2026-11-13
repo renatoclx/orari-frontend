@@ -1,10 +1,11 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { CalendarPlus, Clock } from "lucide-react";
+import { CalendarPlus } from "lucide-react";
 import { AppFormMessage } from "@/components/client-app/AppFormMessage";
 import { JoinPlaceButton } from "@/components/client-app/JoinPlaceButton";
 import { PlaceAvatar } from "@/components/client-app/PlaceAvatar";
+import { PlaceServiceList } from "@/components/client-app/PlaceServiceList";
 import { Button } from "@/components/ui/button";
 import { ApiError } from "@/services/api";
 import { getAccount } from "@/services/app-account.service";
@@ -12,7 +13,6 @@ import { getPlace, listPlaceServices } from "@/services/app-place.service";
 import { getAppToken } from "@/services/app-session";
 import type { PlaceShowcase } from "@/types/client-app";
 import { segmentLabel } from "@/utils/business-segment";
-import { formatDuration, formatPrice } from "@/utils/format";
 
 export const metadata: Metadata = { title: "Estabelecimento" };
 
@@ -104,26 +104,17 @@ export default async function PlacePage({
       <section className="space-y-2">
         <h2 className="font-semibold">Serviços</h2>
         {services.length > 0 ? (
-          <ul className="space-y-2">
-            {services.map((service) => (
-              <li
-                key={service.id}
-                className="rounded-card border border-border bg-card p-3"
-              >
-                <p className="font-medium">{service.name}</p>
-                <p className="flex items-center gap-1.5 text-sm text-muted-foreground tabular-nums">
-                  <Clock className="size-4" aria-hidden="true" />
-                  {formatDuration(service.duration)}
-                  {service.price !== null && ` · ${formatPrice(service.price)}`}
-                </p>
-                {service.description && (
-                  <p className="mt-1 text-sm text-muted-foreground">
-                    {service.description}
-                  </p>
-                )}
-              </li>
-            ))}
-          </ul>
+          <>
+            {isClient && (
+              <p className="text-sm text-muted-foreground">
+                Toque em um serviço para agendar.
+              </p>
+            )}
+            <PlaceServiceList
+              services={services}
+              bookingHref={isClient ? `${here}/agendar` : undefined}
+            />
+          </>
         ) : (
           <p className="rounded-card border border-border bg-card p-4 text-sm text-muted-foreground">
             Este estabelecimento ainda não tem serviços para agendar pelo app.

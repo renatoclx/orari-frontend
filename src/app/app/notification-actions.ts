@@ -1,18 +1,24 @@
 "use server";
 
 import { ApiError } from "@/services/api";
+import { listMessages } from "@/services/app-push.service";
 import { dismissProWelcome } from "@/services/app-pro-welcome.service";
 import {
   clearProNotifications,
   deleteProPushSubscription,
   getProUnreadInfo,
+  listProNotifications,
   markAllProNotificationsRead,
   markProNotificationRead,
   saveProNotificationPreferences,
   saveProPushSubscription,
 } from "@/services/app-pro-notification.service";
-import type { PushSubscriptionJson } from "@/types/client-app";
-import type { NotificationPreference, UnreadInfo } from "@/types/notification";
+import type { AppMessage, PushSubscriptionJson } from "@/types/client-app";
+import type {
+  AppNotification,
+  NotificationPreference,
+  UnreadInfo,
+} from "@/types/notification";
 
 // Server Actions das notificações do profissional no app.
 
@@ -122,5 +128,39 @@ export async function appProDismissWelcomeAction(): Promise<void> {
     await dismissProWelcome();
   } catch (error) {
     if (!(error instanceof ApiError)) throw error;
+  }
+}
+
+/** As últimas notificações do profissional, para o aviso na tela. */
+export async function appProRecentAction(): Promise<AppNotification[] | null> {
+  try {
+    return (await listProNotifications(1)).items;
+  } catch (error) {
+    if (error instanceof ApiError && error.status !== 401) return null;
+    throw error;
+  }
+}
+
+/**
+ * O número de avisos do cliente e quando chegou o mais novo, no mesmo formato
+ * do sino do profissional (a API do cliente não tem uma rota só para isso).
+ */
+export async function appUnreadMessagesAction(): Promise<UnreadInfo | null> {
+  try {
+    const page = await listMessages(1);
+    return { unread: page.unread, latestAt: page.items[0]?.createdAt ?? null };
+  } catch (error) {
+    if (error instanceof ApiError && error.status !== 401) return null;
+    throw error;
+  }
+}
+
+/** Os últimos avisos do cliente, para o aviso na tela. */
+export async function appRecentMessagesAction(): Promise<AppMessage[] | null> {
+  try {
+    return (await listMessages(10)).items;
+  } catch (error) {
+    if (error instanceof ApiError && error.status !== 401) return null;
+    throw error;
   }
 }

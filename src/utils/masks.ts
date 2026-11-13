@@ -5,6 +5,14 @@ export function onlyDigits(value: string): string {
   return value.replace(/\D/g, "");
 }
 
+/**
+ * Campo que aceita telefone ou e-mail: enquanto só houver números e símbolos de
+ * telefone, aplica a máscara; com letra ou "@", deixa o texto como está.
+ */
+export function maskPhoneOrEmail(value: string): string {
+  return /^[\d\s()+\-.]*$/.test(value) ? maskPhone(value) : value;
+}
+
 /** "11987654321" → "(11) 98765-4321"; "1133224455" → "(11) 3322-4455" */
 export function maskPhone(value: string): string {
   const digits = onlyDigits(value).slice(0, 11);

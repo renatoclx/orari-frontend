@@ -51,19 +51,9 @@ export async function login(
   const clientIp = clientIpFrom((await headers()).get(FORWARDED_FOR_HEADER));
 
   try {
+    // O profissional (só app) não entra pelo sistema web: a própria API recusa
+    // (403, com a mensagem que aparece abaixo) e nenhum token é emitido.
     const tokens = await authService.login(email, password, clientIp);
-    // O profissional (só app) não entra pelo sistema web: o tipo é conferido
-    // antes de gravar a sessão, e o refresh token desta tentativa é revogado.
-    const user = await authService.fetchUserByToken(tokens.accessToken);
-    if (user.type === "PROFESSIONAL") {
-      await authService.logout(tokens.refreshToken).catch(() => undefined);
-      return {
-        email,
-        fieldErrors,
-        message:
-          "Profissionais entram pelo aplicativo do Orari, não pelo sistema web.",
-      };
-    }
     await setSession(tokens);
   } catch (error) {
     if (!(error instanceof ApiError)) throw error;

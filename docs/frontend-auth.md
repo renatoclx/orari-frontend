@@ -155,7 +155,7 @@ O app do cliente (`screens/app-cliente.md`) tem uma sessão **separada** da clí
 
 ## App do profissional (`/app`): o mesmo app, outra sessão
 
-O profissional (usuário do tipo `PROFESSIONAL`, só app; `screens/app-profissional.md`) entra pelo **mesmo formulário** do cliente, com o **telefone**. A Server Action tenta primeiro o telefone como profissional (`POST /auth/professional/login`) e depois como cliente, com a mesma mensagem de erro; se a pessoa for as duas coisas com a mesma senha, entra como profissional.
+O profissional (usuário do tipo `PROFESSIONAL`, só app; `screens/app-profissional.md`) entra pelo **mesmo formulário** do cliente, com o **telefone ou o e-mail** (campo `login`; com `@` é e-mail). A Server Action tenta primeiro como profissional (`POST /auth/professional/login`) e, sendo telefone, depois como cliente (e-mail não tem conta de cliente), com a mesma mensagem de erro; se a pessoa for as duas coisas com a mesma senha, entra como profissional.
 
 | | Clínica | App do cliente | App do profissional |
 |---|---|---|---|
@@ -172,3 +172,5 @@ O profissional (usuário do tipo `PROFESSIONAL`, só app; `screens/app-profissio
 ## Limitações conhecidas
 
 Ver `frontend-technical-debt.md`.
+
+**Painel web:** o profissional não entra. O `POST /auth/login` da API recusa o tipo `PROFESSIONAL` com 403 (depois de conferir a senha) e não emite token; a tela mostra a mensagem "Profissionais entram pelo aplicativo do Orari, não pelo sistema web.". O layout do painel ainda leva ao `/app` uma sessão de profissional que escape.

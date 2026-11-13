@@ -26,12 +26,12 @@ export function login(
 }
 
 /**
- * Entrada do profissional no app, pelo telefone (como o cliente). Só o usuário
- * só de app entra por aqui; a API recusa (401) qualquer outro caso, com a mesma
- * resposta.
+ * Entrada do profissional no app, pelo telefone ou pelo e-mail (`login`). Só o
+ * usuário só de app entra por aqui; a API recusa (401) qualquer outro caso, com
+ * a mesma resposta.
  */
 export function loginProfessional(
-  phone: string,
+  login: string,
   password: string,
   clientIp?: string,
 ): Promise<AuthTokens> {
@@ -39,18 +39,7 @@ export function loginProfessional(
     authenticated: false,
     method: "POST",
     headers: forwardedForHeader(clientIp),
-    body: JSON.stringify({ phone, password }),
-  });
-}
-
-/**
- * Usuário de um access token em mãos, antes de gravar a sessão (o login confere
- * o tipo: o profissional entra só pelo app). Não usa os cookies.
- */
-export function fetchUserByToken(accessToken: string): Promise<CurrentUser> {
-  return apiFetch<CurrentUser>("/auth/me", {
-    authenticated: false,
-    headers: { Authorization: `Bearer ${accessToken}` },
+    body: JSON.stringify({ login, password }),
   });
 }
 

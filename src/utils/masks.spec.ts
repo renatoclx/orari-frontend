@@ -6,6 +6,7 @@ import {
   maskMinutes,
   maskPhone,
   onlyDigits,
+  maskPhoneOrEmail,
 } from "@/utils/masks";
 
 describe("onlyDigits", () => {
@@ -100,5 +101,16 @@ describe("maskMinutes", () => {
     expect(maskMinutes("12345")).toBe("1234");
     expect(maskMinutes("abc")).toBe("");
     expect(maskMinutes("60")).toBe("60");
+  });
+});
+
+describe("maskPhoneOrEmail", () => {
+  it("máscara de telefone enquanto só há números", () => {
+    expect(maskPhoneOrEmail("11988880001")).toBe("(11) 98888-0001");
+  });
+
+  it("deixa o texto como está quando vira e-mail", () => {
+    expect(maskPhoneOrEmail("pro@clinica.com")).toBe("pro@clinica.com");
+    expect(maskPhoneOrEmail("p")).toBe("p");
   });
 });

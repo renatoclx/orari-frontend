@@ -4,13 +4,22 @@ import { useState } from "react";
 import { cn } from "cn";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { maskCep, maskCpf, maskPhone } from "@/utils/masks";
+import { maskCep, maskCpf, maskPhone, maskPhoneOrEmail } from "@/utils/masks";
 
 type AppFieldProps = {
   name: string;
   label: string;
   error?: string;
-  type?: "text" | "password" | "tel" | "email" | "date" | "cpf" | "cep";
+  type?:
+    | "text"
+    | "password"
+    | "tel"
+    | "email"
+    | "date"
+    | "cpf"
+    | "cep"
+    /** Telefone ou e-mail (a máscara some quando vira e-mail). */
+    | "login";
   autoComplete?: string;
   defaultValue?: string;
   /** Valor controlado de fora (ex.: rua preenchida pelo CEP). */
@@ -23,6 +32,7 @@ type AppFieldProps = {
 // Máscara de cada tipo enquanto se digita.
 const MASKS: Partial<Record<string, (value: string) => string>> = {
   tel: maskPhone,
+  login: maskPhoneOrEmail,
   cpf: maskCpf,
   cep: maskCep,
 };
@@ -56,7 +66,13 @@ export function AppField({
         id={id}
         name={name}
         type={mask ? "text" : type}
-        inputMode={type === "tel" ? "tel" : mask ? "numeric" : undefined}
+        inputMode={
+          type === "tel"
+            ? "tel"
+            : mask && type !== "login"
+              ? "numeric"
+              : undefined
+        }
         autoComplete={autoComplete}
         value={value}
         onChange={(event) => setValue(event.target.value)}

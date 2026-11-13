@@ -1,6 +1,6 @@
 # Notificações
 
-O sino do cabeçalho e a página `/notificacoes`: a caixa de notificações do usuário do painel (ADMIN). O profissional tem a dele no app (ver [app-profissional.md](app-profissional.md), "Avisos"). Regras e rotas: `docs/business-rules/mensagens.md` do backend, "Notificações".
+O sino do cabeçalho e a página `/notificacoes`: a caixa de notificações do usuário do painel (ADMIN). O profissional tem a dele no app (ver [app-profissional.md](app-profissional.md): a caixa em Avisos e as configurações do push em Menu → Avisos no celular). Regras e rotas: `docs/business-rules/mensagens.md` do backend, "Notificações".
 
 ## O sino (cabeçalho)
 

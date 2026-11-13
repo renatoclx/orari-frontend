@@ -6,12 +6,8 @@ import {
 } from "@/app/app/notification-actions";
 import { MarkAllReadButton } from "@/components/notifications/MarkAllReadButton";
 import { NotificationList } from "@/components/notifications/NotificationList";
-import {
-  getProNotificationPreferences,
-  listProNotifications,
-} from "@/services/app-pro-notification.service";
+import { listProNotifications } from "@/services/app-pro-notification.service";
 import { AppPagination } from "./AppPagination";
-import { ProfessionalPushCard } from "./ProfessionalPushCard";
 import { pageCount } from "./professional-clients";
 
 const TABS = [
@@ -21,8 +17,8 @@ const TABS = [
 
 /**
  * Avisos do profissional no app (screens/app-profissional.md): a caixa dele,
- * 10 por página, com o filtro de não lidas, e o card do aparelho com o que
- * vira push. Filtro e página vão na URL.
+ * 10 por página, com o filtro de não lidas. Filtro e página vão na URL. As
+ * configurações do aviso no celular ficam no Menu (Avisos no celular).
  */
 export async function ProfessionalNotifications({
   onlyUnread,
@@ -31,10 +27,7 @@ export async function ProfessionalNotifications({
   onlyUnread: boolean;
   page: number;
 }) {
-  const [result, prefs] = await Promise.all([
-    listProNotifications(page, onlyUnread),
-    getProNotificationPreferences(),
-  ]);
+  const result = await listProNotifications(page, onlyUnread);
   const href = (target: number) => {
     const params = new URLSearchParams();
     if (onlyUnread) params.set("filtro", "nao-lidas");
@@ -104,11 +97,6 @@ export async function ProfessionalNotifications({
           </p>
         </div>
       )}
-
-      <ProfessionalPushCard
-        publicKey={prefs.publicKey}
-        preferences={prefs.preferences}
-      />
     </>
   );
 }

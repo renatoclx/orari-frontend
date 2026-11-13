@@ -57,6 +57,7 @@ const PROFESSIONAL_PATHS = new Set([
   "/app/avisos",
   "/app/menu",
   "/app/menu/senha",
+  "/app/menu/notificacoes",
   "/app/sessao-encerrada",
   "/app/manifest.webmanifest",
 ]);

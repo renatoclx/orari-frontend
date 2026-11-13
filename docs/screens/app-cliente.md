@@ -58,10 +58,10 @@ Barra de navegação embaixo, do app inteiro: **Início**, **Buscar** (marcada t
 ### Página do estabelecimento (`/app/local/<subdomínio>`)
 
 - É o **Endereço no app** que a clínica divulga: abre **com ou sem** a conta.
-- Topo: logo (ou iniciais), nome e "segmento · cidade". Embaixo, os **Serviços** que aparecem no app (com profissional ligado): nome, duração, preço e descrição, numa lista de linhas. **Para o cliente do local**, cada linha é um link para o Agendar com o serviço já escolhido (`?servico=`), com **seta** à direita e a dica "Toque em um serviço para agendar."; **para quem ainda não é cliente** (ou sem conta), as linhas são só informação, sem seta e sem toque.
+- Topo: logo (ou iniciais), nome e "segmento · cidade". Embaixo, os **Serviços** que aparecem no app (com profissional ligado): nome, duração, preço e descrição, em **cartões separados** (um por serviço, com espaço entre eles). **Para o cliente do local**, cada linha é um link para o Agendar com o serviço já escolhido (`?servico=`), com **seta** à direita e a dica "Toque em um serviço para agendar."; **para quem ainda não é cliente** (ou sem conta), as linhas são só informação, sem seta e sem toque.
 - **Sem a conta:** "Entre ou crie sua conta para agendar aqui." e os botões **Entrar** e **Criar conta** (voltam para esta página).
 - **Com a conta, sem ser cliente:** "Você ainda não é cliente daqui. Ao entrar, o estabelecimento recebe o seu nome e telefone." e **Entrar neste estabelecimento**: cria um cadastro novo na clínica, **não confirmado** (até 2 agendamentos futuros até a clínica confirmar; `pessoas.md`). Depois: "Pronto, você agora é cliente de …".
-- **Já cliente:** o botão **Agendar** (se há serviços no app) e a vitrine.
+- **Já cliente:** sem botão Agendar; o título da lista passa a ser **"Escolha um serviço para agendar"**, e tocar no serviço abre o Agendar com ele escolhido.
 - Erro ao montar uma tela (ex.: a API fora do ar): "Não foi possível abrir esta tela", escura, com **Tentar de novo**.
 - Estabelecimento inexistente, com o portal desligado ou fora do plano: a página "Não encontramos esta página", escura e com o botão **Buscar estabelecimentos** (vale para qualquer endereço do app que não existe).
 
@@ -123,7 +123,7 @@ Barra de navegação embaixo, do app inteiro: **Início**, **Buscar** (marcada t
 - Só para quem já é cliente do estabelecimento: sem a conta, vai a Entrar e volta; sem ser cliente, volta à página do estabelecimento.
 - Topo: "‹ <estabelecimento>" (volta à página dele) e o título **Agendar**.
 - Uma página só, que se completa conforme as escolhas (mudar uma apaga as que dependem dela):
-  1. **Escolha o serviço**: linhas de uma lista num quadro só (nome, duração, preço e uma **seta** à direita, que mostra que dá para tocar). O escolhido ganha o visto e um fundo suave com uma faixa à esquerda, sem virar um bloco cheio. Vindo da página do local (`?servico=<id>`), já vem escolhido; um id que não existe é ignorado. Ao escolher, a tela rola até o passo seguinte. Os passos têm número (1 · serviço, 2 · profissional, 3 · dia, 4 · horário).
+  1. **Escolha o serviço**: cartões separados, um por serviço (nome, duração, preço e uma **seta** à direita, que mostra que dá para tocar). O escolhido ganha o visto e um fundo suave com uma faixa à esquerda, sem virar um bloco cheio. Vindo da página do local (`?servico=<id>`), o serviço já vem escolhido e a lista **nem aparece**: a tela abre com o serviço num cartão ("1 · Serviço", com **Trocar**) e já nos passos seguintes; um id que não existe é ignorado e a lista aparece. Escolher na lista também a fecha no cartão, e **Trocar** a abre de novo. Os passos têm número (1 · serviço, 2 · profissional, 3 · dia, 4 · horário).
   2. **Profissional**: quem atende o serviço; com um só, já vem escolhido.
   3. **Dia**: faixa que rola de lado (dia da semana, número e mês), de hoje até os **dias à frente** da clínica (no máximo 60). Começa em hoje.
   4. **Horário · <dia por extenso>**: os horários livres do dia, calculados no servidor com as regras da clínica (antecedência, janelas, compromissos e turmas), agrupados em **Manhã**, **Tarde** e **Noite** (com a quantidade), 3 por linha, com contorno azul; o escolhido fica preenchido. Sem horário: "Nenhum horário livre neste dia. Escolha outro dia."

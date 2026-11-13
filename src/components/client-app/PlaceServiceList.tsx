@@ -19,7 +19,7 @@ export function PlaceServiceList({
   bookingHref?: string;
 }) {
   return (
-    <ul className="divide-y divide-border overflow-hidden rounded-card border border-border bg-card">
+    <ul className="space-y-3">
       {services.map((service) => {
         const content = (
           <>
@@ -47,9 +47,12 @@ export function PlaceServiceList({
             )}
           </>
         );
-        const rowClass = "flex items-center gap-3 px-4 py-3.5";
+        const rowClass = "flex items-center gap-3 px-4 py-4";
         return (
-          <li key={service.id}>
+          <li
+            key={service.id}
+            className="overflow-hidden rounded-card border border-border bg-card"
+          >
             {bookingHref ? (
               <Link
                 href={`${bookingHref}?servico=${encodeURIComponent(service.id)}`}

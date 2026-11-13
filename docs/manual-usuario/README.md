@@ -51,3 +51,12 @@ O sumário é numerado pelo `build.mjs` em duas passadas. Textos: `manual.html`.
      real: pelo CDP o menu abre no canto da tela.
    - PDFs: `node build.mjs manual-relatorios`, `manual-comissoes` e
      `manual-contas-a-pagar`; copie-os para `public/manuais/`.
+
+10. Avisos, sino e Primeiros passos (imagens `n01`, `n02`, `m01`, `m04`, `m05`, `a06`,
+    `a07`, `a14` e `pro-13` a `pro-15`, nos manuais do administrador, de Mensagens, do
+    app do cliente e do app do profissional): `node scripts/cap-13-avisos.mjs`, com
+    `DATABASE_URL` do banco local e a conta de um cliente de teste em
+    `CLIENT_PHONE` e `CLIENT_PASSWORD`. Usa o Playwright (Studio Aurora e Clínica
+    Nova Teste). **Insere avisos de exemplo** (e esconde os existentes durante a
+    captura) e **apaga/restaura tudo** ao terminar; não grava agendamento nem mensagem.
+    A tela de entrar do app (`a01` e `pro-01`) é uma captura simples de `/app/entrar`.

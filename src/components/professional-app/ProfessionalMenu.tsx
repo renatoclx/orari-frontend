@@ -1,8 +1,8 @@
 import Link from "next/link";
 import { ChevronRight, LockKeyhole, LogOut } from "lucide-react";
-import { appLogoutAction } from "@/app/app/actions";
 import { AppFormMessage } from "@/components/client-app/AppFormMessage";
 import { getProfessionalMe } from "@/services/app-pro.service";
+import { ProfessionalLogoutForm } from "./ProfessionalLogoutForm";
 import { formatPhone, getInitials } from "@/utils/format";
 
 // Mesma linha do menu do cliente: ícone, título, explicação e seta.
@@ -61,7 +61,7 @@ export async function ProfessionalMenu({
             aria-hidden="true"
           />
         </Link>
-        <form action={appLogoutAction}>
+        <ProfessionalLogoutForm>
           <button type="submit" className={`${rowClass} cursor-pointer`}>
             <LogOut className="size-6 shrink-0" aria-hidden="true" />
             <span className="min-w-0 flex-1 space-y-0.5">
@@ -71,7 +71,7 @@ export async function ProfessionalMenu({
               </span>
             </span>
           </button>
-        </form>
+        </ProfessionalLogoutForm>
       </nav>
     </>
   );

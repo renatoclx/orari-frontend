@@ -26,6 +26,7 @@ export const ROUTES = [
   "/anamnese/modelos/novo",
   "/anamnese/auditoria",
   "/configuracoes",
+  "/notificacoes",
   "/ajuda",
 ];
 

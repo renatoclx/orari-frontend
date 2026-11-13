@@ -54,6 +54,7 @@ const PROFESSIONAL_PATHS = new Set([
   "/app/agenda",
   "/app/clientes",
   "/app/comissoes",
+  "/app/avisos",
   "/app/menu",
   "/app/menu/senha",
   "/app/sessao-encerrada",

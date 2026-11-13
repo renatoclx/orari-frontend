@@ -140,6 +140,7 @@ src/
     client-portal/           tela Portal do cliente (formulário e regras)
     portal-access/           Acesso ao portal (QR + WhatsApp) e Confirmar cliente
     client-app/              telas e regras puras do app do cliente
+    notifications/           o sino, a lista e a página de notificações (painel e app)
     professional-app/        telas e regras puras do app do profissional (Início,
                              agenda, clientes, comissões); o app é o mesmo /app
     client-portfolio/, receivables/, appointment-report/, rankings/,

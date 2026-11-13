@@ -181,6 +181,15 @@ regras de cada tela, em `docs/screens/`.
 - **2026-11-12 — Gráfico da semana em CSS, sem biblioteca,** de segunda a domingo, uma série na cor primária; o que passou em cor cheia e o agendado em tom claro. _Por quê:_ é uma barra por dia; uma biblioteca pesaria no PWA.
 - **2026-11-12 — A turma é um atendimento por sessão nas contagens (agenda, Início);** faltas e cancelados contam marcações.
 
+## Notificações
+
+- **2026-11-13 — Uma caixa por usuário, com sino e contador (marca vermelha),** no cabeçalho do painel e no topo do app do profissional. _Por quê:_ o push é o toque no ombro; o que fica gravado é o que vale, e o contador diz o que falta ler. Referência: Mercado Livre e redes sociais.
+- **2026-11-13 — A caixa recebe tudo; só o push tem interruptor.** _Por quê:_ nada se perde, e o interruptor controla só a interrupção.
+- **2026-11-13 — O push é genérico, sem o nome do cliente,** e a caixa leva os nomes. _Por quê:_ a tela bloqueada do celular é pública.
+- **2026-11-13 — Contador por consulta a cada minuto, ao voltar para a aba e ao ler** (evento da janela), sem tempo real. _Por quê:_ simples e confiável; SSE fica para depois.
+- **2026-11-13 — O push só no app do profissional por enquanto;** o painel tem a caixa e o sino, sem service worker. _Por quê:_ o service worker do app já existe (escopo `/app/`); o do painel é um passo à parte.
+- **2026-11-13 — Um único despachante no backend** para toda fonte de aviso (cliente no app, depois resumo do dia, boas-vindas, jobs; o WhatsApp entra como canal). _Por quê:_ quem avisa não precisa saber de canal.
+
 ## Qualidade e testes
 
 - **2026-10-23 — Testes automáticos só de funções puras e de pontos de borda do servidor,** com Vitest (a mesma ferramenta do backend) e `arquivo.spec.ts` ao lado do código. _Por quê:_ é onde está a regra que quebra sem barulho (fuso, arredondamento, disponibilidade de horários); componentes e telas seguem verificados à mão e com `axe-core`. Ponta a ponta (Playwright) fica fora por ora.

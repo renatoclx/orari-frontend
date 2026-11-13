@@ -71,6 +71,7 @@ describe("proRouteAllowed", () => {
       "/app/agenda",
       "/app/clientes",
       "/app/comissoes",
+      "/app/avisos",
       "/app/comissoes/fechamentos",
       "/app/comissoes/fechamentos/0a1b2c3d-0000-4000-8000-000000000001",
       "/app/clientes/0a1b2c3d-0000-4000-8000-000000000001",

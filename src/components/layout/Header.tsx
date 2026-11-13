@@ -4,6 +4,7 @@ import { Can } from "@/components/layout/Access";
 import { CalendarShortcut } from "@/components/layout/CalendarShortcut";
 import { Hint } from "@/components/shared/Hint";
 import { Logo } from "@/components/layout/Logo";
+import { NotificationBell } from "@/components/notifications/NotificationBell";
 import { CompanyLogo } from "@/components/layout/CompanyLogo";
 import { UserMenu } from "@/components/layout/UserMenu";
 import type { CurrentUser } from "@/types/auth";
@@ -50,6 +51,8 @@ export function Header({ user, onOpenMobile }: HeaderProps) {
             />
           </Can>
         </div>
+        {/* O sino: as notificações do usuário (screens/notificacoes.md). */}
+        <NotificationBell />
         {/* key: logo nova recomeça do zero (a anterior pode ter falhado). */}
         <CompanyLogo
           key={user.company.logoUrl}

@@ -119,7 +119,7 @@ Fonte das regras: `docs/screen-patterns.md` e `docs/screens/pessoas.md`. Modelo:
 
 ## Notificações (o sino)
 
-- O sino vai no cabeçalho do painel (antes da logo e do usuário) e no topo, à direita, das telas do app do profissional. O **número de não lidas** fica numa marca redonda **vermelha** (token `destructive`, texto `text-background` para o contraste nos dois temas), sem número em zero e **"99+"** a partir de 100. O nome acessível diz a quantidade ("Notificações: 3 não lidas"): o número não é só cor.
+- O sino vai no cabeçalho do painel (antes da logo e do usuário) e no app do profissional, **só o ícone, sem moldura de botão**: na linha da saudação no Início e no topo, à direita, nas demais telas. O **número de não lidas** fica numa marca redonda **vermelha** (token `destructive`, texto `text-background` para o contraste nos dois temas), sem número em zero e **"99+"** a partir de 100. O nome acessível diz a quantidade ("Notificações: 3 não lidas"): o número não é só cor.
 - No painel o sino abre um `Popover` com as últimas 10 (item: ícone, título em negrito se não lida, texto, "há 5 min" e uma bolinha `primary` nas não lidas), **Marcar todas como lidas** no topo e **Ver todas** no rodapé. No app, o sino é um link para a página **Avisos** (as janelas de diálogo não se misturam com o tema escuro do app). Tocar numa notificação marca como lida e leva ao destino.
 - O número é conferido a cada minuto, ao voltar para a aba e ao ler/marcar (`announceNotificationsChanged`); aba escondida não consulta.
 - O texto do push é genérico (sem o nome do cliente); a caixa leva os nomes.

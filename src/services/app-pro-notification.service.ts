@@ -1,5 +1,6 @@
 import "server-only";
 
+import { cache } from "react";
 import { proFetch } from "@/services/app-pro-api";
 import type { PushSubscriptionJson } from "@/types/client-app";
 import type {
@@ -20,13 +21,16 @@ export function listProNotifications(
   return proFetch<NotificationsPage>(`/notifications?${params}`);
 }
 
-/** Quantas não lidas: o número do sino. */
-export async function getProUnreadCount(): Promise<number> {
+/**
+ * Quantas não lidas: o número do sino. O `cache` evita repetir a chamada quando
+ * o layout e o Início pedem o número na mesma requisição.
+ */
+export const getProUnreadCount = cache(async (): Promise<number> => {
   const { unread } = await proFetch<{ unread: number }>(
     "/notifications/unread-count",
   );
   return unread;
-}
+});
 
 export function markProNotificationRead(id: string): Promise<void> {
   return proFetch<void>(`/notifications/${encodeURIComponent(id)}/read`, {

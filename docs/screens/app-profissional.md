@@ -54,7 +54,7 @@ Mesmo PWA do cliente (`/app`); muda o que aparece conforme quem entrou. Só cons
 
 ## Avisos e o sino (`/app/avisos`)
 
-- **Sino no topo, à direita**, em todas as telas do app (só o profissional): botão com a **marca vermelha** do número de não lidas ("99+" a partir de 100; o nome acessível diz quantas). O número já vem certo na primeira tela e é conferido a cada minuto e ao voltar ao app. Leva a **Avisos**.
+- **Sino só com o ícone** (sem moldura de botão), à direita, em todas as telas do app (só o profissional): no **Início** fica na linha da saudação ("Olá Camila"); nas demais, numa linha própria no topo. Leva a **Avisos** e mostra a **marca vermelha** do número de não lidas ("99+" a partir de 100; o nome acessível diz quantas). O número já vem certo na primeira tela e é conferido a cada minuto e ao voltar ao app. Leva a **Avisos**.
 - **Avisos:** título, filtro **Todas** / **Não lidas (N)** (`?filtro=nao-lidas`), **Marcar todas como lidas** e a lista de 10 por página (`?pagina=`). Tocar num aviso marca como lida e abre o destino (ex.: a Agenda do dia do horário). Vazio: "Nenhum aviso ainda" ou "Nenhum aviso não lido: você está em dia".
 - **Avisos neste aparelho** (card no fim): ativar e desativar o push **neste aparelho** (mesmos estados do app do cliente: instalar no iPhone, navegador sem suporte, bloqueado, desligado e ligado) e **um interruptor por categoria** do que também vira push (hoje: Agendamentos). A caixa recebe tudo; só o push tem interruptor. Sem a chave do push no servidor, o card avisa que os avisos no celular não estão disponíveis.
 - **O que chega hoje:** o cliente marca ou cancela um horário **seu** pelo app. O texto da caixa tem os nomes; o do push é genérico ("Horário marcado para 16/11 às 08:00"), sem o nome do cliente.

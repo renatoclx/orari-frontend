@@ -1,6 +1,6 @@
 import { AppBottomNav } from "@/components/client-app/AppBottomNav";
 import { getAccount } from "@/services/app-account.service";
-import { ProfessionalBell } from "@/components/professional-app/ProfessionalBell";
+import { ProfessionalBellBar } from "@/components/professional-app/ProfessionalBell";
 import { ApiError } from "@/services/api";
 import { getProfessionalMe } from "@/services/app-pro.service";
 import { getProUnreadCount } from "@/services/app-pro-notification.service";
@@ -35,9 +35,7 @@ export default async function AccountAppLayout({
       {/* Margem lateral de 20 px: no celular, o conteúdo não encosta na borda. */}
       <main className="flex flex-1 flex-col gap-6 px-5 pt-8 pb-6">
         {kind === "professional" && (
-          <div className="-mb-2 flex justify-end">
-            <ProfessionalBell initial={unreadNotices} />
-          </div>
+          <ProfessionalBellBar initial={unreadNotices} />
         )}
         {children}
       </main>

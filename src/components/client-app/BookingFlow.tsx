@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState, useTransition } from "react";
-import { CalendarCheck, Check, ChevronRight } from "lucide-react";
+import { CalendarCheck, Check, ChevronRight, Pencil } from "lucide-react";
 import { appAvailabilityAction, appBookAction } from "@/app/app/actions";
 import { AppFormMessage } from "@/components/client-app/AppFormMessage";
 import { BOTTOM_NAV_OFFSET } from "@/components/client-app/AppBottomNav";
@@ -55,6 +55,9 @@ export function BookingFlow({
   const initial = services.find((item) => item.id === initialServiceId);
   const [serviceId, setServiceId] = useState<string | undefined>(initial?.id);
   // Um profissional só: já vem escolhido.
+  // Com o serviço escolhido (ex.: vindo da página do local), a lista fecha e o
+  // passo seguinte já fica à vista; "Trocar" abre a lista de novo.
+  const [changingService, setChangingService] = useState(false);
   const [professionalId, setProfessionalId] = useState<string | undefined>(
     initial?.professionals.length === 1
       ? initial.professionals[0].id
@@ -74,6 +77,7 @@ export function BookingFlow({
   function chooseService(id: string) {
     const chosen = services.find((item) => item.id === id);
     setServiceId(id);
+    setChangingService(false);
     // Um profissional só: já vem escolhido.
     setProfessionalId(
       chosen?.professionals.length === 1
@@ -143,53 +147,76 @@ export function BookingFlow({
     <div className="flex flex-1 flex-col gap-6">
       {message && <AppFormMessage>{message}</AppFormMessage>}
 
-      <section className="space-y-2">
-        <h2 className="font-semibold">1 · Escolha o serviço</h2>
-        {/* Linhas de lista: a seta mostra que dá para tocar; o escolhido ganha o
-            visto e um fundo suave, sem virar um bloco cheio como um botão. */}
-        <ul className="space-y-3">
-          {services.map((item) => {
-            const selected = item.id === serviceId;
-            return (
-              <li key={item.id}>
-                <button
-                  type="button"
-                  aria-pressed={selected}
-                  onClick={() => chooseService(item.id)}
-                  className={`flex w-full items-center gap-3 rounded-card border px-4 py-4 text-left transition-colors ${
-                    selected
-                      ? "border-primary bg-primary/10"
-                      : "border-border bg-card hover:bg-muted/50 active:bg-muted"
-                  }`}
-                >
-                  <span className="min-w-0 flex-1">
-                    <span className="block font-medium">{item.name}</span>
-                    <span className="block text-sm text-muted-foreground tabular-nums">
-                      {formatDuration(item.duration)}
+      {service && !changingService ? (
+        <section className="space-y-2">
+          <h2 className="font-semibold">1 · Serviço</h2>
+          {/* O serviço escolhido fica num cartão só; tocar nele abre a lista. */}
+          <button
+            type="button"
+            onClick={() => setChangingService(true)}
+            className="flex w-full items-center gap-3 rounded-card border border-primary bg-primary/10 px-4 py-4 text-left"
+          >
+            <span className="min-w-0 flex-1">
+              <span className="block font-medium">{service.name}</span>
+              <span className="block text-sm text-muted-foreground tabular-nums">
+                {formatDuration(service.duration)}
+                {service.price !== null && ` · ${formatPrice(service.price)}`}
+              </span>
+            </span>
+            <span className="flex shrink-0 items-center gap-1.5 text-sm font-medium text-primary">
+              <Pencil className="size-4" aria-hidden="true" />
+              Trocar
+            </span>
+          </button>
+        </section>
+      ) : (
+        <section className="space-y-2">
+          <h2 className="font-semibold">1 · Escolha o serviço</h2>
+          {/* Cartões separados: a seta mostra que dá para tocar. */}
+          <ul className="space-y-3">
+            {services.map((item) => {
+              const selected = item.id === serviceId;
+              return (
+                <li key={item.id}>
+                  <button
+                    type="button"
+                    aria-pressed={selected}
+                    onClick={() => chooseService(item.id)}
+                    className={`flex w-full items-center gap-3 rounded-card border px-4 py-4 text-left transition-colors ${
+                      selected
+                        ? "border-primary bg-primary/10"
+                        : "border-border bg-card hover:bg-muted/50 active:bg-muted"
+                    }`}
+                  >
+                    <span className="min-w-0 flex-1">
+                      <span className="block font-medium">{item.name}</span>
+                      <span className="block text-sm text-muted-foreground tabular-nums">
+                        {formatDuration(item.duration)}
+                      </span>
                     </span>
-                  </span>
-                  {item.price !== null && (
-                    <span className="shrink-0 font-semibold tabular-nums">
-                      {formatPrice(item.price)}
-                    </span>
-                  )}
-                  {selected ? (
-                    <span className="flex size-6 shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground">
-                      <Check className="size-4" aria-hidden="true" />
-                      <span className="sr-only">Escolhido</span>
-                    </span>
-                  ) : (
-                    <ChevronRight
-                      className="size-5 shrink-0 text-primary"
-                      aria-hidden="true"
-                    />
-                  )}
-                </button>
-              </li>
-            );
-          })}
-        </ul>
-      </section>
+                    {item.price !== null && (
+                      <span className="shrink-0 font-semibold tabular-nums">
+                        {formatPrice(item.price)}
+                      </span>
+                    )}
+                    {selected ? (
+                      <span className="flex size-6 shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground">
+                        <Check className="size-4" aria-hidden="true" />
+                        <span className="sr-only">Escolhido</span>
+                      </span>
+                    ) : (
+                      <ChevronRight
+                        className="size-5 shrink-0 text-primary"
+                        aria-hidden="true"
+                      />
+                    )}
+                  </button>
+                </li>
+              );
+            })}
+          </ul>
+        </section>
+      )}
 
       {service && (
         <section id="booking-professional" className="scroll-mt-4 space-y-2">

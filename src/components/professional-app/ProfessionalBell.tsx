@@ -25,15 +25,19 @@ export function ProfessionalBell({ initial }: { initial: number }) {
       aria-label={bellLabel(count)}
       className="relative flex size-10 items-center justify-center text-muted-foreground hover:text-foreground"
     >
-      <Bell className="size-6" aria-hidden="true" />
-      {text && (
-        <span
-          aria-hidden="true"
-          className="absolute top-1 right-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-destructive px-1 text-[10px] leading-none font-bold text-background"
-        >
-          {text}
-        </span>
-      )}
+      {/* A marca é posicionada pelo ícone (não pelo botão): fica à direita dele,
+          com só uma pontinha sobre o sino, sem cobri-lo. */}
+      <span className="relative">
+        <Bell className="size-6" aria-hidden="true" />
+        {text && (
+          <span
+            aria-hidden="true"
+            className="absolute -top-1.5 -right-3 flex h-4 min-w-4 items-center justify-center rounded-full bg-destructive px-1 text-[10px] leading-none font-bold text-background"
+          >
+            {text}
+          </span>
+        )}
+      </span>
     </Link>
   );
 }

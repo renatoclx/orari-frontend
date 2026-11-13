@@ -203,7 +203,7 @@ regras de cada tela, em `docs/screens/`.
 - **2026-11-13 — Mensagens → Automáticas foi dividida por quem recebe** (Ao cliente, Ao profissional, Ao administrador), cada uma uma página e um subitem. _Por quê:_ a tela única estava sobrecarregada e ia crescer; o PUT já aceita só as situações enviadas, então a divisão não mudou a API. O endereço antigo redireciona.
 - **2026-11-13 — O resumo de pendências do administrador é uma situação de Mensagens** (liga/desliga, texto, hora de 7h a 10h e itens), com push genérico e a caixa com o detalhe. Dia sem número não manda nada; só entram os itens que o plano libera.
 - **2026-11-13 — "Comandas" no resumo são as comandas do dia** (clientes com atendimento hoje, a regra da tela Comandas), porque o que está em aberto de dias anteriores já entra em "Recebimentos atrasados".
-- **2026-11-13 — "Pendências de hoje" fica no topo do Dashboard,** calculada na hora, para testes; pode migrar para outra tela depois.
+- **2026-11-13 — "Pendências de hoje" fica no Dashboard, logo abaixo dos cards de números** (os "Primeiros passos" ficam no topo), calculada na hora, para testes; pode migrar para outra tela depois.
 
 ## Boas-vindas
 

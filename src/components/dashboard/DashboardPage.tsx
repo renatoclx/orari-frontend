@@ -128,14 +128,16 @@ export async function DashboardPage({
         </p>
       </div>
       {onboarding && <OnboardingChecklist onboarding={onboarding} />}
-      {pending && <PendingToday summary={pending} />}
       <DashboardToolbar filters={filters} month={month} />
 
       {nothing ? (
-        <p className="rounded-card border border-border bg-card p-8 text-center text-sm text-muted-foreground">
-          Nenhum relatório liberado para a empresa. Os blocos do Dashboard
-          aparecem conforme os relatórios liberados em Acessos e limites.
-        </p>
+        <>
+          <p className="rounded-card border border-border bg-card p-8 text-center text-sm text-muted-foreground">
+            Nenhum relatório liberado para a empresa. Os blocos do Dashboard
+            aparecem conforme os relatórios liberados em Acessos e limites.
+          </p>
+          {pending && <PendingToday summary={pending} />}
+        </>
       ) : (
         <>
           <DashboardMetrics
@@ -157,6 +159,9 @@ export async function DashboardPage({
             }
             receivables={receivables}
           />
+
+          {/* Pendências de hoje: logo abaixo dos cards de números. */}
+          {pending && <PendingToday summary={pending} />}
 
           {financial && (
             <DashboardSection title="Financeiro" href="/relatorios/financeiro">

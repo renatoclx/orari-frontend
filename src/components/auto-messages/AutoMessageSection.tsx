@@ -6,6 +6,9 @@ import {
   MAX_BODY,
   MISS_YOU_OPTIONS,
   REMINDER_OFFSET_OPTIONS,
+  SUMMARY_HOUR_OPTIONS,
+  SUMMARY_ITEM_OPTIONS,
+  toggleSummaryItem,
   insertVariable,
   previewMessage,
   toggleOffset,
@@ -135,6 +138,60 @@ export function AutoMessageSection({
             </SelectContent>
           </Select>
         </FormField>
+      )}
+
+      {message.kind === "ADMIN_SUMMARY" && (
+        <>
+          <FormField id={`${id}-hour`} label="Hora do envio">
+            <Select
+              value={String(message.summaryHour ?? 8)}
+              disabled={!editable}
+              onValueChange={(hour) => onChange({ summaryHour: Number(hour) })}
+            >
+              <SelectTrigger id={`${id}-hour`} className="w-40">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {SUMMARY_HOUR_OPTIONS.map((hour) => (
+                  <SelectItem key={hour} value={String(hour)}>
+                    {hour}h
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </FormField>
+          <fieldset className="space-y-2">
+            <legend className="text-sm font-medium">Itens do resumo</legend>
+            <div className="flex flex-wrap gap-x-5 gap-y-2">
+              {SUMMARY_ITEM_OPTIONS.map(({ item, label }) => (
+                <label key={item} className="flex items-center gap-2 text-sm">
+                  <Checkbox
+                    checked={message.summaryItems.includes(item)}
+                    disabled={!editable}
+                    onCheckedChange={() =>
+                      onChange({
+                        summaryItems: toggleSummaryItem(
+                          message.summaryItems,
+                          item,
+                        ),
+                      })
+                    }
+                  />
+                  {label}
+                </label>
+              ))}
+            </div>
+            <p className="text-xs text-muted-foreground">
+              Só entram os itens que o plano da clínica libera (contas a pagar,
+              contas a receber, comandas e clientes).
+            </p>
+            {errors.items && (
+              <p role="alert" className="text-sm text-destructive">
+                {errors.items}
+              </p>
+            )}
+          </fieldset>
+        </>
       )}
 
       <FormField id={`${id}-body`} label="Mensagem" error={errors.body}>

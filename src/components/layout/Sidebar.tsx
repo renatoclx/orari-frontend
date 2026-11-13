@@ -203,9 +203,15 @@ const messagesGroup: NavGroup = {
   label: "Mensagens",
   icon: MessageSquareText,
   children: [
+    { href: "/mensagens/clientes", label: "Ao cliente", feature: "messages" },
     {
-      href: "/mensagens/automaticas",
-      label: "Automáticas",
+      href: "/mensagens/profissionais",
+      label: "Ao profissional",
+      feature: "messages",
+    },
+    {
+      href: "/mensagens/administradores",
+      label: "Ao administrador",
       feature: "messages",
     },
     { href: "/mensagens/enviar", label: "Enviar", feature: "messages" },

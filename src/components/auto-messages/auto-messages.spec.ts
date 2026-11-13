@@ -1,11 +1,14 @@
 import { describe, expect, it } from "vitest";
 import type { AutoMessage } from "@/types/auto-message";
 import {
+  AUTO_MESSAGE_GROUPS,
+  AUTO_MESSAGE_INFO,
   autoMessageErrors,
   autoMessagesHaveErrors,
   insertVariable,
   previewMessage,
   toggleOffset,
+  toggleSummaryItem,
   unknownVariables,
 } from "./auto-messages";
 
@@ -15,6 +18,8 @@ const message = (over: Partial<AutoMessage> = {}): AutoMessage => ({
   body: "Olá, {nome}!",
   reminderOffsets: [1440, 30],
   missYouDays: null,
+  summaryHour: null,
+  summaryItems: [],
   ...over,
 });
 
@@ -46,6 +51,53 @@ describe("situações do profissional", () => {
     expect(previewMessage("Hoje: {quantidade}", "Studio")).toBe(
       "Hoje: 5 atendimentos",
     );
+  });
+});
+
+describe("resumo do administrador", () => {
+  it("o texto aceita {resumo}; nenhuma outra situação aceita", () => {
+    expect(unknownVariables("{nome} {resumo}", "ADMIN_SUMMARY")).toEqual([]);
+    expect(unknownVariables("{resumo}", "BIRTHDAY")).toEqual(["resumo"]);
+  });
+
+  it("ligado sem item: erro; desligado, pode", () => {
+    const base = message({
+      kind: "ADMIN_SUMMARY",
+      body: "Hoje: {resumo}",
+      summaryHour: 8,
+      summaryItems: [],
+    });
+    expect(autoMessageErrors(base).items).toBe("Escolha ao menos um item.");
+    expect(
+      autoMessageErrors({ ...base, enabled: false }).items,
+    ).toBeUndefined();
+    expect(
+      autoMessageErrors({ ...base, summaryItems: ["BIRTHDAYS"] }).items,
+    ).toBeUndefined();
+  });
+
+  it("os itens ligados seguem a ordem do catálogo", () => {
+    expect(toggleSummaryItem(["BIRTHDAYS"], "PAYABLE_TODAY")).toEqual([
+      "PAYABLE_TODAY",
+      "BIRTHDAYS",
+    ]);
+    expect(
+      toggleSummaryItem(["PAYABLE_TODAY", "BIRTHDAYS"], "PAYABLE_TODAY"),
+    ).toEqual(["BIRTHDAYS"]);
+  });
+
+  it("o exemplo mostra uma frase de resumo", () => {
+    expect(previewMessage("Hoje: {resumo}", "Studio")).toContain(
+      "3 contas a pagar hoje",
+    );
+  });
+});
+
+describe("grupos de mensagens", () => {
+  it("cada situação aparece em uma página só, e todas aparecem", () => {
+    const all = Object.values(AUTO_MESSAGE_GROUPS).flatMap((g) => g.kinds);
+    expect(new Set(all).size).toBe(all.length);
+    expect(all.sort()).toEqual(Object.keys(AUTO_MESSAGE_INFO).sort());
   });
 });
 

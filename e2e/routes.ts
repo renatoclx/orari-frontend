@@ -28,6 +28,9 @@ export const ROUTES = [
   "/configuracoes",
   "/notificacoes",
   "/avisos-no-celular",
+  "/mensagens/clientes",
+  "/mensagens/profissionais",
+  "/mensagens/administradores",
   "/ajuda",
 ];
 

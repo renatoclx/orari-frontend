@@ -1,7 +1,8 @@
 // Notificações dos usuários do sistema (o sino). Backend: /notifications.
 
 /** Cresce junto com as fontes de aviso. */
-export type NotificationCategory = "APPOINTMENT" | "REMINDER" | "DAILY_SUMMARY";
+export type NotificationCategory =
+  "APPOINTMENT" | "REMINDER" | "DAILY_SUMMARY" | "PENDING_SUMMARY";
 
 export type AppNotification = {
   id: string;

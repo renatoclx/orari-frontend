@@ -6,13 +6,29 @@ Avisos que a clínica manda ao cliente pelo **app do Orari** (notificação push
 
 ## Acesso
 
-- Grupo **Mensagens** no menu lateral, logo depois do Portal do cliente e antes da Ajuda, com os subitens **Automáticas** (`/mensagens/automaticas`) e **Enviar** (`/mensagens/enviar`).
+- Grupo **Mensagens** no menu lateral, logo depois do Portal do cliente e antes da Ajuda, com os subitens **Ao cliente** (`/mensagens/clientes`), **Ao profissional** (`/mensagens/profissionais`), **Ao administrador** (`/mensagens/administradores`) e **Enviar** (`/mensagens/enviar`).
 - Só para o **ADMIN** e só com a funcionalidade **Mensagens** no plano (matriz de acessos, `empresas.md`; ela exige o Portal do cliente). Os demais veem a página "não encontrada", e a API recusa (403).
 - Sem a ação **Edita**: tudo só leitura, sem os botões de variável e sem o rodapé de salvar.
 
-## Automáticas (`/mensagens/automaticas`)
+## Automáticas: uma página por quem recebe
 
-Card único que ocupa a página, com o conteúdo rolando e o rodapé fixo (como `portal-do-cliente.md`).
+A tela única de Automáticas ficou grande e foi **dividida por quem recebe**; cada página mostra e grava **só as situações do grupo dela** (o `PUT /auto-messages` aceita só as enviadas). O endereço antigo `/mensagens/automaticas` leva a `/mensagens/clientes`.
+
+| Página | Rota | Situações | Aviso do topo |
+| --- | --- | --- | --- |
+| **Ao cliente** | `/mensagens/clientes` | Lembrete, Agendamento marcado, alterado e cancelado, Aniversário, Sentimos sua falta | o do portal (abaixo) |
+| **Ao profissional** | `/mensagens/profissionais` | Lembrete do profissional, Resumo da manhã do profissional | "Chegam ao profissional que usa o app (no sino e, se ele ativar, no celular). Não dependem do portal do cliente. O texto não leva o nome do cliente." |
+| **Ao administrador** | `/mensagens/administradores` | Resumo de pendências do dia | "O resumo das pendências do dia chega a quem administra a clínica (…). Só entram os itens que o plano libera, e o dia sem nenhum item com número não manda nada. Não depende do portal do cliente." |
+
+Todas: card único que ocupa a página, com o conteúdo rolando e o rodapé fixo (como `portal-do-cliente.md`).
+
+### Resumo de pendências do dia (Ao administrador)
+
+- **Hora do envio:** 7h, 8h, 9h ou 10h (padrão 8h). **Itens do resumo** (caixas, padrão todas): Contas a pagar hoje, Contas atrasadas, Recebimentos atrasados, Comandas do dia e Aniversariantes, com a nota "Só entram os itens que o plano da clínica libera". Ligado sem nenhum item: "Escolha ao menos um item." no campo (e a API recusa).
+- **Variáveis:** `{nome}`, `{estabelecimento}`, `{data}` e `{resumo}` (a frase pronta; exemplo: "3 contas a pagar hoje, 2 recebimentos atrasados e 4 aniversariantes"). Padrão: "Bom dia, {nome}! Hoje: {resumo}."
+- Sai uma vez por dia, a partir da hora escolhida (até o meio-dia), para cada administrador; **dia sem nenhum item com número não manda nada**. Ver o bloco "Pendências de hoje" em `dashboard.md`.
+
+### Ao cliente
 
 - **Aviso do topo:**
   - portal ligado: "Só recebem os clientes que usam o app do Orari e deixaram os avisos ligados. Cada mensagem sai uma vez só.";
@@ -37,7 +53,7 @@ Card único que ocupa a página, com o conteúdo rolando e o rodapé fixo (como 
   - **Mensagem** (caixa de texto) com o contador "87/500" (vermelho acima de 500);
   - **Inserir:** botões das variáveis da situação, que entram no lugar do cursor: `{nome}`, `{estabelecimento}` e, nas de agendamento, `{data}`, `{hora}`, `{servico}`, `{profissional}`;
   - **Exemplo:** o texto como chega, com dados fictícios (Ana, Pilates, Camila, 12/11, 09:00) e o nome da clínica.
-- **Padrão de quem nunca salvou:** lembrete, as três de agendamento e as duas do profissional ligadas; aniversário e "sentimos sua falta" desligadas, com o texto pronto.
+- **Padrão de quem nunca salvou:** lembrete, as três de agendamento, as duas do profissional e o resumo do administrador ligadas; aniversário e "sentimos sua falta" desligadas, com o texto pronto.
 - **Erros** (só depois de tentar salvar, no campo): "Escreva a mensagem.", "Use até 500 caracteres.", "{data} não existe nesta mensagem." e, no lembrete ligado sem tempo, "Escolha ao menos um tempo antes do horário." O toast diz "Corrija os campos destacados.".
 - **Rodapé:** **Descartar alterações** e **Salvar alterações** (habilitados só com mudança). Salvo: toast "Mensagens automáticas salvas." Recusado pela API: "Não foi possível salvar as mensagens." com a mensagem dela.
 

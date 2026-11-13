@@ -21,6 +21,7 @@ export async function saveAutoMessagesAction(
   } catch (error) {
     return failureFrom(error);
   }
-  revalidatePath("/mensagens/automaticas");
+  // Cada grupo de mensagens tem a sua página.
+  revalidatePath("/mensagens", "layout");
   return { ok: true };
 }

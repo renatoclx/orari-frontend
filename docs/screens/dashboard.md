@@ -25,6 +25,12 @@ ao relatório completo.
   anterior"); a taxa de falta em pontos percentuais. Sem nada no anterior:
   "Nada no … para comparar"; valor igual: "Igual ao …".
 
+## Pendências de hoje
+
+- **Bloco no topo** (antes do filtro de período), só para o **ADMIN**: "Pendências de hoje" com cinco quadros, **calculados na hora** (sempre o número de agora, independe do período): **Contas a pagar hoje**, **Contas atrasadas**, **Recebimentos atrasados**, **Comandas do dia** e **Aniversariantes**. Cada quadro leva à tela já filtrada (Contas a pagar com a situação e o dia; Contas a receber atrasados; Comandas; Perfil do cliente).
+- Só aparecem os quadros que o plano libera; sem nenhum, o bloco some. Zerado, o quadro fica esmaecido; com todos zerados, o aviso "Nada pendente hoje.". Se a API falhar só nele, o Dashboard abre sem o bloco.
+- É o mesmo cálculo do resumo que sai de manhã (Mensagens → Ao administrador), mas mostra todos os itens do plano, não só os escolhidos para o resumo.
+
 ## Layout
 
 - Título, descrição (com "mês anterior" ou "período anterior") e o filtro de

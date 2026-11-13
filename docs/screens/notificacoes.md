@@ -21,7 +21,7 @@ O sino do cabeçalho e a página `/notificacoes`: a caixa de notificações do u
 ## Avisos no celular (`/avisos-no-celular`)
 
 - Subitem do grupo **Portal do cliente** no menu lateral (sem entrada nova no menu), para qualquer usuário do painel, sem depender de plano.
-- Um interruptor por categoria do que **também vira aviso no celular** (a caixa recebe tudo): o ADMIN vê **Agendamentos**; o profissional vê as três no app (Agendamentos, Lembretes e Resumo da manhã). Muda na hora e desfaz se a API recusar.
+- Um interruptor por categoria do que **também vira aviso no celular** (a caixa recebe tudo): o ADMIN vê **Agendamentos** e **Pendências do dia** (o resumo das manhãs); o profissional vê as três no app (Agendamentos, Lembretes e Resumo da manhã). Muda na hora e desfaz se a API recusar.
 - Nota na tela: o aviso chega aos aparelhos com o app instalado e os avisos ativados; **no computador, o aviso na tela do painel ainda não está disponível** (o sino e a lista continuam funcionando).
 
 ## Fontes

@@ -198,6 +198,13 @@ regras de cada tela, em `docs/screens/`.
 - **2026-11-13 — O profissional recebe o que a clínica faz nos horários dele** (marcou, remarcou, cancelou); quem faz a ação não é avisado. O texto da caixa leva o cliente; o do push não.
 - **2026-11-13 — Sem entrada nova no menu lateral: "Portal do cliente" vira grupo** (Portal e Avisos no celular). _Por quê:_ regra do usuário: configurações novas entram como submenu. "Avisos no celular" do painel só tem as preferências por categoria; o push no painel (service worker próprio) fica para depois.
 
+## Resumo de pendências e Mensagens por destinatário
+
+- **2026-11-13 — Mensagens → Automáticas foi dividida por quem recebe** (Ao cliente, Ao profissional, Ao administrador), cada uma uma página e um subitem. _Por quê:_ a tela única estava sobrecarregada e ia crescer; o PUT já aceita só as situações enviadas, então a divisão não mudou a API. O endereço antigo redireciona.
+- **2026-11-13 — O resumo de pendências do administrador é uma situação de Mensagens** (liga/desliga, texto, hora de 7h a 10h e itens), com push genérico e a caixa com o detalhe. Dia sem número não manda nada; só entram os itens que o plano libera.
+- **2026-11-13 — "Comandas" no resumo são as comandas do dia** (clientes com atendimento hoje, a regra da tela Comandas), porque o que está em aberto de dias anteriores já entra em "Recebimentos atrasados".
+- **2026-11-13 — "Pendências de hoje" fica no topo do Dashboard,** calculada na hora, para testes; pode migrar para outra tela depois.
+
 ## Qualidade e testes
 
 - **2026-10-23 — Testes automáticos só de funções puras e de pontos de borda do servidor,** com Vitest (a mesma ferramenta do backend) e `arquivo.spec.ts` ao lado do código. _Por quê:_ é onde está a regra que quebra sem barulho (fuso, arredondamento, disponibilidade de horários); componentes e telas seguem verificados à mão e com `axe-core`. Ponta a ponta (Playwright) fica fora por ora.

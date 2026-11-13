@@ -9,7 +9,8 @@ export type AutoMessageKind =
   | "BIRTHDAY"
   | "MISS_YOU"
   | "PROFESSIONAL_REMINDER"
-  | "PROFESSIONAL_SUMMARY";
+  | "PROFESSIONAL_SUMMARY"
+  | "ADMIN_SUMMARY";
 
 export type AutoMessage = {
   kind: AutoMessageKind;
@@ -20,4 +21,15 @@ export type AutoMessage = {
   reminderOffsets: number[];
   /** Sentimos sua falta: dias sem vir. */
   missYouDays: number | null;
+  /** Resumo do administrador: a hora do envio (7 a 10) e os itens que entram. */
+  summaryHour: number | null;
+  summaryItems: SummaryItem[];
 };
+
+/** Os itens do resumo de pendências do administrador. */
+export type SummaryItem =
+  | "PAYABLE_TODAY"
+  | "PAYABLE_OVERDUE"
+  | "RECEIVABLE_OVERDUE"
+  | "OPEN_TABS"
+  | "BIRTHDAYS";

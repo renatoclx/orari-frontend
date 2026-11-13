@@ -1,4 +1,8 @@
-import type { AutoMessage, AutoMessageKind } from "@/types/auto-message";
+import type {
+  AutoMessage,
+  AutoMessageKind,
+  SummaryItem,
+} from "@/types/auto-message";
 
 // Regras da tela Mensagens → Automáticas (screens/mensagens.md). As mesmas da
 // API (backend: auto-message.catalog.ts): o que a tela barra, a API também barra.
@@ -20,8 +24,12 @@ const SUMMARY_VARIABLES = [
   "hora",
   "quantidade",
 ] as const;
+// O resumo de pendências do administrador: {resumo} é a frase pronta.
+const ADMIN_VARIABLES = [...PERSON_VARIABLES, "data", "resumo"] as const;
 export type MessageVariable =
-  (typeof APPOINTMENT_VARIABLES)[number] | (typeof SUMMARY_VARIABLES)[number];
+  | (typeof APPOINTMENT_VARIABLES)[number]
+  | (typeof SUMMARY_VARIABLES)[number]
+  | (typeof ADMIN_VARIABLES)[number];
 
 type KindInfo = {
   title: string;
@@ -30,7 +38,7 @@ type KindInfo = {
   variables: readonly MessageVariable[];
 };
 
-/** As oito situações, na ordem da tela (as duas últimas vão ao profissional). */
+/** As nove situações (cada uma aparece na página do grupo dela). */
 export const AUTO_MESSAGE_INFO: Record<AutoMessageKind, KindInfo> = {
   REMINDER: {
     title: "Lembrete",
@@ -72,13 +80,65 @@ export const AUTO_MESSAGE_INFO: Record<AutoMessageKind, KindInfo> = {
     when: "Às 7h30, nos dias em que o profissional tem atendimentos.",
     variables: SUMMARY_VARIABLES,
   },
+  ADMIN_SUMMARY: {
+    title: "Resumo de pendências do dia",
+    when: "Uma vez por dia, na hora escolhida, só com os itens marcados e que o plano libera. Dia sem nada com número não manda nada.",
+    variables: ADMIN_VARIABLES,
+  },
 };
 
-/** As situações que vão ao profissional (sino e aviso no celular), e não ao cliente. */
-export const PROFESSIONAL_KINDS: readonly AutoMessageKind[] = [
-  "PROFESSIONAL_REMINDER",
-  "PROFESSIONAL_SUMMARY",
+/** As páginas de Mensagens → Automáticas: uma por quem recebe, na ordem do menu. */
+export type AutoMessageGroup = "clientes" | "profissionais" | "administradores";
+
+export const AUTO_MESSAGE_GROUPS: Record<
+  AutoMessageGroup,
+  { title: string; kinds: readonly AutoMessageKind[] }
+> = {
+  clientes: {
+    title: "Mensagens ao cliente",
+    kinds: [
+      "REMINDER",
+      "APPOINTMENT_CREATED",
+      "APPOINTMENT_RESCHEDULED",
+      "APPOINTMENT_CANCELLED",
+      "BIRTHDAY",
+      "MISS_YOU",
+    ],
+  },
+  profissionais: {
+    title: "Mensagens ao profissional",
+    kinds: ["PROFESSIONAL_REMINDER", "PROFESSIONAL_SUMMARY"],
+  },
+  administradores: {
+    title: "Mensagens ao administrador",
+    kinds: ["ADMIN_SUMMARY"],
+  },
+};
+
+/** As horas possíveis do resumo do administrador. */
+export const SUMMARY_HOUR_OPTIONS = [7, 8, 9, 10] as const;
+
+/** Os itens do resumo e o nome de cada um na tela. */
+export const SUMMARY_ITEM_OPTIONS: { item: SummaryItem; label: string }[] = [
+  { item: "PAYABLE_TODAY", label: "Contas a pagar hoje" },
+  { item: "PAYABLE_OVERDUE", label: "Contas atrasadas" },
+  { item: "RECEIVABLE_OVERDUE", label: "Recebimentos atrasados" },
+  { item: "OPEN_TABS", label: "Comandas do dia" },
+  { item: "BIRTHDAYS", label: "Aniversariantes" },
 ];
+
+/** Liga ou desliga um item do resumo, mantendo a ordem do catálogo. */
+export function toggleSummaryItem(
+  items: SummaryItem[],
+  item: SummaryItem,
+): SummaryItem[] {
+  const next = items.includes(item)
+    ? items.filter((value) => value !== item)
+    : [...items, item];
+  return SUMMARY_ITEM_OPTIONS.map((option) => option.item).filter((value) =>
+    next.includes(value),
+  );
+}
 
 export const REMINDER_OFFSET_OPTIONS = [
   { minutes: 30, label: "30 min" },
@@ -98,6 +158,7 @@ const SAMPLE = {
   servico: "Pilates",
   profissional: "Camila",
   quantidade: "5 atendimentos",
+  resumo: "3 contas a pagar hoje, 2 recebimentos atrasados e 4 aniversariantes",
 } as const;
 
 const VARIABLE = /\{([^{}\s]+)\}/g;
@@ -119,7 +180,11 @@ export function unknownVariables(
   return variablesOutside(body, AUTO_MESSAGE_INFO[kind].variables);
 }
 
-export type AutoMessageErrors = { body?: string; offsets?: string };
+export type AutoMessageErrors = {
+  body?: string;
+  offsets?: string;
+  items?: string;
+};
 
 export function autoMessageErrors(message: AutoMessage): AutoMessageErrors {
   const errors: AutoMessageErrors = {};
@@ -138,13 +203,20 @@ export function autoMessageErrors(message: AutoMessage): AutoMessageErrors {
   ) {
     errors.offsets = "Escolha ao menos um tempo antes do horário.";
   }
+  if (
+    message.kind === "ADMIN_SUMMARY" &&
+    message.enabled &&
+    message.summaryItems.length === 0
+  ) {
+    errors.items = "Escolha ao menos um item.";
+  }
   return errors;
 }
 
 export function autoMessagesHaveErrors(messages: AutoMessage[]): boolean {
   return messages.some((message) => {
     const errors = autoMessageErrors(message);
-    return Boolean(errors.body || errors.offsets);
+    return Boolean(errors.body || errors.offsets || errors.items);
   });
 }
 

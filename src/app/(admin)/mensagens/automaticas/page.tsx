@@ -1,10 +1,7 @@
-import type { Metadata } from "next";
-import { AutoMessagesPage } from "@/components/auto-messages/AutoMessagesPage";
+import { redirect } from "next/navigation";
 
-export const metadata: Metadata = {
-  title: "Mensagens automáticas | Orari",
-};
-
-export default function AutoMessagesRoute() {
-  return <AutoMessagesPage />;
+// A tela única de Automáticas foi dividida por quem recebe (cliente, profissional
+// e administrador). O endereço antigo leva à primeira.
+export default function AutoMessagesRedirect() {
+  redirect("/mensagens/clientes");
 }

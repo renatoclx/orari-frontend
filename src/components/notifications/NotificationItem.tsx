@@ -1,6 +1,12 @@
 "use client";
 
-import { CalendarDays, Clock, Sun, type LucideIcon } from "lucide-react";
+import {
+  CalendarDays,
+  ClipboardList,
+  Clock,
+  Sun,
+  type LucideIcon,
+} from "lucide-react";
 import type {
   AppNotification,
   NotificationCategory,
@@ -12,6 +18,7 @@ const CATEGORY_ICON: Record<NotificationCategory, LucideIcon> = {
   APPOINTMENT: CalendarDays,
   REMINDER: Clock,
   DAILY_SUMMARY: Sun,
+  PENDING_SUMMARY: ClipboardList,
 };
 
 /**

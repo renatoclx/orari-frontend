@@ -158,12 +158,6 @@ Pontos conhecidos e aceitos por enquanto. Revisar quando o contexto mudar.
 - **Card de push duplicado:** o `ProfessionalPushCard` repete os estados do `PushDeviceCard` (instalar no iPhone, bloqueado, desligado, ligado). Unificar num componente só quando houver uma terceira tela de push.
 - **Sem teste de tela:** o sino e as páginas foram verificados no navegador (Playwright, fora do repositório); só as regras puras têm spec.
 
-## Pendências de hoje
-
-- **Aniversariantes calculados em memória:** o backend lê as datas de nascimento dos clientes ativos e compara o dia e o mês no servidor (como a mensagem de aniversário); uma consulta por mês e dia no banco resolveria para bases grandes.
-- **Quadro do Dashboard sem o valor em dinheiro:** só a contagem; os valores ficam nas telas de destino.
-- **Link de aniversariantes sem filtro:** leva ao Perfil do cliente com o período padrão; o relatório não recebe o dia na URL.
-
 ## Acessibilidade
 
 Auditoria da Etapa 9 (2026-10-22): `axe-core` em todas as rotas e em 11 diálogos e menus, sem achados de contraste, nomes ou marcos. Restos aceitos:

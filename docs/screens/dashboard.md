@@ -27,16 +27,13 @@ ao relatório completo.
 
 ## Primeiros passos
 
-- **Bloco no topo** (acima de "Pendências de hoje"), só para o **ADMIN**, enquanto falta algum passo **obrigatório** e ele não dispensou: card "Primeiros passos" ("Deixe a clínica pronta para agendar. Cada passo leva à tela certa."), o progresso ("3 de 6 concluídos" e a barra) e os passos em duas colunas, cada um um link para a tela certa.
-- **Passos:** Defina o horário de funcionamento e Coloque a logo da clínica (`/configuracoes`), Cadastre um serviço (`/servicos`), um profissional (`/profissionais/novo`) e um cliente (`/clientes/novo`), Faça o primeiro agendamento (`/`) e, **opcional** (fora do progresso), Ligue o portal do cliente (`/portal-do-cliente`). Só entram os que o plano libera. Feito: círculo marcado e título riscado; falta: círculo vazio e seta.
-- **Some sozinho** quando os obrigatórios estão feitos (o opcional não segura o bloco) e com **Dispensar** (no canto do card), que vale só para quem clicou. Cada passo sai dos dados da clínica: nada a marcar.
-- Se a API falhar só nele, o Dashboard abre sem o bloco. No primeiro acesso, uma notificação de boas-vindas leva a esta tela.
+Fora do Dashboard: a orientação da clínica nova não é dado do período. Vive num **dialog** ("Primeiros passos", `OnboardingDialog`), só para o **ADMIN**.
 
-## Pendências de hoje
-
-- **Bloco logo abaixo dos cards de números** (depois do filtro de período e dos seis cards; sozinho, se não há relatório liberado), só para o **ADMIN**: "Pendências de hoje" com cinco quadros, **calculados na hora** (sempre o número de agora, independe do período): **Contas a pagar hoje**, **Contas atrasadas**, **Recebimentos atrasados**, **Comandas do dia** e **Aniversariantes**. Cada quadro leva à tela já filtrada (Contas a pagar com a situação e o dia; Contas a receber atrasados; Comandas; Perfil do cliente).
-- Só aparecem os quadros que o plano libera; sem nenhum, o bloco some. Zerado, o quadro fica esmaecido; com todos zerados, o aviso "Nada pendente hoje.". Se a API falhar só nele, o Dashboard abre sem o bloco.
-- É o mesmo cálculo do resumo que sai de manhã (Mensagens → Ao administrador), mas mostra todos os itens do plano, não só os escolhidos para o resumo.
+- **Como abre:** pela notificação de boas-vindas (leva a `/dashboard?passos=1`) e, enquanto faltar passo e a lista não estiver dispensada, pelo item **Primeiros passos** no rodapé do sino. O `OnboardingDialogHost`, no layout do painel, lê `?passos=1` em qualquer tela, abre o dialog e tira o parâmetro ao fechar.
+- **Conteúdo:** busca os passos ao abrir ("Buscando…", "Tentar de novo"); o progresso ("3 de 6 concluídos" e a barra) e os passos, cada um um link para a tela certa (o link fecha o dialog). Rodapé: **Dispensar** (só para quem clicou) e **Fechar**.
+- **Passos:** Defina o horário de funcionamento e Coloque a logo da clínica (`/configuracoes`), Cadastre um serviço (`/servicos`), um profissional (`/profissionais/novo`) e um cliente (`/clientes/novo`), Faça o primeiro agendamento (`/`) e, **opcional** (fora do progresso), Ligue o portal do cliente (`/portal-do-cliente`). Só entram os que o plano libera. Feito: círculo marcado e título riscado; falta: círculo vazio e seta. Cada passo sai dos dados da clínica: nada a marcar.
+- O item do sino some quando os obrigatórios estão feitos (o opcional não segura) ou com Dispensar.
+- O resumo das pendências do dia (a pagar, atrasadas, a receber, comandas e aniversariantes) **não** fica no Dashboard: chega pela notificação da manhã (Mensagens → Ao administrador).
 
 ## Layout
 

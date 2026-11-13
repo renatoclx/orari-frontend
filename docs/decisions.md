@@ -203,12 +203,12 @@ regras de cada tela, em `docs/screens/`.
 - **2026-11-13 — Mensagens → Automáticas foi dividida por quem recebe** (Ao cliente, Ao profissional, Ao administrador), cada uma uma página e um subitem. _Por quê:_ a tela única estava sobrecarregada e ia crescer; o PUT já aceita só as situações enviadas, então a divisão não mudou a API. O endereço antigo redireciona.
 - **2026-11-13 — O resumo de pendências do administrador é uma situação de Mensagens** (liga/desliga, texto, hora de 7h a 10h e itens), com push genérico e a caixa com o detalhe. Dia sem número não manda nada; só entram os itens que o plano libera.
 - **2026-11-13 — "Comandas" no resumo são as comandas do dia** (clientes com atendimento hoje, a regra da tela Comandas), porque o que está em aberto de dias anteriores já entra em "Recebimentos atrasados".
-- **2026-11-13 — "Pendências de hoje" fica no Dashboard, logo abaixo dos cards de números** (os "Primeiros passos" ficam no topo), calculada na hora, para testes; pode migrar para outra tela depois.
+- **2026-11-13 — "Pendências de hoje" saiu do Dashboard** (ele volta a ser só os números do período): o resumo do dia chega pela notificação da manhã. O bloco e a rota `GET /pending-summary` foram apagados.
 
 ## Boas-vindas
 
 - **2026-11-13 — Boas-vindas no primeiro acesso, uma vez por usuário,** gravadas de forma atômica (`welcomedAt`) antes de enviar. Quem já existia não recebe. Sem interruptor de preferência.
-- **2026-11-13 — Lista de "Primeiros passos" no topo do Dashboard** (sem entrada nova no menu), calculada dos dados da clínica, com Dispensar por usuário; o portal do cliente é opcional. **Os avisos no celular não entram na lista do ADMIN** porque o painel ainda não recebe push.
+- **2026-11-13 — "Primeiros passos" num dialog, fora do Dashboard** (informação que não é dos números do período). Abre pela notificação de boas-vindas (`?passos=1`) e, enquanto faltar passo, por um item no rodapé do sino. Calculada dos dados da clínica, com Dispensar por usuário; o portal do cliente é opcional. **Os avisos no celular não entram na lista do ADMIN** porque o painel ainda não recebe push.
 - **2026-11-13 — Cartão de boas-vindas no Início do profissional,** com convite para ativar os avisos e "Agora não". Boas-vindas ao cliente do app (mensagem da clínica) **ficam para depois**: ele já vê "Conta criada".
 
 ## Qualidade e testes

@@ -2,9 +2,11 @@
 
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { Bell, CheckCheck } from "lucide-react";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { Bell, CheckCheck, ListChecks } from "lucide-react";
 import { toast } from "sonner";
+import { getOnboardingAction } from "@/app/(admin)/onboarding-actions";
+import { showOnboarding } from "@/components/onboarding/onboarding";
 import {
   clearNotificationsAction,
   markAllNotificationsReadAction,
@@ -27,10 +29,19 @@ import { useUnreadCount } from "./useUnreadCount";
 /**
  * O sino do painel (screens/notificacoes.md): o número de não lidas numa
  * marca vermelha e, ao abrir, as últimas notificações. Tocar numa a marca como
- * lida e leva ao destino; "Ver todas" abre a página.
+ * lida e leva ao destino; "Ver todas" abre a página. Para o ADMIN, o rodapé
+ * também reabre os primeiros passos enquanto faltarem (quem limpou a
+ * notificação de boas-vindas não perde o caminho).
  */
-export function NotificationBell() {
+export function NotificationBell({
+  withOnboarding = false,
+}: {
+  withOnboarding?: boolean;
+}) {
   const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+  const [stepsLeft, setStepsLeft] = useState(false);
   const { count, latestAt, setCount, refresh } =
     useUnreadCount(unreadCountAction);
   const [open, setOpen] = useState(false);
@@ -81,6 +92,11 @@ export function NotificationBell() {
   // Ao abrir, busca as últimas (e confere o número junto).
   async function load() {
     setFailed(false);
+    if (withOnboarding) {
+      void getOnboardingAction().then((result) =>
+        setStepsLeft(result.ok && showOnboarding(result.onboarding)),
+      );
+    }
     const page = await recentNotificationsAction();
     if (page) {
       setItems(page.items);
@@ -104,6 +120,14 @@ export function NotificationBell() {
     }
     if (item.url) router.push(item.url);
     void refresh();
+  }
+
+  // Abre o dialog na tela em que o usuário está (o host lê ?passos=1).
+  function openOnboarding() {
+    setOpen(false);
+    const next = new URLSearchParams(searchParams.toString());
+    next.set("passos", "1");
+    router.push(`${pathname}?${next.toString()}`);
   }
 
   async function markAll() {
@@ -185,6 +209,16 @@ export function NotificationBell() {
           >
             Ver todas
           </Link>
+          {stepsLeft && (
+            <button
+              type="button"
+              onClick={openOnboarding}
+              className="flex h-10 w-full items-center justify-center gap-2 rounded-control text-sm font-medium hover:bg-muted"
+            >
+              <ListChecks className="size-4" aria-hidden="true" />
+              Primeiros passos
+            </button>
+          )}
           <ClearNotificationsButton
             action={clearNotificationsAction}
             disabled={items === null || items.length === 0}

@@ -10,22 +10,17 @@ import {
 import { DashboardMetrics } from "@/components/dashboard/DashboardMetrics";
 import { DashboardSection } from "@/components/dashboard/DashboardSection";
 import { DashboardToolbar } from "@/components/dashboard/DashboardToolbar";
-import { PendingToday } from "@/components/dashboard/PendingToday";
-import { OnboardingChecklist } from "@/components/onboarding/OnboardingChecklist";
 import { PaymentMethodDonut } from "@/components/dashboard/PaymentMethodDonut";
 import { FinancialPeriodChart } from "@/components/financial-report/FinancialPeriodChart";
 import { showsProducts } from "@/components/financial-report/financial-report-filters";
 import { PackagesPlanTable } from "@/components/packages-report/PackagesPlanTable";
 import { RankingTable } from "@/components/rankings/RankingTable";
 import { ReceivablesAgingChart } from "@/components/receivables/ReceivablesAgingChart";
-import { ApiError } from "@/services/api";
 import { getAppointmentReport } from "@/services/appointment-report.service";
 import { getCurrentUser } from "@/services/auth.service";
 import { getClientsReport } from "@/services/clients-report.service";
 import { getFinancialReport } from "@/services/financial-report.service";
 import { getPackagesReport } from "@/services/packages-report.service";
-import { getOnboarding } from "@/services/onboarding.service";
-import { getPendingSummary } from "@/services/pending-summary.service";
 import { listPaymentMethods } from "@/services/payment-method.service";
 import { getRankings } from "@/services/rankings.service";
 import { getReceivablesSummary } from "@/services/receivables.service";
@@ -105,19 +100,6 @@ export async function DashboardPage({
 
   // relative: os absolutos de dentro (sr-only, dicas dos gráficos) não
   // esticam a página além da rolagem própria.
-  // As pendências do dia são um extra do topo: se a API falhar só nelas, o
-  // Dashboard abre sem o bloco.
-  const pending = await getPendingSummary().catch((error: unknown) => {
-    if (error instanceof ApiError) return null;
-    throw error;
-  });
-
-  // Os primeiros passos: outro extra do topo (a clínica nova).
-  const onboarding = await getOnboarding().catch((error: unknown) => {
-    if (error instanceof ApiError) return null;
-    throw error;
-  });
-
   return (
     <div className="relative -m-1 flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto p-1">
       <div className="space-y-1">
@@ -127,17 +109,13 @@ export async function DashboardPage({
           {previous.label}.
         </p>
       </div>
-      {onboarding && <OnboardingChecklist onboarding={onboarding} />}
       <DashboardToolbar filters={filters} month={month} />
 
       {nothing ? (
-        <>
-          <p className="rounded-card border border-border bg-card p-8 text-center text-sm text-muted-foreground">
-            Nenhum relatório liberado para a empresa. Os blocos do Dashboard
-            aparecem conforme os relatórios liberados em Acessos e limites.
-          </p>
-          {pending && <PendingToday summary={pending} />}
-        </>
+        <p className="rounded-card border border-border bg-card p-8 text-center text-sm text-muted-foreground">
+          Nenhum relatório liberado para a empresa. Os blocos do Dashboard
+          aparecem conforme os relatórios liberados em Acessos e limites.
+        </p>
       ) : (
         <>
           <DashboardMetrics
@@ -159,9 +137,6 @@ export async function DashboardPage({
             }
             receivables={receivables}
           />
-
-          {/* Pendências de hoje: logo abaixo dos cards de números. */}
-          {pending && <PendingToday summary={pending} />}
 
           {financial && (
             <DashboardSection title="Financeiro" href="/relatorios/financeiro">

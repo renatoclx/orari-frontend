@@ -52,7 +52,7 @@ export function Header({ user, onOpenMobile }: HeaderProps) {
           </Can>
         </div>
         {/* O sino: as notificações do usuário (screens/notificacoes.md). */}
-        <NotificationBell />
+        <NotificationBell withOnboarding={user.type === "ADMIN"} />
         {/* key: logo nova recomeça do zero (a anterior pode ter falhado). */}
         <CompanyLogo
           key={user.company.logoUrl}

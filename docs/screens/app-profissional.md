@@ -4,7 +4,7 @@ Mesmo PWA do cliente (`/app`); muda o que aparece conforme quem entrou. Só cons
 
 ## Entrar
 
-- Pelo formulário de `/app/entrar`, com **telefone ou e-mail** e senha (veja [app-cliente.md](app-cliente.md)). O usuário é do tipo Profissional ([usuarios.md](usuarios.md)).
+- Pelo formulário de `/app/entrar`, com **telefone ou e-mail** e senha (veja [app-cliente.md](app-cliente.md)). O usuário é do tipo Profissional ([usuarios.md](usuarios.md)). O **administrador que atua** (ADMIN vinculado a um profissional ativo) também entra, **só pelo e-mail**, e vê no app **as mesmas telas e acessos do profissional**, só com os dados do profissional vinculado; sem vínculo ele não entra. Não vê o cartão de boas-vindas do app (já tem as do painel).
 - Sessão em cookies próprios (`orari_app_pro`, `orari_app_pro_refresh`), nunca os da clínica; o proxy renova o acesso vencido. Uma sessão por vez: entrar como profissional encerra a de cliente, e o contrário também.
 - O sistema web recusa esse usuário, e quem tenta abrir o painel é levado ao app.
 

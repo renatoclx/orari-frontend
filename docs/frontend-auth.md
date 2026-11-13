@@ -173,4 +173,6 @@ O profissional (usuário do tipo `PROFESSIONAL`, só app; `screens/app-profissio
 
 Ver `frontend-technical-debt.md`.
 
+**Administrador que atua:** o ADMIN vinculado a um profissional ativo também entra no app (mesmo formulário, pelo e-mail) e usa as mesmas telas do profissional; o painel dele continua pelo login web. Sem vínculo, a API recusa com a mensagem genérica.
+
 **Painel web:** o profissional não entra. O `POST /auth/login` da API recusa o tipo `PROFESSIONAL` com 403 (depois de conferir a senha) e não emite token; a tela mostra a mensagem "Profissionais entram pelo aplicativo do Orari, não pelo sistema web.". O layout do painel ainda leva ao `/app` uma sessão de profissional que escape.

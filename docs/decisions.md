@@ -191,6 +191,13 @@ regras de cada tela, em `docs/screens/`.
 - **2026-11-13 — O push só no app do profissional por enquanto;** o painel tem a caixa e o sino, sem service worker. _Por quê:_ o service worker do app já existe (escopo `/app/`); o do painel é um passo à parte.
 - **2026-11-13 — Um único despachante no backend** para toda fonte de aviso (cliente no app, depois resumo do dia, boas-vindas, jobs; o WhatsApp entra como canal). _Por quê:_ quem avisa não precisa saber de canal.
 
+## Avisos ao profissional e menu
+
+- **2026-11-13 — Lembrete (30 min antes, fixo) e resumo da manhã (7h30, fixo) são situações de Mensagens → Automáticas,** com liga/desliga e texto editável pela clínica, valendo para todos os profissionais; cada um ainda tem o interruptor de push dele. _Por quê:_ a clínica já configura as mensagens ali; o profissional controla só o que o interrompe.
+- **2026-11-13 — Uma sessão de turma é um lembrete só,** e a turma cancelada, um aviso só. _Por quê:_ o profissional chega à sessão uma vez; um aviso por aluno seria ruído.
+- **2026-11-13 — O profissional recebe o que a clínica faz nos horários dele** (marcou, remarcou, cancelou); quem faz a ação não é avisado. O texto da caixa leva o cliente; o do push não.
+- **2026-11-13 — Sem entrada nova no menu lateral: "Portal do cliente" vira grupo** (Portal e Avisos no celular). _Por quê:_ regra do usuário: configurações novas entram como submenu. "Avisos no celular" do painel só tem as preferências por categoria; o push no painel (service worker próprio) fica para depois.
+
 ## Qualidade e testes
 
 - **2026-10-23 — Testes automáticos só de funções puras e de pontos de borda do servidor,** com Vitest (a mesma ferramenta do backend) e `arquivo.spec.ts` ao lado do código. _Por quê:_ é onde está a regra que quebra sem barulho (fuso, arredondamento, disponibilidade de horários); componentes e telas seguem verificados à mão e com `axe-core`. Ponta a ponta (Playwright) fica fora por ora.

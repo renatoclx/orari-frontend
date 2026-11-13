@@ -117,6 +117,10 @@ Fonte das regras: `docs/screen-patterns.md` e `docs/screens/pessoas.md`. Modelo:
 - **Registro gerado por outra tela** (conta paga da comissão): sem Alterar nem ⋮; em Ações, o atalho para o documento (`Eye`, "Ver recibo") e o texto "Via <tela>" em `text-muted-foreground`. A API também recusa a mudança.
 - **Lista longa de itens editáveis em accordion** (`QuestionCard`): `Collapsible` por item, vários abertos ao mesmo tempo, linha de resumo (número, texto e tipo) com a alça de arrastar e a lixeira fora da área clicável, botão "Recolher todas / Expandir todas" e a pergunta com erro abre sozinha ao enviar.
 
+## Menu lateral: submenu, não entrada nova
+
+- Configuração ou tela nova de uma área que já tem item no menu entra como **submenu** (o item vira grupo, e a tela que ele abria vira o primeiro subitem). Exemplo: **Portal do cliente** é grupo com **Portal** e **Avisos no celular**. Entrada nova no nível principal só com aprovação.
+
 ## Notificações (o sino)
 
 - O sino vai no cabeçalho do painel (antes da logo e do usuário) e no app do profissional, **só o ícone, sem moldura de botão**: na linha da saudação no Início e no topo, à direita, nas demais telas. O **número de não lidas** fica numa marca redonda **vermelha** (token `destructive`, texto `text-background` para o contraste nos dois temas), sem número em zero e **"99+"** a partir de 100. O nome acessível diz a quantidade ("Notificações: 3 não lidas"): o número não é só cor.

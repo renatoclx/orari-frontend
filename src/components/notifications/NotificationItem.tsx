@@ -1,8 +1,18 @@
 "use client";
 
-import { CalendarDays } from "lucide-react";
-import type { AppNotification } from "@/types/notification";
+import { CalendarDays, Clock, Sun, type LucideIcon } from "lucide-react";
+import type {
+  AppNotification,
+  NotificationCategory,
+} from "@/types/notification";
 import { relativeTime } from "./notification-format";
+
+// O ícone de cada categoria.
+const CATEGORY_ICON: Record<NotificationCategory, LucideIcon> = {
+  APPOINTMENT: CalendarDays,
+  REMINDER: Clock,
+  DAILY_SUMMARY: Sun,
+};
 
 /**
  * Uma notificação na lista (o sino e a página). A não lida tem o título em
@@ -17,6 +27,7 @@ export function NotificationItem({
   onOpen: (item: AppNotification) => void;
 }) {
   const unread = item.readAt === null;
+  const Icon = CATEGORY_ICON[item.category];
   return (
     <button
       type="button"
@@ -24,7 +35,7 @@ export function NotificationItem({
       className="flex w-full items-start gap-3 px-4 py-3 text-left hover:bg-muted"
     >
       <span className="mt-0.5 flex size-9 shrink-0 items-center justify-center rounded-full bg-muted text-muted-foreground">
-        <CalendarDays className="size-4" aria-hidden="true" />
+        <Icon className="size-4" aria-hidden="true" />
       </span>
       <span className="min-w-0 flex-1 text-sm">
         <span

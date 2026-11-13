@@ -1,7 +1,12 @@
 import "server-only";
 
 import { apiFetch } from "@/services/api";
-import type { NotificationsPage, UnreadInfo } from "@/types/notification";
+import type {
+  NotificationPreference,
+  NotificationPreferences,
+  NotificationsPage,
+  UnreadInfo,
+} from "@/types/notification";
 
 // Notificações do usuário do painel (backend: /notifications). Cada um só lê e
 // altera as próprias.
@@ -34,4 +39,18 @@ export function markAllNotificationsRead(): Promise<void> {
 /** Limpa a caixa: some da lista e do contador. */
 export function clearNotifications(): Promise<void> {
   return apiFetch<void>("/notifications", { method: "DELETE" });
+}
+
+/** O push de cada categoria do usuário (só as que são dele). */
+export function getNotificationPreferences(): Promise<NotificationPreferences> {
+  return apiFetch<NotificationPreferences>("/notifications/preferences");
+}
+
+export function saveNotificationPreferences(
+  preferences: NotificationPreference[],
+): Promise<NotificationPreferences> {
+  return apiFetch<NotificationPreferences>("/notifications/preferences", {
+    method: "PUT",
+    body: JSON.stringify({ preferences }),
+  });
 }

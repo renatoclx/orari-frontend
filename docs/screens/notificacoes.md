@@ -18,10 +18,17 @@ O sino do cabeçalho e a página `/notificacoes`: a caixa de notificações do u
 - Vazio: "Nenhuma notificação ainda" (explica que aparece, por exemplo, quando um cliente marca um horário pelo app) ou "Nenhuma notificação não lida: você está em dia".
 - Sem funcionalidade de plano: qualquer usuário do painel tem. Cada um vê só as suas.
 
+## Avisos no celular (`/avisos-no-celular`)
+
+- Subitem do grupo **Portal do cliente** no menu lateral (sem entrada nova no menu), para qualquer usuário do painel, sem depender de plano.
+- Um interruptor por categoria do que **também vira aviso no celular** (a caixa recebe tudo): o ADMIN vê **Agendamentos**; o profissional vê as três no app (Agendamentos, Lembretes e Resumo da manhã). Muda na hora e desfaz se a API recusar.
+- Nota na tela: o aviso chega aos aparelhos com o app instalado e os avisos ativados; **no computador, o aviso na tela do painel ainda não está disponível** (o sino e a lista continuam funcionando).
+
 ## Fontes
 
-- Hoje: o cliente marca ou cancela um horário pelo app (avisa os administradores e o profissional do horário). O destino do aviso do administrador é a agenda.
-- Previstas: resumo de pendências do dia, boas-vindas e avisos dos jobs (mesma caixa, categorias novas).
+- O cliente marca ou cancela um horário pelo app (avisa os administradores e o profissional do horário). O destino do aviso do administrador é a agenda.
+- Ao **profissional**: o que a clínica faz nos horários dele, o lembrete (30 min antes) e o resumo da manhã (7h30), configurados em Mensagens → Automáticas (`mensagens.md`).
+- Previstas: pendências do dia do ADMIN, boas-vindas e avisos dos jobs (mesma caixa, categorias novas).
 
 ## Limites
 

@@ -18,6 +18,37 @@ const message = (over: Partial<AutoMessage> = {}): AutoMessage => ({
   ...over,
 });
 
+describe("situações do profissional", () => {
+  it("o resumo aceita {quantidade}; o lembrete não; nenhuma aceita o nome do cliente", () => {
+    expect(
+      unknownVariables("{nome} {quantidade} {hora}", "PROFESSIONAL_SUMMARY"),
+    ).toEqual([]);
+    expect(unknownVariables("{quantidade}", "PROFESSIONAL_REMINDER")).toEqual([
+      "quantidade",
+    ]);
+    expect(unknownVariables("{cliente}", "PROFESSIONAL_REMINDER")).toEqual([
+      "cliente",
+    ]);
+  });
+
+  it("o lembrete do profissional ligado não pede tempo (é fixo em 30 min)", () => {
+    const errors = autoMessageErrors(
+      message({
+        kind: "PROFESSIONAL_REMINDER",
+        body: "Atendimento às {hora}.",
+        reminderOffsets: [],
+      }),
+    );
+    expect(errors).toEqual({});
+  });
+
+  it("o exemplo do resumo mostra a quantidade", () => {
+    expect(previewMessage("Hoje: {quantidade}", "Studio")).toBe(
+      "Hoje: 5 atendimentos",
+    );
+  });
+});
+
 describe("unknownVariables", () => {
   it("aniversário não tem data nem serviço; o lembrete tem", () => {
     expect(unknownVariables("{nome} {data} {servico}", "BIRTHDAY")).toEqual([

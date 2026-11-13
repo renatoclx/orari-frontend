@@ -9,7 +9,7 @@ export function listAutoMessages(): Promise<AutoMessage[]> {
   return apiFetch<AutoMessage[]>("/auto-messages");
 }
 
-/** Grava as situações enviadas e devolve as seis. */
+/** Grava as situações enviadas e devolve as oito. */
 export function saveAutoMessages(items: AutoMessage[]): Promise<AutoMessage[]> {
   return apiFetch<AutoMessage[]>("/auto-messages", {
     method: "PUT",

@@ -27,6 +27,7 @@ export const ROUTES = [
   "/anamnese/auditoria",
   "/configuracoes",
   "/notificacoes",
+  "/avisos-no-celular",
   "/ajuda",
 ];
 

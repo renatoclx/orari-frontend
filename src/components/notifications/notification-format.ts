@@ -35,11 +35,16 @@ export function relativeTime(iso: string, now = new Date()): string {
 /** O nome de cada categoria nas preferências. */
 export const CATEGORY_LABEL: Record<NotificationCategory, string> = {
   APPOINTMENT: "Agendamentos",
+  REMINDER: "Lembretes",
+  DAILY_SUMMARY: "Resumo da manhã",
 };
 
 /** O que cada categoria avisa, em uma linha. */
 export const CATEGORY_HINT: Record<NotificationCategory, string> = {
-  APPOINTMENT: "Quando o cliente marca ou cancela um horário pelo app.",
+  APPOINTMENT:
+    "Quando um horário é marcado, remarcado ou cancelado (pelo cliente ou pela clínica).",
+  REMINDER: "30 minutos antes de cada atendimento.",
+  DAILY_SUMMARY: "Às 7h30, nos dias em que você tem atendimentos.",
 };
 
 /** Intervalo da conferência do número do sino (a cada 30 segundos). */

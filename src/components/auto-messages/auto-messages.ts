@@ -13,7 +13,15 @@ const APPOINTMENT_VARIABLES = [
   "servico",
   "profissional",
 ] as const;
-export type MessageVariable = (typeof APPOINTMENT_VARIABLES)[number];
+// O resumo da manhã do profissional: o dia, o primeiro horário e quantos atendimentos.
+const SUMMARY_VARIABLES = [
+  ...PERSON_VARIABLES,
+  "data",
+  "hora",
+  "quantidade",
+] as const;
+export type MessageVariable =
+  (typeof APPOINTMENT_VARIABLES)[number] | (typeof SUMMARY_VARIABLES)[number];
 
 type KindInfo = {
   title: string;
@@ -22,7 +30,7 @@ type KindInfo = {
   variables: readonly MessageVariable[];
 };
 
-/** As seis situações, na ordem da tela. */
+/** As oito situações, na ordem da tela (as duas últimas vão ao profissional). */
 export const AUTO_MESSAGE_INFO: Record<AutoMessageKind, KindInfo> = {
   REMINDER: {
     title: "Lembrete",
@@ -54,7 +62,23 @@ export const AUTO_MESSAGE_INFO: Record<AutoMessageKind, KindInfo> = {
     when: "Às 10h, para quem não volta desde o último atendimento e não tem nada marcado.",
     variables: PERSON_VARIABLES,
   },
+  PROFESSIONAL_REMINDER: {
+    title: "Lembrete do profissional",
+    when: "30 minutos antes de cada atendimento do profissional (uma vez por sessão, nas turmas).",
+    variables: APPOINTMENT_VARIABLES,
+  },
+  PROFESSIONAL_SUMMARY: {
+    title: "Resumo da manhã do profissional",
+    when: "Às 7h30, nos dias em que o profissional tem atendimentos.",
+    variables: SUMMARY_VARIABLES,
+  },
 };
+
+/** As situações que vão ao profissional (sino e aviso no celular), e não ao cliente. */
+export const PROFESSIONAL_KINDS: readonly AutoMessageKind[] = [
+  "PROFESSIONAL_REMINDER",
+  "PROFESSIONAL_SUMMARY",
+];
 
 export const REMINDER_OFFSET_OPTIONS = [
   { minutes: 30, label: "30 min" },
@@ -73,6 +97,7 @@ const SAMPLE = {
   hora: "09:00",
   servico: "Pilates",
   profissional: "Camila",
+  quantidade: "5 atendimentos",
 } as const;
 
 const VARIABLE = /\{([^{}\s]+)\}/g;

@@ -1,6 +1,5 @@
 "use client";
 
-import { useState } from "react";
 import { BellOff, BellRing, Share } from "lucide-react";
 import {
   appProPreferencesAction,
@@ -12,12 +11,8 @@ import {
   usePushDevice,
   type PushActions,
 } from "@/components/client-app/usePushDevice";
-import {
-  CATEGORY_HINT,
-  CATEGORY_LABEL,
-} from "@/components/notifications/notification-format";
+import { PreferenceSwitches } from "@/components/notifications/PreferenceSwitches";
 import { Button } from "@/components/ui/button";
-import { Switch } from "@/components/ui/switch";
 import type { NotificationPreference } from "@/types/notification";
 
 // As ações do profissional (módulo, para a identidade ser estável no hook).
@@ -65,25 +60,6 @@ function Device({
     publicKey,
     PRO_ACTIONS,
   );
-  const [prefs, setPrefs] = useState(preferences);
-  const [prefsError, setPrefsError] = useState<string>();
-
-  function change(category: NotificationPreference["category"], push: boolean) {
-    const previous = prefs;
-    const next = prefs.map((item) =>
-      item.category === category ? { ...item, push } : item,
-    );
-    // Muda na hora e desfaz se a API recusar.
-    setPrefs(next);
-    setPrefsError(undefined);
-    void appProPreferencesAction(next).then((result) => {
-      if (!result.ok) {
-        setPrefs(previous);
-        setPrefsError(result.message);
-      }
-    });
-  }
-
   return (
     <section
       aria-labelledby="pro-push"
@@ -183,26 +159,10 @@ function Device({
           Tudo chega à caixa de notificações. Aqui você escolhe o que também
           vira aviso no celular.
         </p>
-        {prefs.map(({ category, push }) => (
-          <label
-            key={category}
-            className="flex items-center justify-between gap-4"
-          >
-            <span className="space-y-0.5">
-              <span className="block font-medium">
-                {CATEGORY_LABEL[category]}
-              </span>
-              <span className="block text-sm text-muted-foreground">
-                {CATEGORY_HINT[category]}
-              </span>
-            </span>
-            <Switch
-              checked={push}
-              onCheckedChange={(next) => change(category, next)}
-            />
-          </label>
-        ))}
-        {prefsError && <AppFormMessage>{prefsError}</AppFormMessage>}
+        <PreferenceSwitches
+          preferences={preferences}
+          save={appProPreferencesAction}
+        />
       </div>
     </section>
   );

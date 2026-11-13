@@ -19,20 +19,25 @@ Card único que ocupa a página, com o conteúdo rolando e o rodapé fixo (como 
   - portal desligado (em vermelho): "O portal do cliente está desligado: nenhuma mensagem sai até ele ser ligado em Portal do cliente." (com o link).
 - **Uma seção por situação**, nesta ordem, cada uma com o interruptor, o título e quando sai:
 
-  | Situação | Quando sai (texto da tela) | Opção |
-  | --- | --- | --- |
-  | Lembrete | Antes de cada horário marcado, nos tempos escolhidos. | **Enviar antes do horário:** 30 min, 1h, 2h, 24h, 48h (caixas; padrão 24h e 30 min) |
-  | Agendamento marcado | Quando a clínica marca um horário avulso para o cliente. | — |
-  | Agendamento alterado | Quando a clínica muda a data ou o horário (alterar, remanejar ou repor). | — |
-  | Agendamento cancelado | Quando a clínica cancela um horário (avulso, uma sessão ou uma sessão de turma). | — |
-  | Aniversário | No dia do aniversário, às 9h (data de nascimento do cadastro). | — |
-  | Sentimos sua falta | Às 10h, para quem não volta desde o último atendimento e não tem nada marcado. | **Dias sem vir:** 15, 30, 45, 60 ou 90 (padrão 30) |
+  | Situação                        | Quando sai (texto da tela)                                                             | Opção                                                                               |
+  | ------------------------------- | -------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------- |
+  | Lembrete                        | Antes de cada horário marcado, nos tempos escolhidos.                                  | **Enviar antes do horário:** 30 min, 1h, 2h, 24h, 48h (caixas; padrão 24h e 30 min) |
+  | Agendamento marcado             | Quando a clínica marca um horário avulso para o cliente.                               | —                                                                                   |
+  | Agendamento alterado            | Quando a clínica muda a data ou o horário (alterar, remanejar ou repor).               | —                                                                                   |
+  | Agendamento cancelado           | Quando a clínica cancela um horário (avulso, uma sessão ou uma sessão de turma).       | —                                                                                   |
+  | Aniversário                     | No dia do aniversário, às 9h (data de nascimento do cadastro).                         | —                                                                                   |
+  | Sentimos sua falta              | Às 10h, para quem não volta desde o último atendimento e não tem nada marcado.         | **Dias sem vir:** 15, 30, 45, 60 ou 90 (padrão 30)                                  |
+  | Lembrete do profissional        | 30 minutos antes de cada atendimento do profissional (uma vez por sessão, nas turmas). | — (o tempo é fixo)                                                                  |
+  | Resumo da manhã do profissional | Às 7h30, nos dias em que o profissional tem atendimentos.                              | — (a hora é fixa)                                                                   |
+
+- **Avisos ao profissional:** as duas últimas situações vêm sob um cabeçalho próprio ("Avisos ao profissional": "Chegam ao profissional que usa o app (no sino e, se ele ativar, no celular). Não dependem do portal do cliente. O texto não leva o nome do cliente."). Valem para todos os profissionais com usuário no app e só dependem de **Mensagens no plano**. O aviso do topo sobre o portal desligado vale só para as mensagens ao cliente ("nenhuma mensagem ao cliente sai…").
+- **Variáveis do profissional:** o lembrete usa as do agendamento (`{nome}` e `{profissional}` são o nome do profissional) **sem nome de cliente**; o resumo usa `{nome}`, `{estabelecimento}`, `{data}`, `{hora}` e `{quantidade}` (exemplo: "5 atendimentos"). Padrões: ligados, com texto pronto.
 
 - Em cada seção:
   - **Mensagem** (caixa de texto) com o contador "87/500" (vermelho acima de 500);
   - **Inserir:** botões das variáveis da situação, que entram no lugar do cursor: `{nome}`, `{estabelecimento}` e, nas de agendamento, `{data}`, `{hora}`, `{servico}`, `{profissional}`;
   - **Exemplo:** o texto como chega, com dados fictícios (Ana, Pilates, Camila, 12/11, 09:00) e o nome da clínica.
-- **Padrão de quem nunca salvou:** lembrete e as três de agendamento ligadas; aniversário e "sentimos sua falta" desligadas, com o texto pronto.
+- **Padrão de quem nunca salvou:** lembrete, as três de agendamento e as duas do profissional ligadas; aniversário e "sentimos sua falta" desligadas, com o texto pronto.
 - **Erros** (só depois de tentar salvar, no campo): "Escreva a mensagem.", "Use até 500 caracteres.", "{data} não existe nesta mensagem." e, no lembrete ligado sem tempo, "Escolha ao menos um tempo antes do horário." O toast diz "Corrija os campos destacados.".
 - **Rodapé:** **Descartar alterações** e **Salvar alterações** (habilitados só com mudança). Salvo: toast "Mensagens automáticas salvas." Recusado pela API: "Não foi possível salvar as mensagens." com a mensagem dela.
 

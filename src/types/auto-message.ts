@@ -7,7 +7,9 @@ export type AutoMessageKind =
   | "APPOINTMENT_RESCHEDULED"
   | "APPOINTMENT_CANCELLED"
   | "BIRTHDAY"
-  | "MISS_YOU";
+  | "MISS_YOU"
+  | "PROFESSIONAL_REMINDER"
+  | "PROFESSIONAL_SUMMARY";
 
 export type AutoMessage = {
   kind: AutoMessageKind;

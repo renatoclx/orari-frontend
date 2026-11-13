@@ -1,11 +1,12 @@
 "use client";
 
-import { useState, useTransition } from "react";
-import { Save, X } from "lucide-react";
+import { Fragment, useState, useTransition } from "react";
+import { Info, Save, X } from "lucide-react";
 import { toast } from "sonner";
 import { saveAutoMessagesAction } from "@/app/(admin)/auto-message-actions";
 import { AutoMessageSection } from "@/components/auto-messages/AutoMessageSection";
 import {
+  PROFESSIONAL_KINDS,
   autoMessageErrors,
   autoMessagesHaveErrors,
   sameAutoMessages,
@@ -24,7 +25,7 @@ type AutoMessagesFormProps = {
   notice: React.ReactNode;
 };
 
-/** As seis situações da tela Mensagens → Automáticas (screens/mensagens.md). */
+/** As oito situações da tela Mensagens → Automáticas (screens/mensagens.md). */
 export function AutoMessagesForm({
   messages,
   editable,
@@ -82,14 +83,27 @@ export function AutoMessagesForm({
       <div className="relative min-h-0 flex-1 divide-y divide-border overflow-auto">
         <div className="p-4 md:p-6">{notice}</div>
         {draft.map((message) => (
-          <AutoMessageSection
-            key={message.kind}
-            message={message}
-            errors={errorsOf(message)}
-            editable={editable}
-            placeName={placeName}
-            onChange={(patch) => change(message.kind, patch)}
-          />
+          <Fragment key={message.kind}>
+            {/* As duas últimas vão ao profissional, não ao cliente. */}
+            {message.kind === PROFESSIONAL_KINDS[0] && (
+              <div className="bg-muted/40 p-4 md:p-6">
+                <h2 className="font-semibold">Avisos ao profissional</h2>
+                <p className="flex items-start gap-2 text-sm text-muted-foreground">
+                  <Info className="mt-0.5 size-4 shrink-0" aria-hidden="true" />
+                  Chegam ao profissional que usa o app (no sino e, se ele
+                  ativar, no celular). Não dependem do portal do cliente. O
+                  texto não leva o nome do cliente.
+                </p>
+              </div>
+            )}
+            <AutoMessageSection
+              message={message}
+              errors={errorsOf(message)}
+              editable={editable}
+              placeName={placeName}
+              onChange={(patch) => change(message.kind, patch)}
+            />
+          </Fragment>
         ))}
       </div>
 

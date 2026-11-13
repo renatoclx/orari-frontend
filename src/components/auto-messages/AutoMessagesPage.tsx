@@ -30,8 +30,8 @@ export async function AutoMessagesPage() {
     <p className="flex items-start gap-2 text-sm text-destructive">
       <CircleAlert className="mt-0.5 size-4 shrink-0" aria-hidden="true" />
       <span>
-        O portal do cliente está desligado: nenhuma mensagem sai até ele ser
-        ligado em{" "}
+        O portal do cliente está desligado: nenhuma mensagem ao cliente sai até
+        ele ser ligado em{" "}
         <Link href="/portal-do-cliente" className="font-medium underline">
           Portal do cliente
         </Link>

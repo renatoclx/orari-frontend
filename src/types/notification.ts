@@ -2,7 +2,7 @@
 
 /** Cresce junto com as fontes de aviso. */
 export type NotificationCategory =
-  "APPOINTMENT" | "REMINDER" | "DAILY_SUMMARY" | "PENDING_SUMMARY";
+  "APPOINTMENT" | "REMINDER" | "DAILY_SUMMARY" | "PENDING_SUMMARY" | "WELCOME";
 
 export type AppNotification = {
   id: string;

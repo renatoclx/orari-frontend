@@ -1,6 +1,7 @@
 "use server";
 
 import { ApiError } from "@/services/api";
+import { dismissProWelcome } from "@/services/app-pro-welcome.service";
 import {
   clearProNotifications,
   deleteProPushSubscription,
@@ -110,6 +111,15 @@ export async function appProPushUnsubscribeAction(
 export async function appProClearAction(): Promise<void> {
   try {
     await clearProNotifications();
+  } catch (error) {
+    if (!(error instanceof ApiError)) throw error;
+  }
+}
+
+/** Dispensa o cartão de boas-vindas do Início; falha silenciosa (o cartão volta se não gravou). */
+export async function appProDismissWelcomeAction(): Promise<void> {
+  try {
+    await dismissProWelcome();
   } catch (error) {
     if (!(error instanceof ApiError)) throw error;
   }

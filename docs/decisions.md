@@ -205,6 +205,12 @@ regras de cada tela, em `docs/screens/`.
 - **2026-11-13 — "Comandas" no resumo são as comandas do dia** (clientes com atendimento hoje, a regra da tela Comandas), porque o que está em aberto de dias anteriores já entra em "Recebimentos atrasados".
 - **2026-11-13 — "Pendências de hoje" fica no topo do Dashboard,** calculada na hora, para testes; pode migrar para outra tela depois.
 
+## Boas-vindas
+
+- **2026-11-13 — Boas-vindas no primeiro acesso, uma vez por usuário,** gravadas de forma atômica (`welcomedAt`) antes de enviar. Quem já existia não recebe. Sem interruptor de preferência.
+- **2026-11-13 — Lista de "Primeiros passos" no topo do Dashboard** (sem entrada nova no menu), calculada dos dados da clínica, com Dispensar por usuário; o portal do cliente é opcional. **Os avisos no celular não entram na lista do ADMIN** porque o painel ainda não recebe push.
+- **2026-11-13 — Cartão de boas-vindas no Início do profissional,** com convite para ativar os avisos e "Agora não". Boas-vindas ao cliente do app (mensagem da clínica) **ficam para depois**: ele já vê "Conta criada".
+
 ## Qualidade e testes
 
 - **2026-10-23 — Testes automáticos só de funções puras e de pontos de borda do servidor,** com Vitest (a mesma ferramenta do backend) e `arquivo.spec.ts` ao lado do código. _Por quê:_ é onde está a regra que quebra sem barulho (fuso, arredondamento, disponibilidade de horários); componentes e telas seguem verificados à mão e com `axe-core`. Ponta a ponta (Playwright) fica fora por ora.

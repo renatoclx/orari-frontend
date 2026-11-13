@@ -4,6 +4,7 @@ import {
   CalendarDays,
   ClipboardList,
   Clock,
+  Sparkles,
   Sun,
   type LucideIcon,
 } from "lucide-react";
@@ -19,6 +20,7 @@ const CATEGORY_ICON: Record<NotificationCategory, LucideIcon> = {
   REMINDER: Clock,
   DAILY_SUMMARY: Sun,
   PENDING_SUMMARY: ClipboardList,
+  WELCOME: Sparkles,
 };
 
 /**

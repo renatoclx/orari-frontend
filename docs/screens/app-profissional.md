@@ -15,6 +15,7 @@ Mesmo PWA do cliente (`/app`); muda o que aparece conforme quem entrou. Só cons
 ## Início (`/app`)
 
 - Saudação com o nome, a data, a clínica e o vínculo. Cadastro de profissional inativado: "Seu acesso está suspenso. Fale com a clínica." e nada mais. Os blocos, de cima para baixo (uma chamada só à API, `GET /professional-app/home`):
+  0. **Boas-vindas** (só até dispensar): no primeiro acesso, cartão "Boas-vindas ao Orari!" no topo do Início (o que o app mostra e o convite para os avisos), com **Ativar avisos no celular** (leva a Menu → Avisos no celular) e **Agora não** (esconde o cartão, só para ele), os dois na largura do cartão. Uma notificação de boas-vindas também chega ao sino. Ao ativar o push pela primeira vez, o aparelho recebe "Avisos ativados".
   1. **Hoje**: "N atendimentos" (ou "Dia livre") e quantos faltam; o **próximo** (horário, cliente ou "Turma", serviço) ou, se houver, o que está **em andamento**; botão **Agenda**.
   2. **Esta semana**: gráfico de barras (segunda a domingo) com o número sobre cada barra, o total da semana, legenda ("Já passou" em cor cheia, "Agendado" em tom claro) e o dia de hoje destacado. Cada barra leva à Agenda daquele dia. Feito em CSS, na cor primária, sem biblioteca; leitor de tela recebe a descrição em texto ("seg 9: 1; ter 10: 2…").
   3. **Mês**: Concluídos (com "+N que no mês anterior", só quando o mês anterior teve concluídos), Clientes atendidos, Faltas e Cancelados.

@@ -24,6 +24,10 @@ O sino do cabeçalho e a página `/notificacoes`: a caixa de notificações do u
 - Um interruptor por categoria do que **também vira aviso no celular** (a caixa recebe tudo): o ADMIN vê **Agendamentos** e **Pendências do dia** (o resumo das manhãs); o profissional vê as três no app (Agendamentos, Lembretes e Resumo da manhã). Muda na hora e desfaz se a API recusar.
 - Nota na tela: o aviso chega aos aparelhos com o app instalado e os avisos ativados; **no computador, o aviso na tela do painel ainda não está disponível** (o sino e a lista continuam funcionando).
 
+## Boas-vindas
+
+- No **primeiro acesso** (ADMIN ou profissional), uma notificação "Boas-vindas ao Orari!" na caixa (ícone de brilho, destino: o Dashboard ou Menu → Avisos no celular). Não tem interruptor e não aparece nas preferências; sai uma vez só por usuário, mesmo entrando em vários aparelhos.
+
 ## Fontes
 
 - O cliente marca ou cancela um horário pelo app (avisa os administradores e o profissional do horário). O destino do aviso do administrador é a agenda.

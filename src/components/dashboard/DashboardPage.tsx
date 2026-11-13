@@ -11,6 +11,7 @@ import { DashboardMetrics } from "@/components/dashboard/DashboardMetrics";
 import { DashboardSection } from "@/components/dashboard/DashboardSection";
 import { DashboardToolbar } from "@/components/dashboard/DashboardToolbar";
 import { PendingToday } from "@/components/dashboard/PendingToday";
+import { OnboardingChecklist } from "@/components/onboarding/OnboardingChecklist";
 import { PaymentMethodDonut } from "@/components/dashboard/PaymentMethodDonut";
 import { FinancialPeriodChart } from "@/components/financial-report/FinancialPeriodChart";
 import { showsProducts } from "@/components/financial-report/financial-report-filters";
@@ -23,6 +24,7 @@ import { getCurrentUser } from "@/services/auth.service";
 import { getClientsReport } from "@/services/clients-report.service";
 import { getFinancialReport } from "@/services/financial-report.service";
 import { getPackagesReport } from "@/services/packages-report.service";
+import { getOnboarding } from "@/services/onboarding.service";
 import { getPendingSummary } from "@/services/pending-summary.service";
 import { listPaymentMethods } from "@/services/payment-method.service";
 import { getRankings } from "@/services/rankings.service";
@@ -110,6 +112,12 @@ export async function DashboardPage({
     throw error;
   });
 
+  // Os primeiros passos: outro extra do topo (a clínica nova).
+  const onboarding = await getOnboarding().catch((error: unknown) => {
+    if (error instanceof ApiError) return null;
+    throw error;
+  });
+
   return (
     <div className="relative -m-1 flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto p-1">
       <div className="space-y-1">
@@ -119,6 +127,7 @@ export async function DashboardPage({
           {previous.label}.
         </p>
       </div>
+      {onboarding && <OnboardingChecklist onboarding={onboarding} />}
       {pending && <PendingToday summary={pending} />}
       <DashboardToolbar filters={filters} month={month} />
 

@@ -9,7 +9,9 @@ import {
 } from "@/services/app-pro.service";
 import { canAccess } from "@/utils/access";
 import { getProUnreadInfo } from "@/services/app-pro-notification.service";
+import { getProWelcome } from "@/services/app-pro-welcome.service";
 import { HomeCommission } from "./HomeCommission";
+import { HomeWelcome } from "./HomeWelcome";
 import { HomeMonth } from "./HomeMonth";
 import { HomeToday } from "./HomeToday";
 import { HomeUpcoming } from "./HomeUpcoming";
@@ -84,7 +86,7 @@ async function HomeContent({
   timeZone: string;
   showCommission: boolean;
 }) {
-  const [home, commission] = await Promise.all([
+  const [home, commission, welcome] = await Promise.all([
     getProfessionalHome(),
     // A comissão é um extra do Início: se falhar só nela, a tela abre sem o cartão.
     showCommission
@@ -93,10 +95,16 @@ async function HomeContent({
           throw error;
         })
       : null,
+    // As boas-vindas são um extra: se a API falhar só nelas, o Início abre sem o cartão.
+    getProWelcome().catch((error: unknown) => {
+      if (error instanceof ApiError) return { dismissed: true };
+      throw error;
+    }),
   ]);
 
   return (
     <>
+      {!welcome.dismissed && <HomeWelcome />}
       <HomeToday today={home.today} timeZone={timeZone} />
       <HomeWeekChart week={home.week} today={todayIn(timeZone)} />
       <HomeMonth month={home.month} />

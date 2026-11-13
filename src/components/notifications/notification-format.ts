@@ -38,6 +38,8 @@ export const CATEGORY_LABEL: Record<NotificationCategory, string> = {
   REMINDER: "Lembretes",
   DAILY_SUMMARY: "Resumo da manhã",
   PENDING_SUMMARY: "Pendências do dia",
+  // A boas-vindas não tem interruptor (não aparece nas preferências).
+  WELCOME: "Boas-vindas",
 };
 
 /** O que cada categoria avisa, em uma linha. */
@@ -48,6 +50,7 @@ export const CATEGORY_HINT: Record<NotificationCategory, string> = {
   DAILY_SUMMARY: "Às 7h30, nos dias em que você tem atendimentos.",
   PENDING_SUMMARY:
     "Contas a pagar e a receber, comandas e aniversariantes do dia, na hora escolhida pela clínica.",
+  WELCOME: "Boas-vindas ao Orari.",
 };
 
 /** Intervalo da conferência do número do sino (a cada 30 segundos). */

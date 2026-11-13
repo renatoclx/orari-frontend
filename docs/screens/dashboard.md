@@ -25,6 +25,13 @@ ao relatório completo.
   anterior"); a taxa de falta em pontos percentuais. Sem nada no anterior:
   "Nada no … para comparar"; valor igual: "Igual ao …".
 
+## Primeiros passos
+
+- **Bloco no topo** (acima de "Pendências de hoje"), só para o **ADMIN**, enquanto falta algum passo **obrigatório** e ele não dispensou: card "Primeiros passos" ("Deixe a clínica pronta para agendar. Cada passo leva à tela certa."), o progresso ("3 de 6 concluídos" e a barra) e os passos em duas colunas, cada um um link para a tela certa.
+- **Passos:** Defina o horário de funcionamento e Coloque a logo da clínica (`/configuracoes`), Cadastre um serviço (`/servicos`), um profissional (`/profissionais/novo`) e um cliente (`/clientes/novo`), Faça o primeiro agendamento (`/`) e, **opcional** (fora do progresso), Ligue o portal do cliente (`/portal-do-cliente`). Só entram os que o plano libera. Feito: círculo marcado e título riscado; falta: círculo vazio e seta.
+- **Some sozinho** quando os obrigatórios estão feitos (o opcional não segura o bloco) e com **Dispensar** (no canto do card), que vale só para quem clicou. Cada passo sai dos dados da clínica: nada a marcar.
+- Se a API falhar só nele, o Dashboard abre sem o bloco. No primeiro acesso, uma notificação de boas-vindas leva a esta tela.
+
 ## Pendências de hoje
 
 - **Bloco no topo** (antes do filtro de período), só para o **ADMIN**: "Pendências de hoje" com cinco quadros, **calculados na hora** (sempre o número de agora, independe do período): **Contas a pagar hoje**, **Contas atrasadas**, **Recebimentos atrasados**, **Comandas do dia** e **Aniversariantes**. Cada quadro leva à tela já filtrada (Contas a pagar com a situação e o dia; Contas a receber atrasados; Comandas; Perfil do cliente).

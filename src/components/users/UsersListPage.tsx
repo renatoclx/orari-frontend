@@ -4,6 +4,7 @@ import { UsersToolbar } from "@/components/users/UsersToolbar";
 import { getCurrentUser } from "@/services/auth.service";
 import { listPeople } from "@/services/people.service";
 import { listUsers } from "@/services/user.service";
+import { canAccess } from "@/utils/access";
 import type { UserType } from "@/types/auth";
 
 // Itens por página da listagem.
@@ -23,21 +24,18 @@ export async function UsersListPage({ searchParams }: UsersListPageProps) {
   const search =
     typeof searchParams.q === "string" ? searchParams.q.trim() : "";
   const page = Math.max(1, Number(searchParams.page) || 1);
-  const [currentUser, result, professionals, employees] = await Promise.all([
-    getCurrentUser(),
+  // Cacheado na requisição: o layout já o buscou.
+  const currentUser = await getCurrentUser();
+  // As pessoas do vínculo só são buscadas se a empresa tem a funcionalidade: a API
+  // recusa (403) quem não tem, e a tela inteira cairia (ex.: empresa sem Funcionários).
+  const linkable = (type: "PROFESSIONAL" | "EMPLOYEE", feature: string) =>
+    canAccess(currentUser.access, feature)
+      ? listPeople({ type, isActive: true, page: 1, limit: LINK_LIMIT })
+      : Promise.resolve({ items: [] });
+  const [result, professionals, employees] = await Promise.all([
     listUsers({ page, limit: PAGE_SIZE, name: search || undefined }),
-    listPeople({
-      type: "PROFESSIONAL",
-      isActive: true,
-      page: 1,
-      limit: LINK_LIMIT,
-    }),
-    listPeople({
-      type: "EMPLOYEE",
-      isActive: true,
-      page: 1,
-      limit: LINK_LIMIT,
-    }),
+    linkable("PROFESSIONAL", "professionals"),
+    linkable("EMPLOYEE", "employees"),
   ]);
   const toOption = ({ id, name }: { id: string; name: string }) => ({
     id,

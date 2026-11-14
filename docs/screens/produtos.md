@@ -15,6 +15,7 @@ categorias que os agrupam.
   produto") e `products` ("Produtos"), com as quatro ações; fora de todos os
   modelos (o SUPER_ADMIN libera). A API exige ver as categorias para ver os
   produtos.
+- A lista de fornecedores (lista e formulário de produto) só é buscada se a empresa tem a funcionalidade Fornecedores; sem ela, a lista vem vazia e a tela abre normalmente.
 
 ## Categorias
 

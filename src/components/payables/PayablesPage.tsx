@@ -1,3 +1,4 @@
+import { lookupIfAllowed } from "@/utils/lookup";
 import { NewPayableButton } from "@/components/payables/NewPayableButton";
 import { PayableList } from "@/components/payables/PayableList";
 import {
@@ -49,11 +50,15 @@ export async function PayablesPage({
   const api = PAYABLE_FILTERS.find((item) => item.id === filters.status)!.api;
 
   // Primeiro quem é e as categorias: decidem se a comissão em aberto entra.
-  const [user, categories] = await Promise.all([
-    getCurrentUser(),
+  const user = await getCurrentUser();
+  // As listas de apoio (categorias, fornecedores, profissionais e métodos) só são
+  // buscadas se a empresa tem a funcionalidade: sem ela a API recusa (403).
+  const categories = await lookupIfAllowed(
+    user.access,
+    "expense-categories",
     // Todas: o filtro mostra também as inativas (contas antigas usam).
-    listExpenseCategories({ page: 1, limit: LOOKUP_LIMIT }),
-  ]);
+    () => listExpenseCategories({ page: 1, limit: LOOKUP_LIMIT }),
+  );
   const categoryName = categories.items.find(
     (category) => category.id === filters.category,
   )?.name;
@@ -66,19 +71,25 @@ export async function PayablesPage({
     await Promise.all([
       listPayables({ ...params, status: api, page, limit: PAGE_SIZE }),
       getPayableSummary(params),
-      listPeople({
-        type: "SUPPLIER",
-        isActive: true,
-        page: 1,
-        limit: LOOKUP_LIMIT,
-      }),
-      listPeople({
-        type: "PROFESSIONAL",
-        isActive: true,
-        page: 1,
-        limit: LOOKUP_LIMIT,
-      }),
-      listPaymentMethods({ isActive: true, page: 1, limit: LOOKUP_LIMIT }),
+      lookupIfAllowed(user.access, "suppliers", () =>
+        listPeople({
+          type: "SUPPLIER",
+          isActive: true,
+          page: 1,
+          limit: LOOKUP_LIMIT,
+        }),
+      ),
+      lookupIfAllowed(user.access, "professionals", () =>
+        listPeople({
+          type: "PROFESSIONAL",
+          isActive: true,
+          page: 1,
+          limit: LOOKUP_LIMIT,
+        }),
+      ),
+      lookupIfAllowed(user.access, "payment-methods", () =>
+        listPaymentMethods({ isActive: true, page: 1, limit: LOOKUP_LIMIT }),
+      ),
       visibility.cards
         ? getPayableCommissions(params.payeeId)
         : Promise.resolve([]),

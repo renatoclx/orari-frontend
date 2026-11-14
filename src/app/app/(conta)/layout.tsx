@@ -13,12 +13,15 @@ import { canAccess } from "@/utils/access";
 export default async function AccountAppLayout({
   children,
 }: LayoutProps<"/app">) {
-  // O app é um só; o que muda é quem entrou (cliente ou profissional).
-  const kind = (await getAppSessionKind()) ?? "client";
+  // O app é um só; o que muda é quem entrou (cliente ou profissional). Sem
+  // sessão (`null`) é o visitante da página pública do estabelecimento (o link
+  // que a clínica divulga): ele vê as abas do cliente, mas não há conta a buscar.
+  const session = await getAppSessionKind();
+  const kind = session ?? "client";
   // Avisos não lidos: o ponto na aba Menu (a mesma chamada do Início e do
-  // Menu). Só o cliente tem avisos.
+  // Menu). Só o cliente que entrou tem avisos.
   const unreadMessages =
-    kind === "client" ? (await getAccount()).unreadMessages : 0;
+    session === "client" ? (await getAccount()).unreadMessages : 0;
   // A aba Comissões só existe para a clínica que as usa (funcionalidade do plano).
   const showCommissions =
     kind === "professional" &&
@@ -46,7 +49,8 @@ export default async function AccountAppLayout({
       </main>
       {/* Avisos de confirmação e de notificação nova, no rodapé, acima das abas. */}
       <AppToaster withNav />
-      <AppNewNoticeToasts kind={kind} />
+      {/* Só com sessão: as conferências de aviso exigem quem entrou. */}
+      {session && <AppNewNoticeToasts kind={session} />}
       <AppBottomNav
         hasUnread={unreadMessages > 0}
         kind={kind}

@@ -1,3 +1,5 @@
+import { lookupIfAllowed } from "@/utils/lookup";
+import { getCurrentUser } from "@/services/auth.service";
 import { notFound } from "next/navigation";
 import { ProductForm, type Option } from "@/components/products/ProductForm";
 import { ApiError } from "@/services/api";
@@ -26,15 +28,20 @@ function withCurrent(
 
 /** Cadastro e alteração de produto: busca as opções (e o produto) e entrega ao formulário. */
 export async function ProductFormPage({ id }: { id?: string }) {
+  // Cacheado na requisição: o layout já o buscou.
+  const user = await getCurrentUser();
   const [categories, suppliers, product] = await Promise.all([
     // Produto não entra em categoria inativa.
     listProductCategories({ isActive: true, page: 1, limit: LOOKUP_LIMIT }),
-    listPeople({
-      type: "SUPPLIER",
-      isActive: true,
-      page: 1,
-      limit: LOOKUP_LIMIT,
-    }),
+    // Sem Fornecedores na empresa, a lista vem vazia (a API recusaria).
+    lookupIfAllowed(user.access, "suppliers", () =>
+      listPeople({
+        type: "SUPPLIER",
+        isActive: true,
+        page: 1,
+        limit: LOOKUP_LIMIT,
+      }),
+    ),
     id
       ? getProduct(id).catch((error: unknown) => {
           if (error instanceof ApiError && error.status === 404) notFound();

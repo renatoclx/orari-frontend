@@ -11,6 +11,7 @@ foi pago.
   Contas a receber. Só o **ADMIN**.
 - Funcionalidade `payables` ("Contas a pagar") com as quatro ações: Pagar e
   Alterar = Edita; Cancelar e Excluir = Exclui.
+- As listas de apoio da tela (categorias, fornecedores, profissionais e métodos de pagamento) só são buscadas se a empresa tem a funcionalidade correspondente; sem ela, aquela lista vem vazia e a tela abre normalmente (a API recusa a busca de quem não tem a funcionalidade).
 
 ## Regras
 

@@ -1,3 +1,4 @@
+import { lookupIfAllowed } from "@/utils/lookup";
 import Link from "next/link";
 import { Plus } from "lucide-react";
 import { Can } from "@/components/layout/Access";
@@ -56,12 +57,15 @@ export async function ProductsListPage({
       listProducts({ ...productApiFilters(filters), page, limit: PAGE_SIZE }),
       // Todas as categorias, inclusive as inativas: produtos antigos ainda usam.
       listProductCategories({ page: 1, limit: LOOKUP_LIMIT }),
-      listPeople({
-        type: "SUPPLIER",
-        isActive: true,
-        page: 1,
-        limit: LOOKUP_LIMIT,
-      }),
+      // Sem Fornecedores na empresa, a lista vem vazia (a API recusaria).
+      lookupIfAllowed(user.access, "suppliers", () =>
+        listPeople({
+          type: "SUPPLIER",
+          isActive: true,
+          page: 1,
+          limit: LOOKUP_LIMIT,
+        }),
+      ),
       canPayable
         ? listExpenseCategories({
             isActive: true,

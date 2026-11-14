@@ -54,6 +54,7 @@
 ### Vínculo com um profissional ou funcionário
 
 - O campo **Função** vincula o usuário ao cadastro de uma pessoa (`peopleId`): **Profissional** ou **Funcionário** (recepção, secretaria), ou **Nenhuma**. Não há flag própria: ter ou não o vínculo é a informação.
+- As pessoas das listas de vínculo só são buscadas se a empresa tem a funcionalidade (Profissionais, Funcionários): sem ela, aquela lista fica vazia e a tela abre normalmente (a API recusa a busca de quem não tem a funcionalidade).
 - Só o vínculo com **profissional** dá acesso às fichas de anamnese. O vínculo com funcionário identifica a função do usuário; o acesso dele será tratado à parte.
 - Só aparece para ADMIN e USER, e não no cadastro do administrador de uma empresa nova. Escolhida a função, mostra a seleção da pessoa (ativas daquele tipo, até 100 de cada, carregadas na própria página), obrigatória. Trocar a função limpa a pessoa escolhida.
 - Uma pessoa liga-se a no máximo um usuário ativo: se já estiver ligada, a API responde 409 e a mensagem vai para o campo da pessoa.

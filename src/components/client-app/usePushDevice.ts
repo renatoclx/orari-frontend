@@ -1,5 +1,6 @@
 "use client";
 
+import { isStandalone } from "@/components/client-app/standalone";
 import { useCallback, useEffect, useState } from "react";
 import {
   appPushSubscribeAction,
@@ -37,11 +38,6 @@ const isSupported = () =>
   "serviceWorker" in navigator &&
   "PushManager" in window &&
   "Notification" in window;
-
-const isStandalone = () =>
-  window.matchMedia("(display-mode: standalone)").matches ||
-  // Safari do iPhone antigo: a marca própria dele.
-  (navigator as Navigator & { standalone?: boolean }).standalone === true;
 
 // Cada etapa da ativação tem um limite: travada, vira um erro que diz onde
 // parou (no celular não há console para descobrir). O pedido de permissão fica

@@ -1,3 +1,4 @@
+import { InstallPrompt } from "@/components/client-app/InstallPrompt";
 import { Building2, UserRound } from "lucide-react";
 import { AppFormMessage } from "@/components/client-app/AppFormMessage";
 import { firstName, greetingDate } from "@/components/client-app/client-app";
@@ -105,6 +106,7 @@ async function HomeContent({
   return (
     <>
       {!welcome.dismissed && <HomeWelcome />}
+      <InstallPrompt />
       <HomeToday today={home.today} timeZone={timeZone} />
       <HomeWeekChart week={home.week} today={todayIn(timeZone)} />
       <HomeMonth month={home.month} />

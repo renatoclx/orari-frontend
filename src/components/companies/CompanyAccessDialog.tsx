@@ -8,7 +8,6 @@ import { AccessMatrix } from "@/components/companies/AccessMatrix";
 import {
   ACCESS_TEMPLATES,
   applyTemplate,
-  parseLimit,
   validateLimits,
   type LimitErrors,
   type LimitValues,
@@ -116,13 +115,8 @@ function AccessForm({
   function applyPlanTemplate(key: string) {
     const template = ACCESS_TEMPLATES.find((item) => item.key === key);
     if (!template || !state) return;
-    const next = applyTemplate(template, {
-      matrix: state.matrix,
-      limits: {
-        professionals: parseLimit(state.limits.professionals) ?? 1,
-        admins: parseLimit(state.limits.admins) ?? 1,
-      },
-    });
+    // O plano define a matriz e os limites (profissionais e administradores).
+    const next = applyTemplate(template);
     setErrors({});
     setState({
       ...state,

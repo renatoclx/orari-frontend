@@ -218,6 +218,10 @@ regras de cada tela, em `docs/screens/`.
 - **2026-11-13 — Lista de serviços do app em linhas com seta:** para o cliente do local cada linha abre o Agendar com o serviço escolhido; para quem não é cliente, só informação. O escolhido ganha visto e fundo suave, não um bloco cheio.
 - **2026-11-13 — O profissional entra no app por telefone ou e-mail** (campo único "Telefone ou e-mail", máscara só para número); o e-mail não serve ao cliente. O painel web é recusado pela própria API (403 no `POST /auth/login`).
 
+## Planos
+
+- **2026-11-16 — Três planos: Essencial (até 2 profissionais), Plus (até 4) e Clinical (até 6).** Essencial: agenda, cadastros, app do cliente e do profissional, mensagens, receber o cliente (comanda) e o Dashboard, com Contas a receber só para ver; Plus: tudo menos anamnese e turmas; Clinical: tudo. Os modelos de acesso do SUPER_ADMIN seguem os três (substituem Agenda, Essencial, Profissional e Completo). Preço em estudo; profissional extra proposto a R$ 16,90 em todos os planos. WhatsApp será adicional pago.
+
 ## Qualidade e testes
 
 - **2026-10-23 — Testes automáticos só de funções puras e de pontos de borda do servidor,** com Vitest (a mesma ferramenta do backend) e `arquivo.spec.ts` ao lado do código. _Por quê:_ é onde está a regra que quebra sem barulho (fuso, arredondamento, disponibilidade de horários); componentes e telas seguem verificados à mão e com `axe-core`. Ponta a ponta (Playwright) fica fora por ora.

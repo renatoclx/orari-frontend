@@ -255,26 +255,15 @@ export function toggleAccess(
   return { ...matrix, [featureKey]: next };
 }
 
-// Funcionalidades que cada modelo deixa de fora.
-const ANAMNESIS_KEYS = ["anamnesis", "anamnesis-templates", "anamnesis-audit"];
-const CLASS_KEYS = ["class-groups"];
-// Portal do cliente e Mensagens ficam fora de todos os modelos por enquanto: o
-// SUPER_ADMIN libera empresa por empresa (backend: migração client_portal_off).
-const PORTAL_KEYS = ["client-portal", "messages"];
-// Produtos também ficam fora de todos os modelos: o SUPER_ADMIN libera a quem
-// contratar (backend: DEFAULT_OFF).
-const PRODUCT_KEYS = ["product-categories", "products", "product-sales"];
-// Relatórios por versão (a revisar): os da agenda em todas; os do dinheiro a
-// partir do Essencial; os demais a partir do Profissional.
-const FULL_REPORT_KEYS = [
-  "rankings",
-  "client-portfolio",
-  "clients-report",
-  "packages-report",
-];
-// Versão só de agendamento: agenda, cadastros, configurações, o app do
-// cliente e os relatórios da agenda; sem pacotes nem financeiro.
-const AGENDA_KEYS = [
+// Planos do Orari (decididos em 2026-11-16): Essencial (até 2 profissionais),
+// Plus (até 4) e Clinical (até 6). Os modelos só preenchem a tela; depois de
+// aplicados, tudo continua editável. O app do cliente (portal) e as mensagens
+// entram nos três; o WhatsApp, quando vier, será adicional pago.
+
+// Essencial (nail designer, designer de sobrancelhas): a agenda, os cadastros,
+// o app do cliente e do profissional, e receber o cliente (comanda e métodos de
+// pagamento), com o Dashboard e os relatórios da agenda.
+const ESSENTIAL_KEYS = [
   "appointments",
   "recurrences",
   "clients",
@@ -284,9 +273,23 @@ const AGENDA_KEYS = [
   "services",
   "settings",
   "client-portal",
+  "messages",
   "professional-app",
+  "tabs",
+  "payment-methods",
+  "payments",
+  "financial-report",
   "appointments-report",
+  "clients-report",
+  "client-portfolio",
   "dashboard",
+];
+// Plus (barbearia): tudo, menos anamnese e turmas.
+const CLINICAL_ONLY_KEYS = [
+  "anamnesis",
+  "anamnesis-templates",
+  "anamnesis-audit",
+  "class-groups",
 ];
 
 export type AccessTemplate = {
@@ -294,62 +297,51 @@ export type AccessTemplate = {
   label: string;
   matrix: AccessMatrix;
   admins: number;
-  /** Só o Essencial tem limite decidido; nos demais, o valor atual é mantido. */
-  professionals?: number;
+  professionals: number;
 };
 
-// Nomes provisórios (Obsidian: Planos 00). Os modelos só preenchem a tela;
-// depois de aplicados, tudo continua editável.
+// No Essencial, Contas a receber fica só para ver: o "Recebido" do Dashboard e
+// o relatório Financeiro exigem ver os pagamentos, mas a gestão (lançar, alterar
+// e excluir contas) é do Plus em diante. A comanda dá baixa pela própria
+// funcionalidade (Comandas).
+function essentialMatrix(): AccessMatrix {
+  const matrix = matrixWith((key) => ESSENTIAL_KEYS.includes(key));
+  return {
+    ...matrix,
+    payments: { view: true, edit: false, create: false, remove: false },
+  };
+}
+
 export const ACCESS_TEMPLATES: AccessTemplate[] = [
-  {
-    key: "agenda",
-    label: "Agenda",
-    matrix: matrixWith((key) => AGENDA_KEYS.includes(key)),
-    admins: 1,
-  },
   {
     key: "essential",
     label: "Essencial",
-    matrix: matrixWith(
-      (key) =>
-        !ANAMNESIS_KEYS.includes(key) &&
-        !CLASS_KEYS.includes(key) &&
-        !PORTAL_KEYS.includes(key) &&
-        !PRODUCT_KEYS.includes(key) &&
-        !FULL_REPORT_KEYS.includes(key),
-    ),
+    matrix: essentialMatrix(),
     admins: 1,
-    professionals: 3,
+    professionals: 2,
   },
   {
-    key: "professional",
-    label: "Profissional",
-    matrix: matrixWith(
-      (key) =>
-        !CLASS_KEYS.includes(key) &&
-        !PORTAL_KEYS.includes(key) &&
-        !PRODUCT_KEYS.includes(key),
-    ),
+    key: "plus",
+    label: "Plus",
+    matrix: matrixWith((key) => !CLINICAL_ONLY_KEYS.includes(key)),
     admins: 1,
+    professionals: 4,
   },
   {
-    key: "complete",
-    label: "Completo",
-    matrix: matrixWith(
-      (key) => !PORTAL_KEYS.includes(key) && !PRODUCT_KEYS.includes(key),
-    ),
+    key: "clinical",
+    label: "Clinical",
+    matrix: matrixWith(() => true),
     admins: 2,
+    professionals: 6,
   },
 ];
 
-export function applyTemplate(
-  template: AccessTemplate,
-  current: CompanyAccess,
-): CompanyAccess {
+/** O modelo define a matriz e os dois limites (profissionais e administradores). */
+export function applyTemplate(template: AccessTemplate): CompanyAccess {
   return {
     matrix: template.matrix,
     limits: {
-      professionals: template.professionals ?? current.limits.professionals,
+      professionals: template.professionals,
       admins: template.admins,
     },
   };

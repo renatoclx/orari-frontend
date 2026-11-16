@@ -1,16 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import {
-  BookOpen,
-  Check,
-  ChevronLeft,
-  ChevronRight,
-  Copy,
-  Share,
-  SquarePlus,
-  X,
-} from "lucide-react";
+import { Check, Copy, Ellipsis, Share, SquarePlus, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 /**
@@ -80,25 +71,35 @@ export function InstallIosSheet({
 
         {safari ? (
           <ol className="space-y-5">
-            <Step number={1} title="Toque em Compartilhar">
-              {/* Barra do Safari (ilustrativa): o botão certo em destaque. */}
+            <Step number={1} title="Toque nos três pontinhos">
+              {/* Barra do Safari (ilustrativa): o endereço e o botão "…" em destaque. */}
               <div
                 aria-hidden="true"
-                className="mt-2 flex items-center justify-between rounded-control bg-muted px-5 py-2 text-muted-foreground"
+                className="mt-2 flex items-center gap-3 rounded-control bg-muted px-4 py-2 text-muted-foreground"
               >
-                <ChevronLeft className="size-5" />
-                <ChevronRight className="size-5" />
-                <span className="flex size-11 items-center justify-center rounded-full bg-primary/15 text-primary ring-2 ring-primary">
-                  <Share className="size-5" />
+                <span className="flex h-9 flex-1 items-center justify-center rounded-full bg-background/60 text-xs">
+                  app.orariapp.com.br
                 </span>
-                <BookOpen className="size-5" />
-                <Copy className="size-5" />
+                <span className="flex size-11 shrink-0 items-center justify-center rounded-full bg-primary/15 text-primary ring-2 ring-primary">
+                  <Ellipsis className="size-5" />
+                </span>
               </div>
               <p className="mt-1.5 text-xs text-muted-foreground">
-                O quadrado com a seta para cima, no meio da barra de baixo.
+                O botão com os três pontinhos fica ao lado do endereço, na barra
+                do Safari. Se a sua barra já mostrar o Compartilhar (iOS mais
+                antigo), vá para o passo 2.
               </p>
             </Step>
-            <Step number={2} title="Escolha Adicionar à Tela de Início">
+            <Step number={2} title="Toque em Compartilhar">
+              <div
+                aria-hidden="true"
+                className="mt-2 flex items-center justify-between rounded-control bg-muted px-4 py-3 text-sm ring-2 ring-primary"
+              >
+                <span>Compartilhar</span>
+                <Share className="size-5" />
+              </div>
+            </Step>
+            <Step number={3} title="Escolha Adicionar à Tela de Início">
               <div
                 aria-hidden="true"
                 className="mt-2 flex items-center justify-between rounded-control bg-muted px-4 py-3 text-sm ring-2 ring-primary"
@@ -110,7 +111,7 @@ export function InstallIosSheet({
                 Role a lista para baixo, se não aparecer logo.
               </p>
             </Step>
-            <Step number={3} title="Toque em Adicionar">
+            <Step number={4} title="Toque em Adicionar">
               <p className="mt-1 text-sm text-muted-foreground">
                 O Orari aparece na tela de início. Abra o app por ele.
               </p>

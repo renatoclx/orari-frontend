@@ -7,6 +7,7 @@ import {
   maskPhone,
   onlyDigits,
   maskPhoneOrEmail,
+  phoneDigits,
 } from "@/utils/masks";
 
 describe("onlyDigits", () => {
@@ -112,5 +113,36 @@ describe("maskPhoneOrEmail", () => {
   it("deixa o texto como está quando vira e-mail", () => {
     expect(maskPhoneOrEmail("pro@clinica.com")).toBe("pro@clinica.com");
     expect(maskPhoneOrEmail("p")).toBe("p");
+  });
+});
+
+describe("telefone com código do país", () => {
+  it("cola +55 e salva a partir do DDD", () => {
+    expect(maskPhone("+55 31 99000-1111")).toBe("(31) 99000-1111");
+    expect(maskPhone("+5531990001111")).toBe("(31) 99000-1111");
+    expect(maskPhone("+55 (31) 3322-4455")).toBe("(31) 3322-4455");
+  });
+
+  it("55 sem o +, com 12 ou 13 dígitos, também é o país", () => {
+    expect(maskPhone("5531990001111")).toBe("(31) 99000-1111");
+    expect(maskPhone("553133224455")).toBe("(31) 3322-4455");
+  });
+
+  it("DDD 55 (Rio Grande do Sul) continua valendo", () => {
+    expect(maskPhone("55999991111")).toBe("(55) 99999-1111");
+    expect(maskPhone("5533224455")).toBe("(55) 3322-4455");
+    expect(maskPhone("+55 55 99999-1111")).toBe("(55) 99999-1111");
+  });
+
+  it("digitando devagar, o 55 do país sai ao completar o número", () => {
+    let shown = "";
+    for (const char of "+55 31 99000-1111") shown = maskPhone(shown + char);
+    expect(shown).toBe("(31) 99000-1111");
+  });
+
+  it("phoneDigits devolve só o DDD e o número", () => {
+    expect(phoneDigits("+55 31 99000-1111")).toBe("31990001111");
+    expect(phoneDigits("(31) 99000-1111")).toBe("31990001111");
+    expect(phoneDigits("55999991111")).toBe("55999991111");
   });
 });

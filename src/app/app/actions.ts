@@ -56,7 +56,7 @@ import {
   setAppProSession,
   setAppSession,
 } from "@/services/app-session";
-import { onlyDigits } from "@/utils/masks";
+import { onlyDigits, phoneDigits } from "@/utils/masks";
 import {
   deletePushSubscription,
   clearMessages,
@@ -106,7 +106,7 @@ export async function appLoginAction(
 
   const byEmail = isEmailLogin(login);
   const professional = await loginProfessional(
-    byEmail ? login : onlyDigits(login),
+    byEmail ? login : phoneDigits(login),
     password,
   );
   if (professional === "entered") redirect("/app");
@@ -124,7 +124,7 @@ export async function appLoginAction(
 
   try {
     await setAppSession(
-      await loginAccount({ phone: onlyDigits(login), password }),
+      await loginAccount({ phone: phoneDigits(login), password }),
     );
   } catch (error) {
     if (!(error instanceof ApiError)) throw error;
@@ -161,7 +161,7 @@ export async function appRegisterAction(
     await setAppSession(
       await registerAccount({
         name,
-        phone: onlyDigits(phone),
+        phone: phoneDigits(phone),
         password,
         passwordConfirmation,
       }),
@@ -207,7 +207,7 @@ export async function appAccessLinkAction(
             token,
             password,
             passwordConfirmation,
-            ...(needsPhone && { phone: onlyDigits(phone) }),
+            ...(needsPhone && { phone: phoneDigits(phone) }),
           },
     );
     if (result.token && result.expiresAt) {
@@ -458,7 +458,7 @@ export async function appProfileAction(
   ) as ProfileFields;
   const currentPassword = text(formData, "currentPassword");
   const values = { ...fields };
-  const phoneChanged = onlyDigits(fields.phone) !== originalPhone;
+  const phoneChanged = phoneDigits(fields.phone) !== originalPhone;
   const fieldErrors: AppFormState["fieldErrors"] = {
     ...profileErrors(fields, toDateString(new Date(), "America/Sao_Paulo")),
     ...(phoneChanged &&
@@ -475,7 +475,7 @@ export async function appProfileAction(
       : undefined;
     await saveProfile({
       name: fields.name.trim(),
-      phone: onlyDigits(fields.phone),
+      phone: phoneDigits(fields.phone),
       email: orNull(fields.email),
       document: orNull(onlyDigits(fields.document)),
       birthDate: orNull(fields.birthDate),

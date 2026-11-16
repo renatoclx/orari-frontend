@@ -1,4 +1,4 @@
-import { onlyDigits } from "@/utils/masks";
+import { onlyDigits, phoneDigits } from "@/utils/masks";
 
 /** Campos validados no cliente e de novo no servidor. */
 export type PersonFormValues = {
@@ -38,7 +38,7 @@ export function validatePersonForm(
     errors.name = "Informe o nome.";
   }
 
-  const phone = onlyDigits(values.phone);
+  const phone = phoneDigits(values.phone);
   if (!phone) {
     errors.phone = "Informe um contato.";
   } else if (phone.length < 10) {

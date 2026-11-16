@@ -7,7 +7,7 @@ import { AppField } from "@/components/client-app/AppField";
 import { AppFormMessage } from "@/components/client-app/AppFormMessage";
 import { Button } from "@/components/ui/button";
 import type { AppProfile } from "@/types/client-app";
-import { onlyDigits } from "@/utils/masks";
+import { onlyDigits, phoneDigits } from "@/utils/masks";
 
 /**
  * Formulário de Meus dados (screens/app-cliente.md): dados pessoais, contato e
@@ -31,7 +31,7 @@ export function ProfileForm({ profile }: { profile: AppProfile }) {
   const [cepMessage, setCepMessage] = useState<string>();
   const [searching, startSearch] = useTransition();
   const errors = state?.fieldErrors ?? {};
-  const phoneChanged = onlyDigits(phone) !== profile.phone;
+  const phoneChanged = phoneDigits(phone) !== profile.phone;
 
   // Ao terminar o CEP (8 dígitos): preenche rua, bairro e cidade.
   function searchCep(cep: string) {

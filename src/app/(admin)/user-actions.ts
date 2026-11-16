@@ -10,7 +10,7 @@ import {
   type UserFormValues,
 } from "@/components/users/user-validation";
 import { failureFrom, type ActionFailure } from "@/lib/action-result";
-import { onlyDigits } from "@/utils/masks";
+import { phoneDigits } from "@/utils/masks";
 import { ApiError } from "@/services/api";
 import {
   createUser,
@@ -65,7 +65,7 @@ export async function createUserAction(
       ...(linkApplies(values) && { peopleId: values.peopleId }),
       // O login do usuário só de app no aplicativo (só dígitos).
       ...(values.type === "PROFESSIONAL" && {
-        phone: onlyDigits(values.phone),
+        phone: phoneDigits(values.phone),
       }),
     });
   } catch (error) {
@@ -95,7 +95,7 @@ export async function updateUserAction(
       peopleId: linkApplies(values) ? values.peopleId : null,
       // Sair do tipo só de app apaga o telefone na API; aqui só vai o dele.
       ...(values.type === "PROFESSIONAL" && {
-        phone: onlyDigits(values.phone),
+        phone: phoneDigits(values.phone),
       }),
     });
   } catch (error) {

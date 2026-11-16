@@ -2,6 +2,7 @@ import { AppNotice } from "@/components/client-app/AppNotice";
 import type { Metadata } from "next";
 import { AppTips } from "@/components/client-app/AppTips";
 import { FeaturedAppointmentCard } from "@/components/client-app/FeaturedAppointmentCard";
+import { InstallPrompt } from "@/components/client-app/InstallPrompt";
 import { PushInvite } from "@/components/client-app/PushInvite";
 import { ProfessionalHome } from "@/components/professional-app/ProfessionalHome";
 import { RecentPlaces } from "@/components/client-app/RecentPlaces";
@@ -83,6 +84,9 @@ export default async function AppHomePage({ searchParams }: PageProps<"/app">) {
       )}
 
       {featured && <FeaturedAppointmentCard featured={featured} />}
+
+      {/* Instalar o app (Android: botão do navegador; iPhone: instruções). */}
+      <InstallPrompt />
 
       {/* Sem as chaves no servidor, os avisos estão desligados: sem convite. */}
       {publicKey && <PushInvite publicKey={publicKey} />}

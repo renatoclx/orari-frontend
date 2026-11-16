@@ -70,6 +70,7 @@
 - Foto é opcional.
 - Poderá adicionar uma foto ou tirar uma foto através do dispositivo.
 - Adicionar máscara para campo celular: (##) #####-####.
+  - O telefone é guardado **a partir do DDD**: quem cola ou o preenchimento automático traz "+55 31 99000-1111" (ou 12 ou 13 dígitos começando em 55), o 55 do país sai (`phoneDigits`, em `utils/masks.ts`). Um número de 11 dígitos começando em 55 é do DDD 55 (RS) e fica como está. O servidor aplica a mesma regra antes de enviar à API.
 - Adicionar máscara para campo de CPF: ###.###.###-##.
 - Os registros serão inseridos na base sem as máscara.
 - Nome obrigatório.

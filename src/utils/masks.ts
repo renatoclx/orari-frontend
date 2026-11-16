@@ -13,9 +13,25 @@ export function maskPhoneOrEmail(value: string): string {
   return /^[\d\s()+\-.]*$/.test(value) ? maskPhone(value) : value;
 }
 
+/**
+ * Só os dígitos do telefone brasileiro, a partir do DDD: tira o código do país
+ * (55) de quem cola ou preenche "+55 31 99000-1111". Um número brasileiro tem no
+ * máximo 11 dígitos; com 12 ou 13 e começando em 55, o 55 é o país (o DDD 55
+ * também existe, mas "55" + DDD + número sempre passa de 11). Com o "+" no
+ * início, o 55 sai de qualquer jeito.
+ */
+export function phoneDigits(value: string): string {
+  const digits = onlyDigits(value);
+  const explicit = value.trim().startsWith("+");
+  if (digits.startsWith("55") && (explicit || digits.length >= 12)) {
+    return digits.slice(2);
+  }
+  return digits;
+}
+
 /** "11987654321" → "(11) 98765-4321"; "1133224455" → "(11) 3322-4455" */
 export function maskPhone(value: string): string {
-  const digits = onlyDigits(value).slice(0, 11);
+  const digits = phoneDigits(value).slice(0, 11);
   if (digits.length <= 2) return digits.length ? `(${digits}` : "";
   const area = digits.slice(0, 2);
   const rest = digits.slice(2);

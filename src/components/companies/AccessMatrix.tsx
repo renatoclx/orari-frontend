@@ -3,8 +3,10 @@
 import {
   ACCESS_ACTIONS,
   ACCESS_GROUPS,
+  groupState,
   isActionApplicable,
   toggleAccess,
+  toggleGroup,
 } from "@/components/companies/company-access";
 import { Checkbox } from "@/components/ui/checkbox";
 import type { AccessAction, AccessMatrix } from "@/types/company-access";
@@ -37,49 +39,72 @@ export function AccessMatrix({ value, onChange }: AccessMatrixProps) {
         ))}
       </div>
 
-      {ACCESS_GROUPS.map((group) => (
-        <section key={group.label}>
-          <h3 className="border-b border-border bg-background px-3 py-1.5 text-xs font-medium tracking-wide text-muted-foreground uppercase md:border-t-0">
-            {group.label}
-          </h3>
-          <ul className="divide-y divide-border">
-            {group.features.map((feature) => {
-              const row = value[feature.key];
-              return (
-                <li
-                  key={feature.key}
-                  className={`grid grid-cols-2 gap-x-3 gap-y-2 px-3 py-2.5 md:items-center ${ROW_GRID}`}
-                >
-                  <span className="col-span-2 text-sm font-medium md:col-span-1">
-                    {feature.label}
-                  </span>
-                  {ACCESS_ACTIONS.map((action) => (
-                    <AccessCell
-                      key={action.key}
-                      featureLabel={feature.label}
-                      actionLabel={action.label}
-                      applicable={isActionApplicable(feature.key, action.key)}
-                      checked={row?.[action.key] ?? false}
-                      // Sem Visualiza, as outras colunas ficam travadas.
-                      disabled={action.key !== "view" && !row?.view}
-                      onChange={(checked) =>
-                        onChange(
-                          toggleAccess(
-                            value,
-                            feature.key,
-                            action.key as AccessAction,
-                            checked,
-                          ),
-                        )
-                      }
-                    />
-                  ))}
-                </li>
-              );
-            })}
-          </ul>
-        </section>
-      ))}
+      {ACCESS_GROUPS.map((group) => {
+        const state = groupState(value, group.features);
+        return (
+          <section key={group.label}>
+            <h3 className="border-b border-border bg-background px-3 py-1.5 text-xs font-medium tracking-wide text-muted-foreground uppercase md:border-t-0">
+              {/* Caixa da seção: marca ou desmarca todas as colunas dela. Meio
+                marcada quando só parte da seção está liberada. */}
+              <label className="inline-flex cursor-pointer items-center gap-2">
+                <Checkbox
+                  checked={
+                    state === "all"
+                      ? true
+                      : state === "some"
+                        ? "indeterminate"
+                        : false
+                  }
+                  aria-label={`Todas as funcionalidades de ${group.label}`}
+                  // Meio marcada ou vazia: marca tudo; toda marcada: desmarca.
+                  onCheckedChange={() =>
+                    onChange(
+                      toggleGroup(value, group.features, state !== "all"),
+                    )
+                  }
+                />
+                {group.label}
+              </label>
+            </h3>
+            <ul className="divide-y divide-border">
+              {group.features.map((feature) => {
+                const row = value[feature.key];
+                return (
+                  <li
+                    key={feature.key}
+                    className={`grid grid-cols-2 gap-x-3 gap-y-2 px-3 py-2.5 md:items-center ${ROW_GRID}`}
+                  >
+                    <span className="col-span-2 text-sm font-medium md:col-span-1">
+                      {feature.label}
+                    </span>
+                    {ACCESS_ACTIONS.map((action) => (
+                      <AccessCell
+                        key={action.key}
+                        featureLabel={feature.label}
+                        actionLabel={action.label}
+                        applicable={isActionApplicable(feature.key, action.key)}
+                        checked={row?.[action.key] ?? false}
+                        // Sem Visualiza, as outras colunas ficam travadas.
+                        disabled={action.key !== "view" && !row?.view}
+                        onChange={(checked) =>
+                          onChange(
+                            toggleAccess(
+                              value,
+                              feature.key,
+                              action.key as AccessAction,
+                              checked,
+                            ),
+                          )
+                        }
+                      />
+                    ))}
+                  </li>
+                );
+              })}
+            </ul>
+          </section>
+        );
+      })}
     </div>
   );
 }

@@ -299,6 +299,7 @@ const helpLink: NavLink = {
 // Só o SUPER_ADMIN gerencia empresas (screens/empresas.md): o item entra no fim do
 // menu e some para os demais perfis.
 const superAdminItems: NavLink[] = [
+  { href: "/painel", label: "Painel", icon: LayoutDashboard },
   { href: "/empresas", label: "Empresas", icon: Building2 },
   { href: "/assinaturas", label: "Assinaturas", icon: CreditCard },
 ];

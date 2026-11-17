@@ -16,8 +16,8 @@ export async function requireFeature(
 ) {
   const user = await getCurrentUser();
   // O SUPER_ADMIN só administra as empresas: qualquer tela da aplicação
-  // (inclusive a inicial, para onde o login leva) o manda para a gestão.
-  if (user.type === "SUPER_ADMIN") redirect("/empresas");
+  // (inclusive a inicial, para onde o login leva) o manda para o Painel.
+  if (user.type === "SUPER_ADMIN") redirect("/painel");
   if (!canAccess(user.access, feature, action)) notFound();
   return user;
 }

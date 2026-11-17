@@ -4,6 +4,7 @@ import { cache } from "react";
 import { forwardedForHeader } from "@/lib/client-ip";
 import { apiFetch } from "@/services/api";
 import type { AuthTokens, CurrentUser } from "@/types/auth";
+import { withReadOnlyAccess } from "@/utils/access";
 
 // Rotas de autenticação da API. Telas, layouts e Server Actions chamam estas
 // funções, nunca o apiFetch direto.
@@ -55,6 +56,9 @@ export function logout(refreshToken: string): Promise<void> {
 /**
  * Usuário da sessão e a empresa dele; a API recusa (401) se a sessão acabou.
  * O `cache` evita repetir a chamada quando o layout e a página precisam do
- * usuário na mesma requisição.
+ * usuário na mesma requisição. Com a assinatura em somente leitura, os acessos
+ * já chegam só com o Visualiza: os botões de gravar somem em todas as telas.
  */
-export const getCurrentUser = cache(() => apiFetch<CurrentUser>("/auth/me"));
+export const getCurrentUser = cache(async () =>
+  withReadOnlyAccess(await apiFetch<CurrentUser>("/auth/me")),
+);

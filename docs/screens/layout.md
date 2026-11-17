@@ -22,6 +22,15 @@
 - **Sino de notificações** (à esquerda da logo e do usuário): o número de não lidas numa marca vermelha, o painel das últimas 10 e o link para a página (ver [notificacoes.md](notificacoes.md)).
 - O menu do usuário (avatar) reúne: **Configurações da empresa**, **Tema escuro** (item com switch; alterna sem fechar o menu) e **Sair** (com confirmação). O tema deixou de ter botão próprio no header. Na tela de login o tema continua como switch.
 
+## Aviso da assinatura
+
+- Faixa logo abaixo do header, fora da rolagem, com a situação da assinatura da empresa (`subscription` do `/auth/me`; o "hoje" no fuso da empresa):
+  - **Em teste** (cinza, ícone de ampulheta): "Seu teste grátis termina em N dias (dd/mm)." e, no último dia, "Hoje é o último dia do seu teste grátis."
+  - **Em atraso** (vermelho claro, alerta): "O pagamento da assinatura venceu. A partir de dd/mm, o sistema fica somente para consulta."
+  - **Somente leitura** e **Cancelada** (vermelho claro, cadeado): o sistema está só para consulta.
+  - Ativa ou sem assinatura: sem faixa.
+- Em somente leitura, os acessos chegam só com o Visualiza (`withReadOnlyAccess`, no `getCurrentUser`): somem os botões de cadastrar, alterar, excluir e os atalhos; páginas de cadastro e alteração dão "não encontrada". A API recusa as gravações de qualquer forma.
+
 ---
 
 ## Barra de ações lateral

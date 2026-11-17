@@ -2,6 +2,7 @@ import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { AdminShell } from "@/components/layout/AdminShell";
 import { SIDEBAR_COOKIE } from "@/components/layout/sidebar-cookie";
+import { subscriptionNotice } from "@/components/layout/subscription-notice";
 import { getCurrentUser } from "@/services/auth.service";
 
 export default async function AdminLayout({ children }: LayoutProps<"/">) {
@@ -16,8 +17,15 @@ export default async function AdminLayout({ children }: LayoutProps<"/">) {
   // ele volta para o app caso uma sessão da clínica tenha escapado.
   if (user.type === "PROFESSIONAL") redirect("/app");
 
+  // Aviso da assinatura, com o "hoje" no fuso da empresa. Calculado aqui, no
+  // servidor, para o texto não mudar ao hidratar perto da meia-noite.
+  const today = new Intl.DateTimeFormat("en-CA", {
+    timeZone: user.company.timezone,
+  }).format(new Date());
+  const notice = subscriptionNotice(user.subscription, today);
+
   return (
-    <AdminShell defaultCollapsed={collapsed} user={user}>
+    <AdminShell defaultCollapsed={collapsed} user={user} notice={notice}>
       {children}
     </AdminShell>
   );

@@ -8,6 +8,8 @@ import { Header } from "@/components/layout/Header";
 import { Sidebar } from "@/components/layout/Sidebar";
 import { WelcomeToast } from "@/components/layout/WelcomeToast";
 import { SIDEBAR_COOKIE } from "@/components/layout/sidebar-cookie";
+import { SubscriptionBanner } from "@/components/layout/SubscriptionBanner";
+import type { SubscriptionNotice } from "@/components/layout/subscription-notice";
 import { OnboardingDialogHost } from "@/components/onboarding/OnboardingDialogHost";
 import { anamnesisAccess } from "@/utils/anamnesis-access";
 import { canAccess } from "@/utils/access";
@@ -16,6 +18,8 @@ import type { CurrentUser } from "@/types/auth";
 type AdminShellProps = {
   defaultCollapsed: boolean;
   user: CurrentUser;
+  /** Aviso da assinatura (teste, atraso, somente leitura); nulo quando não há. */
+  notice: SubscriptionNotice | null;
   children: React.ReactNode;
 };
 
@@ -23,6 +27,7 @@ type AdminShellProps = {
 export function AdminShell({
   defaultCollapsed,
   user,
+  notice,
   children,
 }: AdminShellProps) {
   const [collapsed, setCollapsed] = useState(defaultCollapsed);
@@ -62,6 +67,7 @@ export function AdminShell({
 
           <div className="flex min-w-0 flex-1 flex-col">
             <Header user={user} onOpenMobile={() => setMobileOpen(true)} />
+            {notice && <SubscriptionBanner notice={notice} />}
             {/* A página não rola: cada componente cuida da própria rolagem. */}
             <main
               id="conteudo"

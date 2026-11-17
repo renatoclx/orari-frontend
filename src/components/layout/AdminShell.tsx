@@ -72,7 +72,10 @@ export function AdminShell({
             </main>
           </div>
 
-          <ActionBar timeZone={user.company.timezone} />
+          {/* Atalhos da agenda: o SUPER_ADMIN não usa a aplicação da empresa. */}
+          {user.type !== "SUPER_ADMIN" && (
+            <ActionBar timeZone={user.company.timezone} />
+          )}
           <WelcomeToast userName={user.name} />
           {/* Primeiros passos: só o ADMIN; abre por ?passos=1 (notificação). */}
           {user.type === "ADMIN" && (

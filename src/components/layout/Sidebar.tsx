@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import {
   Building2,
   CreditCard,
+  HandCoins,
   CalendarDays,
   ChartColumn,
   ChevronDown,
@@ -302,6 +303,7 @@ const superAdminItems: NavLink[] = [
   { href: "/painel", label: "Painel", icon: LayoutDashboard },
   { href: "/empresas", label: "Empresas", icon: Building2 },
   { href: "/assinaturas", label: "Assinaturas", icon: CreditCard },
+  { href: "/cobrancas", label: "Cobranças", icon: HandCoins },
 ];
 
 // Botões de ícone da sidebar (recolher, fechar no celular).

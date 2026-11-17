@@ -61,6 +61,19 @@ export async function PlatformDashboardPage() {
 
       <Group title="Receita e empresas">
         <div className="grid gap-3 xl:grid-cols-2">
+          <div className="xl:col-span-2">
+            <MonthlyBarsChart
+              id="received-month"
+              title="Receita realizada"
+              description="Pagamentos registrados em Cobranças, pela data do pagamento."
+              points={data.receivedByMonth.map((point) => ({
+                month: point.month,
+                count: point.amount,
+              }))}
+              color="var(--chart-positive)"
+              unit="money"
+            />
+          </div>
           <RevenueByPlan data={data} />
           <StatusBreakdown data={data} />
         </div>

@@ -13,7 +13,7 @@ Plano, valor e situação de cada empresa, **só para o SUPER_ADMIN**. As regras
 - Colunas: Empresa ("(inativa)" ao lado das inativas), Plano (com "+ N profissionais" e "+ anamnese"), Ciclo, Valor (do ciclo), Situação e Data, com o que ela significa: fim do teste (em teste), vencimento (ativa) ou último dia antes do bloqueio (em atraso).
 - Situação em badge: Em teste e Em atraso neutras (`secondary`), Ativa verde, Somente leitura e Cancelada vermelhas; Sem assinatura com contorno (`outline`).
 - Filtro **Situação** na URL (`?situacao=`): Todas, Sem assinatura, Em teste, Ativas, Em atraso, Somente leitura e Canceladas. O servidor filtra.
-- Ação única na linha: **Criar assinatura** (`Plus`) ou **Alterar assinatura** (`Pencil`), que abre o formulário.
+- Ações na linha: **Criar assinatura** (`Plus`) ou **Alterar assinatura** (`Pencil`), que abre o formulário, e, com assinatura, **Pagamentos** (`HandCoins`), que abre o histórico e o registro de pagamentos (`cobrancas.md`).
 - No celular, cartões com o plano, o ciclo e o valor numa linha e a situação com a data embaixo.
 
 ## Formulário (página `/assinaturas/<empresa>`)

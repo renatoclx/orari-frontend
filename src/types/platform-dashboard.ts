@@ -30,6 +30,8 @@ export type PlatformDashboard = {
   /** 12 meses ("aaaa-mm"), do mais antigo ao atual. */
   companiesByMonth: { month: string; count: number }[];
   appointmentsByMonth: { month: string; count: number }[];
+  /** Receita realizada: os pagamentos registrados em Cobranças, por mês. */
+  receivedByMonth: { month: string; amount: number }[];
   attention: {
     trialsEnding: AttentionItem[];
     overdue: AttentionItem[];

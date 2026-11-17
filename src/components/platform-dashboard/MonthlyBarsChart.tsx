@@ -10,8 +10,24 @@ import {
   monthLabel,
   monthLongLabel,
 } from "@/components/platform-dashboard/platform-format";
+import { formatPrice } from "@/utils/format";
 
 type Point = { month: string; count: number };
+
+// Valor em reais (receita) ou contagem com a unidade (empresas, agendamentos).
+function valueText(value: number, unit: [string, string] | "money"): string {
+  if (unit === "money") return formatPrice(value);
+  return `${value} ${value === 1 ? unit[0] : unit[1]}`;
+}
+
+// Eixo da receita compacto: "R$ 1,2 mil".
+const compactMoney = (value: number) =>
+  new Intl.NumberFormat("pt-BR", {
+    style: "currency",
+    currency: "BRL",
+    notation: "compact",
+    maximumFractionDigits: 1,
+  }).format(value);
 
 function TooltipBody({
   active,
@@ -20,7 +36,7 @@ function TooltipBody({
 }: {
   active?: boolean;
   payload?: { payload: Point }[];
-  unit: [string, string];
+  unit: [string, string] | "money";
 }) {
   const point = payload?.[0]?.payload;
   if (!active || !point) return null;
@@ -30,15 +46,16 @@ function TooltipBody({
         {monthLongLabel(point.month)}
       </p>
       <p className="tabular-nums">
-        <strong>{point.count}</strong> {point.count === 1 ? unit[0] : unit[1]}
+        <strong>{valueText(point.count, unit)}</strong>
       </p>
     </div>
   );
 }
 
 /**
- * Uma série por mês (12 meses), em colunas de uma cor só: novas empresas ou
- * agendamentos criados. O total do período fica no subtítulo; o mês, na dica.
+ * Uma série por mês (12 meses), em colunas de uma cor só: novas empresas,
+ * agendamentos criados ou a receita realizada. O total do período fica no
+ * canto; o mês, na dica.
  */
 export function MonthlyBarsChart({
   id,
@@ -54,8 +71,8 @@ export function MonthlyBarsChart({
   points: Point[];
   /** Token de gráfico (ex.: "var(--chart-info)"). */
   color: string;
-  /** Singular e plural da unidade na dica. */
-  unit: [string, string];
+  /** Singular e plural da unidade na dica, ou "money" para valores em reais. */
+  unit: [string, string] | "money";
 }) {
   const config = { count: { label: title, color } } satisfies ChartConfig;
   const total = points.reduce((sum, point) => sum + point.count, 0);
@@ -75,9 +92,10 @@ export function MonthlyBarsChart({
         </div>
         <p className="text-right text-sm text-muted-foreground tabular-nums">
           <span className="block text-xl font-semibold text-foreground">
-            {current}
+            {unit === "money" ? formatPrice(current) : current}
           </span>
-          neste mês · {total} em 12 meses
+          neste mês · {unit === "money" ? formatPrice(total) : total} em 12
+          meses
         </p>
       </div>
       {total === 0 ? (
@@ -89,7 +107,7 @@ export function MonthlyBarsChart({
           config={config}
           className="aspect-auto h-48 w-full"
           role="img"
-          aria-label={`${title}: ${current} neste mês e ${total} nos últimos 12 meses`}
+          aria-label={`${title}: ${valueText(current, unit)} neste mês e ${valueText(total, unit)} nos últimos 12 meses`}
         >
           <BarChart data={points} margin={{ left: 4, right: 4, top: 4 }}>
             <CartesianGrid vertical={false} />
@@ -102,8 +120,9 @@ export function MonthlyBarsChart({
               tickFormatter={monthLabel}
             />
             <YAxis
-              width={32}
-              allowDecimals={false}
+              width={unit === "money" ? 64 : 32}
+              allowDecimals={unit === "money"}
+              tickFormatter={unit === "money" ? compactMoney : undefined}
               tickLine={false}
               axisLine={false}
             />

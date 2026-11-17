@@ -3,6 +3,7 @@ import { Pencil, Plus } from "lucide-react";
 import { EmptyValue } from "@/components/shared/EmptyValue";
 import { Hint } from "@/components/shared/Hint";
 import { ListCard } from "@/components/shared/ListCard";
+import { CompanyPaymentsButton } from "@/components/subscription-payments/CompanyPaymentsButton";
 import { SubscriptionStatusBadge } from "@/components/subscriptions/SubscriptionStatusBadge";
 import {
   cycleLabel,
@@ -58,17 +59,25 @@ function RowAction({ item }: { item: CompanySubscriptionItem }) {
   const creating = item.subscription === null;
   const label = `${creating ? "Criar a assinatura de" : "Alterar a assinatura de"} ${item.companyName}`;
   return (
-    <Hint label={label}>
-      <Button asChild variant="ghost" size="icon" aria-label={label}>
-        <Link href={`/assinaturas/${item.companyId}`}>
-          {creating ? (
-            <Plus aria-hidden="true" />
-          ) : (
-            <Pencil aria-hidden="true" />
-          )}
-        </Link>
-      </Button>
-    </Hint>
+    <div className="flex shrink-0 items-center gap-1">
+      <Hint label={label}>
+        <Button asChild variant="ghost" size="icon" aria-label={label}>
+          <Link href={`/assinaturas/${item.companyId}`}>
+            {creating ? (
+              <Plus aria-hidden="true" />
+            ) : (
+              <Pencil aria-hidden="true" />
+            )}
+          </Link>
+        </Button>
+      </Hint>
+      {/* Pagamentos (histórico e registro): só com assinatura. */}
+      {!creating && (
+        <CompanyPaymentsButton
+          company={{ id: item.companyId, name: item.companyName }}
+        />
+      )}
+    </div>
   );
 }
 

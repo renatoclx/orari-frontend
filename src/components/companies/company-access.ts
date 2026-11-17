@@ -255,8 +255,10 @@ export function toggleAccess(
   return { ...matrix, [featureKey]: next };
 }
 
-// Planos do Orari (decididos em 2026-11-16): Essencial (até 2 profissionais),
-// Plus (até 4) e Clinical (até 6). Os modelos só preenchem a tela; depois de
+// Planos do Orari (decididos em 2026-11-16): Essencial (2 profissionais incluídos),
+// Plus (4) e Clinical (3); profissional a mais é cobrado à parte. A anamnese
+// pode ser contratada como adicional no Essencial e no Plus: o SUPER_ADMIN marca
+// as três linhas de Anamnese na empresa. Os modelos só preenchem a tela; depois de
 // aplicados, tudo continua editável. O app do cliente (portal) e as mensagens
 // entram nos três; o WhatsApp, quando vier, será adicional pago.
 
@@ -332,7 +334,7 @@ export const ACCESS_TEMPLATES: AccessTemplate[] = [
     label: "Clinical",
     matrix: matrixWith(() => true),
     admins: 2,
-    professionals: 6,
+    professionals: 3,
   },
 ];
 

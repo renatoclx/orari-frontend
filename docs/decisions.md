@@ -221,6 +221,7 @@ regras de cada tela, em `docs/screens/`.
 ## Planos
 
 - **2026-11-16 — Três planos: Essencial (até 2 profissionais), Plus (até 4) e Clinical (até 6).** Essencial: agenda, cadastros, app do cliente e do profissional, mensagens, receber o cliente (comanda) e o Dashboard, com Contas a receber só para ver; Plus: tudo menos anamnese e turmas; Clinical: tudo. Os modelos de acesso do SUPER_ADMIN seguem os três (substituem Agenda, Essencial, Profissional e Completo). Preço em estudo; profissional extra proposto a R$ 16,90 em todos os planos. WhatsApp será adicional pago.
+- **2026-11-16 — Valores de teste:** Essencial R$ 44,90 (2 profissionais), Plus R$ 89,90 (4) e Clinical R$ 129,90 (3), finais ,90; profissional a mais R$ 16,90; semestral com cerca de 15% e anual com cerca de 30% (parcela arredondada para o final ,90, com o selo do desconto e o preço cheio riscado); lançamento com 50% nos 3 primeiros meses, só no mensal, para os 15 primeiros clientes; **adicional de anamnese** (sem turmas) no Essencial e no Plus, R$ 24,90 em teste.
 
 ## Qualidade e testes
 

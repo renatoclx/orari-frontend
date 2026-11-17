@@ -29,6 +29,7 @@ diferente. Em caso de conflito, prevalece o arquivo da tela.
 | [metodos-pagamento.md](metodos-pagamento.md)               | Métodos de pagamento                                      |
 | [financeiro.md](financeiro.md)                             | Contas a receber, Comandas e venda de produtos            |
 | [empresas.md](empresas.md)                                 | Empresas (só SUPER_ADMIN)                                 |
+| [assinaturas.md](assinaturas.md)                           | Assinaturas: plano, valor e situação (só SUPER_ADMIN)     |
 | [anamnese.md](anamnese.md)                                 | Anamnese: modelos, fichas, PDF e auditoria                |
 | [turmas.md](turmas.md)                                     | Turmas fixas (só ADMIN)                                   |
 | [portal-do-cliente.md](portal-do-cliente.md)               | Portal do cliente: regras e busca do app (só ADMIN)       |

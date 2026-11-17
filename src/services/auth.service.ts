@@ -1,6 +1,7 @@
 import "server-only";
 
 import { cache } from "react";
+import type { toSignupInput } from "@/components/auth/signup-validation";
 import { forwardedForHeader } from "@/lib/client-ip";
 import { apiFetch } from "@/services/api";
 import type { AuthTokens, CurrentUser } from "@/types/auth";
@@ -41,6 +42,22 @@ export function loginProfessional(
     method: "POST",
     headers: forwardedForHeader(clientIp),
     body: JSON.stringify({ login, password }),
+  });
+}
+
+/**
+ * Cadastro sozinho pela landing (screens/cadastro.md): cria a empresa em teste
+ * de 7 dias e devolve os tokens, como o login. Limite por IP na API.
+ */
+export function signup(
+  input: ReturnType<typeof toSignupInput>,
+  clientIp?: string,
+): Promise<AuthTokens> {
+  return apiFetch<AuthTokens>("/auth/signup", {
+    authenticated: false,
+    method: "POST",
+    headers: forwardedForHeader(clientIp),
+    body: JSON.stringify(input),
   });
 }
 

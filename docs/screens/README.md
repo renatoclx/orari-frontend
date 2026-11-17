@@ -18,6 +18,7 @@ diferente. Em caso de conflito, prevalece o arquivo da tela.
 | Arquivo                                                    | Conteúdo                                                  |
 | ---------------------------------------------------------- | --------------------------------------------------------- |
 | [login.md](login.md)                                       | Login e recuperação de senha                              |
+| [cadastro.md](cadastro.md)                                 | Cadastro sozinho com teste de 7 dias, termos e privacidade |
 | [layout.md](layout.md)                                     | Sidebar e barra de ações lateral                          |
 | [pessoas.md](pessoas.md)                                   | Clientes, funcionários e profissionais                    |
 | [servicos.md](servicos.md)                                 | Serviços                                                  |

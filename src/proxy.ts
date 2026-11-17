@@ -28,6 +28,10 @@ import type { AuthTokens } from "@/types/auth";
 // Caminhos usados nos redirecionamentos de proteção das rotas.
 const LOGIN_PATH = "/login";
 const HOME_PATH = "/";
+// Telas de quem ainda não entrou: com sessão, vão para o sistema.
+const GUEST_PATHS = new Set([LOGIN_PATH, "/cadastro"]);
+// Abertas a todos, com ou sem sessão (textos legais, linkados no cadastro).
+const PUBLIC_PATHS = new Set(["/termos", "/privacidade"]);
 
 /**
  * Roda antes de toda requisição. Duas tarefas:
@@ -39,11 +43,13 @@ export async function proxy(request: NextRequest) {
   // App do cliente (/app): sessão própria, sem passar pelas regras da clínica.
   const appRoute = appRouteKind(request.nextUrl.pathname);
   if (appRoute) return guardAppRoute(request, appRoute);
+  if (PUBLIC_PATHS.has(request.nextUrl.pathname)) return NextResponse.next();
 
   // Só para desenvolvimento: AUTH_GUARD=off desliga os redirecionamentos de
   // proteção (em produção a variável é ignorada). A renovação continua valendo.
   const guardEnabled = isAuthGuardEnabled(process.env);
-  const isLoginPage = request.nextUrl.pathname === LOGIN_PATH;
+  // Login e cadastro seguem a mesma regra (o nome ficou do tempo em que só havia o login).
+  const isLoginPage = GUEST_PATHS.has(request.nextUrl.pathname);
   const accessToken = request.cookies.get(ACCESS_TOKEN_COOKIE)?.value;
   const refreshToken = request.cookies.get(REFRESH_TOKEN_COOKIE)?.value;
 

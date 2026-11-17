@@ -304,6 +304,8 @@ const superAdminItems: NavLink[] = [
   { href: "/empresas", label: "Empresas", icon: Building2 },
   { href: "/assinaturas", label: "Assinaturas", icon: CreditCard },
   { href: "/cobrancas", label: "Cobranças", icon: HandCoins },
+  // Ajuda com o manual da plataforma (screens/ajuda.md).
+  helpLink,
 ];
 
 // Botões de ícone da sidebar (recolher, fechar no celular).

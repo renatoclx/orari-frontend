@@ -11,6 +11,7 @@
 
 - Link "Esqueci minha senha" leva para a tela de Recuperação de Senha (implementação futura).
 - Sem login social (Google ou outro OAuth - implementação futura).
+- Abaixo do botão, "Ainda não usa o Orari? **Teste grátis por 7 dias**" leva ao cadastro sozinho (`cadastro.md`).
 
 ---
 

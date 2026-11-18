@@ -18,6 +18,7 @@ diferente. Em caso de conflito, prevalece o arquivo da tela.
 | Arquivo                                                    | Conteúdo                                                  |
 | ---------------------------------------------------------- | --------------------------------------------------------- |
 | [login.md](login.md)                                       | Login e recuperação de senha                              |
+| [cadastro.md](cadastro.md)                                 | Cadastro sozinho com teste de 7 dias, termos e privacidade |
 | [layout.md](layout.md)                                     | Sidebar e barra de ações lateral                          |
 | [pessoas.md](pessoas.md)                                   | Clientes, funcionários e profissionais                    |
 | [servicos.md](servicos.md)                                 | Serviços                                                  |
@@ -29,6 +30,9 @@ diferente. Em caso de conflito, prevalece o arquivo da tela.
 | [metodos-pagamento.md](metodos-pagamento.md)               | Métodos de pagamento                                      |
 | [financeiro.md](financeiro.md)                             | Contas a receber, Comandas e venda de produtos            |
 | [empresas.md](empresas.md)                                 | Empresas (só SUPER_ADMIN)                                 |
+| [assinaturas.md](assinaturas.md)                           | Assinaturas: plano, valor e situação (só SUPER_ADMIN)     |
+| [painel.md](painel.md)                                     | Painel da plataforma: receita, uso e atenção (SUPER_ADMIN) |
+| [cobrancas.md](cobrancas.md)                               | Cobranças: pagamentos das assinaturas (só SUPER_ADMIN)    |
 | [anamnese.md](anamnese.md)                                 | Anamnese: modelos, fichas, PDF e auditoria                |
 | [turmas.md](turmas.md)                                     | Turmas fixas (só ADMIN)                                   |
 | [portal-do-cliente.md](portal-do-cliente.md)               | Portal do cliente: regras e busca do app (só ADMIN)       |

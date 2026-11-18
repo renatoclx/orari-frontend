@@ -5,6 +5,8 @@ import {
   applyTemplate,
   emptyMatrix,
   entriesFromMatrix,
+  groupState,
+  toggleGroup,
   matrixFromEntries,
   isActionApplicable,
   limitWarning,
@@ -68,6 +70,39 @@ describe("toggleAccess", () => {
     const matrix = emptyMatrix();
     expect(isActionApplicable("anamnesis-audit", "edit")).toBe(false);
     expect(toggleAccess(matrix, "anamnesis-audit", "edit", true)).toBe(matrix);
+  });
+});
+
+describe("caixa da seção", () => {
+  const group = (label: string) =>
+    ACCESS_GROUPS.find((g) => g.label === label)!.features;
+
+  it("vazia, parcial e cheia", () => {
+    const empty = emptyMatrix();
+    expect(groupState(empty, group("Cadastros"))).toBe("none");
+    const one = toggleAccess(empty, "clients", "view", true);
+    expect(groupState(one, group("Cadastros"))).toBe("some");
+    const full = toggleGroup(empty, group("Cadastros"), true);
+    expect(groupState(full, group("Cadastros"))).toBe("all");
+  });
+
+  it("marca só as colunas aplicáveis e não mexe nas outras seções", () => {
+    const next = toggleGroup(emptyMatrix(), group("Anamnese"), true);
+    expect(next["anamnesis-audit"]).toEqual({
+      view: true,
+      edit: false,
+      create: false,
+      remove: false,
+    });
+    expect(groupState(next, group("Anamnese"))).toBe("all");
+    expect(next.clients.view).toBe(false);
+  });
+
+  it("desmarcar limpa a seção inteira", () => {
+    const full = template("clinical").matrix;
+    const next = toggleGroup(full, group("Cadastros"), false);
+    expect(groupState(next, group("Cadastros"))).toBe("none");
+    expect(next.appointments.view).toBe(true);
   });
 });
 

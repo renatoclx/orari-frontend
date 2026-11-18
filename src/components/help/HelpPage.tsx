@@ -1,13 +1,19 @@
 import { notFound } from "next/navigation";
 import { ManualList } from "@/components/help/ManualList";
-import { MANUALS } from "@/components/help/manuals";
+import { MANUALS, PLATFORM_MANUALS } from "@/components/help/manuals";
 import { getCurrentUser } from "@/services/auth.service";
 
-// Ajuda (screens/ajuda.md): os manuais em PDF. Por enquanto só o ADMIN; os
-// demais perfis veem 404.
+// Ajuda (screens/ajuda.md): os manuais em PDF. O ADMIN vê os da clínica; o
+// SUPER_ADMIN, o da plataforma; os demais perfis veem 404.
 export async function HelpPage() {
   const currentUser = await getCurrentUser();
-  if (currentUser.type !== "ADMIN") notFound();
+  const manuals =
+    currentUser.type === "ADMIN"
+      ? MANUALS
+      : currentUser.type === "SUPER_ADMIN"
+        ? PLATFORM_MANUALS
+        : null;
+  if (!manuals) notFound();
 
   return (
     <div className="flex min-h-0 flex-1 flex-col gap-4">
@@ -17,7 +23,7 @@ export async function HelpPage() {
           Manuais do Orari, com o passo a passo de cada parte do sistema.
         </p>
       </div>
-      <ManualList manuals={MANUALS} />
+      <ManualList manuals={manuals} />
     </div>
   );
 }

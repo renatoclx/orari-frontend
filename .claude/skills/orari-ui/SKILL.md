@@ -80,6 +80,7 @@ Padrão do sistema (`docs/screen-patterns.md`): cor correspondente à informaç�
 - Status ativo/inativo: use `StatusBadge` (`@/components/shared/StatusBadge`, `active={...}`); não recrie a badge nas telas.
 - `variant="success"` (verde, token `success`): ativo e informações positivas.
 - `variant="destructive"` (vermelho): inativo e informações negativas.
+- Situação da assinatura (`SubscriptionStatusBadge`): Ativa `success`; Somente leitura e Cancelada `destructive`; Em teste e Em atraso `secondary`; Sem assinatura `outline`.
 - Outros significados ainda sem cor definida: pergunte antes de escolher.
 
 ## Listagens

@@ -7,6 +7,7 @@ export type AuthTokens = {
 };
 
 import type { FeatureAccessEntry } from "@/types/company-access";
+import type { SubscriptionStatus } from "@/types/subscription";
 
 /** Espelha o enum UserType do backend. */
 export type UserType = "SUPER_ADMIN" | "ADMIN" | "USER" | "PROFESSIONAL";
@@ -38,4 +39,16 @@ export type CurrentUser = {
   };
   /** O que a empresa do usuário enxerga (esconde menus e telas; a API é quem barra). */
   access: { features: FeatureAccessEntry[] };
+  /**
+   * Situação da assinatura da empresa (a faixa de aviso e o somente leitura).
+   * Nula sem assinatura e para o SUPER_ADMIN; ausente numa API antiga.
+   */
+  subscription?: SubscriptionSummary | null;
+};
+
+export type SubscriptionSummary = {
+  status: SubscriptionStatus;
+  readOnly: boolean;
+  /** Último dia da situação ("aaaa-mm-dd"): fim do teste, vencimento ou tolerância. */
+  endsAt: string | null;
 };

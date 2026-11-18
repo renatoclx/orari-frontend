@@ -16,7 +16,7 @@ export const ACCESS_ACTIONS: { key: AccessAction; label: string }[] = [
 
 const ALL_ACTIONS = ACCESS_ACTIONS.map((action) => action.key);
 
-type AccessFeature = {
+export type AccessFeature = {
   key: string;
   label: string;
   /** Colunas que fazem sentido para a funcionalidade (as demais ficam em "–"). */
@@ -253,6 +253,42 @@ export function toggleAccess(
     next = { ...current, [action]: checked, view: checked || current.view };
   }
   return { ...matrix, [featureKey]: next };
+}
+
+export type GroupState = "all" | "some" | "none";
+
+/** Situação da caixa da seção: todas as colunas aplicáveis marcadas, algumas ou nenhuma. */
+export function groupState(
+  matrix: AccessMatrix,
+  features: AccessFeature[],
+): GroupState {
+  const cells = features.flatMap((feature) =>
+    feature.actions.map((action) => matrix[feature.key]?.[action] ?? false),
+  );
+  if (cells.every(Boolean)) return "all";
+  return cells.some(Boolean) ? "some" : "none";
+}
+
+/**
+ * Marca ou desmarca todas as colunas aplicáveis da seção de uma vez. As
+ * dependências entre seções (ex.: Agenda exige ver Clientes) continuam sendo
+ * conferidas pela API ao salvar.
+ */
+export function toggleGroup(
+  matrix: AccessMatrix,
+  features: AccessFeature[],
+  checked: boolean,
+): AccessMatrix {
+  const next = { ...matrix };
+  for (const feature of features) {
+    next[feature.key] = Object.fromEntries(
+      ALL_ACTIONS.map((action) => [
+        action,
+        checked && feature.actions.includes(action),
+      ]),
+    ) as FeatureAccess;
+  }
+  return next;
 }
 
 // Planos do Orari (decididos em 2026-11-16): Essencial (2 profissionais incluídos),

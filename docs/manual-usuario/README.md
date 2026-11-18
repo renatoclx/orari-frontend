@@ -60,3 +60,15 @@ O sumário é numerado pelo `build.mjs` em duas passadas. Textos: `manual.html`.
     Nova Teste). **Insere avisos de exemplo** (e esconde os existentes durante a
     captura) e **apaga/restaura tudo** ao terminar; não grava agendamento nem mensagem.
     A tela de entrar do app (`a01` e `pro-01`) é uma captura simples de `/app/entrar`.
+
+11. Manual da plataforma (`manual-super-admin.pdf`, imagens `s01` a `s16`), para o
+    SUPER_ADMIN: `SA_TOKEN=<token do SUPER_ADMIN local> node scripts/cap-14-super-admin.mjs`.
+    Usa o Playwright e a API local. **Grava** assinaturas e pagamentos fictícios no
+    Aurora, Orari Demo, John Doe, Renatone e Bela Vista e uma assinatura na Clínica
+    Nova Teste (a Clínica Bem-Estar só aparece nas listas); a faixa do teste e o
+    somente leitura saem do login da Marina (Aurora). Sem a senha do SUPER_ADMIN
+    local, o token pode ser assinado com o `JWT_SECRET` do `.env` do backend
+    (`sub` = id do usuário SUPER_ADMIN). Depois, **apague tudo** no banco local:
+    `delete from subscription_payments; delete from company_subscriptions;` e os
+    `audit_logs` das ações `SUBSCRIPTION_*`. PDF: `node build.mjs manual-super-admin`;
+    copie para `public/manuais/`. A Ajuda mostra só este manual ao SUPER_ADMIN.

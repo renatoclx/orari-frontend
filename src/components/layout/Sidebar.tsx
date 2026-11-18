@@ -4,6 +4,8 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
   Building2,
+  CreditCard,
+  HandCoins,
   CalendarDays,
   ChartColumn,
   ChevronDown,
@@ -298,7 +300,12 @@ const helpLink: NavLink = {
 // Só o SUPER_ADMIN gerencia empresas (screens/empresas.md): o item entra no fim do
 // menu e some para os demais perfis.
 const superAdminItems: NavLink[] = [
+  { href: "/painel", label: "Painel", icon: LayoutDashboard },
   { href: "/empresas", label: "Empresas", icon: Building2 },
+  { href: "/assinaturas", label: "Assinaturas", icon: CreditCard },
+  { href: "/cobrancas", label: "Cobranças", icon: HandCoins },
+  // Ajuda com o manual da plataforma (screens/ajuda.md).
+  helpLink,
 ];
 
 // Botões de ícone da sidebar (recolher, fechar no celular).

@@ -8,8 +8,8 @@ export type Manual = {
 };
 
 // Os PDFs são gerados em docs/manual-usuario (README) e copiados para
-// public/manuais. Um manual novo é uma linha aqui. Por enquanto, só o ADMIN
-// acessa a tela.
+// public/manuais. Um manual novo é uma linha aqui. O ADMIN vê estes; o
+// SUPER_ADMIN, os da plataforma (PLATFORM_MANUALS).
 export const MANUALS: Manual[] = [
   {
     title: "Manual do administrador",
@@ -70,5 +70,16 @@ export const MANUALS: Manual[] = [
     description:
       "Fornecedores, categorias, contas parceladas ou repetidas, pagamento e comissões.",
     file: "/manuais/manual-contas-a-pagar.pdf",
+  },
+];
+
+// Manual do SUPER_ADMIN (a Ajuda mostra só este para ele): o Painel, as
+// empresas e os acessos, as assinaturas, as cobranças e o cadastro sozinho.
+export const PLATFORM_MANUALS: Manual[] = [
+  {
+    title: "Manual da plataforma",
+    description:
+      "Painel, empresas e acessos, assinaturas, cobranças e o cadastro sozinho com teste grátis.",
+    file: "/manuais/manual-super-admin.pdf",
   },
 ];

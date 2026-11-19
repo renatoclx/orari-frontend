@@ -52,11 +52,11 @@ export async function PaymentsListPage({
       <div className="space-y-1">
         <h1 className="text-2xl font-semibold">Cobranças</h1>
         <p className="text-sm text-muted-foreground">
-          Pagamentos das assinaturas em{" "}
+          Pagamentos recebidos em{" "}
           <span className="first-letter:uppercase">
             {monthLongLabel(month)}
           </span>
-          , pela data do pagamento.
+          .
         </p>
       </div>
 
@@ -79,7 +79,7 @@ export async function PaymentsListPage({
         <div className={summaryCardClass}>
           <Card
             icon={Receipt}
-            label="Valor médio"
+            label="Média por pagamento"
             value={payments.count > 0 ? formatPrice(average) : "--"}
             detail="por pagamento"
             tone="neutral"

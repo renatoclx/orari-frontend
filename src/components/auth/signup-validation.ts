@@ -12,6 +12,8 @@ export type SignupValues = {
   email: string;
   phone: string;
   password: string;
+  /** Só na tela: confere a senha digitada; não vai para a API. */
+  passwordConfirmation: string;
   plan: SubscriptionPlan;
   acceptTerms: boolean;
 };
@@ -51,6 +53,11 @@ export function validateSignup(values: SignupValues): SignupErrors {
     errors.password = "A senha precisa ter pelo menos 8 caracteres.";
   } else if (values.password.length > 72) {
     errors.password = "A senha pode ter no máximo 72 caracteres.";
+  }
+  if (!values.passwordConfirmation) {
+    errors.passwordConfirmation = "Repita a senha.";
+  } else if (values.passwordConfirmation !== values.password) {
+    errors.passwordConfirmation = "As senhas não são iguais.";
   }
   if (!values.acceptTerms) {
     errors.acceptTerms = "Aceite os termos para continuar.";

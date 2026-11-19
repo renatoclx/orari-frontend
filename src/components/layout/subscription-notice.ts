@@ -36,7 +36,7 @@ export function subscriptionNotice(
     const message =
       left <= 0
         ? "Hoje é o último dia do seu teste grátis."
-        : `Seu teste grátis termina em ${left} ${left === 1 ? "dia" : "dias"} (${dayMonth(endsAt)}).`;
+        : `Seu teste grátis termina em ${left} ${left === 1 ? "dia" : "dias"}.`;
     return { tone: "neutral", kind: "trial", message };
   }
   if (status === "OVERDUE" && endsAt) {
@@ -47,7 +47,7 @@ export function subscriptionNotice(
     return {
       tone: "alert",
       kind: "overdue",
-      message: `O pagamento da assinatura venceu. A partir de ${dayMonth(blockIso)}, o sistema fica somente para consulta.`,
+      message: `O pagamento da assinatura venceu. A partir de ${dayMonth(blockIso)}, seu acesso fica só para consulta.`,
     };
   }
   if (status === "READ_ONLY" || status === "CANCELED") {
@@ -57,7 +57,7 @@ export function subscriptionNotice(
       message:
         status === "CANCELED"
           ? "A assinatura foi cancelada: os dados podem ser consultados, mas não alterados."
-          : "O sistema está somente para consulta: regularize a assinatura para voltar a cadastrar e alterar.",
+          : "Seu acesso está só para consulta. Fale com o Orari para regularizar e voltar a usar tudo.",
     };
   }
   return null;

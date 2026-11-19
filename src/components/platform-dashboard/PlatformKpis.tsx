@@ -27,11 +27,11 @@ export function PlatformKpis({ data }: { data: PlatformDashboard }) {
       <div className={summaryCardClass}>
         <Card
           icon={Wallet}
-          label="Receita mensal (MRR)"
+          label="Quanto entra por mês"
           value={formatPrice(revenue.mrr)}
           detail={
             discountCost > 0
-              ? `${formatPrice(revenue.arr)}/ano · ${formatPrice(discountCost)} em descontos`
+              ? `${formatPrice(revenue.arr)} por ano · ${formatPrice(discountCost)} a menos por mês por causa dos descontos`
               : `${formatPrice(revenue.arr)} por ano`
           }
           tone="positive"
@@ -40,7 +40,7 @@ export function PlatformKpis({ data }: { data: PlatformDashboard }) {
       <div className={summaryCardClass}>
         <Card
           icon={Repeat}
-          label="Empresas pagantes"
+          label="Empresas que pagam"
           value={revenue.payingCompanies}
           detail={`${trials} em teste agora`}
           tone="neutral"
@@ -49,12 +49,12 @@ export function PlatformKpis({ data }: { data: PlatformDashboard }) {
       <div className={summaryCardClass}>
         <Card
           icon={Sparkles}
-          label="Conversão do teste"
+          label="Testes que viraram clientes"
           value={conversion === null ? "--" : formatPercent(conversion)}
           detail={
             trialConversion.ended > 0
-              ? `${trialConversion.converted} de ${trialConversion.ended} testes encerrados`
-              : "Nenhum teste encerrado ainda"
+              ? `${trialConversion.converted} de ${trialConversion.ended} testes que já terminaram`
+              : "Nenhum teste terminou ainda"
           }
           tone="neutral"
         />
@@ -62,12 +62,12 @@ export function PlatformKpis({ data }: { data: PlatformDashboard }) {
       <div className={summaryCardClass}>
         <Card
           icon={CircleAlert}
-          label="Em atraso"
+          label="Pagamentos atrasados"
           value={formatPrice(revenue.overdueAmount)}
           detail={
             overdueCompanies === 1
-              ? "1 empresa na tolerância"
-              : `${overdueCompanies} empresas na tolerância`
+              ? "1 empresa com prazo extra de 5 dias"
+              : `${overdueCompanies} empresas com prazo extra de 5 dias`
           }
           tone={overdueCompanies > 0 ? "negative" : "neutral"}
         />

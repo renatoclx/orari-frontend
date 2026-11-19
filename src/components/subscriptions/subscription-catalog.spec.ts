@@ -34,4 +34,15 @@ describe("suggestedPrice", () => {
       1090.8,
     );
   });
+
+  it("Clinical: o adicional de anamnese não soma (já vem incluída)", () => {
+    expect(
+      suggestedPrice({
+        plan: "CLINICAL",
+        cycle: "MONTHLY",
+        extraProfessionals: 0,
+        anamnesisAddon: true,
+      }),
+    ).toBe(129.9);
+  });
 });

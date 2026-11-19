@@ -74,7 +74,7 @@ export const STATUS_SERIES: Record<
   TRIAL: { label: "Em teste", color: "var(--chart-info)" },
   ACTIVE: { label: "Ativas", color: "var(--chart-positive)" },
   OVERDUE: { label: "Em atraso", color: "var(--chart-aging-1)" },
-  READ_ONLY: { label: "Somente leitura", color: "var(--chart-negative)" },
+  READ_ONLY: { label: "Só consulta", color: "var(--chart-negative)" },
   CANCELED: { label: "Canceladas", color: "var(--chart-aging-4)" },
   NONE: { label: "Sem assinatura", color: "var(--muted-foreground)" },
 };

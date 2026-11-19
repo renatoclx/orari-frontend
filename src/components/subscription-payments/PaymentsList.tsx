@@ -40,7 +40,7 @@ export function PaymentsList({ items }: { items: SubscriptionPaymentItem[] }) {
         return;
       }
       toast.success("Pagamento excluído.", {
-        description: `${target.companyName}: o pago até voltou ao de antes dele.`,
+        description: `${target.companyName} voltou a ficar paga só até onde estava antes dele.`,
       });
       setRemoving(null);
       router.refresh();
@@ -69,7 +69,7 @@ export function PaymentsList({ items }: { items: SubscriptionPaymentItem[] }) {
 
   return (
     <ListCard
-      columns={["Pago em", "Empresa", "Período", "Forma", "Valor", "Ações"]}
+      columns={["Pago em", "Empresa", "Cobre", "Forma", "Valor", "Ações"]}
       emptyMessage={
         items.length > 0 ? undefined : "Nenhum pagamento neste mês."
       }
@@ -86,7 +86,7 @@ export function PaymentsList({ items }: { items: SubscriptionPaymentItem[] }) {
               {methodLabel(item.method)} · pago em {formatDateOnly(item.paidAt)}
             </p>
             <p className="text-muted-foreground tabular-nums">
-              Período de {period(item)}
+              Cobre de {period(item)}
             </p>
           </div>
           {remove(item)}
@@ -122,7 +122,7 @@ export function PaymentsList({ items }: { items: SubscriptionPaymentItem[] }) {
         title="Excluir pagamento?"
         description={
           removing &&
-          `O pagamento de ${formatPrice(removing.amount)} de ${removing.companyName} sai do histórico e o pago até da assinatura volta ao de antes dele.`
+          `O pagamento de ${formatPrice(removing.amount)} de ${removing.companyName} é apagado, e a empresa volta a ficar paga só até onde estava antes dele.`
         }
         confirmLabel="Excluir"
         pendingLabel="Excluindo…"

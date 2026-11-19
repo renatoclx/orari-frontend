@@ -10,8 +10,9 @@ A empresa cria a própria conta pela landing e começa um **teste grátis de 7 d
 
 ## Formulário
 
-- **Plano do teste**: três botões de escolha (`aria-pressed`) com o nome, o mensal e uma linha do que inclui; embaixo, "7 dias grátis, sem cartão".
-- **Nome do negócio**, **CPF ou CNPJ** (máscara; dígitos conferidos na tela), **Seu nome**, **E-mail** e **Celular (WhatsApp)** lado a lado, **Senha** (8 a 72 caracteres, com mostrar/esconder) e o **aceite** dos termos de uso e da política de privacidade (links abrem em nova aba). Todos obrigatórios.
+- **Plano do teste**: um select com o nome e o mensal de cada plano (para o formulário caber na tela); embaixo, uma linha com os profissionais inclusos e para quem é o plano escolhido (as mesmas frases da landing: Essencial 2, Plus 5, Clinical 7).
+- Em pares (no celular, um embaixo do outro): **Nome do negócio** e **CPF ou CNPJ** (máscara; dígitos conferidos na tela); **Seu nome** e **Celular (WhatsApp)**. Depois, **E-mail**, **Senha** (8 a 72 caracteres) e, embaixo, **Confirme a senha** (precisa ser igual; o olho mostra ou esconde as duas; só na tela, a API recebe uma senha) e o **aceite** dos termos de uso e da política de privacidade (links abrem em nova aba). Todos obrigatórios.
+- A página tem a altura da tela e não rola: só a área do formulário rola (num monitor 1440×900 ele cabe inteiro).
 - Botão **Começar o teste grátis** (`Rocket`, "Criando sua conta…" enquanto envia) e "Já tem conta? Entrar".
 - Erros: cada campo com a sua mensagem; e-mail ou documento já usados aparecem no próprio campo (409 da API); muitos cadastros da mesma conexão (429) aparecem num aviso geral.
 - Com sucesso, a Server Action grava a sessão e abre o **Dashboard** com as boas-vindas "Sua conta está pronta: o teste grátis de 7 dias começou." e os **primeiros passos** abertos.

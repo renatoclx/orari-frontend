@@ -100,6 +100,8 @@ export function SubscriptionForm({
   const [applying, startApply] = useTransition();
 
   const suggested = suggestedCents(values);
+  // O Clinical já inclui a anamnese: o adicional fica desligado e travado.
+  const clinical = values.plan === "CLINICAL";
 
   function set<K extends keyof SubscriptionFormValues>(
     key: K,
@@ -191,9 +193,11 @@ export function SubscriptionForm({
               <FormField id="subscription-plan" label="Plano" required>
                 <Select
                   value={values.plan}
-                  onValueChange={(plan) =>
-                    set("plan", plan as SubscriptionPlan)
-                  }
+                  onValueChange={(plan) => {
+                    set("plan", plan as SubscriptionPlan);
+                    // O Clinical já inclui a anamnese: o adicional não se aplica.
+                    if (plan === "CLINICAL") set("anamnesisAddon", false);
+                  }}
                 >
                   <SelectTrigger id="subscription-plan" className="w-full">
                     <SelectValue />
@@ -207,7 +211,7 @@ export function SubscriptionForm({
                   </SelectContent>
                 </Select>
               </FormField>
-              <FormField id="subscription-cycle" label="Ciclo" required>
+              <FormField id="subscription-cycle" label="Cobrança" required>
                 <Select
                   value={values.cycle}
                   onValueChange={(cycle) => set("cycle", cycle as BillingCycle)}
@@ -242,15 +246,22 @@ export function SubscriptionForm({
                 aria-invalid={errors.extraProfessionals ? true : undefined}
               />
             </FormField>
-            <label className="flex items-center justify-between gap-3 text-sm">
+            <label
+              className={`flex items-center justify-between gap-3 text-sm ${
+                clinical ? "text-muted-foreground" : ""
+              }`}
+            >
               <span>
                 Adicional de anamnese
                 <span className="block text-xs text-muted-foreground">
-                  Fichas, modelos de ficha e auditoria, sem turmas.
+                  {clinical
+                    ? "Já incluída no Clinical."
+                    : "Fichas, modelos de ficha e auditoria, sem turmas."}
                 </span>
               </span>
               <Switch
                 checked={values.anamnesisAddon}
+                disabled={clinical}
                 onCheckedChange={(checked) => set("anamnesisAddon", checked)}
                 aria-label="Adicional de anamnese"
               />
@@ -258,10 +269,10 @@ export function SubscriptionForm({
             <div className="flex flex-wrap items-center justify-between gap-2 rounded-control bg-muted px-3 py-2 text-sm">
               <p className="tabular-nums">
                 Valor sugerido: <strong>{formatPrice(suggested / 100)}</strong>{" "}
-                por ciclo
+                por cobrança
                 <span className="block text-xs text-muted-foreground">
-                  Tabela da landing; nos ciclos longos, a parcela mensal com
-                  desconto termina em ,90.
+                  Calculado com os preços do site. No semestral e no anual, já
+                  com o desconto.
                 </span>
               </p>
               <Button
@@ -276,7 +287,7 @@ export function SubscriptionForm({
             </div>
             <FormField
               id="subscription-priceCents"
-              label="Valor do ciclo"
+              label="Valor cobrado"
               required
               error={errors.priceCents}
             >
@@ -296,8 +307,9 @@ export function SubscriptionForm({
             <div>
               <h2 className="font-semibold">Datas</h2>
               <p className="text-sm text-muted-foreground">
-                A situação sai delas: em teste até o fim do teste, ativa até o
-                pago até, em atraso por 5 dias e, depois, somente leitura.
+                O Orari usa estas datas para saber se a empresa está em teste,
+                em dia ou atrasada. Com 5 dias de atraso, ela passa a só
+                consultar.
               </p>
             </div>
             <div className="grid gap-4 sm:grid-cols-2">
@@ -309,7 +321,7 @@ export function SubscriptionForm({
               />
               <DateField
                 id="subscription-paidUntil"
-                label="Pago até"
+                label="Pago até o dia"
                 value={values.paidUntil}
                 error={errors.paidUntil}
                 onChange={(value) => set("paidUntil", value)}
@@ -332,14 +344,14 @@ export function SubscriptionForm({
               </FormField>
               <DateField
                 id="subscription-discountUntil"
-                label="Desconto até"
+                label="Desconto vale até"
                 value={values.discountUntil}
                 error={errors.discountUntil}
                 onChange={(value) => set("discountUntil", value)}
               />
               <DateField
                 id="subscription-canceledAt"
-                label="Cancelada em"
+                label="Cancelar a partir de"
                 value={values.canceledAt}
                 onChange={(value) => set("canceledAt", value)}
               />
@@ -380,7 +392,7 @@ export function SubscriptionForm({
           if (!open && !applying) router.push(BASE_PATH);
         }}
         title="Aplicar os acessos do plano?"
-        description={`Substitui os acessos e limites de ${companyName} pelos do plano escolhido (com os extras e a anamnese). O que foi ajustado à mão em Acessos e limites se perde.`}
+        description={`${companyName} passa a ter o que o plano inclui (telas e número de profissionais). Ajustes feitos à mão para essa empresa serão desfeitos.`}
         confirmLabel="Aplicar"
         pendingLabel="Aplicando…"
         cancelLabel="Agora não"

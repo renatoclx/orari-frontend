@@ -116,7 +116,8 @@ function Payments({
         return;
       }
       toast.success("Pagamento excluído.", {
-        description: "O pago até voltou ao de antes dele.",
+        description:
+          "A empresa voltou a ficar paga só até onde estava antes dele.",
       });
       setRemoving(null);
       setVersion((value) => value + 1);
@@ -216,7 +217,7 @@ function Payments({
                   </span>
                 </p>
                 <p className="text-muted-foreground tabular-nums">
-                  Período de {formatDateOnly(item.periodStart)} a{" "}
+                  Cobre de {formatDateOnly(item.periodStart)} a{" "}
                   {formatDateOnly(item.periodEnd)}
                   {item.note && ` · ${item.note}`}
                 </p>
@@ -258,7 +259,7 @@ function Payments({
         title="Excluir pagamento?"
         description={
           removing &&
-          `O pagamento de ${formatPrice(removing.amount)} (${formatDateOnly(removing.paidAt)}) sai do histórico e o pago até volta ao de antes dele.`
+          `O pagamento de ${formatPrice(removing.amount)} (${formatDateOnly(removing.paidAt)}) é apagado, e a empresa volta a ficar paga só até onde estava antes dele.`
         }
         confirmLabel="Excluir"
         pendingLabel="Excluindo…"

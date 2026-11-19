@@ -13,6 +13,7 @@ const valid: SignupValues = {
   email: "Marina@Aurora.com ",
   phone: "(11) 99999-8888",
   password: "Senha#2026",
+  passwordConfirmation: "Senha#2026",
   plan: "PLUS",
   acceptTerms: true,
 };
@@ -45,11 +46,26 @@ describe("cadastro sozinho", () => {
       "document",
       "email",
       "password",
+      // A senha mudou e a confirmação não: também acusa.
+      "passwordConfirmation",
       "phone",
     ]);
   });
 
+  it("a confirmação precisa repetir a senha", () => {
+    expect(
+      validateSignup({ ...valid, passwordConfirmation: "" })
+        .passwordConfirmation,
+    ).toBe("Repita a senha.");
+    expect(
+      validateSignup({ ...valid, passwordConfirmation: "Senha#2027" })
+        .passwordConfirmation,
+    ).toBe("As senhas não são iguais.");
+  });
+
   it("envia só os caracteres que valem, com o e-mail em minúsculas", () => {
+    // A confirmação não vai para a API.
+    expect(toSignupInput(valid)).not.toHaveProperty("passwordConfirmation");
     expect(toSignupInput(valid)).toMatchObject({
       document: "11444777000161",
       phone: "11999998888",

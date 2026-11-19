@@ -21,10 +21,10 @@ describe("subscriptionNotice", () => {
 
   it("em teste: os dias que faltam e o último dia", () => {
     expect(subscriptionNotice(trial, "2026-12-01")?.message).toBe(
-      "Seu teste grátis termina em 5 dias (06/12).",
+      "Seu teste grátis termina em 5 dias.",
     );
-    expect(subscriptionNotice(trial, "2026-12-05")?.message).toContain(
-      "1 dia ",
+    expect(subscriptionNotice(trial, "2026-12-05")?.message).toBe(
+      "Seu teste grátis termina em 1 dia.",
     );
     expect(subscriptionNotice(trial, "2026-12-06")?.message).toBe(
       "Hoje é o último dia do seu teste grátis.",

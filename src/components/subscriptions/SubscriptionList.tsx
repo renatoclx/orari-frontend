@@ -26,7 +26,7 @@ type SubscriptionListProps = {
 const ENDS_AT_LABEL: Partial<Record<Subscription["status"], string>> = {
   TRIAL: "fim do teste",
   ACTIVE: "vencimento",
-  OVERDUE: "último dia antes do bloqueio",
+  OVERDUE: "último dia para pagar",
 };
 
 // "Plus + 1 profissional + anamnese"
@@ -99,10 +99,10 @@ export function SubscriptionList({ items, filtered }: SubscriptionListProps) {
       columns={[
         "Empresa",
         "Plano",
-        "Ciclo",
-        "Valor",
+        "Cobrança",
+        "Valor cobrado",
         "Situação",
-        "Data",
+        "Próxima data",
         "Ações",
       ]}
       emptyMessage={

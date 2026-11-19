@@ -167,7 +167,7 @@ await page.waitForURL("**/assinaturas");
 await sleep(1500);
 
 await page.getByRole("button", { name: "Pagamentos de Studio Aurora" }).click();
-await page.getByText("Período de").first().waitFor();
+await page.getByText("Cobre de").first().waitFor();
 await sleep(600);
 await shotDialog(page, "s11-pagamentos");
 await page.getByRole("dialog").getByRole("button", { name: "Registrar pagamento" }).click();

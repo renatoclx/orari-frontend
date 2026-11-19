@@ -21,7 +21,7 @@ export function StatusBreakdown({ data }: { data: PlatformDashboard }) {
             Situação das empresas
           </h2>
           <p className="text-sm text-muted-foreground">
-            Empresas ativas no Orari, pela assinatura.
+            Em que pé está cada empresa.
           </p>
         </div>
         <p className="text-right text-sm text-muted-foreground tabular-nums">

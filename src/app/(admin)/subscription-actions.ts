@@ -19,7 +19,11 @@ import { failureFrom, type ActionFailure } from "@/lib/action-result";
 import { isUuid } from "@/lib/uuid";
 import { getCurrentUser } from "@/services/auth.service";
 import { saveCompanyAccess } from "@/services/company-access.service";
-import { saveSubscription } from "@/services/subscription.service";
+import {
+  cancelSubscription,
+  reactivateSubscription,
+  saveSubscription,
+} from "@/services/subscription.service";
 import type { SubscriptionPlan } from "@/types/subscription";
 
 // Assinaturas das empresas, só do SUPER_ADMIN (screens/assinaturas.md).
@@ -89,6 +93,26 @@ export async function applyPlanAccessAction(
         admins: limits.admins,
       },
     });
+    return { ok: true };
+  } catch (error) {
+    return failureFrom(error);
+  }
+}
+
+/** Cancela a assinatura (a data sai sozinha) ou desfaz o cancelamento. */
+export async function setSubscriptionCanceledAction(
+  companyId: string,
+  canceled: boolean,
+): Promise<SubscriptionActionResult> {
+  const denied = await ensureSuperAdmin();
+  if (denied) return denied;
+  if (!isUuid(companyId)) return { ok: false, message: "Empresa inválida." };
+  try {
+    if (canceled) await cancelSubscription(companyId);
+    else await reactivateSubscription(companyId);
+    revalidatePath("/assinaturas");
+    revalidatePath(`/assinaturas/${companyId}`);
+    revalidatePath("/painel");
     return { ok: true };
   } catch (error) {
     return failureFrom(error);

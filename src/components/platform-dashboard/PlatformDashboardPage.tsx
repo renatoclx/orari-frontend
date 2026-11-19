@@ -64,8 +64,8 @@ export async function PlatformDashboardPage() {
           <div className="xl:col-span-2">
             <MonthlyBarsChart
               id="received-month"
-              title="Receita realizada"
-              description="Pagamentos registrados em Cobranças, pela data do pagamento."
+              title="Dinheiro recebido"
+              description="O que entrou em cada mês."
               points={data.receivedByMonth.map((point) => ({
                 month: point.month,
                 count: point.amount,

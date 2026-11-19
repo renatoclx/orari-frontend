@@ -30,7 +30,7 @@ export const SUBSCRIPTION_FILTERS: {
   },
   {
     id: "somente-leitura",
-    label: "Somente leitura",
+    label: "Só consulta",
     matches: (item) => item.subscription?.status === "READ_ONLY",
   },
   {

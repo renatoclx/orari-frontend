@@ -18,7 +18,7 @@
   <div class="bar"></div>
   <div class="kicker">Manual da plataforma</div>
   <h1>O Orari como negócio: empresas, assinaturas e cobranças</h1>
-  <p>Guia para o super administrador: o Painel com os números da plataforma, as empresas e os acessos de cada uma, as assinaturas com o teste grátis e o somente leitura, as cobranças e o cadastro sozinho pela landing.</p>
+  <p>Guia para o super administrador: o Painel com os números da plataforma, as empresas e os acessos de cada uma, as assinaturas com o teste grátis e o só consulta, as cobranças e o cadastro sozinho pela landing.</p>
   <div class="foot">As telas deste manual usam empresas e valores fictícios do ambiente de testes.</div>
 </section>
 
@@ -39,7 +39,7 @@
 <ul>
   <li><span class="ui">Painel</span>: os números do Orari (receita, empresas, crescimento, uso) e o que precisa de atenção hoje.</li>
   <li><span class="ui">Empresas</span>: o cadastro das empresas, o administrador de cada uma e os <b>acessos e limites</b>.</li>
-  <li><span class="ui">Assinaturas</span>: o plano, o valor e a <b>situação</b> de cada empresa (em teste, ativa, em atraso, somente leitura, cancelada).</li>
+  <li><span class="ui">Assinaturas</span>: o plano, o valor e a <b>situação</b> de cada empresa (em teste, ativa, em atraso, só consulta, cancelada).</li>
   <li><span class="ui">Cobranças</span>: os pagamentos que você registra; cada pagamento avança o “pago até” da assinatura.</li>
 </ul>
 <p>As telas da aplicação (agenda, clientes, financeiro) não aparecem para você: se abrir um endereço delas, o Orari leva ao Painel.</p>
@@ -47,10 +47,10 @@
 <h2>Como as peças se ligam</h2>
 <ol>
   <li><b>Plano</b> (Essencial, Plus, Clinical): define o que a empresa enxerga (a matriz de acessos) e quantos profissionais e administradores ela pode ter.</li>
-  <li><b>Assinatura</b>: guarda o plano contratado, o ciclo (mensal, semestral, anual), o valor e as datas. A situação sai das datas, sozinha, todos os dias.</li>
+  <li><b>Assinatura</b>: guarda o plano contratado, a forma de cobrança (mensal, semestral, anual), o valor e as datas. A situação sai das datas, sozinha, todos os dias.</li>
   <li><b>Cobrança</b>: cada pagamento registrado leva o “pago até” para o fim do período pago, e a empresa volta (ou continua) ativa.</li>
 </ol>
-<div class="box tip"><b class="t">Empresas sem assinatura</b><p>Uma empresa sem assinatura não tem nenhuma restrição: é o caso das empresas de teste do MVP. A partir do momento em que você cria a assinatura, as regras de teste, atraso e somente leitura passam a valer para ela.</p></div>
+<div class="box tip"><b class="t">Empresas sem assinatura</b><p>Uma empresa sem assinatura não tem nenhuma restrição: é o caso das empresas de teste do MVP. A partir do momento em que você cria a assinatura, as regras de teste, atraso e só consulta passam a valer para ela.</p></div>
 
 <!-- ===== 2 ===== -->
 <h1 class="chapter" data-toc="O Painel"><span class="num"></span>O Painel</h1>
@@ -59,25 +59,25 @@
 <figure><img src="images/s01-painel.png" alt=""><figcaption>O topo do Painel: os números e o que precisa de atenção.</figcaption></figure>
 <h2>Os quatro números do topo</h2>
 <ul>
-  <li><b>Receita mensal (MRR)</b>: quanto entra por mês das empresas que pagam (ativas e em atraso). Um plano anual entra como 1/12 do valor; um desconto de lançamento, enquanto vale, já vem descontado. Embaixo, a receita do ano (ARR) e quanto os descontos estão custando por mês.</li>
-  <li><b>Empresas pagantes</b> e quantas estão em teste agora.</li>
-  <li><b>Conversão do teste</b>: dos testes que já terminaram, quantos viraram pagamento.</li>
-  <li><b>Em atraso</b>: o valor das assinaturas vencidas que ainda estão nos 5 dias de tolerância.</li>
+  <li><b>Quanto entra por mês</b>: a soma do que as empresas que pagam (em dia ou atrasadas) pagam por mês. Um plano anual conta como 1/12 do valor; um desconto de lançamento, enquanto vale, já vem descontado. Embaixo, quanto isso dá no ano e quanto os descontos tiram por mês.</li>
+  <li><b>Empresas que pagam</b> e quantas estão em teste agora.</li>
+  <li><b>Testes que viraram clientes</b>: dos testes que já terminaram, quantos viraram pagamento.</li>
+  <li><b>Pagamentos atrasados</b>: o valor das cobranças vencidas que ainda estão no prazo extra de 5 dias.</li>
 </ul>
 
 <h2>Precisa de atenção</h2>
 <p>Quatro listas curtas com o que pede uma ação sua. Clique numa linha para abrir a assinatura da empresa.</p>
 <ul>
   <li><b>Testes acabando</b>: terminam nos próximos 7 dias. Bom momento para conversar e oferecer o plano.</li>
-  <li><b>Pagamentos vencidos</b>: com a data em que a empresa fica somente leitura.</li>
+  <li><b>Pagamentos vencidos</b>: com a data em que a empresa fica só consulta.</li>
   <li><b>Renovações chegando</b>: vencem nos próximos 14 dias.</li>
   <li><b>Empresas paradas</b>: não criam agendamento há 14 dias (risco de cancelar). Quem nunca usou aparece primeiro.</li>
 </ul>
 
-<figure><img src="images/s02-painel-receita.png" alt=""><figcaption>Receita realizada, receita por plano e situação das empresas.</figcaption></figure>
+<figure><img src="images/s02-painel-receita.png" alt=""><figcaption>Dinheiro recebido, quanto entra por plano e a situação das empresas.</figcaption></figure>
 <ul>
-  <li><b>Receita realizada</b>: o que de fato entrou em cada mês (os pagamentos de <span class="ui">Cobranças</span>, pela data do pagamento).</li>
-  <li><b>Receita por plano</b>: de onde vem o MRR, com a participação de cada plano e os ciclos das pagantes.</li>
+  <li><b>Dinheiro recebido</b>: o que de fato entrou em cada mês (os pagamentos de <span class="ui">Cobranças</span>, pela data do pagamento).</li>
+  <li><b>Quanto entra por plano</b>: de onde vem o dinheiro de cada mês, com a parte de cada plano e como as empresas pagam.</li>
   <li><b>Situação das empresas</b>: quantas estão em cada situação.</li>
 </ul>
 <figure><img src="images/s03-painel-crescimento.png" alt=""><figcaption>Crescimento nos últimos 12 meses.</figcaption></figure>
@@ -108,7 +108,7 @@
 <p class="lead">O contrato de cada empresa e a situação dele.</p>
 
 <figure><img src="images/s07-assinaturas.png" alt=""><figcaption>Assinaturas, com a situação e a data que importa.</figcaption></figure>
-<p>A lista traz todas as empresas, com ou sem assinatura: plano, ciclo, valor do ciclo, situação e a data que importa (fim do teste, vencimento ou último dia antes do bloqueio). O filtro no topo separa por situação.</p>
+<p>A lista traz todas as empresas, com ou sem assinatura: plano, forma de cobrança, valor cobrado, situação e a próxima data (fim do teste, vencimento ou último dia antes do bloqueio). O filtro no topo separa por situação.</p>
 
 <h2>As situações</h2>
 <table class="ref">
@@ -116,7 +116,7 @@
   <tr><td><b>Em teste</b></td><td>Até o fim do teste</td><td>Tudo o que o plano libera</td></tr>
   <tr><td><b>Ativa</b></td><td>Até o “pago até”</td><td>Tudo o que o plano libera</td></tr>
   <tr><td><b>Em atraso</b></td><td>Até 5 dias depois do vencimento</td><td>Tudo, com o aviso do bloqueio</td></tr>
-  <tr><td><b>Somente leitura</b></td><td>Teste acabou sem pagamento ou passou a tolerância</td><td>Só consultar; o app do cliente não agenda</td></tr>
+  <tr><td><b>Só consulta</b></td><td>Teste acabou sem pagamento ou passaram os 5 dias de atraso</td><td>Só consultar; o app do cliente não agenda</td></tr>
   <tr><td><b>Cancelada</b></td><td>A partir da data de cancelamento</td><td>Só consultar</td></tr>
 </table>
 <p>A situação muda sozinha conforme as datas: não há botão para “bloquear”. Os dados da empresa nunca são apagados.</p>
@@ -124,9 +124,9 @@
 <h2>Criar ou alterar</h2>
 <figure><img src="images/s08-assinatura.png" alt=""><figcaption>Alterar assinatura: plano e valor à esquerda, datas à direita.</figcaption></figure>
 <ul>
-  <li><b>Plano</b> e <b>Ciclo</b> (mensal, semestral −15%, anual −30%), <b>Profissionais extras</b> e o <b>Adicional de anamnese</b>.</li>
-  <li><span class="ui">Usar valor sugerido</span> calcula o valor do ciclo pela tabela da landing (R$ 16,90 por extra, R$ 24,90 de anamnese; nos ciclos longos, a parcela com desconto termina em ,90). O <b>Valor do ciclo</b> é editável: vale o que você combinar.</li>
-  <li><b>Datas</b>: Fim do teste, Pago até, Desconto (%) e Desconto até, Cancelada em. É preciso o fim do teste ou o pago até. O <span class="ui">X</span> ao lado de uma data a limpa.</li>
+  <li><b>Plano</b> e <b>Cobrança</b> (mensal, semestral −15%, anual −30%), <b>Profissionais extras</b> e o <b>Adicional de anamnese</b>.</li>
+  <li><span class="ui">Usar valor sugerido</span> calcula o valor pelos preços do site (R$ 16,90 por extra, R$ 24,90 de anamnese; no semestral e no anual, já com o desconto). O <b>Valor cobrado</b> é editável: vale o que você combinar.</li>
+  <li><b>Teste, pagamento e desconto</b>: o <b>Último dia do teste grátis</b>; o <b>Pagamento</b> só informa até quando a empresa pagou (muda sozinho ao registrar um pagamento em Cobranças); a chave <b>Oferta de lançamento</b> aplica 50% nos 3 primeiros meses de pagamento (<span class="ui">Ajustar</span> muda o desconto e a data).</li>
 </ul>
 <figure><img src="images/s09-nova-assinatura.png" alt=""><figcaption>Nova assinatura: já vem no Essencial mensal, com 7 dias de teste.</figcaption></figure>
 <figure class="w70"><img src="images/s10-aplicar-acessos.png" alt=""><figcaption>Depois de salvar com plano, extras ou anamnese diferentes.</figcaption></figure>
@@ -141,7 +141,7 @@
 <figure class="w70"><img src="images/s11-pagamentos.png" alt=""><figcaption>Em Assinaturas, o botão de moedas abre os pagamentos da empresa.</figcaption></figure>
 <figure class="w70"><img src="images/s12-registrar-pagamento.png" alt=""><figcaption>Registrar pagamento, já preenchido.</figcaption></figure>
 <ul>
-  <li>O formulário já vem com o <b>próximo período</b> do ciclo (do dia seguinte ao “pago até”; durante o teste, do dia seguinte ao fim dele) e o <b>valor</b> com o desconto que ainda vale, pago hoje, no Pix. Na maioria das vezes é só conferir e registrar.</li>
+  <li>O formulário já vem com o <b>próximo período</b> a cobrar (do dia seguinte ao “pago até”; durante o teste, do dia seguinte ao fim dele) e o <b>valor</b> com o desconto que ainda vale, pago hoje, no Pix. Na maioria das vezes é só conferir e registrar.</li>
   <li>O “pago até” nunca volta para trás: registrar um período antigo não encurta o que já está pago.</li>
   <li><b>Lançou errado?</b> Só o pagamento <b>mais recente</b> de cada empresa tem a lixeira. Excluir devolve o “pago até” de antes dele. Para corrigir um mais antigo, exclua os mais novos e lance de novo.</li>
 </ul>
@@ -162,22 +162,22 @@
 
 <h2>A faixa da assinatura</h2>
 <figure><img src="images/s14-faixa-teste.png" alt=""><figcaption>Em teste: a faixa mostra quantos dias faltam.</figcaption></figure>
-<figure><img src="images/s15-somente-leitura.png" alt=""><figcaption>Somente leitura: a faixa vermelha e só o “ver” nas listas.</figcaption></figure>
-<p>Abaixo do cabeçalho, a empresa vê a situação da assinatura: os dias de teste que faltam, o pagamento vencido (com a data do bloqueio) ou o somente leitura. Em somente leitura, os botões de cadastrar, alterar e excluir somem de todas as telas; a consulta continua.</p>
+<figure><img src="images/s15-somente-leitura.png" alt=""><figcaption>Só consulta: a faixa vermelha e só o “ver” nas listas.</figcaption></figure>
+<p>Abaixo do cabeçalho, a empresa vê a situação da assinatura: os dias de teste que faltam, o pagamento vencido (com a data do bloqueio) ou o só consulta. Em só consulta, os botões de cadastrar, alterar e excluir somem de todas as telas; a consulta continua.</p>
 <div class="box warn"><b class="t">Termos e privacidade</b><p>As páginas /termos e /privacidade estão como <b>rascunho</b>, com trechos [A DEFINIR] (razão social, CNPJ, contato, foro e prazo de guarda dos dados). Revise antes do lançamento, de preferência com um advogado.</p></div>
 
 <!-- ===== 7 ===== -->
 <h1 class="chapter" data-toc="Dúvidas comuns"><span class="num"></span>Dúvidas comuns</h1>
 <p class="lead">Respostas rápidas para as situações mais frequentes.</p>
 
-<h3>A empresa pagou, mas continua em somente leitura.</h3>
+<h3>A empresa pagou, mas continua em só consulta.</h3>
 <p>Registre o pagamento em Cobranças (ou no botão de moedas da assinatura). É o registro que avança o “pago até”; a situação muda na hora.</p>
 <h3>Quero dar mais dias de teste.</h3>
 <p>Em Assinaturas, altere o <b>Fim do teste</b> e salve.</p>
 <h3>A empresa quer cancelar.</h3>
-<p>Preencha <b>Cancelada em</b> com a data (normalmente o fim do período pago). A partir dela, a empresa fica só para consulta.</p>
+<p>Na assinatura dela, clique em <span class="ui">Cancelar assinatura</span>. O Orari calcula a data sozinho: a empresa usa até o fim do que já pagou e depois passa a só consultar. Mudou de ideia? <span class="ui">Desfazer cancelamento</span>.</p>
 <h3>Negociei um valor diferente da tabela.</h3>
-<p>Digite o valor no <b>Valor do ciclo</b>. O sugerido é só uma referência.</p>
+<p>Digite o valor no <b>Valor cobrado</b>. O sugerido é só uma referência.</p>
 <h3>Uma empresa de teste do MVP não aparece em Cobranças.</h3>
 <p>Sem assinatura não há cobrança. Crie a assinatura dela primeiro (em Assinaturas, o botão +).</p>
 <h3>A pessoa não recebeu e-mail de confirmação.</h3>

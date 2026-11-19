@@ -27,10 +27,10 @@ export function RevenueByPlan({ data }: { data: PlatformDashboard }) {
     >
       <div>
         <h2 id="revenue-plan-title" className="font-semibold">
-          Receita por plano
+          Quanto entra por plano
         </h2>
         <p className="text-sm text-muted-foreground">
-          Equivalente mensal das pagantes, com os descontos vigentes.
+          Valor por mês de cada plano, já com os descontos.
         </p>
       </div>
 
@@ -72,7 +72,7 @@ export function RevenueByPlan({ data }: { data: PlatformDashboard }) {
       </ul>
 
       <div className="mt-auto flex flex-wrap gap-2 border-t border-border pt-3 text-sm">
-        <span className="text-muted-foreground">Ciclos das pagantes:</span>
+        <span className="text-muted-foreground">Como pagam:</span>
         {data.byCycle.map((item) => (
           <span
             key={item.cycle}

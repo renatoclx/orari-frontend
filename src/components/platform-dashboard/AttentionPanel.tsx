@@ -122,7 +122,7 @@ export function AttentionPanel({
       <AttentionList
         icon={TriangleAlert}
         title="Pagamentos vencidos"
-        description="Na tolerância de 5 dias; depois, somente leitura."
+        description="Têm 5 dias para pagar; depois, só podem consultar."
         rows={dated(overdue, "bloqueia após")}
         empty="Nenhum pagamento vencido."
         alert

@@ -11,16 +11,16 @@ Como vai o Orari, **só para o SUPER_ADMIN**: receita, empresas, crescimento e u
 ## Blocos, de cima para baixo
 
 - **Cartões do topo** (`SummaryCard`):
-  - **Receita mensal (MRR)**: equivalente mensal das assinaturas ativas e em atraso (valor do ciclo ÷ meses), com o desconto que ainda vale; embaixo, o ARR (× 12) e quanto os descontos custam por mês.
-  - **Empresas pagantes**, com quantas estão em teste.
-  - **Conversão do teste**: dos testes já encerrados, quantos chegaram a pagar ("--" sem nenhum encerrado).
-  - **Em atraso**: soma dos ciclos vencidos ainda na tolerância, com o número de empresas (vermelho quando há).
+  - **Quanto entra por mês** (MRR): equivalente mensal das assinaturas ativas e em atraso (valor do ciclo ÷ meses), com o desconto que ainda vale; embaixo, o ARR (× 12) e quanto os descontos custam por mês.
+  - **Empresas que pagam**, com quantas estão em teste.
+  - **Testes que viraram clientes**: dos testes que já terminaram, quantos chegaram a pagar ("--" sem nenhum terminado).
+  - **Pagamentos atrasados**: soma das cobranças vencidas ainda no prazo extra de 5 dias, com o número de empresas (vermelho quando há).
 - **Precisa de atenção**, quatro listas curtas (até 5 linhas; o resto vira "+ N em Assinaturas"), cada linha um atalho para a assinatura da empresa:
   - **Testes acabando** (próximos 7 dias), **Pagamentos vencidos** (o dia em que bloqueia), **Renovações chegando** (vencem em 14 dias) e **Empresas paradas** (sem agendamento criado há 14 dias, menos as bloqueadas; quem nunca usou primeiro). Prazo por extenso: "hoje", "amanhã", "em 3 dias".
 - **Receita e empresas**:
-  - **Receita realizada** (largura toda): colunas dos 12 meses com a soma dos pagamentos registrados em Cobranças, pela data do pagamento.
-  - **Receita por plano**: uma barra por plano (a maior ocupa a largura), com o MRR, a participação e o número de empresas; embaixo, os ciclos das pagantes (Mensal, Semestral, Anual).
-  - **Situação das empresas**: barra empilhada (Em teste, Ativas, Em atraso, Somente leitura, Canceladas, Sem assinatura) e a legenda com o número de cada uma.
+  - **Dinheiro recebido** (largura toda): colunas dos 12 meses com a soma dos pagamentos registrados em Cobranças, pela data do pagamento.
+  - **Quanto entra por plano**: uma barra por plano (a maior ocupa a largura), com o MRR, a participação e o número de empresas; embaixo, os ciclos das pagantes (Mensal, Semestral, Anual).
+  - **Situação das empresas**: barra empilhada (Em teste, Ativas, Em atraso, Só consulta, Canceladas, Sem assinatura) e a legenda com o número de cada uma.
 - **Crescimento**: dois gráficos de colunas dos últimos 12 meses, com o número do mês atual e o total no canto e o mês por extenso na dica: **Novas empresas** (cadastradas por mês) e **Agendamentos na plataforma** (criados por mês, somando todas as empresas).
 - **Uso por empresa**: tabela (cartões no celular) com Empresa (atalho para a assinatura), Situação, Plano, Agendamentos criados nos últimos 30 dias (com uma barra fina proporcional ao maior), Clientes e Profissionais ativos e a Última atividade ("hoje", "ontem", "há 5 dias", "nunca"). Quem mais usa primeiro.
 

@@ -16,15 +16,24 @@ import { PLANS } from "@/components/subscriptions/subscription-catalog";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import type { SubscriptionPlan } from "@/types/subscription";
 import { formatPrice } from "@/utils/format";
 import { maskCpfOrCnpj, maskPhone } from "@/utils/masks";
 
-// Uma linha sobre cada plano, como na landing.
+// Uma linha sobre cada plano: os profissionais inclusos e a frase da landing
+// (PLANOS e LINHAS do landing-page/index.html). Mudou lá, muda aqui.
 const PLAN_SUMMARY: Record<SubscriptionPlan, string> = {
-  ESSENTIAL: "Até 2 profissionais: agenda, clientes, app e comandas.",
-  PLUS: "Até 4 profissionais: tudo, menos anamnese e turmas.",
-  CLINICAL: "3 profissionais: tudo, com anamnese e turmas.",
+  ESSENTIAL: "2 profissionais. Para autônomos e pequenos negócios.",
+  PLUS: "5 profissionais. Para equipes em crescimento, como salões e barbearias.",
+  CLINICAL:
+    "7 profissionais. Para clínicas, estúdios de Pilates e atendimentos recorrentes.",
 };
 
 /**
@@ -40,6 +49,7 @@ export function SignupForm({ initialPlan }: { initialPlan: SubscriptionPlan }) {
     email: "",
     phone: "",
     password: "",
+    passwordConfirmation: "",
     plan: initialPlan,
     acceptTerms: false,
   });
@@ -85,100 +95,77 @@ export function SignupForm({ initialPlan }: { initialPlan: SubscriptionPlan }) {
         </p>
       )}
 
-      <fieldset className="space-y-2">
-        <legend className="mb-2 text-sm font-medium">
-          Plano do teste <span className="text-destructive">*</span>
-        </legend>
-        {/* Botões de escolha (aria-pressed), como as opções de horário. */}
-        <div className="grid gap-2">
-          {PLANS.map((plan) => {
-            const chosen = values.plan === plan.key;
-            return (
-              <button
-                key={plan.key}
-                type="button"
-                aria-pressed={chosen}
-                onClick={() => set("plan", plan.key)}
-                className={`rounded-control border px-3 py-2.5 text-left text-sm transition-colors ${
-                  chosen
-                    ? "border-primary bg-primary/5"
-                    : "border-border hover:bg-muted"
-                }`}
-              >
-                <span className="flex items-baseline justify-between gap-3">
-                  <span className="font-semibold">{plan.label}</span>
-                  <span className="text-muted-foreground tabular-nums">
-                    {formatPrice(plan.monthly)}/mês
-                  </span>
-                </span>
-                <span className="block text-muted-foreground">
-                  {PLAN_SUMMARY[plan.key]}
-                </span>
-              </button>
-            );
-          })}
-        </div>
-        <p className="text-xs text-muted-foreground">
-          7 dias grátis, sem cartão. Depois, você escolhe se continua.
-        </p>
-      </fieldset>
+      {/* Plano num select (nome e preço) para o formulário não crescer; o
+          resumo do escolhido fica embaixo. Vem da landing pelo ?plano=. */}
+      <FormField id="signup-plan" label="Plano do teste" required>
+        <Select
+          value={values.plan}
+          onValueChange={(plan) => set("plan", plan as SubscriptionPlan)}
+        >
+          <SelectTrigger id="signup-plan" className="w-full">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            {PLANS.map((plan) => (
+              <SelectItem key={plan.key} value={plan.key}>
+                {plan.label} · {formatPrice(plan.monthly)}/mês
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </FormField>
+      <p className="-mt-2 text-xs text-muted-foreground">
+        {PLAN_SUMMARY[values.plan]}
+      </p>
 
-      <FormField
-        id="signup-companyName"
-        label="Nome do negócio"
-        required
-        error={errors.companyName}
-      >
-        <Input
-          id="signup-companyName"
-          autoComplete="organization"
-          placeholder="Ex.: Studio Aurora"
-          value={values.companyName}
-          onChange={(event) => set("companyName", event.target.value)}
-          aria-invalid={errors.companyName ? true : undefined}
-        />
-      </FormField>
-      <FormField
-        id="signup-document"
-        label="CPF ou CNPJ"
-        required
-        error={errors.document}
-      >
-        <MaskedInput
-          id="signup-document"
-          mask={maskCpfOrCnpj}
-          inputMode="numeric"
-          placeholder="Só os números"
-          value={values.document}
-          onValueChange={(digits) => set("document", digits)}
-          aria-invalid={errors.document ? true : undefined}
-        />
-      </FormField>
-      <FormField id="signup-name" label="Seu nome" required error={errors.name}>
-        <Input
-          id="signup-name"
-          autoComplete="name"
-          value={values.name}
-          onChange={(event) => set("name", event.target.value)}
-          aria-invalid={errors.name ? true : undefined}
-        />
-      </FormField>
+      {/* Campos curtos em pares (no celular, um embaixo do outro): o formulário
+          cabe na tela sem rolar em monitores comuns. */}
       <div className="grid gap-4 sm:grid-cols-2">
         <FormField
-          id="signup-email"
-          label="E-mail"
+          id="signup-companyName"
+          label="Nome do negócio"
           required
-          error={errors.email}
+          error={errors.companyName}
         >
           <Input
-            id="signup-email"
-            type="email"
-            autoComplete="email"
-            inputMode="email"
-            placeholder="nome@empresa.com"
-            value={values.email}
-            onChange={(event) => set("email", event.target.value)}
-            aria-invalid={errors.email ? true : undefined}
+            id="signup-companyName"
+            autoComplete="organization"
+            placeholder="Ex.: Studio Aurora"
+            value={values.companyName}
+            onChange={(event) => set("companyName", event.target.value)}
+            aria-invalid={errors.companyName ? true : undefined}
+          />
+        </FormField>
+        <FormField
+          id="signup-document"
+          label="CPF ou CNPJ"
+          required
+          error={errors.document}
+        >
+          <MaskedInput
+            id="signup-document"
+            mask={maskCpfOrCnpj}
+            inputMode="numeric"
+            placeholder="Só os números"
+            value={values.document}
+            onValueChange={(digits) => set("document", digits)}
+            aria-invalid={errors.document ? true : undefined}
+          />
+        </FormField>
+      </div>
+      <div className="grid gap-4 sm:grid-cols-2">
+        <FormField
+          id="signup-name"
+          label="Seu nome"
+          required
+          error={errors.name}
+        >
+          <Input
+            id="signup-name"
+            autoComplete="name"
+            value={values.name}
+            onChange={(event) => set("name", event.target.value)}
+            aria-invalid={errors.name ? true : undefined}
           />
         </FormField>
         <FormField
@@ -199,6 +186,19 @@ export function SignupForm({ initialPlan }: { initialPlan: SubscriptionPlan }) {
           />
         </FormField>
       </div>
+      <FormField id="signup-email" label="E-mail" required error={errors.email}>
+        <Input
+          id="signup-email"
+          type="email"
+          autoComplete="email"
+          inputMode="email"
+          placeholder="nome@empresa.com"
+          value={values.email}
+          onChange={(event) => set("email", event.target.value)}
+          aria-invalid={errors.email ? true : undefined}
+        />
+      </FormField>
+      {/* Senha e, embaixo, a confirmação; o olho mostra ou esconde as duas. */}
       <FormField
         id="signup-password"
         label="Senha"
@@ -231,6 +231,22 @@ export function SignupForm({ initialPlan }: { initialPlan: SubscriptionPlan }) {
             </button>
           </Hint>
         </div>
+      </FormField>
+      <FormField
+        id="signup-passwordConfirmation"
+        label="Confirme a senha"
+        required
+        error={errors.passwordConfirmation}
+      >
+        <Input
+          id="signup-passwordConfirmation"
+          type={showPassword ? "text" : "password"}
+          autoComplete="new-password"
+          placeholder="Repita a senha"
+          value={values.passwordConfirmation}
+          onChange={(event) => set("passwordConfirmation", event.target.value)}
+          aria-invalid={errors.passwordConfirmation ? true : undefined}
+        />
       </FormField>
 
       <div className="space-y-1">

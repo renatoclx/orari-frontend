@@ -39,6 +39,9 @@ export const CYCLES: {
 
 /** Profissional além dos incluídos no plano, por mês. */
 export const EXTRA_PROFESSIONAL_MONTHLY = 16.9;
+/** Oferta de lançamento: o desconto e por quantos meses de pagamento ele vale. */
+export const LAUNCH_OFFER = { percent: 50, months: 3 };
+
 /** Adicional de anamnese (Essencial e Plus), por mês. */
 export const ANAMNESIS_ADDON_MONTHLY = 24.9;
 
@@ -70,7 +73,10 @@ export function suggestedPrice(input: {
   const monthly =
     plan.monthly +
     input.extraProfessionals * EXTRA_PROFESSIONAL_MONTHLY +
-    (input.anamnesisAddon ? ANAMNESIS_ADDON_MONTHLY : 0);
+    // O adicional de anamnese não existe no Clinical (já vem incluída).
+    (input.anamnesisAddon && input.plan !== "CLINICAL"
+      ? ANAMNESIS_ADDON_MONTHLY
+      : 0);
   const installment =
     cycle.discount > 0 ? toNinety(monthly * (1 - cycle.discount)) : monthly;
   return Math.round(installment * cycle.months * 100) / 100;
@@ -84,6 +90,6 @@ export const STATUS_BADGES: Record<
   TRIAL: { label: "Em teste", variant: "secondary" },
   ACTIVE: { label: "Ativa", variant: "success" },
   OVERDUE: { label: "Em atraso", variant: "secondary" },
-  READ_ONLY: { label: "Somente leitura", variant: "destructive" },
+  READ_ONLY: { label: "Só consulta", variant: "destructive" },
   CANCELED: { label: "Cancelada", variant: "destructive" },
 };

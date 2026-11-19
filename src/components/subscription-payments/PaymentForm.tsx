@@ -106,7 +106,7 @@ export function PaymentForm({
             aria-invalid={errors.amountCents ? true : undefined}
           />
         </FormField>
-        <FormField id="payment-method" label="Forma" required>
+        <FormField id="payment-method" label="Forma de pagamento" required>
           <Select
             value={values.method}
             onValueChange={(method) =>
@@ -142,7 +142,7 @@ export function PaymentForm({
         <div className="hidden sm:block" aria-hidden="true" />
         <FormField
           id="payment-periodStart"
-          label="Período de"
+          label="Este pagamento cobre de"
           required
           error={errors.periodStart}
         >
@@ -170,8 +170,7 @@ export function PaymentForm({
         </FormField>
       </div>
       <p className="text-xs text-muted-foreground">
-        O pago até da assinatura passa a ser o fim do período (se for depois do
-        atual).
+        Ao registrar, a empresa fica em dia até a data final acima.
       </p>
       <FormField id="payment-note" label="Observação">
         <Textarea

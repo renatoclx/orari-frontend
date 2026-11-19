@@ -41,6 +41,8 @@ export async function SubscriptionFormPage({
         </p>
       </div>
       <SubscriptionForm
+        // Remonta depois de cancelar ou desfazer: o formulário nasce das props.
+        key={subscription?.canceledAt ?? "sem-cancelamento"}
         companyId={companyId}
         companyName={name}
         subscription={subscription}

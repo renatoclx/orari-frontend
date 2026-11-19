@@ -194,18 +194,18 @@ describe("modelos de plano", () => {
     expect(matrix.settings).toEqual({ ...NONE, view: true, edit: true });
   });
 
-  it("aplicar o modelo define os limites: 2, 4 e 3 profissionais", () => {
+  it("aplicar o modelo define os limites: 2, 5 e 7 profissionais; 1, 2 e 3 administradores", () => {
     expect(applyTemplate(template("essential")).limits).toEqual({
       professionals: 2,
       admins: 1,
     });
     expect(applyTemplate(template("plus")).limits).toEqual({
-      professionals: 4,
-      admins: 1,
+      professionals: 5,
+      admins: 2,
     });
     expect(applyTemplate(template("clinical")).limits).toEqual({
-      professionals: 3,
-      admins: 2,
+      professionals: 7,
+      admins: 3,
     });
   });
 });

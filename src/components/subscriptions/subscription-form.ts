@@ -102,8 +102,9 @@ export function validateSubscriptionForm(
       errors.discountUntil = "Informe até quando vale o desconto.";
     }
   }
+  // O "pago até" muda pelos pagamentos; sem ele, o teste precisa de um fim.
   if (!values.trialEndsAt && !values.paidUntil) {
-    errors.paidUntil = "Informe o fim do teste ou até quando está pago.";
+    errors.trialEndsAt = "Informe o último dia do teste grátis.";
   }
   return errors;
 }
@@ -128,4 +129,49 @@ export function toSubscriptionInput(
     paidUntil: values.paidUntil || null,
     canceledAt: values.canceledAt || null,
   };
+}
+
+// Datas "aaaa-mm-dd" sem passar por fuso (contas de calendário).
+function shiftIso(iso: string, days: number, months = 0): string {
+  const [year, month, day] = iso.split("-").map(Number);
+  const lastDay = new Date(
+    Date.UTC(year, month - 1 + months + 1, 0),
+  ).getUTCDate();
+  const date = new Date(
+    Date.UTC(year, month - 1 + months, Math.min(day, lastDay)) +
+      days * 86_400_000,
+  );
+  return date.toISOString().slice(0, 10);
+}
+
+/**
+ * Até quando vale a oferta de lançamento: os primeiros meses de pagamento,
+ * contando do dia seguinte ao que já está pago (ou ao fim do teste; sem
+ * nenhum dos dois, de hoje).
+ */
+export function launchOfferUntil(
+  values: Pick<SubscriptionFormValues, "paidUntil" | "trialEndsAt">,
+  todayIso: string,
+  months: number,
+): string {
+  const base = values.paidUntil || values.trialEndsAt;
+  const start = base ? shiftIso(base, 1) : todayIso;
+  return shiftIso(shiftIso(start, 0, months), -1);
+}
+
+/**
+ * Prévia do cancelamento (a mesma conta da API, só para o texto da
+ * confirmação): a empresa usa até o fim do que pagou ou do teste em andamento
+ * e só consulta a partir do dia seguinte; sem nada correndo, a partir de hoje.
+ */
+export function cancellationPreview(
+  subscription: { paidUntil: string | null; trialEndsAt: string | null },
+  todayIso: string,
+): { lastDay: string | null; from: string } {
+  const running = [subscription.paidUntil, subscription.trialEndsAt].filter(
+    (date): date is string => date !== null && date >= todayIso,
+  );
+  if (running.length === 0) return { lastDay: null, from: todayIso };
+  const lastDay = running.sort().at(-1)!;
+  return { lastDay, from: shiftIso(lastDay, 1) };
 }

@@ -39,6 +39,9 @@ export const CYCLES: {
 
 /** Profissional além dos incluídos no plano, por mês. */
 export const EXTRA_PROFESSIONAL_MONTHLY = 16.9;
+/** Oferta de lançamento: o desconto e por quantos meses de pagamento ele vale. */
+export const LAUNCH_OFFER = { percent: 50, months: 3 };
+
 /** Adicional de anamnese (Essencial e Plus), por mês. */
 export const ANAMNESIS_ADDON_MONTHLY = 24.9;
 

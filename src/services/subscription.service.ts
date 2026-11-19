@@ -33,3 +33,16 @@ export function saveSubscription(
     body: JSON.stringify(input),
   });
 }
+
+/** Cancela: a API calcula a data (fim do que foi pago ou do teste em andamento). */
+export async function cancelSubscription(companyId: string): Promise<void> {
+  await apiFetch(`/companies/${companyId}/subscription/cancel`, {
+    method: "POST",
+  });
+}
+
+export async function reactivateSubscription(companyId: string): Promise<void> {
+  await apiFetch(`/companies/${companyId}/subscription/cancel`, {
+    method: "DELETE",
+  });
+}

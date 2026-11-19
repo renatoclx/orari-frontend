@@ -3,11 +3,21 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
-import { Calculator, Plus, Save, SlidersHorizontal, X } from "lucide-react";
+import {
+  Ban,
+  Calculator,
+  Pencil,
+  Plus,
+  RotateCcw,
+  Save,
+  SlidersHorizontal,
+  X,
+} from "lucide-react";
 import { toast } from "sonner";
 import {
   applyPlanAccessAction,
   saveSubscriptionAction,
+  setSubscriptionCanceledAction,
 } from "@/app/(admin)/subscription-actions";
 import { ConfirmDialog } from "@/components/shared/ConfirmDialog";
 import { DatePicker } from "@/components/shared/DatePicker";
@@ -17,12 +27,15 @@ import { MaskedInput } from "@/components/shared/MaskedInput";
 import { SubscriptionStatusBadge } from "@/components/subscriptions/SubscriptionStatusBadge";
 import {
   CYCLES,
+  LAUNCH_OFFER,
   PLANS,
   suggestedPrice,
 } from "@/components/subscriptions/subscription-catalog";
 import {
+  cancellationPreview,
   hasErrors,
   initialSubscriptionValues,
+  launchOfferUntil,
   validateSubscriptionForm,
   type SubscriptionFormErrors,
   type SubscriptionFormValues,
@@ -303,59 +316,43 @@ export function SubscriptionForm({
             </FormField>
           </section>
 
-          <section className="space-y-4">
+          <section className="space-y-5">
             <div>
-              <h2 className="font-semibold">Datas</h2>
+              <h2 className="font-semibold">Teste, pagamento e desconto</h2>
               <p className="text-sm text-muted-foreground">
-                O Orari usa estas datas para saber se a empresa está em teste,
-                em dia ou atrasada. Com 5 dias de atraso, ela passa a só
+                Com 5 dias de atraso no pagamento, a empresa passa a só
                 consultar.
               </p>
             </div>
-            <div className="grid gap-4 sm:grid-cols-2">
-              <DateField
-                id="subscription-trialEndsAt"
-                label="Fim do teste"
-                value={values.trialEndsAt}
-                onChange={(value) => set("trialEndsAt", value)}
-              />
-              <DateField
-                id="subscription-paidUntil"
-                label="Pago até o dia"
-                value={values.paidUntil}
-                error={errors.paidUntil}
-                onChange={(value) => set("paidUntil", value)}
-              />
-              <FormField
-                id="subscription-discountPercent"
-                label="Desconto (%)"
-                error={errors.discountPercent}
-              >
-                <Input
-                  id="subscription-discountPercent"
-                  inputMode="numeric"
-                  placeholder="Ex.: 50"
-                  value={values.discountPercent}
-                  onChange={(event) =>
-                    set("discountPercent", event.target.value)
-                  }
-                  aria-invalid={errors.discountPercent ? true : undefined}
-                />
-              </FormField>
-              <DateField
-                id="subscription-discountUntil"
-                label="Desconto vale até"
-                value={values.discountUntil}
-                error={errors.discountUntil}
-                onChange={(value) => set("discountUntil", value)}
-              />
-              <DateField
-                id="subscription-canceledAt"
-                label="Cancelar a partir de"
-                value={values.canceledAt}
-                onChange={(value) => set("canceledAt", value)}
-              />
+            <DateField
+              id="subscription-trialEndsAt"
+              label="Último dia do teste grátis"
+              value={values.trialEndsAt}
+              error={errors.trialEndsAt}
+              onChange={(value) => set("trialEndsAt", value)}
+            />
+
+            {/* O "pago até" não se digita: muda sozinho a cada pagamento. */}
+            <div className="space-y-1 text-sm">
+              <p className="font-medium">Pagamento</p>
+              <p className="text-muted-foreground">
+                {values.paidUntil
+                  ? `Paga até ${formatDateOnly(values.paidUntil)}.`
+                  : "Nenhum pagamento registrado ainda."}{" "}
+                Muda sozinho quando você registra um pagamento (botão de moedas
+                na lista de assinaturas ou em Cobranças).
+              </p>
             </div>
+
+            <LaunchOfferField values={values} errors={errors} set={set} />
+
+            {subscription && (
+              <CancellationField
+                companyId={companyId}
+                companyName={companyName}
+                subscription={subscription}
+              />
+            )}
           </section>
         </div>
       </div>
@@ -451,5 +448,201 @@ function DateField({
         )}
       </div>
     </FormField>
+  );
+}
+
+// Hoje no fuso do navegador (o SUPER_ADMIN está no Brasil), "aaaa-mm-dd".
+const todayIso = () => new Intl.DateTimeFormat("en-CA").format(new Date());
+
+/**
+ * Oferta de lançamento: uma chave que preenche o desconto e até quando ele
+ * vale (os primeiros meses de pagamento). "Ajustar" mostra os dois campos
+ * para outro combinado.
+ */
+function LaunchOfferField({
+  values,
+  errors,
+  set,
+}: {
+  values: SubscriptionFormValues;
+  errors: SubscriptionFormErrors;
+  set: <K extends keyof SubscriptionFormValues>(
+    key: K,
+    value: SubscriptionFormValues[K],
+  ) => void;
+}) {
+  const on = values.discountPercent.trim() !== "";
+  // Desconto diferente da oferta padrão já abre os campos.
+  const [adjusting, setAdjusting] = useState(
+    on && values.discountPercent !== String(LAUNCH_OFFER.percent),
+  );
+
+  function toggle(checked: boolean) {
+    if (checked) {
+      set("discountPercent", String(LAUNCH_OFFER.percent));
+      set(
+        "discountUntil",
+        launchOfferUntil(values, todayIso(), LAUNCH_OFFER.months),
+      );
+    } else {
+      set("discountPercent", "");
+      set("discountUntil", "");
+      setAdjusting(false);
+    }
+  }
+
+  return (
+    <div className="space-y-3">
+      <label className="flex items-center justify-between gap-3 text-sm">
+        <span>
+          <span className="font-medium">Oferta de lançamento</span>
+          <span className="block text-xs text-muted-foreground">
+            {LAUNCH_OFFER.percent}% de desconto nos {LAUNCH_OFFER.months}{" "}
+            primeiros meses de pagamento.
+          </span>
+        </span>
+        <Switch
+          checked={on}
+          onCheckedChange={toggle}
+          aria-label="Oferta de lançamento"
+        />
+      </label>
+      {on && !adjusting && (
+        <p className="flex flex-wrap items-center gap-x-2 text-sm text-muted-foreground">
+          {values.discountPercent}% de desconto até{" "}
+          {values.discountUntil ? formatDateOnly(values.discountUntil) : "--"}.
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            onClick={() => setAdjusting(true)}
+          >
+            <Pencil aria-hidden="true" />
+            Ajustar
+          </Button>
+        </p>
+      )}
+      {on && adjusting && (
+        <div className="grid gap-4 sm:grid-cols-2">
+          <FormField
+            id="subscription-discountPercent"
+            label="Desconto (%)"
+            error={errors.discountPercent}
+          >
+            <Input
+              id="subscription-discountPercent"
+              inputMode="numeric"
+              value={values.discountPercent}
+              onChange={(event) => set("discountPercent", event.target.value)}
+              aria-invalid={errors.discountPercent ? true : undefined}
+            />
+          </FormField>
+          <DateField
+            id="subscription-discountUntil"
+            label="Desconto vale até"
+            value={values.discountUntil}
+            error={errors.discountUntil}
+            onChange={(value) => set("discountUntil", value)}
+          />
+        </div>
+      )}
+    </div>
+  );
+}
+
+/**
+ * Cancelar a assinatura por botão: a data sai sozinha (a empresa usa até o
+ * fim do que pagou e depois só consulta). Cancelada, mostra a data e
+ * "Desfazer cancelamento". Só na alteração.
+ */
+function CancellationField({
+  companyId,
+  companyName,
+  subscription,
+}: {
+  companyId: string;
+  companyName: string;
+  subscription: Subscription;
+}) {
+  const router = useRouter();
+  const [confirming, setConfirming] = useState(false);
+  const [pending, startTransition] = useTransition();
+  const canceled = subscription.canceledAt !== null;
+  const preview = cancellationPreview(subscription, todayIso());
+
+  function run(cancel: boolean) {
+    startTransition(async () => {
+      const result = await setSubscriptionCanceledAction(companyId, cancel);
+      if (!result.ok) {
+        toast.error(
+          cancel
+            ? "Não foi possível cancelar a assinatura."
+            : "Não foi possível desfazer o cancelamento.",
+          { description: result.message },
+        );
+        return;
+      }
+      toast.success(
+        cancel ? "Assinatura cancelada." : "Cancelamento desfeito.",
+        { description: companyName },
+      );
+      setConfirming(false);
+      router.refresh();
+    });
+  }
+
+  return (
+    <div className="space-y-2 border-t border-border pt-4 text-sm">
+      <p className="font-medium">Cancelamento</p>
+      {canceled ? (
+        <>
+          <p className="text-muted-foreground">
+            Assinatura cancelada. A empresa só consulta a partir de{" "}
+            {formatDateOnly(subscription.canceledAt!)}.
+          </p>
+          <Button
+            type="button"
+            variant="outline"
+            disabled={pending}
+            onClick={() => run(false)}
+          >
+            <RotateCcw aria-hidden="true" />
+            {pending ? "Desfazendo…" : "Desfazer cancelamento"}
+          </Button>
+        </>
+      ) : (
+        <>
+          <p className="text-muted-foreground">
+            A empresa usa até o fim do que já pagou e depois passa a só
+            consultar. Os dados ficam guardados.
+          </p>
+          <Button
+            type="button"
+            variant="outline"
+            onClick={() => setConfirming(true)}
+          >
+            <Ban aria-hidden="true" />
+            Cancelar assinatura
+          </Button>
+        </>
+      )}
+      <ConfirmDialog
+        open={confirming}
+        onOpenChange={setConfirming}
+        title="Cancelar a assinatura?"
+        description={
+          preview.lastDay
+            ? `${companyName} usa normalmente até ${formatDateOnly(preview.lastDay)} e, a partir de ${formatDateOnly(preview.from)}, passa a só consultar. Dá para desfazer depois.`
+            : `${companyName} passa a só consultar a partir de hoje. Dá para desfazer depois.`
+        }
+        confirmLabel="Cancelar assinatura"
+        pendingLabel="Cancelando…"
+        cancelLabel="Voltar"
+        pending={pending}
+        destructive
+        icon={Ban}
+        onConfirm={() => run(true)}
+      />
+    </div>
   );
 }

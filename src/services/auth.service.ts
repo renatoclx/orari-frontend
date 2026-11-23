@@ -94,6 +94,21 @@ export function resetPassword(
   });
 }
 
+/**
+ * Troca da própria senha (pede a atual). A API encerra todas as sessões da
+ * pessoa, inclusive esta: quem chama entra de novo com a senha nova.
+ */
+export async function changeOwnPassword(input: {
+  currentPassword: string;
+  newPassword: string;
+  newPasswordConfirmation: string;
+}): Promise<void> {
+  await apiFetch("/auth/me/password", {
+    method: "PATCH",
+    body: JSON.stringify(input),
+  });
+}
+
 /** Revoga o refresh token no backend (a sessão deixa de poder ser renovada). */
 export function logout(refreshToken: string): Promise<void> {
   return apiFetch<void>("/auth/logout", {

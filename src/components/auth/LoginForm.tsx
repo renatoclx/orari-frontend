@@ -69,16 +69,7 @@ export function LoginForm() {
       </div>
 
       <div className="space-y-2">
-        {/* "Esqueci minha senha" ao lado do rótulo: perto de onde a pessoa trava. */}
-        <div className="flex items-center justify-between gap-3">
-          <Label htmlFor="password">Senha</Label>
-          <Link
-            href="/esqueci-senha"
-            className="text-sm font-medium text-primary hover:underline"
-          >
-            Esqueci minha senha
-          </Link>
-        </div>
+        <Label htmlFor="password">Senha</Label>
         <div className="relative">
           <LockKeyhole className={iconClass} aria-hidden="true" />
           <Input
@@ -127,6 +118,15 @@ export function LoginForm() {
         <LogIn aria-hidden="true" />
         {pending ? "Entrando…" : "Entrar"}
       </Button>
+      {/* Logo abaixo do Entrar: quem errou a senha encontra a saída ali. */}
+      <p className="text-center">
+        <Link
+          href="/esqueci-senha"
+          className="text-sm font-medium text-primary hover:underline"
+        >
+          Esqueci minha senha
+        </Link>
+      </p>
       {/* Quem ainda não tem conta: o cadastro sozinho (screens/cadastro.md). */}
       <p className="text-center text-sm text-muted-foreground">
         Ainda não usa o Orari?{" "}

@@ -9,12 +9,12 @@ export const metadata: Metadata = {
 };
 
 // RASCUNHO (2026-11-17) para revisão do responsável, de preferência com um
-// advogado. Os trechos [A DEFINIR] dependem de dados da empresa e de decisões.
+// advogado. Dados da empresa e prazos preenchidos em 2026-11-23.
 const SECTIONS: LegalSection[] = [
   {
     title: "Quem somos e o que é o Orari",
     body: [
-      'O Orari é um sistema on-line de agendamento e gestão para negócios que atendem com hora marcada (estética, barbearia, pilates, clínicas e afins), mantido por [A DEFINIR: razão social e CNPJ], aqui chamado de "Orari".',
+      'O Orari é um sistema on-line de agendamento e gestão para negócios que atendem com hora marcada (estética, barbearia, pilates, clínicas e afins), mantido por 48.927.477 RENATO JEAN VALSESIA CHRISTINO, CNPJ 48.927.477/0001-43, aqui chamado de "Orari".',
       'Estes termos valem para a empresa que contrata o Orari ("cliente") e para as pessoas que ela cadastra como usuárias. Ao criar a conta, quem se cadastra declara ter poderes para aceitar estes termos em nome do negócio.',
     ],
   },
@@ -46,7 +46,7 @@ const SECTIONS: LegalSection[] = [
     title: "Cancelamento",
     body: [
       "O cliente pode cancelar quando quiser, pelo contato do Orari. O acesso continua até o fim do período já pago; não há devolução proporcional de período em uso, salvo exigência legal.",
-      "Depois do cancelamento, os dados ficam disponíveis para consulta e exportação por [A DEFINIR: prazo, ex.: 60 dias] e então são excluídos, exceto o que a lei exigir guardar.",
+      "Depois do cancelamento, ou do fim do teste grátis sem assinatura, os dados ficam disponíveis para consulta e exportação por 60 dias e então são excluídos, exceto o que a lei exigir guardar.",
     ],
   },
   {
@@ -81,8 +81,8 @@ const SECTIONS: LegalSection[] = [
   {
     title: "Foro e contato",
     body: [
-      "Fica eleito o foro de [A DEFINIR: cidade/UF] para resolver questões destes termos, salvo regra legal diferente para o consumidor.",
-      "Contato: [A DEFINIR: e-mail e WhatsApp do Orari].",
+      "Fica eleito o foro de José Bonifácio-SP para resolver questões destes termos, salvo regra legal diferente para o consumidor.",
+      "Contato: contato@orariapp.com.br e WhatsApp (17) 99250-8313.",
     ],
   },
 ];

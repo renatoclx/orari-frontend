@@ -61,6 +61,39 @@ export function signup(
   });
 }
 
+/**
+ * "Esqueci minha senha": a API manda o link por e-mail. Responde sempre igual,
+ * exista o e-mail ou não (não revela quem tem conta).
+ */
+export async function requestPasswordReset(
+  email: string,
+  clientIp?: string,
+): Promise<void> {
+  await apiFetch("/auth/password/forgot", {
+    authenticated: false,
+    method: "POST",
+    headers: forwardedForHeader(clientIp),
+    body: JSON.stringify({ email }),
+  });
+}
+
+/** Senha nova com o token do link; devolve se a pessoa entra pelo app. */
+export function resetPassword(
+  input: {
+    token: string;
+    newPassword: string;
+    newPasswordConfirmation: string;
+  },
+  clientIp?: string,
+): Promise<{ professional: boolean }> {
+  return apiFetch<{ professional: boolean }>("/auth/password/reset", {
+    authenticated: false,
+    method: "POST",
+    headers: forwardedForHeader(clientIp),
+    body: JSON.stringify(input),
+  });
+}
+
 /** Revoga o refresh token no backend (a sessão deixa de poder ser renovada). */
 export function logout(refreshToken: string): Promise<void> {
   return apiFetch<void>("/auth/logout", {

@@ -3,7 +3,8 @@
 import { Hint } from "@/components/shared/Hint";
 import { useState, useTransition } from "react";
 import Link from "next/link";
-import { Building2, LogOut } from "lucide-react";
+import { Building2, KeyRound, LogOut } from "lucide-react";
+import { ChangePasswordDialog } from "@/components/layout/ChangePasswordDialog";
 import { ThemeMenuItem } from "@/components/layout/ThemeToggle";
 import { logout } from "@/app/(admin)/actions";
 import { PersonAvatar } from "@/components/shared/PersonAvatar";
@@ -32,9 +33,10 @@ type UserMenuProps = {
   user: CurrentUser;
 };
 
-/** Menu do usuário logado: configurações da empresa, tema e saída (que pede confirmação). */
+/** Menu do usuário logado: configurações da empresa, alterar senha, tema e saída (que pede confirmação). */
 export function UserMenu({ user }: UserMenuProps) {
   const [confirmOpen, setConfirmOpen] = useState(false);
+  const [passwordOpen, setPasswordOpen] = useState(false);
   const [pending, startTransition] = useTransition();
 
   function handleLogout() {
@@ -76,6 +78,14 @@ export function UserMenu({ user }: UserMenuProps) {
               Configurações da empresa
             </Link>
           </DropdownMenuItem>
+          {/* Troca da própria senha (pede a atual), num dialog. */}
+          <DropdownMenuItem
+            onSelect={() => setPasswordOpen(true)}
+            className="gap-2.5 px-3 py-2"
+          >
+            <KeyRound aria-hidden="true" />
+            Alterar senha
+          </DropdownMenuItem>
           <ThemeMenuItem />
           <DropdownMenuSeparator className="my-1.5" />
           <DropdownMenuItem
@@ -113,6 +123,10 @@ export function UserMenu({ user }: UserMenuProps) {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+      <ChangePasswordDialog
+        open={passwordOpen}
+        onOpenChange={setPasswordOpen}
+      />
     </>
   );
 }

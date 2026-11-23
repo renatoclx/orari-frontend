@@ -29,9 +29,10 @@ import type { AuthTokens } from "@/types/auth";
 const LOGIN_PATH = "/login";
 const HOME_PATH = "/";
 // Telas de quem ainda não entrou: com sessão, vão para o sistema.
-const GUEST_PATHS = new Set([LOGIN_PATH, "/cadastro"]);
+const GUEST_PATHS = new Set([LOGIN_PATH, "/cadastro", "/esqueci-senha"]);
 // Abertas a todos, com ou sem sessão (textos legais, linkados no cadastro).
-const PUBLIC_PATHS = new Set(["/termos", "/privacidade"]);
+// O link do e-mail de senha abre mesmo com uma sessão aberta no navegador.
+const PUBLIC_PATHS = new Set(["/termos", "/privacidade", "/redefinir-senha"]);
 
 /**
  * Roda antes de toda requisição. Duas tarefas:

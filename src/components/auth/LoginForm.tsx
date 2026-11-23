@@ -69,7 +69,16 @@ export function LoginForm() {
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="password">Senha</Label>
+        {/* "Esqueci minha senha" ao lado do rótulo: perto de onde a pessoa trava. */}
+        <div className="flex items-center justify-between gap-3">
+          <Label htmlFor="password">Senha</Label>
+          <Link
+            href="/esqueci-senha"
+            className="text-sm font-medium text-primary hover:underline"
+          >
+            Esqueci minha senha
+          </Link>
+        </div>
         <div className="relative">
           <LockKeyhole className={iconClass} aria-hidden="true" />
           <Input

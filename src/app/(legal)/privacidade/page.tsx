@@ -9,12 +9,12 @@ export const metadata: Metadata = {
 };
 
 // RASCUNHO (2026-11-17), baseado na LGPD (Lei 13.709/2018), para revisão do
-// responsável, de preferência com um advogado. [A DEFINIR] = dado pendente.
+// responsável, de preferência com um advogado. Dados preenchidos em 2026-11-23.
 const SECTIONS: LegalSection[] = [
   {
     title: "Quem trata os dados",
     body: [
-      "O Orari ([A DEFINIR: razão social e CNPJ]) trata dados pessoais de dois jeitos:",
+      "O Orari (48.927.477 RENATO JEAN VALSESIA CHRISTINO, CNPJ 48.927.477/0001-43) trata dados pessoais de dois jeitos:",
       "- como controlador, dos dados de quem contrata e usa o sistema (o negócio e seus usuários);",
       "- como operador, dos dados que cada negócio cadastra sobre os próprios clientes, seguindo as instruções do negócio, que é o controlador desses dados.",
     ],
@@ -47,7 +47,7 @@ const SECTIONS: LegalSection[] = [
   {
     title: "Com quem compartilhamos",
     body: [
-      "Só com fornecedores necessários para o serviço funcionar, que tratam os dados em nosso nome: hospedagem dos servidores ([A DEFINIR: provedor, ex.: KingHost]), envio de avisos no celular (serviços de notificação do navegador) e, quando houver, meios de pagamento e envio de mensagens.",
+      "Só com fornecedores necessários para o serviço funcionar, que tratam os dados em nosso nome: hospedagem dos servidores (KingHost), envio de e-mails do sistema, como o de redefinir a senha (Resend), cópia de segurança criptografada dos dados (Google Drive), envio de avisos no celular (serviços de notificação do navegador) e, quando houver, meios de pagamento e envio de mensagens.",
       "Também quando a lei ou uma ordem judicial exigir.",
     ],
   },
@@ -60,7 +60,7 @@ const SECTIONS: LegalSection[] = [
   {
     title: "Por quanto tempo guardamos",
     body: [
-      "Enquanto a conta estiver ativa. Depois do cancelamento, por [A DEFINIR: prazo, ex.: 60 dias] para consulta e exportação, e então excluímos, exceto o que a lei exige guardar (como registros de acesso, por 6 meses, e dados fiscais, pelo prazo legal).",
+      "Enquanto a conta estiver ativa. Depois do cancelamento, ou do fim do teste grátis sem assinatura, por 60 dias para consulta e exportação, e então excluímos, exceto o que a lei exige guardar (como registros de acesso, por 6 meses, e dados fiscais, pelo prazo legal).",
     ],
   },
   {
@@ -79,7 +79,7 @@ const SECTIONS: LegalSection[] = [
   {
     title: "Contato e encarregado",
     body: [
-      "Encarregado de dados (DPO): [A DEFINIR: nome e e-mail].",
+      "Encarregado de dados (DPO): Renato Jean Valsesia Christino, renato.christino@gmail.com. Contato geral: contato@orariapp.com.br.",
       "Esta política pode mudar; mudanças relevantes são avisadas no sistema.",
     ],
   },

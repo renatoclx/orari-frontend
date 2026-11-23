@@ -9,7 +9,7 @@
 
 ### Regras específicas
 
-- Link "Esqueci minha senha" (ao lado do rótulo Senha) leva a `/esqueci-senha`.
+- Link "Esqueci minha senha" (abaixo do botão Entrar) leva a `/esqueci-senha`.
 - Sem login social (Google ou outro OAuth - implementação futura).
 - Abaixo do botão, "Ainda não usa o Orari? **Teste grátis por 7 dias**" leva ao cadastro sozinho (`cadastro.md`).
 

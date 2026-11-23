@@ -20,7 +20,7 @@
 - À esquerda, o nome fantasia da empresa (só do tablet em diante; no celular, o espaço fica para o menu, a logo do Orari e os atalhos).
 - À direita, a logo da empresa (quando houver), o nome e o tipo do usuário e o avatar.
 - **Sino de notificações** (à esquerda da logo e do usuário): o número de não lidas numa marca vermelha, o painel das últimas 10 e o link para a página (ver [notificacoes.md](notificacoes.md)).
-- O menu do usuário (avatar) reúne: **Configurações da empresa**, **Tema escuro** (item com switch; alterna sem fechar o menu) e **Sair** (com confirmação). O tema deixou de ter botão próprio no header. Na tela de login o tema continua como switch.
+- O menu do usuário (avatar) reúne: **Configurações da empresa**, **Alterar senha** (`KeyRound`; dialog com senha atual, nova senha e confirmação, um olho que mostra as três; senha atual errada aparece no campo; ao alterar, os outros aparelhos saem e este continua entrado), **Tema escuro** (item com switch; alterna sem fechar o menu) e **Sair** (com confirmação). O tema deixou de ter botão próprio no header. Na tela de login o tema continua como switch.
 
 ## Aviso da assinatura
 

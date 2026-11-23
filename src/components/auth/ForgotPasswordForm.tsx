@@ -92,15 +92,12 @@ export function ForgotPasswordForm() {
         <Send aria-hidden="true" />
         {pending ? "Enviando…" : "Enviar o link"}
       </Button>
-      <p className="text-center text-sm text-muted-foreground">
-        Lembrou?{" "}
-        <Link
-          href="/login"
-          className="font-medium text-primary hover:underline"
-        >
-          Entrar
+      <Button asChild variant="outline" size="lg" className="w-full">
+        <Link href="/login">
+          <ArrowLeft aria-hidden="true" />
+          Voltar
         </Link>
-      </p>
+      </Button>
     </form>
   );
 }

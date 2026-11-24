@@ -32,10 +32,10 @@
 
 ### Campos
 
-- Nome
-- E-mail
 - Tipo de Usuário
 - Função (Nenhuma, Profissional ou Funcionário) e, escolhida, a pessoa (Profissional ou Funcionário)
+- Nome
+- E-mail
 - Telefone (só no tipo Profissional)
 - Senha
 - Confirme a senha
@@ -58,6 +58,7 @@
 - Só o vínculo com **profissional** dá acesso às fichas de anamnese. O vínculo com funcionário identifica a função do usuário; o acesso dele será tratado à parte.
 - Só aparece para ADMIN e USER, e não no cadastro do administrador de uma empresa nova. Escolhida a função, mostra a seleção da pessoa (ativas daquele tipo, até 100 de cada, carregadas na própria página), obrigatória. Trocar a função limpa a pessoa escolhida.
 - Uma pessoa liga-se a no máximo um usuário ativo: se já estiver ligada, a API responde 409 e a mensagem vai para o campo da pessoa.
+- No cadastro, escolher a pessoa preenche o Nome e o E-mail e o Telefone do contato principal dela (o que existir; os campos continuam editáveis). Na alteração, a escolha não muda esses campos.
 - Na alteração, escolher "Nenhuma" desfaz o vínculo. Um vínculo com pessoa que ficou inativa aparece como "Cadastro inativo".
 - A coluna **Função** (e o "Visualizar") mostra o **cargo** da pessoa (`profession`), ou "Profissional" / "Funcionário" quando não há cargo. A cor diferencia profissional (verde) de funcionário (neutra). Sem vínculo, "--". O nome da pessoa não aparece (a API não o devolve).
 

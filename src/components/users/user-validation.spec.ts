@@ -106,10 +106,10 @@ describe("validateUserForm (cadastro)", () => {
 
   it("a ordem dos campos é a da tela", () => {
     expect(userFieldOrder).toEqual([
-      "name",
-      "email",
       "type",
       "peopleId",
+      "name",
+      "email",
       "phone",
       "password",
       "passwordConfirmation",

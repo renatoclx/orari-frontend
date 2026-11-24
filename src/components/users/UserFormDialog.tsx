@@ -53,8 +53,16 @@ type UserFormDialogProps = {
   linkOptions?: LinkOptions;
 };
 
-/** Pessoa que pode ser vinculada a um usuário. */
-export type PersonOption = { id: string; name: string };
+/**
+ * Pessoa que pode ser vinculada a um usuário. E-mail e telefone vêm do contato
+ * principal dela e preenchem o cadastro do usuário.
+ */
+export type PersonOption = {
+  id: string;
+  name: string;
+  email?: string | null;
+  phone?: string | null;
+};
 export type LinkOptions = Record<LinkedPersonType, PersonOption[]>;
 
 // Função do usuário no formulário. O Radix Select não aceita valor vazio: "NONE" é "sem vínculo".
@@ -152,6 +160,31 @@ function UserForm({
     setErrors((current) => ({ ...current, [field]: undefined }));
   }
 
+  // Escolher a pessoa no cadastro traz o nome e o contato principal dela, para
+  // não digitar de novo (continuam editáveis). Na alteração, não: ligar um
+  // usuário a uma pessoa não pode trocar o e-mail com que ele já entra.
+  function choosePerson(peopleId: string) {
+    const person = personOptions.find((option) => option.id === peopleId);
+    if (editing || !person) {
+      set("peopleId", peopleId);
+      return;
+    }
+    setValues((current) => ({
+      ...current,
+      peopleId,
+      name: person.name,
+      email: person.email ?? "",
+      phone: person.phone ?? "",
+    }));
+    setErrors((current) => ({
+      ...current,
+      peopleId: undefined,
+      name: undefined,
+      email: undefined,
+      phone: undefined,
+    }));
+  }
+
   function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     // Fora de `canLink` o vínculo não vale, mesmo que a função tenha ficado escolhida.
@@ -218,28 +251,6 @@ function UserForm({
         </DialogDescription>
       </DialogHeader>
 
-      <FormField id={ids("name")} label="Nome" required error={errors.name}>
-        <Input
-          id={ids("name")}
-          value={values.name}
-          onChange={(event) => set("name", event.target.value)}
-          autoComplete="off"
-          aria-invalid={errors.name ? true : undefined}
-          autoFocus
-        />
-      </FormField>
-
-      <FormField id={ids("email")} label="E-mail" required error={errors.email}>
-        <Input
-          id={ids("email")}
-          type="email"
-          value={values.email}
-          onChange={(event) => set("email", event.target.value)}
-          autoComplete="off"
-          aria-invalid={errors.email ? true : undefined}
-        />
-      </FormField>
-
       {!forCompany && (
         <FormField
           id={ids("type")}
@@ -256,6 +267,7 @@ function UserForm({
             <SelectTrigger
               id={ids("type")}
               className="w-full"
+              autoFocus={!editing}
               aria-invalid={errors.type ? true : undefined}
             >
               <SelectValue placeholder="Selecione o tipo" />
@@ -315,7 +327,7 @@ function UserForm({
             >
               <Select
                 value={values.peopleId || undefined}
-                onValueChange={(next) => set("peopleId", next)}
+                onValueChange={choosePerson}
               >
                 <SelectTrigger
                   id={ids("peopleId")}
@@ -338,6 +350,30 @@ function UserForm({
           )}
         </>
       )}
+
+      {/* Depois do vínculo: no cadastro, a pessoa escolhida já preenche estes campos. */}
+      <FormField id={ids("name")} label="Nome" required error={errors.name}>
+        <Input
+          id={ids("name")}
+          value={values.name}
+          onChange={(event) => set("name", event.target.value)}
+          autoComplete="off"
+          aria-invalid={errors.name ? true : undefined}
+          // No cadastro, o foco começa no tipo (o primeiro campo).
+          autoFocus={editing || Boolean(forCompany)}
+        />
+      </FormField>
+
+      <FormField id={ids("email")} label="E-mail" required error={errors.email}>
+        <Input
+          id={ids("email")}
+          type="email"
+          value={values.email}
+          onChange={(event) => set("email", event.target.value)}
+          autoComplete="off"
+          aria-invalid={errors.email ? true : undefined}
+        />
+      </FormField>
 
       {/* O usuário só de app entra no aplicativo pelo telefone, como o cliente. */}
       {onlyApp && (

@@ -6,6 +6,7 @@ import { listPeople } from "@/services/people.service";
 import { listUsers } from "@/services/user.service";
 import { canAccess } from "@/utils/access";
 import type { UserType } from "@/types/auth";
+import type { PersonListItem } from "@/types/people";
 
 // Itens por página da listagem.
 const PAGE_SIZE = 10;
@@ -37,9 +38,13 @@ export async function UsersListPage({ searchParams }: UsersListPageProps) {
     linkable("PROFESSIONAL", "professionals"),
     linkable("EMPLOYEE", "employees"),
   ]);
-  const toOption = ({ id, name }: { id: string; name: string }) => ({
+  // O contato principal vai junto: no cadastro, escolher a pessoa já preenche
+  // o e-mail e o telefone do usuário.
+  const toOption = ({ id, name, principalContact }: PersonListItem) => ({
     id,
     name,
+    email: principalContact?.email ?? null,
+    phone: principalContact?.phone ?? null,
   });
   const linkOptions = {
     PROFESSIONAL: professionals.items.map(toOption),

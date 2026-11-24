@@ -27,10 +27,10 @@ export type UserFormErrors = Partial<Record<keyof UserFormValues, string>>;
 
 // Ordem em que os campos aparecem no formulário: o foco vai para o primeiro inválido.
 export const userFieldOrder: (keyof UserFormValues)[] = [
-  "name",
-  "email",
   "type",
   "peopleId",
+  "name",
+  "email",
   "phone",
   "password",
   "passwordConfirmation",

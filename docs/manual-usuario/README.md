@@ -72,3 +72,13 @@ O sumário é numerado pelo `build.mjs` em duas passadas. Textos: `manual.html`.
     `delete from subscription_payments; delete from company_subscriptions;` e os
     `audit_logs` das ações `SUBSCRIPTION_*`. PDF: `node build.mjs manual-super-admin`;
     copie para `public/manuais/`. A Ajuda mostra só este manual ao SUPER_ADMIN.
+
+12. Ajustes de 24/11/2026 (imagens `01-login`, `03-menu-usuario`, `a07-agendar`,
+    `a07b-confirmar` e `pro-04-agenda`, nos manuais do administrador, do app do
+    cliente e do app do profissional): `CLIENT_PHONE=... CLIENT_PASSWORD=...
+    PRO_PASSWORD=... node scripts/cap-15-ajustes.mjs`, no Studio Aurora (Marina,
+    Camila e uma conta de cliente do Aurora; o Agendar não mostra o nome de quem
+    entrou). Usa o Playwright e **só abre telas**: para no resumo do agendamento,
+    sem confirmar. PDFs: `node build.mjs`, `manual-app` e `manual-app-profissional`;
+    copie-os para `public/manuais/`. As outras imagens do app ainda estão com a
+    fonte antiga (Jakarta); o app passou a usar a Inter.

@@ -213,7 +213,7 @@ Segue a mesma estrutura de um novo agendamento.
 
 ### Estrutura do dialog
 
-- Reaproveita o dialog de novo agendamento em modo de alteração, com o título "Alterar agendamento" e o botão "Salvar alterações".
+- Reaproveita o dialog de novo agendamento em modo de alteração, com o título "Alterar Agendamento" e o botão "Salvar alterações".
 - Todos os campos vêm preenchidos com os dados do agendamento: Cliente, Serviço, Profissional, Data, Horário (o horário atual já vem marcado) e Observações.
 - Aberto pelo botão "Alterar" do dialog de detalhes do agendamento.
 

@@ -401,15 +401,15 @@ function NewAppointmentForm({
       <DialogHeader>
         <DialogTitle>
           {editing
-            ? "Alterar agendamento"
+            ? "Alterar Agendamento"
             : overbooking
               ? "Encaixar horário"
-              : "Novo agendamento"}
+              : "Novo Agendamento"}
         </DialogTitle>
         <DialogDescription>
           {editing
-            ? "Altere os dados do agendamento."
-            : "Escolha o cliente, o serviço e o horário do atendimento."}
+            ? "Informe os dados a serem alterados."
+            : "Preencha as informações para realizar o agendamento."}
         </DialogDescription>
       </DialogHeader>
 

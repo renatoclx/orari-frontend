@@ -58,6 +58,7 @@ export default async function BookingPage({
       {services.length > 0 ? (
         <BookingFlow
           slug={slug}
+          place={{ name: place.name, logoUrl: place.logoUrl }}
           services={services}
           // Vindo da lista de serviços da página do local: já vem escolhido
           // (um id que não existe é ignorado).

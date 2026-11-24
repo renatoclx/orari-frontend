@@ -23,6 +23,24 @@ export function shiftDay(day: string, delta: number): string {
   return date.toISOString().slice(0, 10);
 }
 
+// Faixa de dias da Agenda: uma semana para trás (rever o que passou) e um mês
+// para frente; o calendário cobre o resto.
+const STRIP_BEFORE = 7;
+const STRIP_AFTER = 30;
+
+/**
+ * Dias da faixa da Agenda: em volta de hoje e, se o dia aberto ficou fora
+ * (escolhido no calendário), em volta dele, para ele aparecer na faixa.
+ */
+export function agendaStripDays(day: string, today: string): string[] {
+  const first = shiftDay(today, -STRIP_BEFORE);
+  const last = shiftDay(today, STRIP_AFTER);
+  const anchor = day >= first && day <= last ? today : day;
+  return Array.from({ length: STRIP_BEFORE + STRIP_AFTER + 1 }, (_, index) =>
+    shiftDay(anchor, index - STRIP_BEFORE),
+  );
+}
+
 /** Hoje no relógio da clínica, como "AAAA-MM-DD". */
 export function todayIn(timeZone: string, now = new Date()): string {
   // O locale sv-SE já escreve a data como AAAA-MM-DD.

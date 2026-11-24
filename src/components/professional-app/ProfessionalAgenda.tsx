@@ -1,31 +1,24 @@
 import Link from "next/link";
-import {
-  CalendarCheck,
-  CalendarX,
-  ChevronLeft,
-  ChevronRight,
-} from "lucide-react";
+import { CalendarCheck, CalendarX } from "lucide-react";
 import { longDate } from "@/components/client-app/client-app";
 import {
   getProfessionalAgenda,
   getProfessionalMe,
 } from "@/services/app-pro.service";
 import { AgendaDatePicker } from "./AgendaDatePicker";
+import { AgendaDayStrip } from "./AgendaDayStrip";
 import { AgendaEntryCard } from "./AgendaEntryCard";
 import {
   buildEntries,
   relativeDayLabel,
-  shiftDay,
   summarizeEntries,
   todayIn,
 } from "./professional-agenda";
 
-const NAV_BUTTON =
-  "flex size-10 shrink-0 items-center justify-center rounded-control border border-border bg-card text-muted-foreground hover:text-foreground";
-
 /**
  * Aba Agenda do profissional (screens/app-profissional.md): a lista do dia,
- * só dele, com setas, Hoje e a escolha de qualquer data. Só consulta.
+ * só dele, com a faixa de dias (como no Agendar do cliente), Hoje e a escolha
+ * de qualquer data no calendário. Só consulta.
  */
 export async function ProfessionalAgenda({ day }: { day?: string }) {
   const [me, agenda] = await Promise.all([
@@ -36,20 +29,11 @@ export async function ProfessionalAgenda({ day }: { day?: string }) {
   const today = todayIn(timeZone);
   const entries = buildEntries(agenda, timeZone);
   const relative = relativeDayLabel(agenda.day, today);
-  const href = (target: string) =>
-    target === today ? "/app/agenda" : `/app/agenda?dia=${target}`;
 
   return (
     <>
       <header className="flex items-center gap-2">
-        <Link
-          href={href(shiftDay(agenda.day, -1))}
-          aria-label="Dia anterior"
-          className={NAV_BUTTON}
-        >
-          <ChevronLeft className="size-5" aria-hidden="true" />
-        </Link>
-        <div className="min-w-0 flex-1 text-center">
+        <div className="min-w-0 flex-1">
           <h1 className="text-lg font-semibold">
             {relative ?? "Agenda"}
             {relative && (
@@ -63,15 +47,11 @@ export async function ProfessionalAgenda({ day }: { day?: string }) {
             {longDate(agenda.day)}
           </p>
         </div>
-        <Link
-          href={href(shiftDay(agenda.day, 1))}
-          aria-label="Próximo dia"
-          className={NAV_BUTTON}
-        >
-          <ChevronRight className="size-5" aria-hidden="true" />
-        </Link>
+        {/* Para datas fora da faixa. */}
         <AgendaDatePicker day={agenda.day} />
       </header>
+
+      <AgendaDayStrip day={agenda.day} today={today} />
 
       <div className="flex min-h-10 items-center justify-between gap-3">
         <p className="text-sm font-medium">{summarizeEntries(entries)}</p>

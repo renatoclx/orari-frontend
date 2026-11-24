@@ -5,10 +5,18 @@ type PlaceAvatarProps = {
   name: string;
   logoUrl: string | null;
   size?: "md" | "lg" | "xl";
+  /** Texto da imagem; "" quando o nome já aparece ao lado (ex.: profissional). */
+  alt?: string;
 };
 
-// Logo do estabelecimento em círculo; sem logo, as iniciais do nome.
-export function PlaceAvatar({ name, logoUrl, size = "md" }: PlaceAvatarProps) {
+// Logo do estabelecimento em círculo; sem logo, as iniciais do nome. Serve
+// também para a foto do profissional no Agendar, com o mesmo jeito.
+export function PlaceAvatar({
+  name,
+  logoUrl,
+  size = "md",
+  alt = `Logo de ${name}`,
+}: PlaceAvatarProps) {
   const box = {
     md: "size-10 text-sm",
     lg: "size-16 text-lg",
@@ -18,7 +26,7 @@ export function PlaceAvatar({ name, logoUrl, size = "md" }: PlaceAvatarProps) {
   return logoUrl ? (
     <Image
       src={logoUrl}
-      alt={`Logo de ${name}`}
+      alt={alt}
       width={80}
       height={80}
       unoptimized

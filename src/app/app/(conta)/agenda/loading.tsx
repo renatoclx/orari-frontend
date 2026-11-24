@@ -5,6 +5,8 @@ export default function AgendaLoading() {
   return (
     <>
       <Skeleton className="h-12 w-full" />
+      {/* A faixa de dias (botões de 76 px). */}
+      <Skeleton className="h-19 w-full rounded-control" />
       <Skeleton className="h-5 w-32" />
       <div className="space-y-2">
         {Array.from({ length: 4 }, (_, index) => (

@@ -1,7 +1,10 @@
 import { Menu } from "lucide-react";
+import { AgendaBlockShortcut } from "@/components/agenda-blocks/AgendaBlockShortcut";
+import { Can } from "@/components/layout/Access";
 import { CalendarShortcut } from "@/components/layout/CalendarShortcut";
 import { Hint } from "@/components/shared/Hint";
 import { Logo } from "@/components/layout/Logo";
+import { NotificationBell } from "@/components/notifications/NotificationBell";
 import { CompanyLogo } from "@/components/layout/CompanyLogo";
 import { UserMenu } from "@/components/layout/UserMenu";
 import type { CurrentUser } from "@/types/auth";
@@ -14,6 +17,8 @@ type HeaderProps = {
 
 /** Cabeçalho: menu no celular, nome e logo da empresa, atalhos e usuário (o tema fica no menu do usuário). */
 export function Header({ user, onOpenMobile }: HeaderProps) {
+  // O SUPER_ADMIN só administra as empresas: sem atalhos da agenda nem sino.
+  const usesApp = user.type !== "SUPER_ADMIN";
   return (
     <header className="flex h-16 shrink-0 items-center gap-2 border-b border-border bg-card px-4 md:px-8">
       <Hint label="Abrir o menu de navegação" side="bottom">
@@ -36,11 +41,22 @@ export function Header({ user, onOpenMobile }: HeaderProps) {
       </p>
 
       <div className="ml-auto flex items-center gap-3">
-        {/* No celular só o calendário aparece (screens/layout.md); os demais atalhos
-            ficam na barra lateral, do tablet em diante. */}
-        <div className="flex items-center md:hidden">
-          <CalendarShortcut placement="header" />
-        </div>
+        {/* No celular só o calendário e o bloqueio de horários aparecem
+            (screens/layout.md); os demais atalhos ficam na barra lateral, do
+            tablet em diante. */}
+        {usesApp && (
+          <div className="flex items-center md:hidden">
+            <CalendarShortcut placement="header" />
+            <Can feature="appointments" action="create">
+              <AgendaBlockShortcut
+                timeZone={user.company.timezone}
+                placement="header"
+              />
+            </Can>
+          </div>
+        )}
+        {/* O sino: as notificações do usuário (screens/notificacoes.md). */}
+        {usesApp && <NotificationBell withOnboarding={user.type === "ADMIN"} />}
         {/* key: logo nova recomeça do zero (a anterior pode ter falhado). */}
         <CompanyLogo
           key={user.company.logoUrl}

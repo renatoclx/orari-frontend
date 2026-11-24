@@ -9,7 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import type { CheckoutItem } from "@/types/payment";
 import type { PaymentMethodItem } from "@/types/payment-method";
-import { checkoutState } from "@/utils/checkout";
+import { canReceive, checkoutState } from "@/utils/checkout";
 import { formatPrice } from "@/utils/format";
 
 type CheckoutListProps = {
@@ -21,6 +21,9 @@ type CheckoutListProps = {
   timeZone: string;
   /** Hoje no fuso da empresa, "aaaa-mm-dd". */
   today: string;
+  /** Pode lançar e cancelar venda de produtos (só ADMIN com a funcionalidade). */
+  canSell: boolean;
+  canCancelSale: boolean;
   /** Rodapé fixo do card (paginação). */
   footer: React.ReactNode;
 };
@@ -40,7 +43,7 @@ function CheckoutBadge({ checkout }: { checkout: CheckoutItem }) {
   }
 }
 
-// Receber só na comanda aberta; nas demais, Ver (só leitura).
+// Receber quando há o que receber (também antes da conclusão); senão, Ver.
 function OpenButton({
   checkout,
   onOpen,
@@ -48,7 +51,7 @@ function OpenButton({
   checkout: CheckoutItem;
   onOpen: (checkout: CheckoutItem) => void;
 }) {
-  if (checkoutState(checkout) === "open") {
+  if (canReceive(checkout)) {
     return (
       <Button size="sm" onClick={() => onOpen(checkout)}>
         <HandCoins aria-hidden="true" />
@@ -86,6 +89,8 @@ export function CheckoutList({
   search,
   timeZone,
   today,
+  canSell,
+  canCancelSale,
   footer,
 }: CheckoutListProps) {
   // A comanda fica guardada ao fechar, para o dialog não mudar de conteúdo
@@ -199,6 +204,8 @@ export function CheckoutList({
         methods={methods}
         timeZone={timeZone}
         today={today}
+        canSell={canSell}
+        canCancelSale={canCancelSale}
       />
     </div>
   );

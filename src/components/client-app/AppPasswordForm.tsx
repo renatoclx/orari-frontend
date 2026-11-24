@@ -7,12 +7,16 @@ import { AppField } from "@/components/client-app/AppField";
 import { AppFormMessage } from "@/components/client-app/AppFormMessage";
 import { Button } from "@/components/ui/button";
 
-/** Trocar a senha do app (Menu → Segurança; screens/app-cliente.md). */
-export function AppPasswordForm() {
-  const [state, action, pending] = useActionState(
-    appChangePasswordAction,
-    undefined,
-  );
+/**
+ * Trocar a senha do app (Menu → Segurança; screens/app-cliente.md). O
+ * profissional passa a action dele (a conta é outra); sem `action`, é a do cliente.
+ */
+export function AppPasswordForm({
+  action: submit = appChangePasswordAction,
+}: {
+  action?: typeof appChangePasswordAction;
+}) {
+  const [state, action, pending] = useActionState(submit, undefined);
   return (
     <form action={action} noValidate className="space-y-4">
       {state?.message && <AppFormMessage>{state.message}</AppFormMessage>}

@@ -17,6 +17,8 @@ type PhotoUploadProps = {
   name?: string;
   /** Foto já cadastrada (alteração), ex.: "/uploads/people/x.png". */
   currentUrl?: string | null;
+  /** Texto alternativo da prévia (o produto usa a mesma foto das pessoas). */
+  alt?: string;
 };
 
 // Foto da pessoa: uma div circular que mostra a imagem escolhida ou tirada na
@@ -25,6 +27,7 @@ type PhotoUploadProps = {
 export function PhotoUpload({
   name = "photo",
   currentUrl = null,
+  alt = "Foto da pessoa",
 }: PhotoUploadProps) {
   const inputRef = useRef<HTMLInputElement>(null);
   const [preview, setPreview] = useState<string>();
@@ -103,7 +106,7 @@ export function PhotoUpload({
           className="rounded-full"
         >
           <Avatar className="size-24 border border-border">
-            {shownUrl && <AvatarImage src={shownUrl} alt="Foto da pessoa" />}
+            {shownUrl && <AvatarImage src={shownUrl} alt={alt} />}
             <AvatarFallback>
               <Camera
                 className="size-8 text-muted-foreground"

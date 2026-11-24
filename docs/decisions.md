@@ -136,6 +136,94 @@ regras de cada tela, em `docs/screens/`.
 - **2026-11-05 — Portal do cliente tem entrada própria no menu** (a última antes de Ajuda), não uma seção em Configurações; o **Acesso ao portal** fica visível na coluna Ações da lista de Clientes. _Por quê:_ Configurações é só da empresa, e ação frequente não fica atrás de outro menu.
 - **2026-11-05 — Em Meus dados o cliente altera o cadastro todo (inclusive a foto), copiado para cada clínica;** Pacotes e Recorrências são só consulta.
 
+## Relatórios e Dashboard
+
+- **2026-11-09 — Relatórios só do ADMIN, cada um com funcionalidade própria (só Visualiza),** marcados no modelo padrão. _Por quê:_ mostram faturamento; e a venda por versões precisa ligar e desligar cada um.
+- **2026-11-09 — Toda impressão é uma rota própria `(print)/.../imprimir`,** em aba nova e tema claro, com a lista inteira. _Por quê:_ o `window.print` da tela pegaria o tema escuro, a sidebar e só a página atual da lista.
+- **2026-11-10 — Menu Relatórios em um nível só;** ordem feita: Agendamentos, Rankings, Financeiro, Pacotes, Perfil do cliente e Dashboard.
+- **2026-11-10 — Financeiro pela data do pagamento** (o que entrou no caixa); Rankings pelo atendimento concluído (o faturado); Análise de recebíveis pelo vencimento (o que falta). _Por quê:_ três perguntas diferentes sobre dinheiro, sem um relatório repetir o outro.
+- **2026-11-10 — Dashboard é item próprio no topo da sidebar** (a agenda continua sendo a página inicial), só visual, e **sem API própria:** cada bloco usa a rota do relatório e segue a funcionalidade dele; as métricas comparam com o período anterior. _Por quê:_ o número do Dashboard é sempre o do relatório.
+- **2026-11-10 — Cores categóricas `chart-cat-1..5`** para categorias sem ordem (métodos de pagamento), com a cor presa à entidade (ordem do cadastro), não à posição. _Por quê:_ verde e vermelho já dizem bom e ruim; e a cor não pode mudar quando o ranking muda.
+- **2026-11-10 — Modelo de plano "Agenda"** (só agendamento, com o app do cliente) e relatórios por modelo; empresa nova continua com todos. Empresas de teste em produção são ajustadas à mão (sem migração). Distribuição a revisar.
+
+## Contas a receber e a pagar
+
+- **2026-11-10 — "Pagamentos" passa a se chamar Contas a receber** (menu e tela; rota e funcionalidade iguais), simétrico ao Contas a pagar; o relatório que se chamava "Contas a receber" vira **Análise de recebíveis** (rota `/relatorios/analise-de-recebiveis`). _Por quê:_ a tela operacional fica com o nome simples, e o relatório, que é análise, não disputa o nome.
+- **2026-11-10 — Fornecedor é um tipo de pessoa** (`SUPPLIER`, os mesmos campos), que aceita **CPF ou CNPJ** e tem uma **categoria principal** opcional (pré-preenche a conta). _Por quê:_ reaproveita as telas de pessoas; o CNPJ só faz sentido nele.
+- **2026-11-10 — Categorias de despesa cadastráveis**, com 9 iniciais em toda empresa. _Por quê:_ cada negócio tem as suas despesas.
+- **2026-11-10 — Contas a pagar só do ADMIN; repetição só "parcelar" e "repetir por N meses"**, uma conta por mês. Valor pago diferente: **altera-se o valor antes de pagar**. Alterar e cancelar valem **só para a conta**; ficam as duas ações, **Cancelar** (histórico) e **Excluir** (lançamento errado; paga não). _Por quê:_ a forma mais simples que cobre o uso comum.
+- **2026-11-10 — Comissão no Contas a pagar:** a comissão em aberto aparece como **linha calculada** por profissional (sem vencimento; soma no "A vencer") e se quita pelo **fechamento**. O fechamento (valor pago) e o **adiantamento** (que passou a pedir o método de pagamento) geram **contas pagas** na categoria Comissões, protegidas; desfazer o fechamento cancela a conta e excluir o adiantamento a apaga. Nada retroativo. _Por quê:_ cada saída de dinheiro entra no dia em que aconteceu, e a comissão continua tendo um lugar só para ser mexida.
+
+## Comissão
+
+- **2026-11-10 — Comissão por serviço** (percentual do valor cobrado ou valor fixo), gerada na conclusão do atendimento, também sem o cliente ter pago; cancelado não gera; nada retroativo (`commissionSince`). _Por quê:_ o roteiro de 2026-11-04 e "da implantação em diante".
+- **2026-11-10 — Pacote: total contratado ÷ sessões geradas**, congelado (opção A). _Por quê:_ simples e não mexe no passado.
+- **2026-11-10 — Só o ADMIN define e vê a comissão;** o profissional vinculado a um usuário ADMIN nasce **sem comissão** (o dono que atende). _Por quê:_ é remuneração, e o dono não recebe de si mesmo.
+- **2026-11-10 — Adiantamento até o disponível;** pode ser excluído enquanto não fechado. **Fechamento** de tudo o que está em aberto até a data de corte, com método e data do pagamento, **recibo para assinar** (número sequencial, valor por extenso, detalhamento) e **desfazer só o último** (recibo cancelado, número não volta). _Por quê:_ fechar o mês é o uso comum; o recibo é o comprovante que o profissional assina.
+
+## Produtos, estoque e venda
+
+- **2026-11-11 — Produtos e categorias só do ADMIN**, três funcionalidades fora de todos os modelos (o SUPER_ADMIN libera): Categorias de produto, Produtos e Venda de produtos (que exige Comandas e Produtos). Grupo próprio no menu, abaixo de Serviços. _Por quê:_ é um módulo que nem toda clínica contrata.
+- **2026-11-11 — Formulário de produto em página** (13 campos e foto), como Planos e Pessoas; categorias em dialog. _Por quê:_ o tamanho do formulário.
+- **2026-11-11 — Estoque é o saldo das movimentações:** compra, uso interno, perda, ajuste (pelo saldo contado), venda e venda cancelada; o estoque atual só é informado no cadastro. Saldo negativo é recusado. A compra muda o preço de custo (**último custo**) e pode lançar a conta a pagar (**opcional**). _Por quê:_ histórico confiável e o custo sempre atualizado sem conta de média.
+- **2026-11-11 — Venda na comanda já nesta fase:** vários itens e **um pagamento** (terceira origem do pagamento, sem criar a entidade Comanda); baixa o estoque **ao lançar**; valor sugerido = promocional (editável); **"Nova venda"** para quem só compra; cancela **só a pendente** (o estoque volta); o pagamento da venda é **protegido** (só a baixa pelo Contas a receber); **só o ADMIN vende**. _Por quê:_ cobre o balcão sem a reestruturação de uma comanda gravada.
+- **2026-11-11 — A comanda continua sendo o dia do cliente.** A comanda paga não aceita produto (a compra seguinte é Nova venda e reabre a comanda do dia); o pago do dia fica num bloco recolhível "Recebidos". Gravar o fechamento da comanda no backend (comandas separadas no mesmo dia) foi avaliado e deixado de fora. _Por quê:_ resolve a leitura no balcão sem desestruturar o backend.
+
+## App do profissional
+
+- **2026-11-12 — O profissional usa o mesmo PWA (`/app`), com sessão e abas próprias,** em vez de um app novo. _Por quê:_ reaproveita a instalação, o visual, o login e a infraestrutura; o custo de manutenção é um só.
+- **2026-11-12 — Entra pelo telefone, e o app tenta profissional antes de cliente,** com uma mensagem de erro única. _Por quê:_ é o que o profissional já usa no dia a dia e não revela se a conta existe; a ambiguidade (mesma pessoa, mesma senha) favorece o mais restrito.
+- **2026-11-12 — O acesso é negado por padrão na API (`@ProfessionalApp()` + guard global).** _Por quê:_ havia 22 controllers sem `@Roles`, liberados a qualquer usuário logado; um perfil novo herdaria tudo. Lista exata fixada em teste.
+- **2026-11-12 — Só consulta:** agenda, clientes, comissões e Início; sem alterar agendamentos, sem anamnese e sem status de pagamento dos clientes. Cliente só os dele (telefone sim; e-mail, CPF e endereço não).
+- **2026-11-12 — Funcionalidade `professional-app` em todos os planos; `commissions` exigida para a aba Comissões.** O SUPER_ADMIN pode desligar cada uma por empresa.
+- **2026-11-12 — Detalhes abrem no próprio cartão, não em diálogo,** e os avisos ficam na tela. _Por quê:_ as janelas da clínica ficam fora da área escura do app (mesma razão do app do cliente).
+- **2026-11-12 — Listas de 10 por página (`?pagina=`), filtros na URL (`?q=`, `?dia=`, `?mes=`);** o recibo mostra os 10 primeiros atendimentos e "Ver todos", porque é um documento.
+- **2026-11-12 — Gráfico da semana em CSS, sem biblioteca,** de segunda a domingo, uma série na cor primária; o que passou em cor cheia e o agendado em tom claro. _Por quê:_ é uma barra por dia; uma biblioteca pesaria no PWA.
+- **2026-11-12 — A turma é um atendimento por sessão nas contagens (agenda, Início);** faltas e cancelados contam marcações.
+
+## Notificações
+
+- **2026-11-13 — Uma caixa por usuário, com sino e contador (marca vermelha),** no cabeçalho do painel e no topo do app do profissional. _Por quê:_ o push é o toque no ombro; o que fica gravado é o que vale, e o contador diz o que falta ler. Referência: Mercado Livre e redes sociais.
+- **2026-11-13 — A caixa recebe tudo; só o push tem interruptor.** _Por quê:_ nada se perde, e o interruptor controla só a interrupção.
+- **2026-11-13 — O push é genérico, sem o nome do cliente,** e a caixa leva os nomes. _Por quê:_ a tela bloqueada do celular é pública.
+- **2026-11-13 — Contador por consulta a cada 30 segundos, ao voltar para a aba e ao ler** (evento da janela), sem tempo real. A notificação nova aparece também no **toaster do painel** (a conferência devolve a data da mais nova, e o painel compara com a que já viu).
+- **2026-11-13 — Limpar notificações tira da lista e do contador, mas a linha fica** (`clearedAt`): a chave de deduplicação continua valendo e um evento repetido não volta a avisar. A confirmação é no próprio lugar, sem diálogo (vale no sino, no painel e no app). _Por quê:_ simples e confiável; SSE fica para depois.
+- **2026-11-13 — O push só no app do profissional por enquanto;** o painel tem a caixa e o sino, sem service worker. _Por quê:_ o service worker do app já existe (escopo `/app/`); o do painel é um passo à parte.
+- **2026-11-13 — Um único despachante no backend** para toda fonte de aviso (cliente no app, depois resumo do dia, boas-vindas, jobs; o WhatsApp entra como canal). _Por quê:_ quem avisa não precisa saber de canal.
+
+## Avisos ao profissional e menu
+
+- **2026-11-13 — Lembrete (30 min antes, fixo) e resumo da manhã (7h30, fixo) são situações de Mensagens → Automáticas,** com liga/desliga e texto editável pela clínica, valendo para todos os profissionais; cada um ainda tem o interruptor de push dele. _Por quê:_ a clínica já configura as mensagens ali; o profissional controla só o que o interrompe.
+- **2026-11-13 — Uma sessão de turma é um lembrete só,** e a turma cancelada, um aviso só. _Por quê:_ o profissional chega à sessão uma vez; um aviso por aluno seria ruído.
+- **2026-11-13 — O profissional recebe o que a clínica faz nos horários dele** (marcou, remarcou, cancelou); quem faz a ação não é avisado. O texto da caixa leva o cliente; o do push não.
+- **2026-11-13 — Sem entrada nova no menu lateral: "Portal do cliente" vira grupo** (Portal e Avisos no celular). _Por quê:_ regra do usuário: configurações novas entram como submenu. "Avisos no celular" do painel só tem as preferências por categoria; o push no painel (service worker próprio) fica para depois.
+
+## Resumo de pendências e Mensagens por destinatário
+
+- **2026-11-13 — Mensagens → Automáticas foi dividida por quem recebe** (Ao cliente, Ao profissional, Ao administrador), cada uma uma página e um subitem. _Por quê:_ a tela única estava sobrecarregada e ia crescer; o PUT já aceita só as situações enviadas, então a divisão não mudou a API. O endereço antigo redireciona.
+- **2026-11-13 — O resumo de pendências do administrador é uma situação de Mensagens** (liga/desliga, texto, hora de 7h a 10h e itens), com push genérico e a caixa com o detalhe. Dia sem número não manda nada; só entram os itens que o plano libera.
+- **2026-11-13 — "Comandas" no resumo são as comandas do dia** (clientes com atendimento hoje, a regra da tela Comandas), porque o que está em aberto de dias anteriores já entra em "Recebimentos atrasados".
+- **2026-11-13 — "Pendências de hoje" saiu do Dashboard** (ele volta a ser só os números do período): o resumo do dia chega pela notificação da manhã. O bloco e a rota `GET /pending-summary` foram apagados.
+
+## Boas-vindas
+
+- **2026-11-13 — Boas-vindas no primeiro acesso, uma vez por usuário,** gravadas de forma atômica (`welcomedAt`) antes de enviar. Quem já existia não recebe. Sem interruptor de preferência.
+- **2026-11-13 — "Primeiros passos" num dialog, fora do Dashboard** (informação que não é dos números do período). Abre pela notificação de boas-vindas (`?passos=1`) e, enquanto faltar passo, por um item no rodapé do sino. Calculada dos dados da clínica, com Dispensar por usuário; o portal do cliente é opcional. **Os avisos no celular não entram na lista do ADMIN** porque o painel ainda não recebe push.
+- **2026-11-13 — Cartão de boas-vindas no Início do profissional,** com convite para ativar os avisos e "Agora não". Boas-vindas ao cliente do app (mensagem da clínica) **ficam para depois**: ele já vê "Conta criada".
+
+## Atualização da agenda e login do app
+
+- **2026-11-13 — A agenda se atualiza sozinha:** a cada 60 s (aba visível, sem diálogo aberto) e quando chega notificação de agendamento; a conferência do sino passa de 30 para 15 s. Tempo real (SSE) fica como dívida.
+- **2026-11-13 — O app (cliente e profissional) tem toaster no rodapé,** acima da barra de abas, para as confirmações e para a notificação nova com o app aberto. As confirmações deixam de ser blocos na página (que empurravam o conteúdo); erros e avisos de regra continuam na tela. O toaster da clínica não aparece no `/app`.
+- **2026-11-13 — Lista de serviços do app em linhas com seta:** para o cliente do local cada linha abre o Agendar com o serviço escolhido; para quem não é cliente, só informação. O escolhido ganha visto e fundo suave, não um bloco cheio.
+- **2026-11-13 — O profissional entra no app por telefone ou e-mail** (campo único "Telefone ou e-mail", máscara só para número); o e-mail não serve ao cliente. O painel web é recusado pela própria API (403 no `POST /auth/login`).
+
+## Planos
+
+- **2026-11-16 — Três planos: Essencial (até 2 profissionais), Plus (até 4) e Clinical (até 6).** Essencial: agenda, cadastros, app do cliente e do profissional, mensagens, receber o cliente (comanda) e o Dashboard, com Contas a receber só para ver; Plus: tudo menos anamnese e turmas; Clinical: tudo. Os modelos de acesso do SUPER_ADMIN seguem os três (substituem Agenda, Essencial, Profissional e Completo). Preço em estudo; profissional extra proposto a R$ 16,90 em todos os planos. WhatsApp será adicional pago.
+- **2026-11-19 — Limites dos planos iguais aos da landing:** Essencial 2 profissionais e 1 administrador, **Plus 5 e 2**, **Clinical 7 e 3** (eram 4 e 1, 3 e 2). Valem no cadastro sozinho (backend, `plan-templates.ts`) e no "Aplicar modelo" (frontend, `ACCESS_TEMPLATES`); empresas que já existem não mudam.
+- **2026-11-16 — Valores de teste:** Essencial R$ 44,90 (2 profissionais), Plus R$ 89,90 (4) e Clinical R$ 129,90 (3), finais ,90; profissional a mais R$ 16,90; semestral com cerca de 15% e anual com cerca de 30% (parcela arredondada para o final ,90, com o selo do desconto e o preço cheio riscado); lançamento com 50% nos 3 primeiros meses, só no mensal, para os 15 primeiros clientes; **adicional de anamnese** (sem turmas) no Essencial e no Plus, R$ 24,90 em teste.
+
 ## Qualidade e testes
 
 - **2026-10-23 — Testes automáticos só de funções puras e de pontos de borda do servidor,** com Vitest (a mesma ferramenta do backend) e `arquivo.spec.ts` ao lado do código. _Por quê:_ é onde está a regra que quebra sem barulho (fuso, arredondamento, disponibilidade de horários); componentes e telas seguem verificados à mão e com `axe-core`. Ponta a ponta (Playwright) fica fora por ora.

@@ -16,6 +16,7 @@ const valid = (overrides: Partial<UserFormValues> = {}): UserFormValues => ({
   passwordConfirmation: "senha1234",
   linkType: "",
   peopleId: "",
+  phone: "",
   ...overrides,
 });
 
@@ -109,6 +110,7 @@ describe("validateUserForm (cadastro)", () => {
       "email",
       "type",
       "peopleId",
+      "phone",
       "password",
       "passwordConfirmation",
     ]);
@@ -124,6 +126,7 @@ describe("validateUpdateUserForm (alteração)", () => {
         type: "ADMIN",
         linkType: "",
         peopleId: "",
+        phone: "",
       }),
     ).toEqual({});
   });
@@ -135,6 +138,7 @@ describe("validateUpdateUserForm (alteração)", () => {
       type: "",
       linkType: "",
       peopleId: "",
+      phone: "",
     });
 
     expect(Object.keys(errors).sort()).toEqual(["email", "name", "type"]);
@@ -165,6 +169,7 @@ describe("vínculo com profissional ou funcionário", () => {
       type: "USER",
       linkType: "EMPLOYEE",
       peopleId: "",
+      phone: "",
     });
 
     expect(errors.peopleId).toBe("Selecione o funcionário.");
@@ -183,5 +188,91 @@ describe("vínculo com profissional ou funcionário", () => {
       linkApplies(valid({ type: "ADMIN", linkType: "PROFESSIONAL" })),
     ).toBe(true);
     expect(linkApplies(valid())).toBe(false);
+  });
+});
+
+describe("usuário só de app (PROFESSIONAL)", () => {
+  const base = {
+    name: "Rafael",
+    email: "rafael@clinica.com",
+    password: "Senha@Forte1",
+    passwordConfirmation: "Senha@Forte1",
+    type: "PROFESSIONAL",
+    phone: "(11) 98888-0001",
+  } as const;
+
+  it("o vínculo sempre vale, mesmo sem função escolhida", () => {
+    expect(linkApplies({ type: "PROFESSIONAL", linkType: "" })).toBe(true);
+    expect(linkApplies({ type: "USER", linkType: "" })).toBe(false);
+  });
+
+  it("exige um profissional: sem pessoa ou com funcionário é recusado", () => {
+    expect(
+      validateUserForm({ ...base, linkType: "PROFESSIONAL", peopleId: "" })
+        .peopleId,
+    ).toBe("Selecione o profissional.");
+    expect(
+      validateUserForm({ ...base, linkType: "EMPLOYEE", peopleId: "p1" })
+        .peopleId,
+    ).toBe("Selecione o profissional.");
+    expect(
+      validateUserForm({ ...base, linkType: "", peopleId: "" }).peopleId,
+    ).toBe("Selecione o profissional.");
+  });
+
+  it("com o profissional escolhido, é válido (também na alteração)", () => {
+    const values = {
+      ...base,
+      linkType: "PROFESSIONAL",
+      peopleId: "p1",
+    } as const;
+    expect(validateUserForm(values)).toEqual({});
+    expect(validateUpdateUserForm(values)).toEqual({});
+  });
+});
+
+describe("telefone de acesso ao app (só no PROFESSIONAL)", () => {
+  const pro = valid({
+    type: "PROFESSIONAL",
+    linkType: "PROFESSIONAL",
+    peopleId: "p1",
+  });
+
+  it("é obrigatório no usuário só de app", () => {
+    expect(validateUserForm({ ...pro, phone: "" }).phone).toBe(
+      "Informe o telefone de acesso ao app.",
+    );
+  });
+
+  it("aceita 10 ou 11 dígitos, com a máscara", () => {
+    expect(validateUserForm({ ...pro, phone: "(11) 98888-0001" })).toEqual({});
+    expect(validateUserForm({ ...pro, phone: "(11) 3888-0001" })).toEqual({});
+  });
+
+  it("recusa número curto ou longo demais", () => {
+    expect(validateUserForm({ ...pro, phone: "(11) 9888" }).phone).toBe(
+      "Informe o telefone com DDD (10 ou 11 dígitos).",
+    );
+    expect(
+      validateUserForm({ ...pro, phone: "119888800012" }).phone,
+    ).toBeDefined();
+  });
+
+  it("os demais tipos não pedem telefone (nem o conferem)", () => {
+    expect(validateUserForm(valid({ phone: "" }))).toEqual({});
+    expect(validateUserForm(valid({ phone: "abc" }))).toEqual({});
+  });
+
+  it("vale também na alteração", () => {
+    expect(validateUpdateUserForm({ ...pro, phone: "" }).phone).toBeDefined();
+  });
+
+  it("o campo vem depois do vínculo e antes da senha", () => {
+    expect(userFieldOrder.indexOf("phone")).toBeGreaterThan(
+      userFieldOrder.indexOf("peopleId"),
+    );
+    expect(userFieldOrder.indexOf("phone")).toBeLessThan(
+      userFieldOrder.indexOf("password"),
+    );
   });
 });

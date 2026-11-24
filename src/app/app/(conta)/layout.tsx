@@ -1,19 +1,61 @@
 import { AppBottomNav } from "@/components/client-app/AppBottomNav";
+import { AppNewNoticeToasts } from "@/components/client-app/AppNewNoticeToasts";
+import { AppToaster } from "@/components/client-app/AppToaster";
 import { getAccount } from "@/services/app-account.service";
+import { ProfessionalBellBar } from "@/components/professional-app/ProfessionalBell";
+import { ApiError } from "@/services/api";
+import { getProfessionalMe } from "@/services/app-pro.service";
+import { getProUnreadInfo } from "@/services/app-pro-notification.service";
+import { getAppSessionKind } from "@/services/app-session";
+import { canAccess } from "@/utils/access";
 
 // Telas de quem entrou no app: o conteúdo rola e a barra fica embaixo.
 export default async function AccountAppLayout({
   children,
 }: LayoutProps<"/app">) {
-  // Avisos não lidos: o ponto na aba Menu (a mesma chamada do Início e do Menu).
-  const { unreadMessages } = await getAccount();
+  // O app é um só; o que muda é quem entrou (cliente ou profissional). Sem
+  // sessão (`null`) é o visitante da página pública do estabelecimento (o link
+  // que a clínica divulga): ele vê as abas do cliente, mas não há conta a buscar.
+  const session = await getAppSessionKind();
+  const kind = session ?? "client";
+  // Avisos não lidos: o ponto na aba Menu (a mesma chamada do Início e do
+  // Menu). Só o cliente que entrou tem avisos.
+  const unreadMessages =
+    session === "client" ? (await getAccount()).unreadMessages : 0;
+  // A aba Comissões só existe para a clínica que as usa (funcionalidade do plano).
+  const showCommissions =
+    kind === "professional" &&
+    canAccess((await getProfessionalMe()).access, "commissions");
+  // O sino do topo (só o profissional): o número já certo na primeira tela. Se a
+  // API falhar só aqui, a tela abre sem número (o sino confere de novo depois).
+  const unreadNotices =
+    kind === "professional"
+      ? await getProUnreadInfo().then(
+          ({ unread }) => unread,
+          (error: unknown) => {
+            if (error instanceof ApiError) return 0;
+            throw error;
+          },
+        )
+      : 0;
   return (
     <div className="flex flex-1 flex-col">
       {/* Margem lateral de 20 px: no celular, o conteúdo não encosta na borda. */}
       <main className="flex flex-1 flex-col gap-6 px-5 pt-8 pb-6">
+        {kind === "professional" && (
+          <ProfessionalBellBar initial={unreadNotices} />
+        )}
         {children}
       </main>
-      <AppBottomNav hasUnread={unreadMessages > 0} />
+      {/* Avisos de confirmação e de notificação nova, no rodapé, acima das abas. */}
+      <AppToaster withNav />
+      {/* Só com sessão: as conferências de aviso exigem quem entrou. */}
+      {session && <AppNewNoticeToasts kind={session} />}
+      <AppBottomNav
+        hasUnread={unreadMessages > 0}
+        kind={kind}
+        showCommissions={showCommissions}
+      />
     </div>
   );
 }

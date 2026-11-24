@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { AppSplash } from "@/components/client-app/AppSplash";
+import { InstallPromptListener } from "@/components/client-app/install-prompt-store";
 
 export const metadata: Metadata = {
   title: { default: "Orari", template: "%s | Orari" },
@@ -34,6 +35,8 @@ export default function ClientAppLayout({ children }: LayoutProps<"/app">) {
     // (2,4:1); o escuro dá 6,1:1, e o ciano sobre o fundo escuro, 7,5:1.
     <div className="dark min-h-dvh bg-background pt-[env(safe-area-inset-top)] text-foreground [color-scheme:dark] [--primary-foreground:#052e36] [--primary:#00b8db] [--ring:#00b8db]">
       <AppSplash />
+      {/* Guarda o evento de instalar do Android assim que o app abre. */}
+      <InstallPromptListener />
       <div className="mx-auto flex min-h-dvh w-full max-w-md flex-col">
         {children}
       </div>

@@ -1,5 +1,6 @@
 "use client";
 
+import { isStandalone } from "@/components/client-app/standalone";
 import { useCallback, useEffect, useState } from "react";
 import {
   appPushSubscribeAction,
@@ -13,6 +14,22 @@ import {
 } from "@/components/client-app/push-support";
 import type { PushSubscriptionJson } from "@/types/client-app";
 
+/** O que a ativação grava e apaga na API: o cliente e o profissional têm as suas. */
+export type PushActions = {
+  subscribe: (
+    subscription: PushSubscriptionJson,
+  ) => Promise<{ ok: true } | { ok: false; message: string }>;
+  unsubscribe: (
+    endpoint: string,
+  ) => Promise<{ ok: true } | { ok: false; message: string }>;
+};
+
+// Padrão: as do app do cliente (módulo, para a identidade ser estável nas dependências).
+const CLIENT_ACTIONS: PushActions = {
+  subscribe: appPushSubscribeAction,
+  unsubscribe: appPushUnsubscribeAction,
+};
+
 // O service worker mora em /app-assets/ e cuida só do app (ver next.config.ts).
 const SW_URL = "/app-assets/sw.js";
 const SW_SCOPE = "/app/";
@@ -21,11 +38,6 @@ const isSupported = () =>
   "serviceWorker" in navigator &&
   "PushManager" in window &&
   "Notification" in window;
-
-const isStandalone = () =>
-  window.matchMedia("(display-mode: standalone)").matches ||
-  // Safari do iPhone antigo: a marca própria dele.
-  (navigator as Navigator & { standalone?: boolean }).standalone === true;
 
 // Cada etapa da ativação tem um limite: travada, vira um erro que diz onde
 // parou (no celular não há console para descobrir). O pedido de permissão fica
@@ -104,7 +116,10 @@ async function currentSubscription(): Promise<PushSubscription | null> {
  * desativar. `situation` é nula até ler o navegador, depois de montar (o
  * servidor não sabe nada do aparelho e o HTML tem que bater na hidratação).
  */
-export function usePushDevice(publicKey: string) {
+export function usePushDevice(
+  publicKey: string,
+  actions: PushActions = CLIENT_ACTIONS,
+) {
   const [situation, setSituation] = useState<PushSituation | null>(null);
   const [ios, setIos] = useState(false);
   const [busy, setBusy] = useState(false);
@@ -120,9 +135,7 @@ export function usePushDevice(publicKey: string) {
       // API apaga a inscrição, mas o celular continua com ela; assim quem entra
       // de novo volta a receber sem precisar ativar outra vez.
       if (subscription && permission === "granted") {
-        void appPushSubscribeAction(
-          subscription.toJSON() as PushSubscriptionJson,
-        );
+        void actions.subscribe(subscription.toJSON() as PushSubscriptionJson);
       }
       if (!active) return;
       const onIos = isIosDevice(navigator.userAgent, navigator.maxTouchPoints);
@@ -141,7 +154,7 @@ export function usePushDevice(publicKey: string) {
     return () => {
       active = false;
     };
-  }, []);
+  }, [actions]);
 
   const enable = useCallback(async () => {
     setError(undefined);
@@ -165,20 +178,18 @@ export function usePushDevice(publicKey: string) {
       );
       const subscription = await step(
         "subscribe",
-        registration.pushManager
-          .getSubscription()
-          .then(
-            (existing) =>
-              existing ??
-              registration.pushManager.subscribe({
-                userVisibleOnly: true,
-                applicationServerKey: urlBase64ToUint8Array(publicKey),
-              }),
-          ),
+        registration.pushManager.getSubscription().then(
+          (existing) =>
+            existing ??
+            registration.pushManager.subscribe({
+              userVisibleOnly: true,
+              applicationServerKey: urlBase64ToUint8Array(publicKey),
+            }),
+        ),
       );
       const result = await step(
         "save",
-        appPushSubscribeAction(subscription.toJSON() as PushSubscriptionJson),
+        actions.subscribe(subscription.toJSON() as PushSubscriptionJson),
       );
       if (!result.ok) {
         // Sem a API gravar, o aparelho não receberia nada: desfaz aqui também.
@@ -198,7 +209,7 @@ export function usePushDevice(publicKey: string) {
     } finally {
       setBusy(false);
     }
-  }, [publicKey]);
+  }, [publicKey, actions]);
 
   const disable = useCallback(async () => {
     setError(undefined);
@@ -208,7 +219,7 @@ export function usePushDevice(publicKey: string) {
       if (subscription) {
         const { endpoint } = subscription;
         await subscription.unsubscribe();
-        await appPushUnsubscribeAction(endpoint);
+        await actions.unsubscribe(endpoint);
       }
       setSituation("off");
     } catch {
@@ -216,7 +227,7 @@ export function usePushDevice(publicKey: string) {
     } finally {
       setBusy(false);
     }
-  }, []);
+  }, [actions]);
 
   return { situation, ios, busy, error, enable, disable };
 }

@@ -7,7 +7,10 @@ import {
   createServiceAction,
   updateServiceAction,
 } from "@/app/(admin)/service-actions";
+import { useCan } from "@/components/layout/Access";
+import { CommissionField } from "@/components/services/CommissionField";
 import {
+  parseCommission,
   serviceFieldOrder,
   validateServiceForm,
   type ServiceFormErrors,
@@ -37,6 +40,8 @@ type ServiceFormDialogProps = {
   onOpenChange: (open: boolean) => void;
   /** Presente na alteração; sem isso, é o cadastro. */
   service?: ServiceItem;
+  /** Só o ADMIN define a comissão (a API recusa os demais). */
+  canSetCommission?: boolean;
 };
 
 // "50.00" (reais, texto da API) → "5000" (centavos, o que a máscara guarda).
@@ -49,6 +54,7 @@ const FIELD_IDS = {
   name: "service-name",
   duration: "service-duration",
   price: "service-price",
+  commission: "service-commission-value",
 } as const;
 
 // Dialog de formulário (screen-patterns.md) de cadastro e alteração de serviço.
@@ -58,11 +64,16 @@ export function ServiceFormDialog({
   open,
   onOpenChange,
   service,
+  canSetCommission = false,
 }: ServiceFormDialogProps) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-lg">
-        <ServiceForm service={service} onClose={() => onOpenChange(false)} />
+        <ServiceForm
+          service={service}
+          canSetCommission={canSetCommission}
+          onClose={() => onOpenChange(false)}
+        />
       </DialogContent>
     </Dialog>
   );
@@ -71,14 +82,18 @@ export function ServiceFormDialog({
 // Formulário em si; separado do Dialog para o estado começar limpo a cada abertura.
 function ServiceForm({
   service,
+  canSetCommission,
   onClose,
 }: {
   service?: ServiceItem;
+  canSetCommission: boolean;
   onClose: () => void;
 }) {
   const [errors, setErrors] = useState<ServiceFormErrors>({});
   const [pending, startTransition] = useTransition();
   const editing = service !== undefined;
+  // "Aceitar turmas" só faz sentido com Turmas liberadas para a empresa.
+  const showsClasses = useCan("class-groups");
 
   function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -90,6 +105,14 @@ function ServiceForm({
       duration: String(data.get("duration") ?? ""),
       price: String(data.get("price") ?? ""),
     });
+    if (canSetCommission) {
+      const commission = parseCommission({
+        type: String(data.get("commissionType") ?? ""),
+        percent: String(data.get("commissionPercent") ?? ""),
+        cents: String(data.get("commissionCents") ?? ""),
+      });
+      if (!commission.ok) found.commission = commission.error;
+    }
     setErrors(found);
 
     const firstInvalid = serviceFieldOrder.find((field) => found[field]);
@@ -222,15 +245,29 @@ function ServiceForm({
         />
       </FormField>
 
-      {/* Liga o serviço ao cadastro de turmas (vários clientes no mesmo horário). */}
-      <div className="flex items-center gap-2">
-        <Switch
-          id="service-allows-classes"
-          name="allowsClasses"
-          defaultChecked={service?.allowsClasses ?? false}
+      {/* Liga o serviço ao cadastro de turmas (vários clientes no mesmo
+          horário). Só com Turmas liberadas; o campo de controle diz à action
+          que a caixa estava na tela. */}
+      {showsClasses && (
+        <div className="flex items-center justify-center gap-2">
+          <input type="hidden" name="classesEnabled" value="1" />
+          <Switch
+            id="service-allows-classes"
+            name="allowsClasses"
+            defaultChecked={service?.allowsClasses ?? false}
+          />
+          <Label htmlFor="service-allows-classes">Aceitar turmas</Label>
+        </div>
+      )}
+
+      {canSetCommission && (
+        <CommissionField
+          id={FIELD_IDS.commission}
+          type={service?.commissionType}
+          value={service?.commissionValue}
+          error={errors.commission}
         />
-        <Label htmlFor="service-allows-classes">Aceita turma</Label>
-      </div>
+      )}
 
       <ServiceProfessionalsField serviceId={service?.id} />
 

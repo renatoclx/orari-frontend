@@ -16,7 +16,7 @@ export const ACCESS_ACTIONS: { key: AccessAction; label: string }[] = [
 
 const ALL_ACTIONS = ACCESS_ACTIONS.map((action) => action.key);
 
-type AccessFeature = {
+export type AccessFeature = {
   key: string;
   label: string;
   /** Colunas que fazem sentido para a funcionalidade (as demais ficam em "–"). */
@@ -39,6 +39,7 @@ export const ACCESS_GROUPS: { label: string; features: AccessFeature[] }[] = [
       { key: "clients", label: "Clientes", actions: ALL_ACTIONS },
       { key: "employees", label: "Funcionários", actions: ALL_ACTIONS },
       { key: "professionals", label: "Profissionais", actions: ALL_ACTIONS },
+      { key: "suppliers", label: "Fornecedores", actions: ALL_ACTIONS },
       { key: "users", label: "Usuários", actions: ALL_ACTIONS },
       { key: "services", label: "Serviços", actions: ALL_ACTIONS },
     ],
@@ -54,11 +55,43 @@ export const ACCESS_GROUPS: { label: string; features: AccessFeature[] }[] = [
     label: "Financeiro",
     features: [
       { key: "tabs", label: "Comandas", actions: ALL_ACTIONS },
-      { key: "payments", label: "Pagamentos", actions: ALL_ACTIONS },
+      { key: "payments", label: "Contas a receber", actions: ALL_ACTIONS },
       {
         key: "payment-methods",
         label: "Métodos de pagamento",
         actions: ALL_ACTIONS,
+      },
+      // Só o ADMIN. Pagar = Edita; cancelar e excluir = Exclui.
+      { key: "payables", label: "Contas a pagar", actions: ALL_ACTIONS },
+      // Só o ADMIN usa (contas a pagar).
+      {
+        key: "expense-categories",
+        label: "Categorias de despesa",
+        actions: ALL_ACTIONS,
+      },
+      // Só o ADMIN. Edita = fechar; Cria = lançar adiantamento; Exclui =
+      // excluir adiantamento ou desfazer fechamento. A API exige ver
+      // Profissionais e Pagamentos.
+      { key: "commissions", label: "Comissões", actions: ALL_ACTIONS },
+    ],
+  },
+  {
+    label: "Produtos",
+    features: [
+      // Só o ADMIN. Exclui/Inativa = inativar (não há exclusão de categoria).
+      {
+        key: "product-categories",
+        label: "Categorias de produto",
+        actions: ALL_ACTIONS,
+      },
+      // Só o ADMIN. A API exige ver Categorias de produto.
+      { key: "products", label: "Produtos", actions: ALL_ACTIONS },
+      // Venda na comanda (só o ADMIN vende): Cria = vender; Exclui = cancelar
+      // a venda pendente; não há alteração. A API exige Comandas e Produtos.
+      {
+        key: "product-sales",
+        label: "Venda de produtos",
+        actions: ["view", "create", "remove"],
       },
     ],
   },
@@ -94,6 +127,66 @@ export const ACCESS_GROUPS: { label: string; features: AccessFeature[] }[] = [
       },
       // Mensagens automáticas ao cliente do app; a API exige o Portal do cliente.
       { key: "messages", label: "Mensagens", actions: ["view", "edit"] },
+      // App do profissional (PWA, só leitura): a agenda, os clientes e as
+      // comissões dele. Vem em todos os planos; a API exige ver Agendamentos.
+      {
+        key: "professional-app",
+        label: "App do profissional",
+        actions: ["view"],
+      },
+    ],
+  },
+  {
+    label: "Relatórios",
+    features: [
+      // Só leitura; a API exige ver Clientes e Profissionais.
+      {
+        key: "client-portfolio",
+        label: "Carteira de clientes",
+        actions: ["view"],
+      },
+      // Só leitura; a API exige ver Pagamentos e Clientes.
+      {
+        key: "receivables",
+        label: "Análise de recebíveis",
+        actions: ["view"],
+      },
+      // Só leitura; a API exige ver Agendamentos.
+      {
+        key: "appointments-report",
+        label: "Agendamentos",
+        actions: ["view"],
+      },
+      // Só leitura; a API exige ver Agendamentos e Pagamentos.
+      {
+        key: "rankings",
+        label: "Rankings",
+        actions: ["view"],
+      },
+      // Só leitura; a API exige ver Pagamentos.
+      {
+        key: "financial-report",
+        label: "Financeiro",
+        actions: ["view"],
+      },
+      // Só leitura; a API exige ver Contratações.
+      {
+        key: "packages-report",
+        label: "Pacotes",
+        actions: ["view"],
+      },
+      // Só leitura; a API exige ver Clientes e Agendamentos.
+      {
+        key: "clients-report",
+        label: "Perfil do cliente",
+        actions: ["view"],
+      },
+      // Só a tela; cada bloco segue o relatório de origem.
+      {
+        key: "dashboard",
+        label: "Dashboard",
+        actions: ["view"],
+      },
     ],
   },
 ];
@@ -162,61 +255,132 @@ export function toggleAccess(
   return { ...matrix, [featureKey]: next };
 }
 
-// Funcionalidades que cada modelo deixa de fora.
-const ANAMNESIS_KEYS = ["anamnesis", "anamnesis-templates", "anamnesis-audit"];
-const CLASS_KEYS = ["class-groups"];
-// Portal do cliente e Mensagens ficam fora de todos os modelos por enquanto: o
-// SUPER_ADMIN libera empresa por empresa (backend: migração client_portal_off).
-const PORTAL_KEYS = ["client-portal", "messages"];
+export type GroupState = "all" | "some" | "none";
+
+/** Situação da caixa da seção: todas as colunas aplicáveis marcadas, algumas ou nenhuma. */
+export function groupState(
+  matrix: AccessMatrix,
+  features: AccessFeature[],
+): GroupState {
+  const cells = features.flatMap((feature) =>
+    feature.actions.map((action) => matrix[feature.key]?.[action] ?? false),
+  );
+  if (cells.every(Boolean)) return "all";
+  return cells.some(Boolean) ? "some" : "none";
+}
+
+/**
+ * Marca ou desmarca todas as colunas aplicáveis da seção de uma vez. As
+ * dependências entre seções (ex.: Agenda exige ver Clientes) continuam sendo
+ * conferidas pela API ao salvar.
+ */
+export function toggleGroup(
+  matrix: AccessMatrix,
+  features: AccessFeature[],
+  checked: boolean,
+): AccessMatrix {
+  const next = { ...matrix };
+  for (const feature of features) {
+    next[feature.key] = Object.fromEntries(
+      ALL_ACTIONS.map((action) => [
+        action,
+        checked && feature.actions.includes(action),
+      ]),
+    ) as FeatureAccess;
+  }
+  return next;
+}
+
+// Planos do Orari (decididos em 2026-11-16): Essencial (2 profissionais incluídos),
+// Plus (5) e Clinical (7), com 1, 2 e 3 administradores (landing, 2026-11-19);
+// profissional a mais é cobrado à parte. A anamnese
+// pode ser contratada como adicional no Essencial e no Plus: o SUPER_ADMIN marca
+// as três linhas de Anamnese na empresa. Os modelos só preenchem a tela; depois de
+// aplicados, tudo continua editável. O app do cliente (portal) e as mensagens
+// entram nos três; o WhatsApp, quando vier, será adicional pago.
+
+// Essencial (nail designer, designer de sobrancelhas): a agenda, os cadastros,
+// o app do cliente e do profissional, e receber o cliente (comanda e métodos de
+// pagamento), com o Dashboard e os relatórios da agenda.
+const ESSENTIAL_KEYS = [
+  "appointments",
+  "recurrences",
+  "clients",
+  "employees",
+  "professionals",
+  "users",
+  "services",
+  "settings",
+  "client-portal",
+  "messages",
+  "professional-app",
+  "tabs",
+  "payment-methods",
+  "payments",
+  "financial-report",
+  "appointments-report",
+  "clients-report",
+  "client-portfolio",
+  "dashboard",
+];
+// Plus (barbearia): tudo, menos anamnese e turmas.
+const CLINICAL_ONLY_KEYS = [
+  "anamnesis",
+  "anamnesis-templates",
+  "anamnesis-audit",
+  "class-groups",
+];
 
 export type AccessTemplate = {
   key: string;
   label: string;
   matrix: AccessMatrix;
   admins: number;
-  /** Só o Essencial tem limite decidido; nos demais, o valor atual é mantido. */
-  professionals?: number;
+  professionals: number;
 };
 
-// Nomes provisórios (Obsidian: Planos 00). Os modelos só preenchem a tela;
-// depois de aplicados, tudo continua editável.
+// No Essencial, Contas a receber fica só para ver: o "Recebido" do Dashboard e
+// o relatório Financeiro exigem ver os pagamentos, mas a gestão (lançar, alterar
+// e excluir contas) é do Plus em diante. A comanda dá baixa pela própria
+// funcionalidade (Comandas).
+function essentialMatrix(): AccessMatrix {
+  const matrix = matrixWith((key) => ESSENTIAL_KEYS.includes(key));
+  return {
+    ...matrix,
+    payments: { view: true, edit: false, create: false, remove: false },
+  };
+}
+
 export const ACCESS_TEMPLATES: AccessTemplate[] = [
   {
     key: "essential",
     label: "Essencial",
-    matrix: matrixWith(
-      (key) =>
-        !ANAMNESIS_KEYS.includes(key) &&
-        !CLASS_KEYS.includes(key) &&
-        !PORTAL_KEYS.includes(key),
-    ),
+    matrix: essentialMatrix(),
     admins: 1,
-    professionals: 3,
+    professionals: 2,
   },
   {
-    key: "professional",
-    label: "Profissional",
-    matrix: matrixWith(
-      (key) => !CLASS_KEYS.includes(key) && !PORTAL_KEYS.includes(key),
-    ),
-    admins: 1,
-  },
-  {
-    key: "complete",
-    label: "Completo",
-    matrix: matrixWith((key) => !PORTAL_KEYS.includes(key)),
+    key: "plus",
+    label: "Plus",
+    matrix: matrixWith((key) => !CLINICAL_ONLY_KEYS.includes(key)),
     admins: 2,
+    professionals: 5,
+  },
+  {
+    key: "clinical",
+    label: "Clinical",
+    matrix: matrixWith(() => true),
+    admins: 3,
+    professionals: 7,
   },
 ];
 
-export function applyTemplate(
-  template: AccessTemplate,
-  current: CompanyAccess,
-): CompanyAccess {
+/** O modelo define a matriz e os dois limites (profissionais e administradores). */
+export function applyTemplate(template: AccessTemplate): CompanyAccess {
   return {
     matrix: template.matrix,
     limits: {
-      professionals: template.professionals ?? current.limits.professionals,
+      professionals: template.professionals,
       admins: template.admins,
     },
   };

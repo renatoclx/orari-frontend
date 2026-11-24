@@ -1,14 +1,23 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import {
   firstName,
   newPasswordErrors,
+  isEmailLogin,
   phoneError,
+  loginError,
 } from "@/components/client-app/client-app";
+import { FORWARDED_FOR_HEADER, clientIpFrom } from "@/lib/client-ip";
 import { safeReturnPath } from "@/lib/app-routes";
 import { ApiError } from "@/services/api";
+import {
+  changeProfessionalPassword,
+  getProfessionalMe,
+} from "@/services/app-pro.service";
+import * as authService from "@/services/auth.service";
 import {
   changeAccountPassword,
   loginAccount,
@@ -39,11 +48,15 @@ import {
 import { toDateString } from "@/utils/time";
 import { isDateString } from "@/utils/time";
 import {
+  clearAppProSession,
   clearAppSession,
+  getAppProRefreshToken,
+  getAppSessionKind,
   getAppToken,
+  setAppProSession,
   setAppSession,
 } from "@/services/app-session";
-import { onlyDigits } from "@/utils/masks";
+import { onlyDigits, phoneDigits } from "@/utils/masks";
 import {
   deletePushSubscription,
   clearMessages,
@@ -71,29 +84,55 @@ const text = (formData: FormData, name: string) =>
 const hasErrors = (errors: AppFormState["fieldErrors"]) =>
   Object.values(errors).some(Boolean);
 
-/** Entrar com telefone e senha. */
+/**
+ * Entra no app com telefone ou e-mail e senha, o mesmo formulário do cliente e
+ * do profissional. O profissional (acesso dado pela clínica) entra pelos dois;
+ * o cliente, só pelo telefone: tenta o profissional primeiro e, se a API não o
+ * reconhecer, e o login for um telefone, o cliente. A mensagem de erro é a
+ * mesma em todos os casos (não revela de quem é o telefone ou o e-mail).
+ */
 export async function appLoginAction(
   _previous: AppFormState | undefined,
   formData: FormData,
 ): Promise<AppFormState> {
-  const phone = text(formData, "phone");
+  const login = text(formData, "login").trim();
   const password = text(formData, "password");
   const fieldErrors = {
-    phone: phoneError(phone),
+    login: loginError(login),
     password: password ? undefined : "Informe sua senha.",
   };
-  const values = { phone };
+  const values = { login };
   if (hasErrors(fieldErrors)) return { values, fieldErrors };
+
+  const byEmail = isEmailLogin(login);
+  const professional = await loginProfessional(
+    byEmail ? login : phoneDigits(login),
+    password,
+  );
+  if (professional === "entered") redirect("/app");
+  if (professional !== "unknown") {
+    return { values, fieldErrors: {}, message: professional };
+  }
+  // E-mail: só o profissional tem; o cliente entra pelo telefone.
+  if (byEmail) {
+    return {
+      values,
+      fieldErrors: {},
+      message: "Telefone, e-mail ou senha incorretos.",
+    };
+  }
 
   try {
     await setAppSession(
-      await loginAccount({ phone: onlyDigits(phone), password }),
+      await loginAccount({ phone: phoneDigits(login), password }),
     );
   } catch (error) {
     if (!(error instanceof ApiError)) throw error;
     // Genérica de propósito: não revela se o telefone tem conta.
     const message =
-      error.status === 401 ? "Telefone ou senha incorretos." : error.message;
+      error.status === 401
+        ? "Telefone, e-mail ou senha incorretos."
+        : error.message;
     return { values, fieldErrors: {}, message };
   }
   // Fora do try: o redirect lança um erro especial do Next. Veio da página de
@@ -122,7 +161,7 @@ export async function appRegisterAction(
     await setAppSession(
       await registerAccount({
         name,
-        phone: onlyDigits(phone),
+        phone: phoneDigits(phone),
         password,
         passwordConfirmation,
       }),
@@ -168,7 +207,7 @@ export async function appAccessLinkAction(
             token,
             password,
             passwordConfirmation,
-            ...(needsPhone && { phone: onlyDigits(phone) }),
+            ...(needsPhone && { phone: phoneDigits(phone) }),
           },
     );
     if (result.token && result.expiresAt) {
@@ -181,8 +220,38 @@ export async function appAccessLinkAction(
   redirect("/app");
 }
 
-/** Sair do app neste aparelho. */
+/**
+ * Tenta entrar como profissional (usuário só de app) pelo telefone ou e-mail. Devolve
+ * "entered" (cookies gravados), "unknown" (a API não reconhece o telefone com
+ * essa senha: segue para o login de cliente) ou a mensagem de um erro que não
+ * é de credencial (ex.: tentativas demais), que vale para os dois casos.
+ */
+async function loginProfessional(
+  login: string,
+  password: string,
+): Promise<"entered" | "unknown" | string> {
+  const clientIp = clientIpFrom((await headers()).get(FORWARDED_FOR_HEADER));
+  try {
+    await setAppProSession(
+      await authService.loginProfessional(login, password, clientIp),
+    );
+    return "entered";
+  } catch (error) {
+    if (!(error instanceof ApiError)) throw error;
+    return error.status === 401 ? "unknown" : error.message;
+  }
+}
+
+/** Sair do app (cliente ou profissional), só deste aparelho. */
 export async function appLogoutAction(): Promise<void> {
+  if ((await getAppSessionKind()) === "professional") {
+    const refreshToken = await getAppProRefreshToken();
+    if (refreshToken) {
+      await authService.logout(refreshToken).catch(() => undefined);
+    }
+    await clearAppProSession();
+    redirect("/app/entrar?saiu=1");
+  }
   try {
     await logoutAccount();
   } catch {
@@ -302,6 +371,56 @@ export async function appChangePasswordAction(
   redirect("/app/menu?senha=1");
 }
 
+/**
+ * Troca a senha do profissional (Menu → Segurança). A API encerra todas as
+ * sessões dele, inclusive esta: entra de novo com a senha nova para este
+ * aparelho continuar entrado (os outros saem).
+ */
+export async function appProChangePasswordAction(
+  _previous: AppFormState | undefined,
+  formData: FormData,
+): Promise<AppFormState> {
+  const currentPassword = text(formData, "currentPassword");
+  const newPassword = text(formData, "password");
+  const newPasswordConfirmation = text(formData, "passwordConfirmation");
+  const fieldErrors = {
+    currentPassword: currentPassword ? undefined : "Informe a senha atual.",
+    ...newPasswordErrors(newPassword, newPasswordConfirmation),
+  };
+  if (hasErrors(fieldErrors)) return { values: {}, fieldErrors };
+
+  // O e-mail todo usuário tem (o telefone é opcional): serve para entrar de novo.
+  const { email } = await getProfessionalMe();
+  try {
+    await changeProfessionalPassword({
+      currentPassword,
+      newPassword,
+      newPasswordConfirmation,
+    });
+  } catch (error) {
+    if (!(error instanceof ApiError)) throw error;
+    if (error.status === 400 && /senha atual/i.test(error.message)) {
+      return {
+        values: {},
+        fieldErrors: { currentPassword: "Senha atual incorreta." },
+      };
+    }
+    return { values: {}, fieldErrors: {}, message: error.message };
+  }
+
+  try {
+    const clientIp = clientIpFrom((await headers()).get(FORWARDED_FOR_HEADER));
+    await setAppProSession(
+      await authService.loginProfessional(email, newPassword, clientIp),
+    );
+  } catch (error) {
+    if (!(error instanceof ApiError)) throw error;
+    // A senha foi trocada; só não deu para continuar entrado.
+    redirect("/app/entrar?expirou=1");
+  }
+  redirect("/app/menu?senha=1");
+}
+
 /** Endereço pelo CEP (ViaCEP), consultado no servidor. */
 export async function appCepAction(cep: string): Promise<CepLookup> {
   const digits = onlyDigits(cep);
@@ -339,7 +458,7 @@ export async function appProfileAction(
   ) as ProfileFields;
   const currentPassword = text(formData, "currentPassword");
   const values = { ...fields };
-  const phoneChanged = onlyDigits(fields.phone) !== originalPhone;
+  const phoneChanged = phoneDigits(fields.phone) !== originalPhone;
   const fieldErrors: AppFormState["fieldErrors"] = {
     ...profileErrors(fields, toDateString(new Date(), "America/Sao_Paulo")),
     ...(phoneChanged &&
@@ -356,7 +475,7 @@ export async function appProfileAction(
       : undefined;
     await saveProfile({
       name: fields.name.trim(),
-      phone: onlyDigits(fields.phone),
+      phone: phoneDigits(fields.phone),
       email: orNull(fields.email),
       document: orNull(onlyDigits(fields.document)),
       birthDate: orNull(fields.birthDate),

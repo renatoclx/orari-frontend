@@ -4,7 +4,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 export function PaymentsListLoading() {
   return (
     <div className="flex min-h-0 flex-1 flex-col gap-4">
-      <h1 className="text-2xl font-semibold">Pagamentos</h1>
+      <h1 className="text-2xl font-semibold">Contas a receber</h1>
       <div className="grid gap-3 sm:grid-cols-3">
         {Array.from({ length: 3 }, (_, index) => (
           <Skeleton key={index} className="h-24 rounded-card" />

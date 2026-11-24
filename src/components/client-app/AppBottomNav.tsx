@@ -4,26 +4,46 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
   CalendarDays,
+  HandCoins,
   House,
   Search,
   UserRound,
+  Users,
   type LucideIcon,
 } from "lucide-react";
 
 // Abas do app, como no AppBarber: a barra é do app inteiro, não de um local.
 // `also`: outras rotas em que a aba fica marcada (a página de um
 // estabelecimento faz parte de Buscar; a troca de senha, do Menu).
-const TABS: {
-  href: string;
-  label: string;
-  icon: LucideIcon;
-  also?: string;
-}[] = [
+type Tab = { href: string; label: string; icon: LucideIcon; also?: string };
+
+const CLIENT_TABS: Tab[] = [
   { href: "/app", label: "Início", icon: House },
   { href: "/app/buscar", label: "Buscar", icon: Search, also: "/app/local/" },
   { href: "/app/agendamentos", label: "Agendamentos", icon: CalendarDays },
   { href: "/app/menu", label: "Menu", icon: UserRound, also: "/app/menu/" },
 ];
+
+// O profissional vê as abas dele (e as rotas em `proRouteAllowed`, lib/app-routes.ts).
+const PROFESSIONAL_TABS: Tab[] = [
+  { href: "/app", label: "Início", icon: House },
+  { href: "/app/agenda", label: "Agenda", icon: CalendarDays },
+  {
+    href: "/app/clientes",
+    label: "Clientes",
+    icon: Users,
+    also: "/app/clientes/",
+  },
+  { href: "/app/menu", label: "Menu", icon: UserRound, also: "/app/menu/" },
+];
+
+// Entra antes do Menu, só para a clínica que usa comissões no plano.
+const COMMISSIONS_TAB: Tab = {
+  href: "/app/comissoes",
+  label: "Comissões",
+  icon: HandCoins,
+  also: "/app/comissoes/",
+};
 
 /**
  * Altura da barra (64 px dos itens + 1 px da borda), sem a área do gesto do
@@ -37,8 +57,28 @@ export const BOTTOM_NAV_OFFSET =
  * `hasUnread`: avisos não lidos, um ponto na aba Menu (some na tela Avisos,
  * que os marca como lidos).
  */
-export function AppBottomNav({ hasUnread }: { hasUnread: boolean }) {
+export function AppBottomNav({
+  hasUnread,
+  kind = "client",
+  showCommissions = false,
+}: {
+  hasUnread: boolean;
+  /** Quem entrou: cada um tem as suas abas. */
+  kind?: "client" | "professional";
+  /** Profissional de empresa com a funcionalidade Comissões. */
+  showCommissions?: boolean;
+}) {
   const pathname = usePathname();
+  const TABS =
+    kind === "professional"
+      ? showCommissions
+        ? [
+            ...PROFESSIONAL_TABS.slice(0, -1),
+            COMMISSIONS_TAB,
+            PROFESSIONAL_TABS.at(-1)!,
+          ]
+        : PROFESSIONAL_TABS
+      : CLIENT_TABS;
   const showDot = hasUnread && pathname !== "/app/menu/avisos";
   return (
     <nav

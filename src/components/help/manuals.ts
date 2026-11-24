@@ -8,13 +8,13 @@ export type Manual = {
 };
 
 // Os PDFs são gerados em docs/manual-usuario (README) e copiados para
-// public/manuais. Um manual novo é uma linha aqui. Por enquanto, só o ADMIN
-// acessa a tela.
+// public/manuais. Um manual novo é uma linha aqui. O ADMIN vê estes; o
+// SUPER_ADMIN, os da plataforma (PLATFORM_MANUALS).
 export const MANUALS: Manual[] = [
   {
     title: "Manual do administrador",
     description:
-      "Primeiros passos, agenda, pessoas, serviços, recorrências, pacotes e financeiro.",
+      "Primeiros passos, agenda, pessoas, serviços, recorrências, pacotes, comandas e contas a receber.",
     file: "/manuais/manual-administrador.pdf",
   },
   {
@@ -42,9 +42,44 @@ export const MANUALS: Manual[] = [
     file: "/manuais/manual-app.pdf",
   },
   {
+    title: "Manual do app do profissional",
+    description:
+      "Para enviar aos profissionais: entrar, Início, agenda, clientes, comissões e recibo.",
+    file: "/manuais/manual-app-profissional.pdf",
+  },
+  {
     title: "Manual de Mensagens",
     description:
       "Mensagens automáticas, os dados do cliente no texto e o envio a todos.",
     file: "/manuais/manual-mensagens.pdf",
+  },
+  {
+    title: "Manual de Relatórios e Dashboard",
+    description:
+      "O Dashboard e os sete relatórios: o que cada número quer dizer, filtros e impressão.",
+    file: "/manuais/manual-relatorios.pdf",
+  },
+  {
+    title: "Manual de Comissões",
+    description:
+      "Comissão no serviço, acompanhamento, adiantamentos, fechamento e recibo.",
+    file: "/manuais/manual-comissoes.pdf",
+  },
+  {
+    title: "Manual de Contas a pagar",
+    description:
+      "Fornecedores, categorias, contas parceladas ou repetidas, pagamento e comissões.",
+    file: "/manuais/manual-contas-a-pagar.pdf",
+  },
+];
+
+// Manual do SUPER_ADMIN (a Ajuda mostra só este para ele): o Painel, as
+// empresas e os acessos, as assinaturas, as cobranças e o cadastro sozinho.
+export const PLATFORM_MANUALS: Manual[] = [
+  {
+    title: "Manual da plataforma",
+    description:
+      "Painel, empresas e acessos, assinaturas, cobranças e o cadastro sozinho com teste grátis.",
+    file: "/manuais/manual-super-admin.pdf",
   },
 ];

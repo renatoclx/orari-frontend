@@ -34,3 +34,41 @@ com capturas de tela de uma clínica fictícia ("Clínica Bem-Estar").
    - PDFs: `node build.mjs manual-portal`, `manual-app` e `manual-mensagens`.
 
 O sumário é numerado pelo `build.mjs` em duas passadas. Textos: `manual.html`.
+
+9. Manuais de Relatórios e Dashboard, de Comissões e de Contas a pagar
+   (`manual-relatorios.pdf`, `manual-comissoes.pdf`, `manual-contas-a-pagar.pdf`):
+   - **Relatórios** e as imagens 28, 29 e 33 do manual do administrador:
+     `node scripts/cap-11-relatorios.mjs`, na Clínica Bem-Estar, período de
+     outubro de 2026. **Só leitura** (abre telas e fecha os diálogos sem salvar).
+   - **Comissões e Contas a pagar**: `node scripts/cap-12-comissoes-contas.mjs`, no
+     Studio Aurora. Antes: comissões **em aberto** de um profissional (o roteiro usa
+     a Camila Rocha), fornecedores com nomes de demonstração (CNPJ e categoria
+     principal) e clientes com nomes fictícios em todas as telas. O roteiro
+     **grava um fechamento** (para a "Comissão fechada", o recibo e a conta
+     gerada); depois, apague o fechamento, a conta paga dele e o que foi criado
+     para as capturas, e volte os nomes como estavam.
+   - O recorte do menu ⋮ (`f08-mais-acoes.png`) sai pelo Playwright, com clique
+     real: pelo CDP o menu abre no canto da tela.
+   - PDFs: `node build.mjs manual-relatorios`, `manual-comissoes` e
+     `manual-contas-a-pagar`; copie-os para `public/manuais/`.
+
+10. Avisos, sino e Primeiros passos (imagens `n01`, `n02`, `m01`, `m04`, `m05`, `a06`,
+    `a07`, `a14` e `pro-13` a `pro-15`, nos manuais do administrador, de Mensagens, do
+    app do cliente e do app do profissional): `node scripts/cap-13-avisos.mjs`, com
+    `DATABASE_URL` do banco local e a conta de um cliente de teste em
+    `CLIENT_PHONE` e `CLIENT_PASSWORD`. Usa o Playwright (Studio Aurora e Clínica
+    Nova Teste). **Insere avisos de exemplo** (e esconde os existentes durante a
+    captura) e **apaga/restaura tudo** ao terminar; não grava agendamento nem mensagem.
+    A tela de entrar do app (`a01` e `pro-01`) é uma captura simples de `/app/entrar`.
+
+11. Manual da plataforma (`manual-super-admin.pdf`, imagens `s01` a `s16`), para o
+    SUPER_ADMIN: `SA_TOKEN=<token do SUPER_ADMIN local> node scripts/cap-14-super-admin.mjs`.
+    Usa o Playwright e a API local. **Grava** assinaturas e pagamentos fictícios no
+    Aurora, Orari Demo, John Doe, Renatone e Bela Vista e uma assinatura na Clínica
+    Nova Teste (a Clínica Bem-Estar só aparece nas listas); a faixa do teste e o
+    somente leitura saem do login da Marina (Aurora). Sem a senha do SUPER_ADMIN
+    local, o token pode ser assinado com o `JWT_SECRET` do `.env` do backend
+    (`sub` = id do usuário SUPER_ADMIN). Depois, **apague tudo** no banco local:
+    `delete from subscription_payments; delete from company_subscriptions;` e os
+    `audit_logs` das ações `SUBSCRIPTION_*`. PDF: `node build.mjs manual-super-admin`;
+    copie para `public/manuais/`. A Ajuda mostra só este manual ao SUPER_ADMIN.

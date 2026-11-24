@@ -1,3 +1,4 @@
+import { AppNotice } from "@/components/client-app/AppNotice";
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
@@ -12,8 +13,9 @@ import {
   type LucideIcon,
 } from "lucide-react";
 import { appLogoutAction } from "@/app/app/actions";
-import { AppFormMessage } from "@/components/client-app/AppFormMessage";
+import { ProfessionalMenu } from "@/components/professional-app/ProfessionalMenu";
 import { getAccount } from "@/services/app-account.service";
+import { getAppSessionKind } from "@/services/app-session";
 import { getProfile } from "@/services/app-profile.service";
 import { formatPhone, getInitials } from "@/utils/format";
 
@@ -70,6 +72,10 @@ export default async function AppMenuPage({
   searchParams,
 }: PageProps<"/app/menu">) {
   const { senha, dados } = await searchParams;
+  // Quem entrou como profissional vê o Menu dele.
+  if ((await getAppSessionKind()) === "professional") {
+    return <ProfessionalMenu senhaTrocada={Boolean(senha)} />;
+  }
   const [profile, { unreadMessages }] = await Promise.all([
     getProfile(),
     getAccount(),
@@ -103,14 +109,16 @@ export default async function AppMenuPage({
       </header>
 
       {senha && (
-        <AppFormMessage tone="info">
-          Senha trocada. Os outros aparelhos saíram da sua conta.
-        </AppFormMessage>
+        <AppNotice
+          param="senha"
+          message="Senha trocada. Os outros aparelhos saíram da sua conta."
+        />
       )}
       {dados && (
-        <AppFormMessage tone="info">
-          Dados salvos. Eles também foram atualizados nos seus estabelecimentos.
-        </AppFormMessage>
+        <AppNotice
+          param="dados"
+          message="Dados salvos. Eles também foram atualizados nos seus estabelecimentos."
+        />
       )}
 
       <nav aria-label="Opções da conta" className="border-t border-border">

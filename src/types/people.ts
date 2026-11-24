@@ -6,7 +6,7 @@ export type ContactType = "MAIN" | "MESSAGE" | "BRANCH";
 export type AddressType = "MAIN" | "MESSAGE" | "BRANCH";
 
 /** Espelha o enum PeopleType do backend. */
-export type PeopleType = "CLIENT" | "EMPLOYEE" | "PROFESSIONAL";
+export type PeopleType = "CLIENT" | "EMPLOYEE" | "PROFESSIONAL" | "SUPPLIER";
 
 /** Contato principal que a listagem de pessoas traz junto de cada item. */
 export type PrincipalContact = {
@@ -20,8 +20,11 @@ export type PrincipalContact = {
 export type PersonListItem = {
   id: string;
   name: string;
-  /** CPF sem máscara. */
+  /** CPF sem máscara (no fornecedor, CPF ou CNPJ). */
   document: string | null;
+  /** Só no fornecedor: categoria de despesa principal. */
+  expenseCategoryId?: string | null;
+  expenseCategory?: { id: string; name: string } | null;
   birthDate: string | null;
   profession: string | null;
   type: PeopleType;
@@ -36,6 +39,8 @@ export type PersonListItem = {
    * (no máximo 2 agendamentos futuros pelo app até confirmar).
    */
   portalConfirmed?: boolean;
+  /** Só profissional: recebe comissão (o vinculado a um usuário ADMIN nasce sem). */
+  receivesCommission?: boolean;
   principalContact: PrincipalContact | null;
 };
 
@@ -72,9 +77,13 @@ export type CreatePersonInput = {
   birthDate?: string;
   profession?: string;
   note?: string;
+  /** Só o ADMIN envia, e só para profissional. */
+  receivesCommission?: boolean;
   phone?: string;
   contacts?: NewContactInput[];
   addresses?: NewAddressInput[];
+  /** Só no fornecedor (ADMIN); `null` tira. */
+  expenseCategoryId?: string | null;
 };
 
 /** Contato cadastrado (GET /contacts). */
@@ -106,4 +115,8 @@ export type UpdatePersonInput = {
   birthDate: string | null;
   profession: string | null;
   note: string | null;
+  /** Só o ADMIN envia, e só para profissional; ausente, não muda. */
+  receivesCommission?: boolean;
+  /** Só no fornecedor (ADMIN); `null` tira. */
+  expenseCategoryId?: string | null;
 };

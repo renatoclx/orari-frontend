@@ -45,6 +45,8 @@ type ServiceListProps = {
   search: string;
   /** Rodapé fixo do card (paginação). */
   footer: React.ReactNode;
+  /** Só o ADMIN define a comissão no formulário. */
+  canSetCommission: boolean;
 };
 
 // Círculo de 16 px, sem borda, com a cor do serviço (screens/servicos.md).
@@ -148,11 +150,18 @@ function ServiceActions({
 
 // Conteúdo do dialog de visualização.
 function ServiceDetails({ service }: { service: ServiceItem }) {
+  // Sem Turmas liberadas, a linha "Aceita turmas" não faz sentido.
+  const showsClasses = useCan("class-groups");
   const rows: [string, React.ReactNode][] = [
     ["Descrição", service.description],
     ["Preço", service.price && formatPrice(service.price)],
     ["Duração", formatDuration(service.duration)],
-    ["Aceita turma", service.allowsClasses ? "Sim" : "Não"],
+    ...(showsClasses
+      ? ([["Aceita turmas", service.allowsClasses ? "Sim" : "Não"]] as [
+          string,
+          React.ReactNode,
+        ][])
+      : []),
     [
       "Cor",
       service.color && (
@@ -192,7 +201,12 @@ function ServiceDetails({ service }: { service: ServiceItem }) {
 }
 
 /** Card da listagem: tabela (computador) ou lista empilhada (celular), com as ações de cada serviço. */
-export function ServiceList({ services, search, footer }: ServiceListProps) {
+export function ServiceList({
+  services,
+  search,
+  footer,
+  canSetCommission,
+}: ServiceListProps) {
   // O serviço fica guardado ao fechar, para o dialog não trocar de título
   // durante a animação de saída.
   const [editing, setEditing] = useState<ServiceItem>();
@@ -372,6 +386,7 @@ export function ServiceList({ services, search, footer }: ServiceListProps) {
         open={editOpen}
         onOpenChange={setEditOpen}
         service={editing}
+        canSetCommission={canSetCommission}
       />
 
       <Dialog

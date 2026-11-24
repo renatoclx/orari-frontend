@@ -7,10 +7,10 @@
   - Clientes / Funcionários / Profissionais / Usuários
 - Cada tipo de Pessoa irá referenciar um PeopleType no backend.
 - Usuário é uma entidade separada, que possui referência diferente (UserType)
-- Itens do menu, em ordem: Agendamentos, Recorrências, Pessoas (dropdown), Serviços, Turmas (só para o ADMIN), Pacotes (dropdown com Planos e Contratações) e Financeiro (dropdown com Comandas, Pagamentos e Métodos de pagamento) e, para quem acessa a anamnese, Anamnese (dropdown para o ADMIN com Fichas preenchidas, Modelos de ficha e Auditoria; para o profissional vinculado, só o item Fichas preenchidas) e, só para o ADMIN, Portal do cliente (`portal-do-cliente.md`), Mensagens (dropdown com Automáticas e Enviar; `mensagens.md`) e Ajuda, nessa ordem, no fim; só para o SUPER_ADMIN, Empresas.
+- Itens do menu, em ordem: Agendamentos, Recorrências, Pessoas (dropdown), Serviços, Turmas (só para o ADMIN), Pacotes (dropdown com Planos e Contratações) e Financeiro (dropdown com Comandas, Pagamentos e Métodos de pagamento) e, para quem acessa a anamnese, Anamnese (dropdown para o ADMIN com Fichas preenchidas, Modelos de ficha e Auditoria; para o profissional vinculado, só o item Fichas preenchidas) e, só para o ADMIN, Portal do cliente (dropdown com Portal e Avisos no celular; `portal-do-cliente.md`), Mensagens (dropdown com Ao cliente, Ao profissional, Ao administrador e Enviar; `mensagens.md`) e Ajuda, nessa ordem, no fim. O SUPER_ADMIN vê só Painel, Empresas, Assinaturas, Cobranças e Ajuda (sem sino e sem atalhos da agenda); abrir uma tela da aplicação o leva a `/painel`.
 - Ordem do menu (sidebar): Agendamentos, Recorrências, Pessoas, Serviços, Turmas (só ADMIN), Pacotes e Financeiro (dropdowns: Pessoas, Pacotes e Financeiro).
 - **Acessos da empresa:** cada item do menu está ligado a uma funcionalidade (`empresas.md`, "Acessos e limites"). O item some quando a empresa não tem **Visualiza** nela, e um grupo sem nenhum subitem visível também some. Ajuda e Empresas não dependem disso. Sem o `access` na resposta de `/auth/me` (API antiga), nada é escondido.
-- **Atalhos da barra lateral** (novo cliente, novo serviço, nova recorrência e comandas) também seguem o acesso: cada um some sem a ação correspondente (Cria; Visualiza para comandas).
+- **Atalhos da barra lateral** (novo cliente, novo serviço, nova recorrência, comandas e bloquear horários) também seguem o acesso: cada um some sem a ação correspondente (Cria; Visualiza para comandas; Cria de Agendamentos para bloquear horários).
 - Configurações da empresa (`configuracoes.md`): acessadas pelo menu do usuário.
 
 ---
@@ -19,7 +19,17 @@
 
 - À esquerda, o nome fantasia da empresa (só do tablet em diante; no celular, o espaço fica para o menu, a logo do Orari e os atalhos).
 - À direita, a logo da empresa (quando houver), o nome e o tipo do usuário e o avatar.
-- O menu do usuário (avatar) reúne: **Configurações da empresa**, **Tema escuro** (item com switch; alterna sem fechar o menu) e **Sair** (com confirmação). O tema deixou de ter botão próprio no header. Na tela de login o tema continua como switch.
+- **Sino de notificações** (à esquerda da logo e do usuário): o número de não lidas numa marca vermelha, o painel das últimas 10 e o link para a página (ver [notificacoes.md](notificacoes.md)).
+- O menu do usuário (avatar) reúne: **Configurações da empresa**, **Alterar senha** (`KeyRound`; dialog com senha atual, nova senha e confirmação, um olho que mostra as três; senha atual errada aparece no campo; ao alterar, os outros aparelhos saem e este continua entrado), **Tema escuro** (item com switch; alterna sem fechar o menu) e **Sair** (com confirmação). O tema deixou de ter botão próprio no header. Na tela de login o tema continua como switch.
+
+## Aviso da assinatura
+
+- Faixa logo abaixo do header, fora da rolagem, com a situação da assinatura da empresa (`subscription` do `/auth/me`; o "hoje" no fuso da empresa):
+  - **Em teste** (cinza, ícone de ampulheta): "Seu teste grátis termina em N dias." e, no último dia, "Hoje é o último dia do seu teste grátis."
+  - **Em atraso** (vermelho claro, alerta): "O pagamento da assinatura venceu. A partir de dd/mm, seu acesso fica só para consulta."
+  - **Só consulta** e **Cancelada** (vermelho claro, cadeado): "Seu acesso está só para consulta. Fale com o Orari para regularizar e voltar a usar tudo."
+  - Ativa ou sem assinatura: sem faixa.
+- Em somente leitura, os acessos chegam só com o Visualiza (`withReadOnlyAccess`, no `getCurrentUser`): somem os botões de cadastrar, alterar, excluir e os atalhos; páginas de cadastro e alteração dão "não encontrada". A API recusa as gravações de qualquer forma.
 
 ---
 
@@ -32,5 +42,6 @@
   - Serviços (ícone para cadastro rápido de um serviço);
   - Recorrência (ícone que abre o cadastro de uma nova recorrência);
   - Comandas (ícone de recibo; leva às comandas do dia, `/financeiro/comandas`);
+  - Bloquear horários (ícone de calendário riscado; abre o dialog "Bloquear horários", ver `agendamentos.md`). Só com a ação Cria de Agendamentos.
 
-No celular, somente o item calendário será exibido, os demais devem permanecer ocultos.
+No celular, somente o calendário e o bloquear horários aparecem, no header; os demais ficam ocultos.

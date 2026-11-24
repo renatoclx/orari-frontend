@@ -4,7 +4,7 @@ Tela em que a clínica liga o portal do cliente e define as regras do app (rota 
 
 ## Acesso
 
-- Item **Portal do cliente** no menu lateral, o último antes de **Ajuda**, com ícone de celular.
+- Grupo **Portal do cliente** no menu lateral (com ícone de celular), logo antes de **Mensagens**, com os subitens **Portal** (esta tela, em `/portal-do-cliente`) e **Avisos no celular** (`/avisos-no-celular`, ver [notificacoes.md](notificacoes.md)).
 - Só para o **ADMIN** e só com a funcionalidade **Portal do cliente** no plano (matriz de acessos, `empresas.md`). Os demais veem a página "não encontrada", e a API recusa (403).
 - Sem a ação **Edita**, a tela fica só leitura e sem o rodapé de salvar.
 

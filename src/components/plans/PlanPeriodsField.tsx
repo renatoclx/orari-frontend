@@ -98,7 +98,7 @@ export function PlanPeriodsField({
                       onlyDigits(event.target.value).slice(0, 3),
                     )
                   }
-                  placeholder="3"
+                  placeholder="Ex.: 3"
                 />
               </div>
               <div className="space-y-1.5">

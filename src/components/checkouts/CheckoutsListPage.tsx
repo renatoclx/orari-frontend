@@ -1,8 +1,11 @@
 import { CheckoutList } from "@/components/checkouts/CheckoutList";
+import { NewSaleButton } from "@/components/product-sales/NewSaleButton";
 import { ListSearch } from "@/components/shared/ListSearch";
 import { TablePagination } from "@/components/shared/TablePagination";
 import { getCurrentUser } from "@/services/auth.service";
 import { listCheckouts } from "@/services/payment.service";
+import { listPeople } from "@/services/people.service";
+import { canAccess } from "@/utils/access";
 import { listPaymentMethods } from "@/services/payment-method.service";
 import { formatDateOnly } from "@/utils/format";
 import { toDateString } from "@/utils/time";
@@ -27,22 +30,36 @@ export async function CheckoutsListPage({
     typeof searchParams.q === "string" ? searchParams.q.trim() : "";
   const page = Math.max(1, Number(searchParams.page) || 1);
 
-  const [{ company }, result, methods] = await Promise.all([
+  const [user, result, methods] = await Promise.all([
     getCurrentUser(),
     listCheckouts({ search: search || undefined, page, limit: PAGE_SIZE }),
     listPaymentMethods({ isActive: true, page: 1, limit: METHODS_LIMIT }),
   ]);
-  const timeZone = company.timezone;
+  const timeZone = user.company.timezone;
+  // Venda de produtos: só o ADMIN, com a funcionalidade (a API confere de novo).
+  const isAdmin = user.type === "ADMIN";
+  const canSell = isAdmin && canAccess(user.access, "product-sales", "create");
+  const canCancelSale =
+    isAdmin && canAccess(user.access, "product-sales", "remove");
+  // Primeiros clientes para a "Nova venda" (a busca traz os demais).
+  const clients = canSell
+    ? (
+        await listPeople({ type: "CLIENT", isActive: true, page: 1, limit: 20 })
+      ).items.map(({ id, name }) => ({ id, name }))
+    : [];
   // "Hoje" é o dia da empresa, o mesmo que a API usa para montar as comandas.
   const todayIso = toDateString(new Date(), timeZone);
 
   return (
     <div className="flex min-h-0 flex-1 flex-col gap-4">
-      <div>
-        <h1 className="text-2xl font-semibold">Comandas do dia</h1>
-        <p className="text-sm text-muted-foreground">
-          {formatDateOnly(`${todayIso}T00:00:00Z`)}
-        </p>
+      <div className="flex flex-wrap items-start justify-between gap-3">
+        <div>
+          <h1 className="text-2xl font-semibold">Comandas do dia</h1>
+          <p className="text-sm text-muted-foreground">
+            {formatDateOnly(`${todayIso}T00:00:00Z`)}
+          </p>
+        </div>
+        {canSell && <NewSaleButton clients={clients} />}
       </div>
       <div className="flex flex-wrap items-center gap-3">
         <ListSearch
@@ -57,6 +74,8 @@ export async function CheckoutsListPage({
         search={search}
         timeZone={timeZone}
         today={todayIso}
+        canSell={canSell}
+        canCancelSale={canCancelSale}
         footer={
           <TablePagination
             page={page}

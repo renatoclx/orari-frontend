@@ -57,7 +57,7 @@ Pontos conhecidos e aceitos por enquanto. Revisar quando o contexto mudar.
 - **Busca de clientes do filtro duplicada.** Pagamentos e Contratações usam `useClientSearch`, que ainda tem a mesma lógica do dialog de novo agendamento.
 - **Resumo e lista em chamadas separadas.** Os totais (`/payments/summary`) e a lista (`/payments`) são duas consultas; se um pagamento mudar entre elas, os números podem divergir até a próxima carga.
 - **Pagamento sem cobrança própria na comanda.** Sessões de pacote aparecem como "Incluído no pacote", e o avulso ainda não concluído, como "Aguardando conclusão"; receber antes de concluir (sinal) não existe.
-- **Status da comanda só no frontend.** A regra dos quatro estados (`utils/checkout.ts`) deduz a situação de `appointments[].payment`, `clientPlanId` e dos pagamentos anteriores; o backend poderia devolver um `status` explícito por comanda e a tela deixaria de deduzir.
+- **Status da comanda só no frontend.** A regra dos quatro estados (`utils/checkout.ts`) deduz a situação de `appointments[].payment`, `clientPlanId`, das vendas de hoje e dos pagamentos anteriores; o backend poderia devolver um `status` explícito por comanda e a tela deixaria de deduzir.
 
 ## Anamnese
 
@@ -93,6 +93,38 @@ Pontos conhecidos e aceitos por enquanto. Revisar quando o contexto mudar.
 - **Limite no botão.** "Novo profissional" e "Novo usuário" não ficam desabilitados no limite (o `/auth/me` não traz o uso); a mensagem `PLAN_LIMIT_REACHED` aparece ao salvar.
 - **Contatos e endereços.** Não são barrados por funcionalidade no backend (ver `technical-debt.md` dele).
 
+## Relatórios
+
+- **Sem exportar em planilha.** Os relatórios só têm a tela e a impressão.
+- **Dashboard dobra as chamadas:** a comparação consulta cada relatório duas vezes (período e anterior). Com muitos dados, uma rota própria de resumo seria mais leve.
+- **Erro de um relatório derruba o Dashboard inteiro** (`Promise.all`); isolar cada bloco fica para depois.
+- **Rosca com mais de 5 métodos:** do 6º em diante (pela ordem do cadastro) somam em "Outros", mesmo que um deles receba muito.
+- **Modelos de plano a revisar:** a distribuição dos relatórios por modelo é provisória.
+
+## Comissões
+
+- **Percentual por profissional:** hoje só "recebe ou não recebe"; um percentual diferente por profissional (ex.: Camila 50%) fica para quando um cliente pedir.
+- **Atalho "Novo serviço" da barra de ações** não tem o campo de comissão (só a página de Serviços sabe se o usuário é ADMIN); define-se ao alterar.
+- **Texto do recibo** é fixo; um modelo editável pela clínica fica para depois (pedido de 2026-11-10: "depois readaptamos").
+- **Adiantamentos antigos sem método:** os lançados antes de 2026-11-10 mostram "--" e não geraram conta paga; os fechamentos antigos também não (nada retroativo).
+
+## Contas a pagar
+
+- **Série não se altera de uma vez:** alterar e cancelar valem para uma conta; mudar o aluguel de todos os meses é conta a conta.
+- **Sem comprovante anexado** (boleto, nota) nem juros e multa automáticos; valor diferente é alterar antes de pagar.
+- **Listas de apoio até 100:** favorecidos (fornecedores e profissionais), categorias e métodos vêm numa página só (`LOOKUP_LIMIT`); o filtro de favorecido é um `Select`, não uma busca.
+- **Comissão em aberto ignora o filtro de vencimento** (some com ele) e não tem data; o "A vencer" a soma sem contar como conta.
+- **Sem saídas nos relatórios:** Caixa, Fluxo de caixa e despesas por categoria ficam para depois; não há impressão nem exportação da tela.
+
+## Produtos, estoque e venda
+
+- **Comanda é o dia do cliente:** duas visitas no mesmo dia ficam na mesma comanda (o pago vai para "Recebidos"); comandas separadas exigiriam gravar o fechamento no backend.
+- **Listas de apoio até 100:** categorias e fornecedores do filtro e do formulário, e as categorias de despesa e métodos da compra, vêm numa página só (`LOOKUP_LIMIT`); a busca de produtos da venda traz até 20.
+- **Erro da API no campo pela mensagem:** `productErrorField` decide o campo pelo texto da mensagem (SKU, categoria, fornecedor...); se a API mudar a frase, o erro volta ao aviso geral.
+- **Sem leitor de código de barras, foto na venda nem desconto:** a venda é por busca de nome ou SKU; desconto, comissão sobre produto, venda sem cadastro e devolução de venda paga ficaram fora.
+- **Movimentação sem data própria:** vale o momento do lançamento (uma compra que chegou ontem é lançada hoje); a conta a pagar tem as datas dela.
+- **Estoque baixo só na tela de produtos:** não há aviso no Dashboard nem notificação.
+
 ## Empresas
 
 - **Usuários do SUPER_ADMIN.** A API exige `companyId` quando o SUPER_ADMIN cria um usuário e lista os usuários de todas as empresas. A tela de Usuários não pede nem filtra por empresa: para o SUPER_ADMIN, o cadastro responde 400 ("companyId é obrigatório") e a lista mistura empresas. O fluxo "Cadastrar administrador" de Empresas já envia a empresa; falta um seletor de empresa na tela de Usuários.
@@ -107,6 +139,24 @@ Pontos conhecidos e aceitos por enquanto. Revisar quando o contexto mudar.
 - **Telefone não confirmado:** depende do envio do código pelo WhatsApp (Meta).
 - **Clientes duplicados:** quem já era cliente e entrou sozinho pela busca fica com 2 cadastros; falta juntar.
 - **Busca só por nome;** geolocalização no futuro.
+
+## App do profissional
+
+- **Sem teste de fumaça de `/app`:** `e2e/smoke.e2e.ts` cobre só o painel da clínica. As telas do app (cliente e profissional) foram verificadas por roteiros de navegador (Playwright) que não estão no repositório. Para entrar no CI, o smoke precisaria de um segundo login (profissional) e de dados de teste.
+- **Só consulta:** o profissional não confirma, remaneja nem marca falta; avisos push, anamnese e status de pagamento do cliente ficam fora por decisão (ver `decisions.md`).
+- **Esqueci a senha:** não há recuperação pelo app; a clínica redefine a senha no cadastro do usuário.
+- **"Não encontrado" com status 200:** a ficha do cliente e o recibo, ao não achar o registro, mostram a página de erro, mas o Next já respondeu 200 por causa do `loading.tsx` (carregamento progressivo). Só a aparência importa ao usuário; seria preciso tirar o `loading.tsx` para o 404 real.
+- **Início conta em memória:** a API traz os agendamentos da semana e dos dois meses (até 5.000) e agrupa no servidor; para um profissional com volume muito alto, o certo seria agregar no banco.
+- **Fechamentos paginados no service:** a API corta a página depois de buscar todos os fechamentos dele (poucos por período); a consulta do ADMIN não tem paginação.
+- **Cenários de borda:** verificados no Studio Aurora em 2026-11-12 (profissional sem comissão, fechamento desfeito, empresa sem `commissions`, cadastro inativado e tempo de resposta: 7 a 12 ms de mediana nas seis rotas; 40 requisições simultâneas do Início sem falha; o cálculo do Início com 5.000 linhas leva ~40 ms). Não há teste automático de tela para eles (ver o smoke acima).
+
+## Notificações
+
+- **Sem tempo real:** o número do sino é conferido a cada 15 segundos, ao voltar para a aba e ao ler; um aviso novo (e o toast do painel) pode levar até 15 s para aparecer; a agenda também se atualiza a cada 60 s (SSE ou WebSocket resolveria).
+- **Push só no app do profissional:** o painel da clínica tem o sino e a caixa, mas não recebe push no navegador (falta um service worker próprio do painel).
+- **Sem "Testar" no aviso do profissional:** o app do cliente tem o botão de teste; o do profissional ainda não (falta a rota no backend).
+- **Card de push duplicado:** o `ProfessionalPushCard` repete os estados do `PushDeviceCard` (instalar no iPhone, bloqueado, desligado, ligado). Unificar num componente só quando houver uma terceira tela de push.
+- **Sem teste de tela:** o sino e as páginas foram verificados no navegador (Playwright, fora do repositório); só as regras puras têm spec.
 
 ## Acessibilidade
 

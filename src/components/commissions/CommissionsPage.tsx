@@ -1,0 +1,191 @@
+import { monthOf } from "@/components/client-portfolio/portfolio-filters";
+import { AdvanceList } from "@/components/commissions/AdvanceList";
+import { CloseCommissionButton } from "@/components/commissions/CloseCommissionButton";
+import { ClosingList } from "@/components/commissions/ClosingList";
+import { CommissionList } from "@/components/commissions/CommissionList";
+import {
+  CommissionTabs,
+  type Tab,
+} from "@/components/commissions/CommissionTabs";
+import { LaunchAdvanceButton } from "@/components/commissions/LaunchAdvanceButton";
+import { CommissionProfessionalList } from "@/components/commissions/CommissionProfessionalList";
+import { CommissionsCards } from "@/components/commissions/CommissionsCards";
+import {
+  ALL_PROFESSIONALS,
+  COMMISSIONS_PATH,
+  commissionsQuery,
+  readCommissionFilters,
+} from "@/components/commissions/commission-filters";
+import { CommissionsToolbar } from "@/components/commissions/CommissionsToolbar";
+import { TablePagination } from "@/components/shared/TablePagination";
+import { getCurrentUser } from "@/services/auth.service";
+import {
+  getCommissionSummary,
+  listClosings,
+  listCommissionAdvances,
+  listCommissions,
+} from "@/services/commission.service";
+import { listPaymentMethods } from "@/services/payment-method.service";
+import { listPeople } from "@/services/people.service";
+import { MAX_PAGE_SIZE } from "@/utils/fetch-all-pages";
+import { toDateString } from "@/utils/time";
+
+const PAGE_SIZE = 10;
+
+/**
+ * Comissões (screens/comissoes.md): sem profissional, os totais por
+ * profissional; com ele, os atendimentos um a um. Tudo pela URL.
+ */
+export async function CommissionsPage({
+  searchParams,
+}: {
+  /** ?profissional=, ?de=, ?ate=, ?aba= e ?page=. */
+  searchParams: Record<string, string | string[] | undefined>;
+}) {
+  const [{ company }, professionals] = await Promise.all([
+    getCurrentUser(),
+    listPeople({
+      type: "PROFESSIONAL",
+      isActive: true,
+      page: 1,
+      limit: MAX_PAGE_SIZE,
+    }),
+  ]);
+  const today = toDateString(new Date(), company.timezone);
+  const month = monthOf(today);
+  const options = professionals.items.map(({ id, name }) => ({ id, name }));
+  const filters = readCommissionFilters(
+    searchParams,
+    options.map((option) => option.id),
+  );
+  const query = commissionsQuery(filters, month).toString();
+  const page = Math.max(1, Number(searchParams.page) || 1);
+  const professionalId =
+    filters.professional === ALL_PROFESSIONALS
+      ? undefined
+      : filters.professional;
+  const params = {
+    from: filters.from || undefined,
+    to: filters.to || undefined,
+    professionalId,
+  };
+
+  // Aba do quadro do profissional; a de adiantamentos não depende do período.
+  const tab: Tab =
+    searchParams.aba === "adiantamentos" || searchParams.aba === "fechamentos"
+      ? searchParams.aba
+      : "atendimentos";
+
+  const [summary, list, advances, closings, methods] = await Promise.all([
+    getCommissionSummary(params),
+    professionalId
+      ? listCommissions({ ...params, page, limit: PAGE_SIZE })
+      : Promise.resolve(null),
+    professionalId
+      ? listCommissionAdvances({
+          professionalId,
+          from: params.from,
+          to: params.to,
+        })
+      : Promise.resolve(null),
+    professionalId ? listClosings(professionalId) : Promise.resolve(null),
+    // Métodos ativos: pagamento do fechamento e do adiantamento.
+    listPaymentMethods({ isActive: true, page: 1, limit: 100 }),
+  ]);
+  const methodOptions = methods.items.map(({ id, name }) => ({ id, name }));
+  const professionalName =
+    options.find((option) => option.id === professionalId)?.name ?? "";
+
+  // Mantém filtros e período; a página volta à primeira ao trocar de aba.
+  const tabHref = (key: Tab) => {
+    const next = new URLSearchParams(query);
+    if (key !== "atendimentos") next.set("aba", key);
+    return `${COMMISSIONS_PATH}?${next}`;
+  };
+  const tabs = list && advances && closings && (
+    <CommissionTabs
+      active={tab}
+      hrefFor={tabHref}
+      counts={{
+        atendimentos: list.total,
+        adiantamentos: advances.length,
+        fechamentos: closings.length,
+      }}
+    />
+  );
+
+  // relative: os absolutos de dentro (sr-only, dicas dos gráficos) não
+  // esticam a página além da rolagem própria.
+  return (
+    <div className="relative -m-1 flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto p-1">
+      <div className="flex flex-wrap items-start justify-between gap-3">
+        <div className="space-y-1">
+          <h1 className="text-2xl font-semibold">Comissões</h1>
+          <p className="text-sm text-muted-foreground">
+            A comissão de cada profissional pelos atendimentos concluídos, o que
+            já foi adiantado e o que falta pagar.
+          </p>
+        </div>
+        <div className="flex w-full flex-wrap gap-2 max-sm:flex-col-reverse sm:w-auto">
+          {/* Fechar só com um profissional escolhido no filtro. */}
+          {professionalId && (
+            <CloseCommissionButton
+              professional={{ id: professionalId, name: professionalName }}
+              methods={methodOptions}
+              today={today}
+            />
+          )}
+          <LaunchAdvanceButton
+            professionals={options}
+            defaultProfessionalId={professionalId}
+            methods={methodOptions}
+            today={today}
+          />
+        </div>
+      </div>
+      <CommissionsToolbar
+        filters={filters}
+        month={month}
+        professionals={options}
+      />
+      <CommissionsCards summary={summary} />
+      <div className="flex min-h-[28rem] flex-1 flex-col">
+        {closings && tab === "fechamentos" ? (
+          <ClosingList
+            closings={closings}
+            professionalName={professionalName}
+            tabs={tabs}
+          />
+        ) : advances && tab === "adiantamentos" ? (
+          <AdvanceList
+            advances={advances}
+            professionalName={professionalName}
+            tabs={tabs}
+          />
+        ) : list ? (
+          <CommissionList
+            tabs={tabs}
+            items={list.items}
+            timeZone={company.timezone}
+            footer={
+              <TablePagination
+                page={page}
+                limit={PAGE_SIZE}
+                total={list.total}
+                basePath={COMMISSIONS_PATH}
+                query={Object.fromEntries(new URLSearchParams(query))}
+              />
+            }
+          />
+        ) : (
+          <CommissionProfessionalList
+            rows={summary.byProfessional}
+            hrefFor={(id) =>
+              `${COMMISSIONS_PATH}?${commissionsQuery(filters, month, { professional: id })}`
+            }
+          />
+        )}
+      </div>
+    </div>
+  );
+}

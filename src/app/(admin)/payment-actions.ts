@@ -18,10 +18,13 @@ const HALF_DAY_MS = 12 * 60 * 60 * 1000;
  */
 export async function settlePaymentsAction(input: {
   paymentIds: string[];
+  /** Atendimentos recebidos antes da conclusão (comanda). */
+  appointmentIds?: string[];
   paymentMethodId: string;
   paidDate?: string;
 }): Promise<SettlePaymentsResult> {
-  if (input.paymentIds.length === 0) {
+  const appointmentIds = input.appointmentIds ?? [];
+  if (input.paymentIds.length + appointmentIds.length === 0) {
     return { ok: false, message: "Marque ao menos um pagamento." };
   }
   if (!input.paymentMethodId) {
@@ -50,6 +53,7 @@ export async function settlePaymentsAction(input: {
 
     await settlePayments({
       paymentIds: input.paymentIds,
+      ...(appointmentIds.length > 0 && { appointmentIds }),
       paymentMethodId: input.paymentMethodId,
       paidAt,
     });

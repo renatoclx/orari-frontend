@@ -36,6 +36,8 @@ const userTypeLabels: Record<UserType, string> = {
   SUPER_ADMIN: "Super administrador",
   ADMIN: "Administrador",
   USER: "Usuário",
+  // Entra só pelo app (PWA), nunca pelo sistema web.
+  PROFESSIONAL: "Profissional (só app)",
 };
 
 /** "ADMIN" → "Administrador" */
@@ -63,6 +65,14 @@ export function formatPrice(price: string | number): string {
     style: "currency",
     currency: "BRL",
   }).format(Number(price));
+}
+
+/** 0.125 → "12,5%"; 0.5 → "50%" (até uma casa, só quando há). */
+export function formatPercent(rate: number): string {
+  return new Intl.NumberFormat("pt-BR", {
+    style: "percent",
+    maximumFractionDigits: 1,
+  }).format(rate);
 }
 
 /** 60 → "60 minutos"; 1 → "1 minuto" */

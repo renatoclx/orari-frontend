@@ -27,6 +27,8 @@ import {
   HistoryTabs,
   type HistoryTab,
 } from "@/components/people/history/HistoryTabs";
+import { PEOPLE_KINDS } from "@/components/people/people-kinds";
+import { PersonDetailsDialog } from "@/components/people/PersonDetailsDialog";
 import { PortalAccessDialog } from "@/components/portal-access/PortalAccessDialog";
 import { PortalConfirmButton } from "@/components/portal-access/PortalConfirmButton";
 import { PersonAvatar } from "@/components/shared/PersonAvatar";
@@ -317,8 +319,8 @@ export async function ClientHistoryPage({
             </p>
             {unconfirmed && (
               <p className="text-sm text-muted-foreground">
-                Cadastrado pelo app, com o telefone ainda não conferido. Até a
-                confirmação, agenda no máximo 2 horários futuros pelo app.
+                Telefone ainda não conferido. Apenas 02 agendamentos permitidos
+                pelo aplicativo.
               </p>
             )}
           </div>
@@ -340,6 +342,23 @@ export async function ClientHistoryPage({
                 timeZone={timeZone}
               />
             )}
+          {/* Dados cadastrais, com contatos e endereços; também no inativo
+              (é só consulta). O principal vem dos contatos: a rota da
+              pessoa não o traz. */}
+          <PersonDetailsDialog
+            person={{
+              ...client,
+              principalContact: principal
+                ? {
+                    id: principal.id,
+                    type: principal.type,
+                    phone: principal.phone,
+                    email: principal.email,
+                  }
+                : null,
+            }}
+            kind={PEOPLE_KINDS.CLIENT}
+          />
           {/* Inativo: só consulta (a API não altera pessoa inativa). */}
           {client.deletedAt === null && (
             <Button asChild variant="outline">

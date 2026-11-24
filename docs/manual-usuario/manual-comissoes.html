@@ -1,0 +1,163 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<title>Manual de Comissões — Orari</title>
+<link rel="stylesheet" href="manual.css">
+<style>
+  /* Cabeçalho das páginas: o manual.css traz o do manual do administrador. */
+  @page { @top-left { content: "Orari · Manual de Comissões"; } }
+</style>
+</head>
+<body>
+
+<!-- ===== Capa ===== -->
+<section class="cover">
+  <img class="logo" src="assets/logo-white.svg" alt="Orari">
+  <div class="spacer"></div>
+  <div class="bar"></div>
+  <div class="kicker">Manual de Comissões</div>
+  <h1>A comissão da equipe calculada sozinha, com recibo para assinar</h1>
+  <p>Guia para o administrador: configurar a comissão, acompanhar o que cada profissional tem a receber, lançar adiantamentos, fechar o período e imprimir o recibo.</p>
+  <div class="foot">As telas deste manual usam dados fictícios do “Studio Aurora”.</div>
+</section>
+
+<!-- ===== Sumário ===== -->
+<section class="toc">
+  <h2>Sumário</h2>
+  <ol id="toc"></ol>
+  <div class="intro">
+    <b>Como usar este manual.</b> Leia primeiro “Como funciona”: ele explica as palavras que aparecem nas telas (em aberto, adiantamento, fechamento). Depois siga a ordem do dia a dia: configurar, acompanhar, adiantar e fechar. Os quadros azuis trazem dicas; os amarelos, avisos importantes. Os nomes de botões e campos aparecem <span class="ui">assim</span>, como na tela.
+  </div>
+</section>
+
+<!-- ===== 1 ===== -->
+<h1 class="chapter" data-toc="Como funciona"><span class="num"></span>Como funciona</h1>
+<p class="lead">A comissão nasce sozinha, a cada atendimento concluído.</p>
+
+<ol class="steps">
+  <li>Você define a comissão <b>no serviço</b>: um percentual do valor cobrado ou um valor fixo por atendimento.</li>
+  <li>Quando um atendimento desse serviço é <b>concluído</b>, o Orari calcula a comissão do profissional, mesmo que o cliente ainda não tenha pago. Atendimento <b>cancelado</b> não gera comissão.</li>
+  <li>A comissão fica <b>em aberto</b> até o fechamento. Nesse meio-tempo, você pode dar <b>adiantamentos</b> ao profissional.</li>
+  <li>No <b>fechamento</b> (por exemplo, no fim do mês), o Orari soma tudo o que está em aberto até uma data, desconta os adiantamentos e gera o <b>recibo</b> para o profissional assinar.</li>
+</ol>
+
+<h2>Bom saber</h2>
+<ul>
+  <li><b>Só o administrador</b> configura e vê as comissões. O menu fica em <span class="ui">Financeiro</span> &rarr; <span class="ui">Comissões</span> e precisa estar liberado no seu plano.</li>
+  <li><b>Nada retroativo</b>: a comissão vale para os atendimentos concluídos depois que você a configurou.</li>
+  <li><b>Pacote</b>: cada sessão vale o total contratado dividido pelo número de sessões, calculado na contratação.</li>
+  <li><b>O dono que atende</b>: o profissional ligado ao usuário administrador começa <b>sem</b> comissão (ninguém paga comissão a si mesmo).</li>
+  <li>Os adiantamentos e o fechamento viram <b>contas pagas</b> no <span class="ui">Contas a pagar</span>, para a saída de dinheiro aparecer nas despesas (Manual de Contas a pagar).</li>
+</ul>
+
+<!-- ===== 2 ===== -->
+<h1 class="chapter" data-toc="Configurar a comissão"><span class="num"></span>Configurar a comissão</h1>
+<p class="lead">No serviço, o quanto; no profissional, se ele recebe.</p>
+
+<h2>No serviço</h2>
+<ol class="steps">
+  <li>Em <span class="ui">Serviços</span>, clique em <span class="ui">Alterar</span> (lápis) no serviço.</li>
+  <li>Em <span class="ui">Comissão do profissional</span>, escolha <b>Percentual</b> ou <b>Valor fixo</b> e informe o número.</li>
+  <li>Clique em <span class="ui">Salvar alterações</span>.</li>
+</ol>
+<figure class="w55"><img src="images/c01-servico-comissao.png" alt=""><figcaption>Comissão de 40% no serviço Pilates.</figcaption></figure>
+<div class="box warn"><b class="t">Mudar a regra</b><p>A nova regra vale para os atendimentos concluídos daí em diante. As comissões já calculadas não mudam.</p></div>
+
+<h2>No profissional</h2>
+<p>No cadastro do profissional (<span class="ui">Pessoas</span> &rarr; <span class="ui">Profissionais</span> &rarr; <span class="ui">Alterar</span>), a chave <span class="ui">Recebe comissão</span> diz se ele recebe. Desligue para quem não recebe, como o dono que atende. Religar vale para os atendimentos daí em diante.</p>
+<figure><img src="images/c02-profissional-recebe.png" alt=""><figcaption>A chave Recebe comissão, no fim dos dados principais.</figcaption></figure>
+
+<!-- ===== 3 ===== -->
+<h1 class="chapter" data-toc="Acompanhar"><span class="num"></span>Acompanhar</h1>
+<p class="lead">Quanto cada profissional gerou, já recebeu adiantado e tem a receber.</p>
+
+<figure><img src="images/c03-comissoes.png" alt=""><figcaption>Financeiro &rarr; Comissões, com todos os profissionais.</figcaption></figure>
+
+<p>Os quatro cartões do topo:</p>
+<ul>
+  <li><b>Comissão gerada</b>: a comissão dos atendimentos concluídos no período.</li>
+  <li><b>Já pago pelos clientes</b>: quanto desses atendimentos os clientes já pagaram.</li>
+  <li><b>Adiantado</b> e <b>A pagar</b>: o que está <b>em aberto</b> agora, sem depender do período. A pagar = comissão em aberto − adiantado.</li>
+</ul>
+<p>Na tabela <b>Por profissional</b>, o ícone de olho abre os detalhes de um profissional. Ou escolha-o no primeiro filtro.</p>
+
+<h2>Os detalhes de um profissional</h2>
+<figure><img src="images/c04-comissoes-profissional.png" alt=""><figcaption>Comissões de um profissional, aba Atendimentos.</figcaption></figure>
+<ul>
+  <li><b>Atendimentos</b>: cada atendimento com a base, a regra (“40%” ou “R$ 15,00 fixo”), a comissão, se o cliente pagou e a <b>situação</b> (“Em aberto” ou “Fechado nº 0001”).</li>
+  <li><b>Adiantamentos</b>: os do período e todos os que estão em aberto.</li>
+  <li><b>Fechamentos</b>: os fechamentos feitos, com o recibo.</li>
+</ul>
+
+<!-- ===== 4 ===== -->
+<h1 class="chapter" data-toc="Adiantamentos"><span class="num"></span>Adiantamentos</h1>
+<p class="lead">Um vale antes do fechamento, descontado depois.</p>
+
+<ol class="steps">
+  <li>Em <span class="ui">Comissões</span>, clique em <span class="ui">Lançar adiantamento</span>.</li>
+  <li>Escolha o <b>profissional</b> e a <b>data</b> (hoje ou antes, nunca no futuro).</li>
+  <li>Informe o <b>valor</b>. Embaixo aparece o <b>disponível para adiantar</b>: a comissão em aberto menos o que já foi adiantado. O valor não pode passar dele.</li>
+  <li>Escolha o <b>método de pagamento</b> (como o dinheiro saiu: PIX, dinheiro…) e, se quiser, uma observação.</li>
+  <li>Clique em <span class="ui">Lançar</span>.</li>
+</ol>
+<figure class="w55"><img src="images/c05-adiantamento.png" alt=""><figcaption>Lançar adiantamento.</figcaption></figure>
+<p>O adiantamento entra como <b>conta paga</b> no <span class="ui">Contas a pagar</span>, na categoria Comissões.</p>
+
+<figure><img src="images/c09-adiantamentos.png" alt=""><figcaption>Aba Adiantamentos: em aberto ou já fechado.</figcaption></figure>
+<div class="box tip"><b class="t">Lançou errado?</b><p>Enquanto o adiantamento está <b>em aberto</b>, a lixeira da linha o exclui (a conta paga dele sai junto). Depois do fechamento, ele já está no recibo e não pode mais ser excluído.</p></div>
+
+<!-- ===== 5 ===== -->
+<h1 class="chapter" data-toc="Fechar e imprimir o recibo"><span class="num"></span>Fechar e imprimir o recibo</h1>
+<p class="lead">Quitar tudo o que está em aberto até uma data.</p>
+
+<ol class="steps">
+  <li>Escolha o profissional no filtro e clique em <span class="ui">Fechar comissão</span>. (No <span class="ui">Contas a pagar</span>, o bloco “Comissões em aberto” tem o mesmo botão.)</li>
+  <li>Em <span class="ui">Fechar até</span>, escolha a <b>data de corte</b>: entram os atendimentos até o fim desse dia e os adiantamentos com data até ela. O resumo se refaz a cada data: comissões, menos adiantamentos, igual a <b>A pagar</b>.</li>
+  <li>Escolha o <b>método</b> e a <b>data do pagamento</b>.</li>
+  <li>Clique em <span class="ui">Fechar e gerar recibo</span>.</li>
+</ol>
+<div class="row">
+  <figure><img src="images/c06-fechar.png" alt=""><figcaption>Fechar comissão.</figcaption></figure>
+  <figure><img src="images/c07-fechada.png" alt=""><figcaption>Comissão fechada.</figcaption></figure>
+</div>
+<p>Ao terminar, clique em <span class="ui">Imprimir recibo</span>. O recibo abre numa aba nova, pronto para imprimir.</p>
+
+<h2>O recibo</h2>
+<figure class="w70"><img src="images/c10-recibo.png" alt=""><figcaption>Recibo de pagamento de comissão.</figcaption></figure>
+<ul>
+  <li>Traz a empresa, o número do recibo, o valor por extenso, o resumo (comissões, adiantamentos e valor pago) e o <b>detalhamento de cada atendimento</b>.</li>
+  <li>Embaixo, as linhas de local e data e a de <b>assinatura</b> do profissional, com o nome e o CPF (quando cadastrado).</li>
+  <li>O número é sequencial na empresa e não se repete.</li>
+</ul>
+<div class="box tip"><b class="t">Vira conta paga</b><p>O valor pago entra no <span class="ui">Contas a pagar</span> como conta paga (“Comissão nº 0002”), com o profissional como favorecido. Se os adiantamentos cobriram tudo (valor pago zero), nenhuma conta é criada.</p></div>
+
+<!-- ===== 6 ===== -->
+<h1 class="chapter" data-toc="Fechamentos e desfazer"><span class="num"></span>Fechamentos e desfazer</h1>
+<p class="lead">O histórico dos fechamentos e como corrigir um engano.</p>
+
+<figure><img src="images/c08-fechamentos.png" alt=""><figcaption>Aba Fechamentos.</figcaption></figure>
+<ul>
+  <li>Cada fechamento mostra a data de corte, o pagamento, as comissões, o adiantado e o pago. O ícone de impressora abre o recibo de novo, sempre igual ao assinado.</li>
+  <li>Só o <b>último</b> fechamento do profissional pode ser <b>desfeito</b> (ícone de desfazer). O recibo fica marcado como <b>cancelado</b>, o número não volta, e as comissões e os adiantamentos voltam a ficar em aberto.</li>
+  <li>Ao desfazer, a conta paga do fechamento fica <b>cancelada</b> no <span class="ui">Contas a pagar</span>.</li>
+</ul>
+<div class="box warn"><b class="t">Antes de desfazer</b><p>Se o profissional já assinou o recibo, guarde-o: o novo fechamento terá outro número.</p></div>
+
+<!-- ===== 7 ===== -->
+<h1 class="chapter" data-toc="Dúvidas comuns"><span class="num"></span>Dúvidas comuns</h1>
+<p class="lead">Respostas rápidas para as situações mais frequentes.</p>
+
+<h3>Um atendimento concluído não gerou comissão.</h3>
+<p>Confira se o serviço tem comissão, se o profissional está com <span class="ui">Recebe comissão</span> ligado e se o atendimento foi concluído depois disso. A comissão aparece em alguns minutos.</p>
+<h3>O cliente não pagou. O profissional recebe assim mesmo?</h3>
+<p>A comissão nasce na conclusão do atendimento. A coluna “Cliente pagou” e o cartão “Já pago pelos clientes” mostram o que já entrou, para você decidir quando fechar.</p>
+<h3>Não consigo lançar o adiantamento.</h3>
+<p>O valor não pode passar do disponível para adiantar (comissão em aberto − já adiantado), e o método de pagamento é obrigatório.</p>
+<h3>O botão Fechar comissão está desabilitado.</h3>
+<p>Não há nada em aberto até a data de corte escolhida. Escolha uma data mais adiante.</p>
+<h3>Fechei com a data errada.</h3>
+<p>Se é o último fechamento do profissional, desfaça e feche de novo. O recibo desfeito continua consultável, marcado como cancelado.</p>
+
+</body>
+</html>

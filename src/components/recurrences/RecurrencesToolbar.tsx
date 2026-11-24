@@ -41,6 +41,7 @@ export function RecurrencesToolbar({
 
   return (
     <div className="flex flex-wrap items-center gap-3">
+      <label className="font-semibold text-zinc-700">Filtrar por:</label>
       <Select
         value={professionalId}
         onValueChange={(value) => change("professional", value)}

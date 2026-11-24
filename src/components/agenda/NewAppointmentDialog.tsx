@@ -379,7 +379,8 @@ function NewAppointmentForm({
   // Mensagem enquanto não há horários para mostrar.
   const timesHint = (() => {
     if (!professionalId) return "Selecione o profissional.";
-    if (!service) return "Selecione o serviço para ver os horários.";
+    if (!service)
+      return "Os horários serão exibidos de acordo com o serviço selecionado.";
     if (availabilityLoading || !availability) return "Buscando horários…";
     if (starts.length > 0) return null;
 
@@ -474,7 +475,7 @@ function NewAppointmentForm({
             setServiceId(next);
             setErrors((current) => ({ ...current, service: undefined }));
           }}
-          placeholder="Selecione o serviço"
+          placeholder="Selecione o serviço..."
           searchPlaceholder="Buscar serviço…"
           emptyMessage="Nenhum serviço encontrado."
         />
@@ -495,7 +496,7 @@ function NewAppointmentForm({
           }}
         >
           <SelectTrigger id="appointment-professional" className="w-full">
-            <SelectValue placeholder="Selecione o profissional" />
+            <SelectValue placeholder="Selecione o profissional..." />
           </SelectTrigger>
           <SelectContent>
             {professionals.map((item) => (

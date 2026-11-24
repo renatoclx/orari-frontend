@@ -35,6 +35,10 @@ const Toaster = ({ ...props }: ToasterProps) => {
       toastOptions={{
         classNames: {
           toast: "cn-toast",
+          // Botão de ação do toast (ex.: "Abrir"): sem fundo, na cor do texto do
+          // próprio aviso, só com sublinhado.
+          actionButton:
+            "!h-auto !bg-transparent !px-2 !py-1 !font-semibold !text-inherit underline underline-offset-2 hover:opacity-80",
         },
       }}
       {...props}

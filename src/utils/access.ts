@@ -16,3 +16,25 @@ export function canAccess(
     access.features.find((item) => item.feature === feature)?.[action] ?? false
   );
 }
+
+/**
+ * Assinatura em somente leitura (screens/layout.md, "Aviso da assinatura"):
+ * fica só o Visualiza de cada funcionalidade, e a tela esconde o que grava. A
+ * API recusa as gravações de qualquer forma.
+ */
+export function withReadOnlyAccess<
+  T extends Pick<CurrentUser, "access" | "subscription">,
+>(user: T): T {
+  if (!user.subscription?.readOnly || !user.access) return user;
+  return {
+    ...user,
+    access: {
+      features: user.access.features.map((item) => ({
+        ...item,
+        edit: false,
+        create: false,
+        remove: false,
+      })),
+    },
+  };
+}

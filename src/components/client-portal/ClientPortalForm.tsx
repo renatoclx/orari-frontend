@@ -116,11 +116,11 @@ export function ClientPortalForm({
       <div className="min-h-0 flex-1 divide-y divide-border overflow-auto">
         <section className="space-y-3 p-4 md:p-6">
           <div>
-            <h2 className="font-semibold">Situação</h2>
+            <h2 className="font-semibold">Ativação do Portal</h2>
             <p className="text-sm text-muted-foreground">
               Ligado, os clientes veem os horários livres e agendam sozinhos
-              pelo app. Desligado, o app e os links de acesso deixam de
-              funcionar para este estabelecimento.
+              pelo aplicativo. Desligado, as funcionalidades ficam inativas para
+              o estabelecimento.
             </p>
           </div>
           <label className="flex items-center gap-3 text-sm font-medium">

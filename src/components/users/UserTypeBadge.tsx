@@ -7,6 +7,7 @@ const VARIANT = {
   SUPER_ADMIN: "default",
   ADMIN: "secondary",
   USER: "outline",
+  PROFESSIONAL: "outline",
 } as const;
 
 export function UserTypeBadge({ type }: { type: UserType }) {

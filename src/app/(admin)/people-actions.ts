@@ -12,12 +12,20 @@ import {
   type ActionFailure as BaseActionFailure,
 } from "@/lib/action-result";
 import { formText } from "@/lib/form-data";
-import { createAddress, deleteAddress } from "@/services/address.service";
+import { isUuid } from "@/lib/uuid";
+import type { PersistedAddress } from "@/components/people/AddressesField";
+import {
+  createAddress,
+  deleteAddress,
+  listAddresses,
+} from "@/services/address.service";
 import {
   createContact,
   deleteContact,
+  listContacts,
   updateContact,
 } from "@/services/contact.service";
+import { getCity, listStates } from "@/services/location.service";
 import {
   createPerson,
   deletePerson,
@@ -28,12 +36,13 @@ import {
 } from "@/services/people.service";
 import type {
   AddressType,
+  ContactRecord,
   ContactType,
   NewAddressInput,
   NewContactInput,
   PeopleType,
 } from "@/types/people";
-import { onlyDigits } from "@/utils/masks";
+import { onlyDigits, phoneDigits } from "@/utils/masks";
 
 /** Campos do formulário de pessoa a que um erro pode se referir. */
 export type PersonField = keyof PersonFormValues;
@@ -75,6 +84,21 @@ const INVALID_TYPE: ActionFailure = {
   message: "Tipo de cadastro inválido.",
 };
 
+// "Recebe comissão" só vem no formulário do profissional aberto pelo ADMIN
+// (campo de controle); sem ele, nada é enviado e a chave gravada não muda.
+// Categoria principal: só no formulário do fornecedor aberto pelo ADMIN (campo
+// de controle); "Sem categoria" vira null, que é como a API a tira.
+const categoryOf = (data: FormData) => {
+  if (data.get("expenseCategoryEnabled") !== "1") return {};
+  const value = formText(data, "expenseCategoryId");
+  return { expenseCategoryId: isUuid(value) ? value : null };
+};
+
+const commissionOf = (data: FormData) =>
+  data.get("commissionEnabled") === "1"
+    ? { receivesCommission: data.get("receivesCommission") === "on" }
+    : {};
+
 /**
  * Cadastro completo da pessoa (cliente, funcionário ou profissional). O formulário entra como FormData (os campos,
  * mais as listas de contatos e endereços em JSON e a foto, se houver). Valida
@@ -95,7 +119,10 @@ export async function createPersonAction(
     document: formText(data, "document"),
   };
 
-  const errors = validatePersonForm(values);
+  const errors = validatePersonForm(values, {
+    // Fornecedor pode ser empresa: aceita CNPJ.
+    allowCnpj: type === "SUPPLIER",
+  });
   const invalid = (Object.keys(errors) as PersonField[]).find(
     (field) => errors[field],
   );
@@ -106,7 +133,7 @@ export async function createPersonAction(
   const contactType = formText(data, "contactType") as ContactType;
   const mainContact: NewContactInput = {
     type: CONTACT_TYPES.includes(contactType) ? contactType : "MAIN",
-    phone: onlyDigits(values.phone),
+    phone: phoneDigits(values.phone),
     ...(values.email && { email: values.email }),
     isPrincipal: true,
   };
@@ -117,7 +144,7 @@ export async function createPersonAction(
     type: CONTACT_TYPES.includes(item.type as ContactType)
       ? (item.type as ContactType)
       : "MAIN",
-    phone: onlyDigits(asString(item.phone)),
+    phone: phoneDigits(asString(item.phone)),
     isPrincipal: false,
   }));
 
@@ -154,6 +181,8 @@ export async function createPersonAction(
       ...(birthDate && { birthDate }),
       ...(profession && { profession }),
       ...(note && { note }),
+      ...commissionOf(data),
+      ...categoryOf(data),
       contacts: [mainContact, ...extraContacts],
       ...(addresses.length > 0 && { addresses }),
     });
@@ -196,7 +225,7 @@ export async function quickCreateClientAction(
     await createPerson({
       name: name.trim(),
       type: "CLIENT",
-      phone: onlyDigits(phone),
+      phone: phoneDigits(phone),
     });
   } catch (error) {
     return failureFrom(error);
@@ -271,7 +300,10 @@ export async function updatePersonAction(
     document: formText(data, "document"),
   };
 
-  const errors = validatePersonForm(values);
+  const errors = validatePersonForm(values, {
+    // Fornecedor pode ser empresa: aceita CNPJ.
+    allowCnpj: type === "SUPPLIER",
+  });
   const invalid = (Object.keys(errors) as PersonField[]).find(
     (field) => errors[field],
   );
@@ -287,6 +319,8 @@ export async function updatePersonAction(
       birthDate: formText(data, "birthDate") || null,
       profession: formText(data, "profession") || null,
       note: formText(data, "note") || null,
+      ...commissionOf(data),
+      ...categoryOf(data),
     });
   } catch (error) {
     return failureFrom(error, "document" as const);
@@ -303,13 +337,13 @@ export async function updatePersonAction(
     if (mainContactId) {
       await updateContact(mainContactId, {
         type: type_,
-        phone: onlyDigits(values.phone),
+        phone: phoneDigits(values.phone),
         email: values.email || null,
       });
     } else {
       await createContact(id, {
         type: type_,
-        phone: onlyDigits(values.phone),
+        phone: phoneDigits(values.phone),
         ...(values.email && { email: values.email }),
         isPrincipal: true,
       });
@@ -348,7 +382,7 @@ export async function addContactAction(
   try {
     await createContact(personId, {
       type: CONTACT_TYPES.includes(contact.type) ? contact.type : "MAIN",
-      phone: onlyDigits(contact.phone),
+      phone: phoneDigits(contact.phone),
       isPrincipal: false,
     });
   } catch (error) {
@@ -421,4 +455,53 @@ export async function deleteAddressAction(
 
   revalidatePerson(type, personId);
   return { ok: true };
+}
+
+/**
+ * Contatos e endereços de uma pessoa, para o Visualizar do histórico do
+ * cliente (screens/pessoas.md). A API devolve só o código da cidade: o nome e
+ * a UF são resolvidos aqui, como na tela de alteração.
+ */
+export async function getPersonContactsAction(id: string): Promise<
+  | {
+      ok: true;
+      contacts: ContactRecord[];
+      addresses: PersistedAddress[];
+    }
+  | BaseActionFailure
+> {
+  if (!isUuid(id)) return { ok: false, message: "Pessoa inválida." };
+  try {
+    const [contacts, addresses, states] = await Promise.all([
+      listContacts(id),
+      listAddresses(id),
+      listStates(),
+    ]);
+    const cityIds = [...new Set(addresses.map((address) => address.cityId))];
+    const cities = new Map(
+      await Promise.all(
+        cityIds.map(async (cityId) => [cityId, await getCity(cityId)] as const),
+      ),
+    );
+    const acronyms = new Map(states.map((state) => [state.id, state.acronym]));
+    return {
+      ok: true,
+      // O principal primeiro.
+      contacts: [...contacts].sort(
+        (a, b) => Number(b.isPrincipal) - Number(a.isPrincipal),
+      ),
+      addresses: addresses
+        .map((address) => {
+          const city = cities.get(address.cityId);
+          return {
+            ...address,
+            cityName: city?.name ?? "",
+            stateAcronym: (city && acronyms.get(city.stateId)) ?? "",
+          };
+        })
+        .sort((a, b) => Number(b.isPrincipal) - Number(a.isPrincipal)),
+    };
+  } catch (error) {
+    return failureFrom(error);
+  }
 }

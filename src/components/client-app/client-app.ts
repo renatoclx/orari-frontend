@@ -19,6 +19,24 @@ export function phoneError(value: string): string | undefined {
     : "Informe o telefone com DDD (10 ou 11 dígitos).";
 }
 
+const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+/** Com "@" o login é um e-mail (só o profissional tem); sem, um telefone. */
+export function isEmailLogin(value: string): boolean {
+  return value.includes("@");
+}
+
+/** Telefone com DDD ou e-mail, como o formulário de entrar aceita. */
+export function loginError(value: string): string | undefined {
+  if (!value.trim()) return "Informe o telefone ou o e-mail.";
+  if (isEmailLogin(value)) {
+    return EMAIL_PATTERN.test(value.trim())
+      ? undefined
+      : "Informe um e-mail válido.";
+  }
+  return phoneError(value);
+}
+
 /** Senha nova e a confirmação, com a mesma regra dos usuários (8 a 72). */
 export function newPasswordErrors(
   password: string,

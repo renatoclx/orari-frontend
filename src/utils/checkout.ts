@@ -1,4 +1,4 @@
-import type { CheckoutItem } from "@/types/payment";
+import type { CheckoutAppointment, CheckoutItem } from "@/types/payment";
 
 /**
  * Situação de uma comanda na listagem:
@@ -16,7 +16,7 @@ export type CheckoutState = "open" | "awaiting" | "paid" | "package";
  * só do frontend: a API não devolve um status por comanda.
  */
 export function checkoutState(checkout: CheckoutItem): CheckoutState {
-  const { appointments, previousPayments } = checkout;
+  const { appointments, previousPayments, productSales } = checkout;
 
   if (Number(checkout.todayPending) + Number(checkout.previousPending) > 0) {
     return "open";
@@ -26,7 +26,9 @@ export function checkoutState(checkout: CheckoutItem): CheckoutState {
   // Comanda sem nada (não deveria existir) também cai aqui: neutra, sem botão
   // de receber, e nunca "Paga".
   const awaiting =
-    appointments.length === 0 && previousPayments.length === 0
+    appointments.length === 0 &&
+    previousPayments.length === 0 &&
+    productSales.length === 0
       ? true
       : appointments.some(
           (appointment) =>
@@ -35,10 +37,33 @@ export function checkoutState(checkout: CheckoutItem): CheckoutState {
   if (awaiting) return "awaiting";
 
   const hasPaid =
-    appointments.some((appointment) => appointment.payment?.status === "PAID") ||
-    previousPayments.some((payment) => payment.status === "PAID");
+    appointments.some(
+      (appointment) => appointment.payment?.status === "PAID",
+    ) ||
+    previousPayments.some((payment) => payment.status === "PAID") ||
+    productSales.some((sale) => sale.payment?.status === "PAID");
   if (hasPaid) return "paid";
 
   // Sobrou só sessão de pacote.
   return "package";
+}
+
+/**
+ * Atendimento que dá para receber antes da conclusão: avulso ainda sem
+ * pagamento e com preço no serviço (é o valor cobrado). A API confere de novo.
+ */
+export function receivableAhead(appointment: CheckoutAppointment): boolean {
+  return (
+    appointment.payment === null &&
+    appointment.clientPlanId === null &&
+    appointment.service.price !== null
+  );
+}
+
+/** A comanda tem o que receber: pendência ou atendimento a receber antes. */
+export function canReceive(checkout: CheckoutItem): boolean {
+  return (
+    checkoutState(checkout) === "open" ||
+    checkout.appointments.some(receivableAhead)
+  );
 }

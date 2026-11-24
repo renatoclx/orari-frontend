@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { Hint } from "@/components/shared/Hint";
 import { useActionState, useState } from "react";
 import {
@@ -117,6 +118,25 @@ export function LoginForm() {
         <LogIn aria-hidden="true" />
         {pending ? "Entrando…" : "Entrar"}
       </Button>
+      {/* Logo abaixo do Entrar: quem errou a senha encontra a saída ali. */}
+      <p className="text-center">
+        <Link
+          href="/esqueci-senha"
+          className="text-sm font-medium text-primary hover:underline"
+        >
+          Esqueci minha senha
+        </Link>
+      </p>
+      {/* Quem ainda não tem conta: o cadastro sozinho (screens/cadastro.md). */}
+      <p className="text-center text-sm text-muted-foreground">
+        Ainda não usa o Orari?{" "}
+        <Link
+          href="/cadastro"
+          className="font-medium text-primary hover:underline"
+        >
+          Teste grátis por 7 dias
+        </Link>
+      </p>
     </form>
   );
 }

@@ -4,7 +4,10 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
   Building2,
+  CreditCard,
+  HandCoins,
   CalendarDays,
+  ChartColumn,
   ChevronDown,
   CircleHelp,
   ClipboardList,
@@ -14,12 +17,14 @@ import {
   PanelLeftClose,
   PanelLeftOpen,
   Repeat,
+  ShoppingBag,
   Smartphone,
   Users,
   UsersRound,
   Wallet,
   X,
   type LucideIcon,
+  LayoutDashboard,
 } from "lucide-react";
 import { Logo } from "@/components/layout/Logo";
 import { filterMenuByAccess } from "@/components/layout/menu-access";
@@ -90,6 +95,11 @@ const navItems: (NavLink | NavGroup)[] = [
         label: "Profissionais",
         feature: "professionals",
       },
+      {
+        href: "/fornecedores",
+        label: "Fornecedores",
+        feature: "suppliers",
+      },
       { href: "/usuarios", label: "Usuários", feature: "users" },
     ],
   },
@@ -116,7 +126,7 @@ const navItems: (NavLink | NavGroup)[] = [
     icon: Wallet,
     children: [
       { href: "/financeiro/comandas", label: "Comandas", feature: "tabs" },
-      { href: "/financeiro", label: "Pagamentos", feature: "payments" },
+      { href: "/financeiro", label: "Contas a receber", feature: "payments" },
       {
         href: "/financeiro/metodos-de-pagamento",
         label: "Métodos de pagamento",
@@ -162,13 +172,31 @@ const classGroupsLink: NavLink = {
   feature: "class-groups",
 };
 
-// Portal do cliente (screens/portal-do-cliente.md): só o ADMIN; o item fica
-// por último, logo antes da Ajuda.
-const clientPortalLink: NavLink = {
-  href: "/portal-do-cliente",
+// Produtos (screens/produtos.md): só o ADMIN; o grupo entra logo depois de
+// Serviços, o outro catálogo do que a clínica vende.
+const productsGroup: NavGroup = {
+  label: "Produtos",
+  icon: ShoppingBag,
+  children: [
+    { href: "/produtos", label: "Produtos", feature: "products" },
+    {
+      href: "/produtos/categorias",
+      label: "Categorias",
+      feature: "product-categories",
+    },
+  ],
+};
+
+// Portal do cliente (screens/portal-do-cliente.md): só o ADMIN; o grupo fica
+// por último, logo antes da Ajuda. "Portal" é a tela das regras do app do cliente;
+// "Avisos no celular" (screens/notificacoes.md) não depende de plano.
+const clientPortalGroup: NavGroup = {
   label: "Portal do cliente",
   icon: Smartphone,
-  feature: "client-portal",
+  children: [
+    { href: "/portal-do-cliente", label: "Portal", feature: "client-portal" },
+    { href: "/avisos-no-celular", label: "Avisos no celular" },
+  ],
 };
 
 // Mensagens (screens/mensagens.md): só o ADMIN, com Mensagens no plano; logo
@@ -177,13 +205,88 @@ const messagesGroup: NavGroup = {
   label: "Mensagens",
   icon: MessageSquareText,
   children: [
+    { href: "/mensagens/clientes", label: "Ao cliente", feature: "messages" },
     {
-      href: "/mensagens/automaticas",
-      label: "Automáticas",
+      href: "/mensagens/profissionais",
+      label: "Ao profissional",
+      feature: "messages",
+    },
+    {
+      href: "/mensagens/administradores",
+      label: "Ao administrador",
       feature: "messages",
     },
     { href: "/mensagens/enviar", label: "Enviar", feature: "messages" },
   ],
+};
+
+// Relatórios (screens/carteira-clientes.md): só o ADMIN; o grupo recebe os
+// próximos relatórios. Fica depois do Financeiro.
+const reportsGroup: NavGroup = {
+  label: "Relatórios",
+  icon: ChartColumn,
+  children: [
+    {
+      href: "/relatorios/carteira-clientes",
+      label: "Carteira de clientes",
+      feature: "client-portfolio",
+    },
+    {
+      href: "/relatorios/analise-de-recebiveis",
+      label: "Análise de recebíveis",
+      feature: "receivables",
+    },
+    {
+      href: "/relatorios/agendamentos",
+      label: "Agendamentos",
+      feature: "appointments-report",
+    },
+    {
+      href: "/relatorios/rankings",
+      label: "Rankings",
+      feature: "rankings",
+    },
+    {
+      href: "/relatorios/financeiro",
+      label: "Financeiro",
+      feature: "financial-report",
+    },
+    {
+      href: "/relatorios/pacotes",
+      label: "Pacotes",
+      feature: "packages-report",
+    },
+    {
+      href: "/relatorios/perfil-do-cliente",
+      label: "Perfil do cliente",
+      feature: "clients-report",
+    },
+  ],
+};
+
+// Comissões (screens/comissoes.md) e Categorias de despesa (contas a pagar):
+// só o ADMIN, no fim do grupo Financeiro.
+const payablesItem = {
+  href: "/financeiro/contas-a-pagar",
+  label: "Contas a pagar",
+  feature: "payables",
+};
+const adminFinanceItems = [
+  { href: "/financeiro/comissoes", label: "Comissões", feature: "commissions" },
+  {
+    href: "/financeiro/categorias-de-despesa",
+    label: "Categorias de despesa",
+    feature: "expense-categories",
+  },
+];
+
+// Dashboard (screens/dashboard.md): só o ADMIN, no topo do menu. A página
+// inicial continua sendo a agenda.
+const dashboardLink: NavLink = {
+  href: "/dashboard",
+  label: "Dashboard",
+  icon: LayoutDashboard,
+  feature: "dashboard",
 };
 
 // Ajuda (screens/ajuda.md): os manuais em PDF. Por enquanto só para o ADMIN;
@@ -197,7 +300,12 @@ const helpLink: NavLink = {
 // Só o SUPER_ADMIN gerencia empresas (screens/empresas.md): o item entra no fim do
 // menu e some para os demais perfis.
 const superAdminItems: NavLink[] = [
+  { href: "/painel", label: "Painel", icon: LayoutDashboard },
   { href: "/empresas", label: "Empresas", icon: Building2 },
+  { href: "/assinaturas", label: "Assinaturas", icon: CreditCard },
+  { href: "/cobrancas", label: "Cobranças", icon: HandCoins },
+  // Ajuda com o manual da plataforma (screens/ajuda.md).
+  helpLink,
 ];
 
 // Botões de ícone da sidebar (recolher, fechar no celular).
@@ -330,7 +438,7 @@ function isActivePath(pathname: string, href: string): boolean {
 }
 
 // Subitem ativo de um grupo: o de caminho mais específico (em
-// /financeiro/metodos-de-pagamento, "Métodos de pagamento", não "Pagamentos").
+// /financeiro/metodos-de-pagamento, "Métodos de pagamento", não "Contas a receber").
 function activeChildHref(
   pathname: string,
   children: { href: string }[],
@@ -360,17 +468,33 @@ function SidebarNav({
   const services = navItems.findIndex(
     (entry) => "href" in entry && entry.href === "/servicos",
   );
+  // Comissões (remuneração) e o que é das contas a pagar entram no grupo
+  // Financeiro só para o ADMIN.
+  const withCommissions = navItems.map((entry) => {
+    if (!isAdmin || !("children" in entry) || entry.label !== "Financeiro") {
+      return entry;
+    }
+    // Contas a pagar logo abaixo de Contas a receber; o resto no fim.
+    const receivables = entry.children.findIndex(
+      (child) => child.href === "/financeiro",
+    );
+    const children = [...entry.children];
+    children.splice(receivables + 1, 0, payablesItem);
+    return { ...entry, children: [...children, ...adminFinanceItems] };
+  });
   const items = filterMenuByAccess(
     [
-      ...navItems.slice(0, services + 1),
-      ...(isAdmin ? [classGroupsLink] : []),
-      ...navItems.slice(services + 1),
+      ...(isAdmin ? [dashboardLink] : []),
+      ...withCommissions.slice(0, services + 1),
+      ...(isAdmin ? [productsGroup, classGroupsLink] : []),
+      ...withCommissions.slice(services + 1),
+      ...(isAdmin ? [reportsGroup] : []),
       ...(isAdmin
         ? [anamnesisGroup]
         : canAccessAnamnesis
           ? [clientRecordsLink]
           : []),
-      ...(isAdmin ? [clientPortalLink, messagesGroup, helpLink] : []),
+      ...(isAdmin ? [clientPortalGroup, messagesGroup, helpLink] : []),
       ...(isSuperAdmin ? superAdminItems : []),
     ],
     access,

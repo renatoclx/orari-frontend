@@ -12,6 +12,8 @@ export type UserFormValues = {
   linkType: LinkedPersonType | "";
   /** Pessoa escolhida (só vale com `linkType`). */
   peopleId: string;
+  /** Login do usuário só de app no aplicativo (só vale no tipo PROFESSIONAL). */
+  phone: string;
 };
 
 /**
@@ -29,12 +31,13 @@ export const userFieldOrder: (keyof UserFormValues)[] = [
   "email",
   "type",
   "peopleId",
+  "phone",
   "password",
   "passwordConfirmation",
 ];
 
 // Tipos que existem no backend (enum UserType).
-const USER_TYPES: UserType[] = ["SUPER_ADMIN", "ADMIN", "USER"];
+const USER_TYPES: UserType[] = ["SUPER_ADMIN", "ADMIN", "USER", "PROFESSIONAL"];
 
 // Regras de senha do backend (is-user-password.decorator.ts): de 8 a 72. O
 // limite de 72 é em bytes, porque o bcrypt só considera os primeiros 72 bytes;
@@ -72,11 +75,13 @@ function validateIdentity(
 
 /**
  * O vínculo só vale com uma função escolhida; o SUPER_ADMIN não se vincula (a
- * tela esconde a opção), então nada a conferir nele.
+ * tela esconde a opção), então nada a conferir nele. O usuário só de app
+ * (PROFESSIONAL) sempre se vincula, e só a um profissional.
  */
 export function linkApplies(
   values: Pick<UserFormValues, "type" | "linkType">,
 ): boolean {
+  if (values.type === "PROFESSIONAL") return true;
   return values.linkType !== "" && values.type !== "SUPER_ADMIN";
 }
 
@@ -84,13 +89,33 @@ export function linkApplies(
 function validateLink(
   values: Pick<UserFormValues, "type" | "linkType" | "peopleId">,
 ): UserFormErrors {
-  if (!linkApplies(values) || values.peopleId) return {};
+  if (!linkApplies(values)) return {};
+  // Só de app: funcionário não vale (a API também recusa).
+  if (values.type === "PROFESSIONAL" && values.linkType !== "PROFESSIONAL") {
+    return { peopleId: "Selecione o profissional." };
+  }
+  if (values.peopleId) return {};
   return {
     peopleId:
       values.linkType === "EMPLOYEE"
         ? "Selecione o funcionário."
         : "Selecione o profissional.",
   };
+}
+
+/** Telefone com DDD (10 ou 11 dígitos), como a API aceita. */
+const PHONE_DIGITS = /^\d{10,11}$/;
+
+/** O telefone de acesso só existe no usuário só de app, e lá é obrigatório. */
+function validatePhone(
+  values: Pick<UserFormValues, "type" | "phone">,
+): UserFormErrors {
+  if (values.type !== "PROFESSIONAL") return {};
+  const digits = values.phone.replace(/\D/g, "");
+  if (!digits) return { phone: "Informe o telefone de acesso ao app." };
+  return PHONE_DIGITS.test(digits)
+    ? {}
+    : { phone: "Informe o telefone com DDD (10 ou 11 dígitos)." };
 }
 
 /**
@@ -126,6 +151,7 @@ export function validateUserForm(values: UserFormValues): UserFormErrors {
   return {
     ...validateIdentity(values),
     ...validateLink(values),
+    ...validatePhone(values),
     ...validatePassword(values.password, values.passwordConfirmation),
   };
 }
@@ -134,8 +160,12 @@ export function validateUserForm(values: UserFormValues): UserFormErrors {
 export function validateUpdateUserForm(
   values: Pick<
     UserFormValues,
-    "name" | "email" | "type" | "linkType" | "peopleId"
+    "name" | "email" | "type" | "linkType" | "peopleId" | "phone"
   >,
 ): UserFormErrors {
-  return { ...validateIdentity(values), ...validateLink(values) };
+  return {
+    ...validateIdentity(values),
+    ...validateLink(values),
+    ...validatePhone(values),
+  };
 }

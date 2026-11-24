@@ -47,10 +47,9 @@ export function PortalConfirmButton({
         title="Confirmar cliente"
         description={
           <>
-            O cadastro de {clientName} foi feito pelo app, e o telefone ainda
-            não foi conferido. Confirme só se você sabe quem é. Depois da
-            confirmação, o cliente agenda pelo app sem o limite de 2
-            agendamentos futuros.
+            O cadastro de {clientName} foi realizado pelo aplicativo. Após a
+            confirmação, o cliente poderá realizar mais de 02 agendamentos
+            futuros.
           </>
         }
         confirmLabel="Confirmar"

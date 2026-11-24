@@ -70,7 +70,9 @@ describe("visibleAppointments", () => {
   it("turma de outro profissional não esconde o cancelado", () => {
     const cancelled = single("a", { status: "CANCELLED" });
     const other = { ...turma(0), professionalId: "p2" };
-    expect(visibleAppointments([cancelled], [other], "p1")).toEqual([cancelled]);
+    expect(visibleAppointments([cancelled], [other], "p1")).toEqual([
+      cancelled,
+    ]);
   });
 
   it("ativo sempre aparece, mesmo sobre turma", () => {

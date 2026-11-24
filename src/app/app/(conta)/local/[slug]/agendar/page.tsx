@@ -19,8 +19,10 @@ export const metadata: Metadata = { title: "Agendar" };
  */
 export default async function BookingPage({
   params,
+  searchParams,
 }: PageProps<"/app/local/[slug]/agendar">) {
   const { slug } = await params;
+  const { servico } = await searchParams;
   const here = `/app/local/${slug}/agendar`;
   if (!(await getAppToken())) {
     redirect(`/app/entrar?voltar=${encodeURIComponent(here)}`);
@@ -57,6 +59,9 @@ export default async function BookingPage({
         <BookingFlow
           slug={slug}
           services={services}
+          // Vindo da lista de serviços da página do local: já vem escolhido
+          // (um id que não existe é ignorado).
+          initialServiceId={typeof servico === "string" ? servico : undefined}
           today={toDateString(new Date(), place.timezone)}
           maxDaysAhead={place.rules.maxDaysAhead}
         />

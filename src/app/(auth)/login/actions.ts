@@ -51,6 +51,8 @@ export async function login(
   const clientIp = clientIpFrom((await headers()).get(FORWARDED_FOR_HEADER));
 
   try {
+    // O profissional (só app) não entra pelo sistema web: a própria API recusa
+    // (403, com a mensagem que aparece abaixo) e nenhum token é emitido.
     const tokens = await authService.login(email, password, clientIp);
     await setSession(tokens);
   } catch (error) {

@@ -8,12 +8,13 @@ App que o **cliente** usa para agendar nos seus estabelecimentos (rota `/app`). 
 
 ### Entrar (`/app/entrar`)
 
-- **Telefone** (com máscara) e **Senha**; botão **Entrar**.
-- Erro: "Telefone ou senha incorretos." (a mesma mensagem com ou sem conta).
+- **Telefone ou e-mail** e **Senha**; botão **Entrar**. A máscara de telefone vale enquanto só houver números; com letra ou `@` o campo vira texto livre. O **e-mail é só do profissional**; o cliente entra pelo telefone.
+- Erro: "Telefone, e-mail ou senha incorretos." (a mesma mensagem com ou sem conta).
 - `?voltar=<caminho do app>` (vindo da página de um estabelecimento): depois de entrar, volta para ela; o link Criar conta leva o mesmo `voltar`. Só caminhos de `/app/` são aceitos.
 - Link **Criar conta** e a dica: "Esqueceu a senha? Peça ao estabelecimento um novo link de acesso: com ele, você cria uma senha nova."
 - Avisos: "Sua sessão terminou. Entre de novo." (`?expirou=1`) e "Você saiu do app." (`?saiu=1`).
 - Já entrado: vai para o Início.
+- **Login único:** o mesmo formulário serve ao profissional. A Server Action tenta primeiro o telefone como profissional, depois como cliente; a mensagem de erro é a mesma nos dois casos. Se a mesma pessoa for profissional e cliente com a mesma senha, entra como profissional. Veja [app-profissional.md](app-profissional.md).
 
 ### Criar conta (`/app/criar-conta`)
 
@@ -36,15 +37,17 @@ O link que a clínica gera (lista de Clientes, ícone de QR code; `pessoas.md`).
 
 Barra de navegação embaixo, do app inteiro: **Início**, **Buscar** (marcada também na página de um estabelecimento), **Agendamentos** e **Menu** (marcada também nas telas abertas por ele). Com aviso não lido, um ponto ciano na aba Menu (some na tela Avisos).
 
-Mensagens de confirmação (faixa ciano) somem sozinhas em 5 segundos; as de erro ficam até o cliente corrigir. Exceção: "Pronto, você agora é cliente de…", que explica o limite de agendamentos e fica na tela.
+**Toaster do app, no rodapé** (logo acima da barra de abas; o toaster da clínica não aparece no `/app`): as confirmações (Agendamento confirmado, Conta criada, Senha trocada, Dados salvos, Você saiu do app, Sua sessão terminou, Avisos ativados, resultado do Testar) e a **notificação nova com o app aberto**, com **Abrir**. Cliente: a caixa de Avisos; profissional: o destino da notificação (e agendamento novo atualiza a agenda aberta). O app confere a cada 15 s. Os erros ficam na tela, até o cliente corrigir, e "Pronto, você agora é cliente de…", que explica o limite de agendamentos, também.
 
 ### Início (`/app`)
 
 - "Olá <primeiro nome>" (o nome em azul) e a data ("Quinta, 5 nov 2026").
-- **Próximo agendamento**: o mais próximo de todos os estabelecimentos (serviço; "Qui, 12/11 às 08:00 · profissional", no relógio da clínica; estabelecimento). Sem nenhum: "Nenhum agendamento marcado."
+- **Busca**, logo abaixo da saudação: "Encontre um estabelecimento", com cara de campo; leva à aba Buscar.
+- **Card do agendamento** (logo do local, nome, serviço, "Qui, 12/11 às 08:00, com profissional" no relógio da clínica): o **Próximo agendamento** (o mais próximo de todos os estabelecimentos; a seta leva a Agendamentos); sem nenhum marcado, o **Último agendamento** (sem os cancelados; tocar abre a página do local), com **Agendar de novo** numa linha própria. Sem agendamento nenhum, o card não aparece.
 - **Convite para os avisos** (com os avisos ligados no servidor), enquanto não estão ativados neste aparelho: "Receba lembretes dos seus horários", "Ative os avisos e saiba antes de cada agendamento." e **Ativar avisos** (ativado: "Avisos ativados. Você vai receber os lembretes dos seus horários."). No iPhone pelo Safari: "No iPhone, os avisos chegam pelo app instalado na tela de início." e **Ver como instalar** (leva a Avisos). O **X** fecha o convite neste aparelho; com os avisos bloqueados, não aparece.
 - Depois de agendar (`?agendado=1`): "Agendamento confirmado. Ele aparece abaixo, em Próximo agendamento."
-- **Meus locais**: logo (ou iniciais) e nome (tocar abre a página do estabelecimento) e o botão **Agendar**, que vai direto para a tela de agendar. Sem nenhum: "Você ainda não tem estabelecimentos. Encontre um em Buscar ou peça o link de acesso ao seu estabelecimento."
+- **Dicas do app** (carrossel): quatro banners do Orari, sem fotos (gradiente na cor do app e um ícone), cada um levando à tela dele: Buscar, Avisos, Pacotes e Recorrências. Troca pelo arrasto ou pelos pontos, sem passar sozinho. Baixas o bastante para o Início caber numa tela do iPhone.
+- **Últimos acessos**: os locais da conta em linha, com o logo (ou as iniciais) num anel ciano e o nome embaixo. Primeiro os locais com agendamento marcado (o mais próximo antes), depois os demais, do último atendimento para o mais antigo; os sem agendamento no fim (cancelados não contam). Sempre aparecem três locais e meio, a pista de que a lista rola; tocar abre a página do estabelecimento. Sem nenhum: "Você ainda não tem estabelecimentos. Encontre um em Buscar ou peça o link de acesso ao seu estabelecimento."
 
 ### Buscar (`/app/buscar`)
 
@@ -55,10 +58,10 @@ Mensagens de confirmação (faixa ciano) somem sozinhas em 5 segundos; as de err
 ### Página do estabelecimento (`/app/local/<subdomínio>`)
 
 - É o **Endereço no app** que a clínica divulga: abre **com ou sem** a conta.
-- Topo: logo (ou iniciais), nome e "segmento · cidade". Embaixo, os **Serviços** que aparecem no app (com profissional ligado): nome, duração, preço e descrição.
+- Topo: logo (ou iniciais), nome e "segmento · cidade". Embaixo, os **Serviços** que aparecem no app (com profissional ligado): nome, duração, preço e descrição, em **cartões separados** (um por serviço, com espaço entre eles). **Para o cliente do local**, cada linha é um link para o Agendar com o serviço já escolhido (`?servico=`), com **seta** à direita e a dica "Toque em um serviço para agendar."; **para quem ainda não é cliente** (ou sem conta), as linhas são só informação, sem seta e sem toque.
 - **Sem a conta:** "Entre ou crie sua conta para agendar aqui." e os botões **Entrar** e **Criar conta** (voltam para esta página).
 - **Com a conta, sem ser cliente:** "Você ainda não é cliente daqui. Ao entrar, o estabelecimento recebe o seu nome e telefone." e **Entrar neste estabelecimento**: cria um cadastro novo na clínica, **não confirmado** (até 2 agendamentos futuros até a clínica confirmar; `pessoas.md`). Depois: "Pronto, você agora é cliente de …".
-- **Já cliente:** o botão **Agendar** (se há serviços no app) e a vitrine.
+- **Já cliente:** sem botão Agendar; o título da lista passa a ser **"Escolha um serviço para agendar"**, e tocar no serviço abre o Agendar com ele escolhido.
 - Erro ao montar uma tela (ex.: a API fora do ar): "Não foi possível abrir esta tela", escura, com **Tentar de novo**.
 - Estabelecimento inexistente, com o portal desligado ou fora do plano: a página "Não encontramos esta página", escura e com o botão **Buscar estabelecimentos** (vale para qualquer endereço do app que não existe).
 
@@ -120,11 +123,11 @@ Mensagens de confirmação (faixa ciano) somem sozinhas em 5 segundos; as de err
 - Só para quem já é cliente do estabelecimento: sem a conta, vai a Entrar e volta; sem ser cliente, volta à página do estabelecimento.
 - Topo: "‹ <estabelecimento>" (volta à página dele) e o título **Agendar**.
 - Uma página só, que se completa conforme as escolhas (mudar uma apaga as que dependem dela):
-  1. **Serviço**: cartões com nome, duração e preço.
+  1. **Escolha o serviço**: cartões separados, um por serviço (nome, duração, preço e uma **seta** à direita, que mostra que dá para tocar). O escolhido ganha o visto e um fundo suave com uma faixa à esquerda, sem virar um bloco cheio. Vindo da página do local (`?servico=<id>`), o serviço já vem escolhido e a lista **nem aparece**: a tela abre com o serviço num cartão ("1 · Serviço", com **Trocar**) e já nos passos seguintes; um id que não existe é ignorado e a lista aparece. Escolher na lista também a fecha no cartão, e **Trocar** a abre de novo. Os passos têm número (1 · serviço, 2 · profissional, 3 · dia, 4 · horário).
   2. **Profissional**: quem atende o serviço; com um só, já vem escolhido.
   3. **Dia**: faixa que rola de lado (dia da semana, número e mês), de hoje até os **dias à frente** da clínica (no máximo 60). Começa em hoje.
   4. **Horário · <dia por extenso>**: os horários livres do dia, calculados no servidor com as regras da clínica (antecedência, janelas, compromissos e turmas), agrupados em **Manhã**, **Tarde** e **Noite** (com a quantidade), 3 por linha, com contorno azul; o escolhido fica preenchido. Sem horário: "Nenhum horário livre neste dia. Escolha outro dia."
-- Escolha de serviço, profissional, dia e horário: contorno e, escolhido, preenchido em azul (`aria-pressed`).
+- Profissional, dia e horário: botões de escolha com contorno e, escolhido, preenchido em azul (`aria-pressed`); o serviço usa a lista acima.
 - **Confirmar <dia>, <dd/mm> às <hh:mm>**: preso embaixo, logo acima da barra de navegação. Agendado: Início com o aviso.
 - Recusas da API aparecem no topo: horário que deixou de estar livre (e os horários são buscados de novo) e o limite do cliente não confirmado ("Até o estabelecimento confirmar o seu cadastro, você pode ter no máximo 2 agendamentos futuros.").
 - Só avulsos: recorrências, pacotes e turmas continuam sendo marcados pela clínica.
@@ -135,6 +138,11 @@ Mensagens de confirmação (faixa ciano) somem sozinhas em 5 segundos; as de err
 - **Ícones** (`public/app-assets/`): fundo na cor da logo (`#00B8DB`) e o símbolo em branco gelo (`#F4F4F5`), dentro da área segura (o Android pode recortar em círculo): 192, 512 (também `maskable`) e o `apple-touch-icon` de 180 para o iPhone. Ficam fora de `/app` porque o proxy protege tudo o que começa com `/app`.
 - **iPhone:** Safari → Compartilhar → "Adicionar à Tela de Início" (o iPhone não mostra aviso de instalar). Marcas próprias: `apple-mobile-web-app-capable`, título "Orari" e a barra de status por cima do app (`black-translucent`; o layout desconta a área do entalhe com `env(safe-area-inset-*)`).
 - **Android:** o Chrome oferece "Instalar app" **só em HTTPS** (em produção). Pelo IP do computador (`http://…`), não aparece.
+- **Convite de instalar no Início** (`InstallPrompt`, cliente e profissional, só no **Início**): cartão "Instale o Orari no celular" ("Abra direto da tela de início, em tela cheia, sem digitar o endereço."), com botão de fechar. Só aparece fora do app instalado (`display-mode: standalone`, ou `navigator.standalone` no Safari antigo) e depois de montar (no servidor conta como "nenhum").
+  - **Android:** o `InstallPromptListener`, no layout de `/app`, guarda o evento `beforeinstallprompt` (com `preventDefault`) assim que o app abre, em qualquer tela. O cartão só aparece com o evento guardado; o botão **Instalar** chama `prompt()` e, com a resposta (`accepted` ou `dismissed`), o evento é limpo (`appinstalled` também limpa). Recusar na janela do navegador também deixa o convite quieto.
+  - **iPhone** (sem evento): o botão é **Como instalar**, que abre uma folha própria (`InstallIosSheet`, não o Dialog do shadcn, que abriria fora da área escura) com quatro passos ilustrados (os três pontinhos da barra do Safari, Compartilhar, Adicionar à Tela de Início, Adicionar; em iOS mais antigo, o Compartilhar já fica na barra). Em outro navegador do iPhone (Chrome, Firefox, Edge, navegador de dentro de outros apps), a folha pede para **abrir no Safari**, com **Copiar endereço**. Fecha por **Entendi**, pelo fundo ou pelo Esc.
+  - **Fechar** (X) deixa o convite quieto por **5 dias**, neste aparelho (`localStorage` `orari-app:install-dismissed-at`; sem o armazenamento, volta a cada visita).
+  - O `sw.js` não mudou: em produção, o Chrome com agente de Android disparou o `beforeinstallprompt` sem service worker registrado.
 - **Splash** (`AppSplash`): ao abrir o app **instalado**, fundo `#00B8DB` com o símbolo em cima e "orari" embaixo, em branco gelo; sai em cerca de 1 segundo (sem animação para quem pede menos movimento). Não aparece no navegador (CSS `display-mode: standalone`). No Android, antes dele, o sistema mostra o próprio splash com a mesma cor (`background_color` do manifesto).
 - **Service worker** (`public/app-assets/sw.js`), registrado ao ativar os avisos, só para `/app/` (o `next.config.ts` manda `Service-Worker-Allowed: /app/` e sem cache). Só mostra as notificações e abre o app ao tocar; não guarda nada em cache (o app continua precisando de internet). Avisos só em HTTPS (em produção) ou em `localhost`; pelo IP do computador (`http://…`), não.
 - Ao abrir o app com os avisos já permitidos, a inscrição do aparelho é enviada de novo à API: quem saiu e entrou no mesmo celular volta a receber sem ativar outra vez.

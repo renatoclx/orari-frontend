@@ -32,6 +32,49 @@ export function appRouteKind(
 }
 
 /**
+ * Quem está entrado no app: o cliente (cookie da conta) ou o profissional
+ * (cookies de acesso e renovação do usuário só de app). Se os dois aparecerem
+ * (só por cookie mexido à mão), vale o profissional, que é o mais restrito.
+ */
+export type AppSessionKind = "client" | "professional";
+
+export function appSessionKind(cookies: {
+  clientToken?: string;
+  proAccess?: string;
+  proRefresh?: string;
+}): AppSessionKind | null {
+  if (cookies.proAccess || cookies.proRefresh) return "professional";
+  return cookies.clientToken ? "client" : null;
+}
+
+// O profissional só abre estas telas do app (o resto é do cliente). Cada
+// etapa nova do app do profissional acrescenta as suas aqui.
+const PROFESSIONAL_PATHS = new Set([
+  "/app",
+  "/app/agenda",
+  "/app/clientes",
+  "/app/comissoes",
+  "/app/avisos",
+  "/app/menu",
+  "/app/menu/senha",
+  "/app/menu/notificacoes",
+  "/app/sessao-encerrada",
+  "/app/manifest.webmanifest",
+]);
+
+/** O profissional pode abrir este caminho do app? Os demais voltam ao Início. */
+export function proRouteAllowed(pathname: string): boolean {
+  const path = pathname.replace(/\/$/, "") || "/app";
+  // A ficha de um cliente é /app/clientes/<id>; os fechamentos e o recibo ficam
+  // sob /app/comissoes/.
+  return (
+    PROFESSIONAL_PATHS.has(path) ||
+    path.startsWith("/app/clientes/") ||
+    path.startsWith("/app/comissoes/")
+  );
+}
+
+/**
  * Para onde voltar depois de entrar ou criar a conta (`?voltar=`). Só aceita
  * um caminho do próprio app: um endereço de fora viraria um redirecionamento
  * para outro site.

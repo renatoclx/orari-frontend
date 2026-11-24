@@ -40,6 +40,16 @@ src/
                              (cadastro, alteração, inativação e reativação)
       payment-actions.ts     Server Action da baixa de pagamentos (um ou vários
                              do mesmo cliente)
+      payable-actions.ts     Server Actions do Contas a pagar (lançar, alterar,
+                             pagar em lote, cancelar e excluir)
+      expense-category-actions.ts Server Actions das categorias de despesa
+      product-category-actions.ts Server Actions das categorias de produto
+                             (cadastro, renomear, inativar e reativar)
+      product-actions.ts     Server Actions de produtos (cadastro e alteração com
+                             foto, inativar, excluir, movimentar estoque e
+                             histórico)
+      product-sale-actions.ts Server Actions da venda na comanda (busca de
+                             produtos, lançar e cancelar)
       location-actions.ts    busca de cidades e consulta de CEP
       page.tsx               Agendamentos ("/"): agenda do dia (?date=)
       servicos/              Serviços: page e loading (cadastro e alteração
@@ -54,8 +64,13 @@ src/
                              [id]/editar/
       usuarios/              Usuários: page e loading (cadastro, alteração e
                              senha em dialog)
-      financeiro/            Financeiro: page (Pagamentos), comandas/ e
-                             metodos-de-pagamento/ (cada um com page e loading)
+      financeiro/            Financeiro: page (Contas a receber), comandas/,
+                             contas-a-pagar/, comissoes/, metodos-de-pagamento/
+                             e categorias-de-despesa/ (cada um com page e
+                             loading)
+      fornecedores/          Fornecedores (mesmas telas de pessoas)
+      produtos/              Produtos (só ADMIN): page, loading, novo/,
+                             [id]/editar/ e categorias/
       anamnese/              Anamnese: modelos/ (lista, novo/, [id]/editar/),
                              fichas/ (Fichas preenchidas, nova/) e auditoria/
       clientes/[id]/anamnese/[fichaId]/  ficha completa, acompanhamento/ e
@@ -69,6 +84,13 @@ src/
       client-portal-actions.ts  Server Action das configurações do portal
       portal-access-actions.ts  Server Actions do link de acesso e de Confirmar
                              cliente
+      relatorios/            relatórios (só ADMIN): carteira-clientes/,
+                             analise-de-recebiveis/, agendamentos/, rankings/,
+                             financeiro/, pacotes/, perfil-do-cliente/
+      dashboard/             Dashboard (só ADMIN): os números dos relatórios
+    (print)/                 versões de impressão (largura A4, tema claro):
+                             relatorios/<relatório>/imprimir/ e o recibo de
+                             comissão (financeiro/comissoes/recibo/[id])
     (auth)/                  telas públicas (sem sidebar)
       layout.tsx             dois painéis: formulário + painel da marca
       login/                 página e Server Action do login
@@ -78,7 +100,8 @@ src/
       (publico)/             entrar, criar-conta, acesso/[token] (link da clínica)
       (conta)/               Início, buscar/, agendamentos/, local/[slug]/ (e
                              agendar/), menu/ (dados/, pacotes/, recorrencias/,
-                             senha/)
+                             senha/); do profissional: agenda/, clientes/ (e
+                             [id]/), comissoes/ (fechamentos/ e [id]/)
       actions.ts             Server Actions do app
       error.tsx, not-found.tsx  telas de erro e 404 do próprio app
       manifest.webmanifest/  Route Handler do manifesto (instalar no celular)
@@ -100,8 +123,16 @@ src/
     users/                   usuários (lista, dialogs de formulário e senha,
                              validação)
     payment-methods/         métodos de pagamento (lista e dialog de formulário)
-    payments/                pagamentos (resumo, filtros, lista, baixa)
+    payments/                contas a receber (resumo, filtros, lista, baixa)
+    payables/                contas a pagar (resumo, filtros, lista, lançar,
+                             pagar, comissões em aberto)
+    expense-categories/      categorias de despesa (lista e dialog)
     checkouts/               comandas do dia (lista e dialog da comanda)
+    product-categories/      categorias de produto (lista, filtros, dialog)
+    products/                produtos (lista, filtros, formulário, Visualizar,
+                             Movimentar estoque, Histórico; regras puras em
+                             product-*.ts e stock-movements.ts)
+    product-sales/           venda na comanda (dialog da venda, Nova venda)
     anamnesis/               anamnese: templates/ (modelos e editor de perguntas),
                              records/ (fichas, acompanhamento, PDF) e audit/
                              (auditoria); AnamnesisAccessProvider (acesso)
@@ -109,6 +140,16 @@ src/
     client-portal/           tela Portal do cliente (formulário e regras)
     portal-access/           Acesso ao portal (QR + WhatsApp) e Confirmar cliente
     client-app/              telas e regras puras do app do cliente
+    notifications/           o sino, a lista e a página de notificações (painel e app)
+    professional-app/        telas e regras puras do app do profissional (Início,
+                             agenda, clientes, comissões); o app é o mesmo /app
+    client-portfolio/, receivables/, appointment-report/, rankings/,
+    financial-report/, packages-report/, clients-report/
+                             um relatório por pasta (filtros, cartões, gráficos,
+                             listas, página e impressão)
+    dashboard/               Dashboard (métricas, comparação, rosca)
+    commissions/             Comissões (filtros, cartões, abas, adiantamentos,
+                             fechamento e recibo)
     <tela>/                  componentes das demais telas (auth/)
   services/                  comunicação com a API e sessão (somente servidor)
   types/                     tipos do domínio, espelhando o backend
@@ -124,7 +165,7 @@ vitest.config.mts            testes (arquivo.spec.ts ao lado do código; ver fro
 .github/workflows/ci.yml     lint, tipos, testes e build a cada push e PR
 ```
 
-- Pastas entre parênteses (`(admin)`, `(auth)`) são **grupos de rotas**: organizam layouts sem mudar a URL.
+- Pastas entre parênteses (`(admin)`, `(auth)`, `(print)`) são **grupos de rotas**: organizam layouts sem mudar a URL.
 - Hooks próprios ficam junto da tela que os usa (ex.: `components/agenda/useAgendaClock.ts`). Uma pasta `hooks/` só será criada quando um hook for usado por mais de uma tela.
 
 ## Organização
@@ -241,12 +282,21 @@ Módulo de dado de saúde (LGPD). Detalhes e destaques técnicos em `screens/ana
 
 Duas telas, sem entidade nova no backend: a comanda é uma visão montada a partir de atendimentos e pagamentos.
 
-- **Pagamentos** (`/financeiro`): `PaymentsListPage` (Server Component) lê os filtros da URL (`?status=`, `?de=`, `?ate=`, `?cliente=`, `?metodo=`, `?page=`) e busca, em paralelo, a listagem, o resumo, os métodos e os clientes. As situações do filtro e o `paymentQuery`, que monta a URL mantendo só o que não é o padrão, ficam em `payment-filters.ts` (`.ts` comum, usado pelo servidor e pela barra de filtros). Data inválida na URL é ignorada.
+- **Contas a receber** (`/financeiro`, antes "Pagamentos"): `PaymentsListPage` (Server Component) lê os filtros da URL (`?status=`, `?de=`, `?ate=`, `?cliente=`, `?metodo=`, `?page=`) e busca, em paralelo, a listagem, o resumo, os métodos e os clientes. As situações do filtro e o `paymentQuery`, que monta a URL mantendo só o que não é o padrão, ficam em `payment-filters.ts` (`.ts` comum, usado pelo servidor e pela barra de filtros). Data inválida na URL é ignorada.
 - **Resumo:** `GET /payments/summary` devolve atrasado, a vencer e recebido, respeitando cliente e vencimento mas não a situação. Cada cartão é um link que aplica a situação; o cartão ativo desfaz o filtro. No celular a barra de filtros some e só os cartões filtram.
 - **Baixa:** `PaymentList` (Client Component) guarda a seleção (só pagamentos pendentes de um cliente por vez, que é a exigência da API) e abre o `SettlePaymentsDialog`. O método e a data do pagamento (`SettleFields`) são compartilhados com a comanda. `settlePaymentsAction` grava com `PATCH /payments/settle` (tudo ou nada); uma data passada vai ao meio-dia do fuso da empresa, para não virar o dia anterior, e a data futura é recusada.
 - **Atendimento e contratação:** o ícone de olho abre o mesmo `AppointmentDetailsDialog` da agenda, só para consulta (`getAppointmentDetailsAction`); pagamento de pacote abre `ClientPlanDialog`.
-- **Comandas** (`/financeiro/comandas`): `GET /payments/checkouts` parte das visitas do dia (clientes com atendimento hoje ou que pagaram hoje) e devolve, por cliente, os atendimentos de hoje, as pendências anteriores e os totais. `CheckoutList` mostra aberta ou paga; `CheckoutDialog` tem as seções "Atendimentos de hoje", "Pendências anteriores" e "Pagos hoje" e dá baixa nos itens marcados. Os da visita começam marcados e as pendências, não; a comanda paga abre só para consulta.
+- **Comandas** (`/financeiro/comandas`): `GET /payments/checkouts` parte das visitas do dia (clientes com atendimento hoje, que compraram hoje ou que pagaram hoje) e devolve, por cliente, os atendimentos e as vendas de hoje, as pendências anteriores e os totais. `CheckoutList` mostra aberta ou paga; `CheckoutDialog` mostra em aberto "Atendimentos de hoje", "Produtos" e "Pendências anteriores", com o pago do dia no bloco recolhível "Recebidos", e dá baixa nos itens marcados. Os de hoje começam marcados e as pendências, não; a comanda paga abre só para consulta (e não aceita produto: a compra seguinte é uma Nova venda).
 - Soma de valores sempre em centavos inteiros, para não acumular erro de ponto flutuante. Depois da baixa, `revalidatePath` recarrega as duas telas.
+
+## Produtos, estoque e venda
+
+Só do ADMIN; três funcionalidades em Acessos e limites (`product-categories`, `products`, `product-sales`), fora de todos os modelos.
+
+- **Cadastro** (`/produtos`, `/produtos/categorias`): o padrão das listagens, com filtros na URL (`product-filters.ts`, comum ao servidor e à barra; "Estoque baixo" é um botão liga e desliga). O formulário é página (`ProductFormPage` + `ProductForm`): a foto e os valores (em JSON) vão num `FormData` à Server Action, que valida de novo (`product-validation.ts`), salva e envia a foto pela rota própria. O fornecedor só vai quando muda; os erros da API voltam ao campo (`productErrorField`).
+- **Estoque:** o estoque atual é o saldo das movimentações (API). `StockMovementDialog` lança compra (com conta a pagar opcional, só com o Contas a pagar no plano; a página decide no servidor e busca categorias e métodos só nesse caso), uso interno, perda e ajuste, com a prévia do saldo (`stock-movements.ts`). `StockHistoryDialog` busca por Server Action ao abrir. Na alteração do produto, o estoque é só leitura e não é enviado.
+- **Venda na comanda:** o pagamento ganhou a terceira origem (`productSale`); `describePayment` a descreve em todas as telas. `CheckoutsListPage` calcula no servidor se o usuário vende e cancela (ADMIN + `product-sales`) e passa por props. `ProductSaleDialog` (busca, carrinho em `utils/sale.ts`) fica **fora do `<form>` da comanda**: o envio de um form filho, mesmo em portal, sobe pela árvore do React até o pai. O `key` do formulário da comanda inclui as vendas, para a venda nova já vir marcada; o pago do dia fica no bloco recolhível "Recebidos".
+- **Relatório financeiro e Dashboard:** cartão e série de Produtos quando a empresa vende ou teve venda no período (`showsProducts`).
 
 ## Empresas (SUPER_ADMIN)
 
@@ -260,6 +310,33 @@ Duas telas, sem entidade nova no backend: a comanda é uma visão montada a part
 - **Painel (SUPER_ADMIN):** botão em `CompanyList` abre `CompanyAccessDialog` (`AccessMatrix`, `AccessLimits`). Regras puras em `components/companies/company-access.ts` (matriz, dependências, modelos de plano, limites, conversão com a API); chamadas em `services/company-access.service.ts` e `(admin)/company-access-actions.ts`.
 - **Leitura pela empresa:** `GET /auth/me` traz `access.features`; o `CurrentUser` o carrega. `utils/access.ts` (`canAccess`) responde "pode?". No servidor, `lib/require-feature.ts` (`requireFeature`) devolve 404 nas páginas sem acesso; no cliente, `components/layout/Access.tsx` (`AccessProvider`, `useCan`, `Can`) esconde botões e atalhos.
 - **Menu:** `layout/menu-access.ts` filtra os itens (cada um tem `feature`); as páginas de servidor que consultam turmas só o fazem com `class-groups` liberada.
+
+## Relatórios e Dashboard
+
+Só leitura e só do ADMIN; cada relatório é uma funcionalidade com só Visualiza (`requireFeature` + `user.type !== "ADMIN"` → 404). A API também recusa.
+
+- **Página no servidor, filtros na URL:** cada relatório tem um `*-filters.ts` (ler e validar os `searchParams`, montar a URL sem o padrão) comum à tela e à impressão; a barra de filtros é o único Client Component (`router.push`). Resumo e lista vêm em paralelo (`Promise.all`); as listas paginam pela URL (`TablePagination`).
+- **Impressão:** `PrintButton` abre `.../imprimir` em aba nova, no grupo `(print)` (layout próprio em largura A4). `AutoPrint` força o tema claro (um `MutationObserver` tira a classe `dark` que o `next-themes` repõe) e chama `window.print`; `PrintHeader` e `PrintTable` (shared); as listas inteiras vêm de `fetchAllPages` (`MAX_PAGE_SIZE` 100).
+- **Componentes compartilhados:** `shared/SummaryCard` (cartões), `rankings/RankingTable` (barras com posição), `clients-report/ShareList` (distribuições sem posição), gráficos Recharts via `ui/chart` com a prop `print` (sem animação).
+- **Dashboard** (`/dashboard`, item próprio no topo do menu): sem rota própria na API. `DashboardPage` chama as rotas dos relatórios que a empresa tem (`canAccess`) e, para a comparação, as mesmas rotas com o período anterior (`previousPeriod`, puro e testado). A rosca de métodos (`PaymentMethodDonut`) dá a cor pela ordem do cadastro de métodos (`payment-method-slices.ts`).
+- **Tokens de gráfico** no `globals.css` (`chart-*`); as regras visuais estão na skill `orari-ui`, "Relatórios e gráficos".
+
+## Comissões
+
+Só do ADMIN (remuneração). A comissão nasce sozinha na API (job na conclusão do atendimento); a tela consulta, lança adiantamentos, fecha e emite o recibo.
+
+- **Regra**: no formulário do serviço (`services/CommissionField`, só para o ADMIN: a página de Serviços passa `canSetCommission`; a Server Action só envia a comissão quando o formulário traz o campo de controle `commissionEnabled`). No profissional, a chave "Recebe comissão" (`PersonForm`, mesmo padrão).
+- **Tela** (`/financeiro/comissoes`, `CommissionsPage`, Server Component): filtros na URL (`commission-filters.ts`), resumo e lista em paralelo; com profissional, abas por link (`?aba=`) para Atendimentos, Adiantamentos e Fechamentos.
+- **Diálogos** (`AdvanceFormDialog`, `CloseCommissionDialog`): Client Components que buscam o disponível ou a prévia por Server Action (`commission-actions.ts`) quando o profissional ou a data mudam; o "buscando" é derivado de qual resposta está guardada (sem `setState` direto no efeito).
+- **Recibo** (`(print)/financeiro/comissoes/recibo/[id]`, `CommissionReceipt`): sai da cópia gravada no fechamento; valor por extenso em `utils/money-in-words.ts` (puro e testado).
+
+## Contas a pagar
+
+Só do ADMIN. Fornecedor é um tipo de pessoa (`SUPPLIER`, mesmas telas de `people/`, com CPF ou CNPJ e categoria principal); as categorias de despesa seguem o cadastro dos métodos de pagamento.
+
+- **Tela** (`/financeiro/contas-a-pagar`, `PayablesPage`, Server Component): filtros na URL (`payable-filters.ts`: situação, vencimento, favorecido e categoria). Primeiro busca o usuário e as categorias (decidem se a comissão em aberto entra, `commissionVisibility`, puro e testado); depois, em paralelo, lista, resumo, favorecidos, métodos e comissões em aberto.
+- **Lista** (`PayableList`, Client Component): seleção das pendentes para pagar em lote (`SettlePayablesDialog`, que reaproveita `SettleFields` do Contas a receber); lançar e alterar no mesmo `PayableFormDialog` (repetição: parcelar ou repetir por N meses; "Já está paga").
+- **Comissão**: a API gera contas pagas no adiantamento e no fechamento (protegidas: a lista mostra "Ver recibo" e "Via Comissões" no lugar das ações). O bloco `OpenCommissions` é linha calculada (`GET /payables/commissions`) e reaproveita o `CloseCommissionButton`; as ações de comissão revalidam as duas telas.
 
 ## Configurações da empresa
 

@@ -1,4 +1,6 @@
+import { AutoRefresh } from "@/components/layout/AutoRefresh";
 import Link from "next/link";
+import { blockRangesOfDay } from "@/components/agenda-blocks/agenda-block";
 import { AgendaToolbar } from "@/components/agenda/AgendaToolbar";
 import { AgendaDayView } from "@/components/agenda/AgendaDayView";
 import {
@@ -7,6 +9,7 @@ import {
 } from "@/components/agenda/agenda-data";
 import { splitClassSessions } from "@/components/agenda/class-session-blocks";
 import { computeGridRange, gridAreas } from "@/components/agenda/agenda-range";
+import { listAgendaBlocks } from "@/services/agenda-block.service";
 import { listAppointments } from "@/services/appointment.service";
 import { getCurrentUser } from "@/services/auth.service";
 import { listBusinessHours } from "@/services/business-hour.service";
@@ -53,6 +56,7 @@ export async function AgendaDayPage({ searchParams }: AgendaDayPageProps) {
     clients,
     services,
     classSessions,
+    agendaBlocks,
   ] = await Promise.all([
     listPeople({ type: "PROFESSIONAL", page: 1, limit: 100 }),
     listAppointments(bounds),
@@ -67,6 +71,8 @@ export async function AgendaDayPage({ searchParams }: AgendaDayPageProps) {
     canAccess(currentUser.access, "class-groups")
       ? listClassSessions(bounds)
       : null,
+    // Horários bloqueados do dia (screens/agendamentos.md, "Bloquear horários").
+    listAgendaBlocks({ from: date, to: date }),
   ]);
 
   // Profissional inativo fica fora da grade (a agenda dele será remanejada).
@@ -104,13 +110,17 @@ export async function AgendaDayPage({ searchParams }: AgendaDayPageProps) {
     end: hours.closeAt,
   }));
 
-  const range = computeGridRange(windows, agendaAppointments);
+  const blocked = blockRangesOfDay(agendaBlocks, date, timeZone);
+  // Um bloqueio fora da janela visível também amplia a grade.
+  const range = computeGridRange(windows, [...agendaAppointments, ...blocked]);
   const areas = gridAreas(windows, range);
 
   const dateLabel = formatLongDate(new Date(`${date}T12:00:00Z`));
 
   return (
     <div className="flex min-h-0 flex-1 flex-col gap-4">
+      {/* Mostra o que entrou por outros lugares (ex.: o celular do cliente). */}
+      <AutoRefresh />
       <h1 className="text-2xl font-semibold">Agendamentos</h1>
       {professionals.length === 0 ? (
         <>
@@ -136,6 +146,7 @@ export async function AgendaDayPage({ searchParams }: AgendaDayPageProps) {
           range={range}
           unavailable={areas.outside}
           breaks={areas.breaks}
+          blocked={blocked}
           timeZone={timeZone}
           serverNow={renderedAt.getTime()}
           services={services.items

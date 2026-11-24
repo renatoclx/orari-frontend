@@ -1,7 +1,7 @@
+import { AppNotice } from "@/components/client-app/AppNotice";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { safeReturnPath } from "@/lib/app-routes";
-import { AppFormMessage } from "@/components/client-app/AppFormMessage";
 import { AppLoginForm } from "@/components/client-app/AppLoginForm";
 
 export const metadata: Metadata = { title: "Entrar" };
@@ -21,11 +21,12 @@ export default async function AppLoginPage({
         </p>
       </div>
       {expirou && (
-        <AppFormMessage tone="info">
-          Sua sessão terminou. Entre de novo.
-        </AppFormMessage>
+        <AppNotice
+          param="expirou"
+          message="Sua sessão terminou. Entre de novo."
+        />
       )}
-      {saiu && <AppFormMessage tone="info">Você saiu do app.</AppFormMessage>}
+      {saiu && <AppNotice param="saiu" message="Você saiu do app." />}
       <AppLoginForm returnTo={returnTo} />
       <p className="text-center text-sm">
         Não tem conta?{" "}

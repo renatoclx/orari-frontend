@@ -5,8 +5,19 @@ import {
   clientIpFrom,
   forwardedForHeader,
 } from "@/lib/client-ip";
-import { APP_HOME_PATH, APP_LOGIN_PATH, appRouteKind } from "@/lib/app-routes";
-import { APP_SESSION_COOKIE } from "@/services/app-session-cookies";
+import {
+  APP_HOME_PATH,
+  APP_LOGIN_PATH,
+  appRouteKind,
+  appSessionKind,
+  proRouteAllowed,
+} from "@/lib/app-routes";
+import {
+  APP_PRO_ACCESS_COOKIE,
+  APP_PRO_REFRESH_COOKIE,
+  APP_SESSION_COOKIE,
+  buildAppProCookies,
+} from "@/services/app-session-cookies";
 import {
   ACCESS_TOKEN_COOKIE,
   REFRESH_TOKEN_COOKIE,
@@ -17,6 +28,11 @@ import type { AuthTokens } from "@/types/auth";
 // Caminhos usados nos redirecionamentos de proteção das rotas.
 const LOGIN_PATH = "/login";
 const HOME_PATH = "/";
+// Telas de quem ainda não entrou: com sessão, vão para o sistema.
+const GUEST_PATHS = new Set([LOGIN_PATH, "/cadastro", "/esqueci-senha"]);
+// Abertas a todos, com ou sem sessão (textos legais, linkados no cadastro).
+// O link do e-mail de senha abre mesmo com uma sessão aberta no navegador.
+const PUBLIC_PATHS = new Set(["/termos", "/privacidade", "/redefinir-senha"]);
 
 /**
  * Roda antes de toda requisição. Duas tarefas:
@@ -28,11 +44,13 @@ export async function proxy(request: NextRequest) {
   // App do cliente (/app): sessão própria, sem passar pelas regras da clínica.
   const appRoute = appRouteKind(request.nextUrl.pathname);
   if (appRoute) return guardAppRoute(request, appRoute);
+  if (PUBLIC_PATHS.has(request.nextUrl.pathname)) return NextResponse.next();
 
   // Só para desenvolvimento: AUTH_GUARD=off desliga os redirecionamentos de
   // proteção (em produção a variável é ignorada). A renovação continua valendo.
   const guardEnabled = isAuthGuardEnabled(process.env);
-  const isLoginPage = request.nextUrl.pathname === LOGIN_PATH;
+  // Login e cadastro seguem a mesma regra (o nome ficou do tempo em que só havia o login).
+  const isLoginPage = GUEST_PATHS.has(request.nextUrl.pathname);
   const accessToken = request.cookies.get(ACCESS_TOKEN_COOKIE)?.value;
   const refreshToken = request.cookies.get(REFRESH_TOKEN_COOKIE)?.value;
 
@@ -149,22 +167,66 @@ function continueWithTokens(
 }
 
 /**
- * Checagem otimista do app do cliente: só olha se o cookie do app existe (quem
- * valida o token é a API). Sem conta, as telas de quem entrou levam a entrar;
- * entrado, entrar e criar conta levam ao Início.
+ * Checagem otimista do app (cliente e profissional): só olha se os cookies
+ * existem (quem valida o token é a API). Sem sessão, as telas de quem entrou
+ * levam a entrar; entrado, entrar e criar conta levam ao Início.
+ *
+ * O profissional tem JWT de acesso (curto) e de renovação: quando o acesso
+ * vence, o proxy renova aqui, como faz para a clínica, mas nos cookies do app.
+ * E ele só abre as telas dele (`proRouteAllowed`): as do cliente voltam ao Início.
  */
-function guardAppRoute(
+async function guardAppRoute(
   request: NextRequest,
   route: "guest" | "open" | "private",
 ) {
-  const hasAppSession = Boolean(request.cookies.get(APP_SESSION_COOKIE)?.value);
-  if (route === "private" && !hasAppSession) {
-    return NextResponse.redirect(new URL(APP_LOGIN_PATH, request.url));
+  const clientToken = request.cookies.get(APP_SESSION_COOKIE)?.value;
+  let proAccess = request.cookies.get(APP_PRO_ACCESS_COOKIE)?.value;
+  let proRefresh = request.cookies.get(APP_PRO_REFRESH_COOKIE)?.value;
+  let renewed: ReturnType<typeof buildAppProCookies> | null = null;
+  let proEnded = false;
+
+  if (!proAccess && proRefresh) {
+    const clientIp = clientIpFrom(request.headers.get(FORWARDED_FOR_HEADER));
+    const result = await refreshOnce(proRefresh, clientIp);
+    if (result === "invalid") {
+      proEnded = true;
+      proRefresh = undefined;
+    } else if (result !== "unavailable") {
+      renewed = buildAppProCookies(result);
+      proAccess = result.accessToken;
+      proRefresh = result.refreshToken;
+      // A página montada nesta mesma requisição lê os cookies da requisição.
+      for (const cookie of renewed) {
+        request.cookies.set(cookie.name, cookie.value);
+      }
+    }
+    // API fora do ar: segue sem renovar; a tela mostra o erro de conexão.
   }
-  if (route === "guest" && hasAppSession) {
-    return NextResponse.redirect(new URL(APP_HOME_PATH, request.url));
+
+  const kind = appSessionKind({ clientToken, proAccess, proRefresh });
+  let redirectTo: string | null = null;
+  if (kind === null) {
+    if (route === "private") redirectTo = APP_LOGIN_PATH;
+  } else if (route === "guest") {
+    redirectTo = APP_HOME_PATH;
+  } else if (
+    kind === "professional" &&
+    !proRouteAllowed(request.nextUrl.pathname)
+  ) {
+    redirectTo = APP_HOME_PATH;
   }
-  return NextResponse.next();
+
+  const response = redirectTo
+    ? NextResponse.redirect(new URL(redirectTo, request.url))
+    : NextResponse.next({ request: { headers: request.headers } });
+  for (const cookie of renewed ?? []) {
+    response.cookies.set(cookie.name, cookie.value, cookie.options);
+  }
+  if (proEnded) {
+    response.cookies.delete(APP_PRO_ACCESS_COOKIE);
+    response.cookies.delete(APP_PRO_REFRESH_COOKIE);
+  }
+  return response;
 }
 
 /** Sessão sem volta (refresh recusado): apaga os cookies e vai para o login. */

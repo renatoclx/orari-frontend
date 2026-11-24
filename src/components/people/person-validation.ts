@@ -1,4 +1,4 @@
-import { onlyDigits } from "@/utils/masks";
+import { onlyDigits, phoneDigits } from "@/utils/masks";
 
 /** Campos validados no cliente e de novo no servidor. */
 export type PersonFormValues = {
@@ -27,14 +27,18 @@ const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
  * Obrigatórios (screens/pessoas.md): nome e um contato (celular). Os opcionais só são
  * conferidos quando preenchidos, para não falharem depois, no cadastro.
  */
-export function validatePersonForm(values: PersonFormValues): PersonFormErrors {
+export function validatePersonForm(
+  values: PersonFormValues,
+  /** Fornecedor: o documento pode ser CNPJ (14 dígitos). */
+  options: { allowCnpj?: boolean } = {},
+): PersonFormErrors {
   const errors: PersonFormErrors = {};
 
   if (!values.name.trim()) {
     errors.name = "Informe o nome.";
   }
 
-  const phone = onlyDigits(values.phone);
+  const phone = phoneDigits(values.phone);
   if (!phone) {
     errors.phone = "Informe um contato.";
   } else if (phone.length < 10) {
@@ -47,8 +51,12 @@ export function validatePersonForm(values: PersonFormValues): PersonFormErrors {
   }
 
   const document = onlyDigits(values.document);
-  if (document && document.length !== 11) {
-    errors.document = "Informe os 11 dígitos do CPF.";
+  const fits =
+    document.length === 11 || (options.allowCnpj && document.length === 14);
+  if (document && !fits) {
+    errors.document = options.allowCnpj
+      ? "Informe os 11 dígitos do CPF ou os 14 do CNPJ."
+      : "Informe os 11 dígitos do CPF.";
   }
 
   return errors;

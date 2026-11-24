@@ -23,7 +23,7 @@
   <div class="bar"></div>
   <div class="kicker">Manual de Mensagens</div>
   <h1>Lembretes e recados no celular dos seus clientes</h1>
-  <p>Guia passo a passo para o administrador: mensagens automáticas (lembretes, agendamentos, aniversário) e mensagens que você escreve e envia na hora.</p>
+  <p>Guia passo a passo para o administrador: mensagens automáticas aos clientes (lembretes, agendamentos, aniversário), avisos ao profissional e ao administrador, e mensagens que você escreve e envia na hora.</p>
   <div class="foot">As telas deste manual usam dados fictícios do “Studio Aurora”.</div>
 </section>
 
@@ -44,18 +44,20 @@
   <li>Recebem no celular os clientes que usam o <b>app do Orari</b> e <b>ativaram os avisos</b> no aparelho.</li>
   <li>Toda mensagem também fica guardada no app, em <b>Menu → Avisos</b>, mesmo para quem não ativou os avisos.</li>
   <li>O cliente escolhe o que recebe, com dois interruptores: <b>Lembretes e agendamentos</b> e <b>Novidades e promoções</b>.</li>
-  <li>O <b>portal precisa estar ligado</b>. Desligado, nenhuma mensagem sai.</li>
+  <li>O <b>portal precisa estar ligado</b>. Desligado, nenhuma mensagem aos clientes sai.</li>
+  <li>Os <b>profissionais</b> que usam o app recebem o lembrete e o resumo da manhã deles, e os <b>administradores</b> recebem o resumo das pendências do dia (capítulo 2). Esses avisos chegam no sino e, se a pessoa ativar, no celular, e <b>não dependem do portal</b>.</li>
 </ul>
 
 <h2>Quem pode usar</h2>
-<p>O menu <span class="ui">Mensagens</span>, com <span class="ui">Automáticas</span> e <span class="ui">Enviar</span>, aparece só para o <b>administrador</b> e precisa estar liberado no seu plano, junto com o Portal do cliente.</p>
+<p>O menu <span class="ui">Mensagens</span>, com <span class="ui">Ao cliente</span>, <span class="ui">Ao profissional</span>, <span class="ui">Ao administrador</span> e <span class="ui">Enviar</span>, aparece só para o <b>administrador</b> e precisa estar liberado no seu plano, junto com o Portal do cliente.</p>
 <div class="box tip"><b class="t">Dica</b><p>Quanto mais clientes usarem o app, mais gente recebe. Envie o link de acesso aos seus clientes (Manual do Portal do cliente, capítulo 5).</p></div>
 
 <!-- ===== 2 ===== -->
 <h1 class="chapter" data-toc="Mensagens automáticas"><span class="num"></span>Mensagens automáticas</h1>
-<p class="lead">Saem sozinhas, na situação certa, uma vez só.</p>
+<p class="lead">Saem sozinhas, na situação certa, uma vez só. Cada página do menu cuida de quem recebe.</p>
 
-<figure><img src="images/m01-automaticas.png" alt=""><figcaption>Mensagens → Automáticas.</figcaption></figure>
+<h2>Ao cliente</h2>
+<figure><img src="images/m01-automaticas.png" alt=""><figcaption>Mensagens → Ao cliente.</figcaption></figure>
 
 <table class="vars">
   <thead><tr><th>Situação</th><th>Quando sai</th><th>Opção</th></tr></thead>
@@ -70,7 +72,7 @@
 </table>
 
 <ol class="steps">
-  <li>No menu, abra <span class="ui">Mensagens</span> → <span class="ui">Automáticas</span>.</li>
+  <li>No menu, abra <span class="ui">Mensagens</span> → <span class="ui">Ao cliente</span>.</li>
   <li>Ligue as situações que quiser, no interruptor de cada uma. No lembrete, marque os tempos antes do horário.</li>
   <li>Ajuste o texto, se quiser (até 500 caracteres). Os botões de <span class="ui">Inserir</span> colocam os dados do cliente no lugar do cursor (capítulo 3). O <b>Exemplo</b> mostra como a mensagem vai chegar.</li>
   <li>Clique em <span class="ui">Salvar alterações</span>. A mensagem “Mensagens automáticas salvas.” confirma.</li>
@@ -83,6 +85,29 @@
     <li>Um horário marcado em cima da hora não recebe o lembrete cujo tempo já passou. Exemplo: marcado 10 minutos antes, não recebe o de 30 minutos.</li>
   </ul>
 </div>
+
+<h2>Ao profissional</h2>
+<p>Em <span class="ui">Mensagens</span> → <span class="ui">Ao profissional</span>, você liga e escreve os avisos que o profissional recebe no app dele. Valem para todos os profissionais que têm usuário no app, e o texto <b>não leva o nome do cliente</b>.</p>
+<table class="vars">
+  <thead><tr><th>Situação</th><th>Quando sai</th><th>Opção</th></tr></thead>
+  <tbody>
+    <tr><td>Lembrete do profissional</td><td>30 minutos antes de cada atendimento (uma vez por sessão, nas turmas).</td><td>— (o tempo é fixo)</td></tr>
+    <tr><td>Resumo da manhã do profissional</td><td>Às 7h30, nos dias em que ele tem atendimentos.</td><td>— (a hora é fixa)</td></tr>
+  </tbody>
+</table>
+<figure><img src="images/m04-ao-profissional.png" alt=""><figcaption>Mensagens → Ao profissional.</figcaption></figure>
+<p>No resumo, o campo <code>{quantidade}</code> vira o número de atendimentos (“5 atendimentos”) e <code>{hora}</code>, o horário do primeiro. Os dois avisos já vêm ligados, com o texto pronto.</p>
+
+<h2>Ao administrador</h2>
+<p>Em <span class="ui">Mensagens</span> → <span class="ui">Ao administrador</span>, você escolhe o <b>resumo das pendências do dia</b>, que chega a quem administra a clínica. Ele junta, numa frase, o que pede atenção hoje.</p>
+<ol class="steps">
+  <li>Ligue o <span class="ui">Resumo de pendências do dia</span>.</li>
+  <li>Escolha a <b>hora do envio</b>: 7h, 8h, 9h ou 10h (padrão: 8h).</li>
+  <li>Marque os <b>itens do resumo</b>: contas a pagar hoje, contas atrasadas, recebimentos atrasados, comandas do dia e aniversariantes. Só entram os itens que o seu plano libera.</li>
+  <li>Ajuste o texto, se quiser, e clique em <span class="ui">Salvar alterações</span>. O campo <code>{resumo}</code> vira a frase pronta, por exemplo “3 contas a pagar hoje, 2 recebimentos atrasados e 4 aniversariantes”.</li>
+</ol>
+<figure><img src="images/m05-ao-administrador.png" alt=""><figcaption>Mensagens → Ao administrador.</figcaption></figure>
+<div class="box tip"><b class="t">Um aviso por dia</b><p>O resumo sai uma vez por dia, a partir da hora escolhida, para cada administrador. Dia em que nenhum item tem número <b>não envia nada</b>. O detalhe fica no sino do sistema.</p></div>
 
 <!-- ===== 3 ===== -->
 <h1 class="chapter" data-toc="Os dados do cliente no texto"><span class="num"></span>Os dados do cliente no texto</h1>
@@ -134,6 +159,14 @@
 <h1 class="chapter" data-toc="Dúvidas comuns"><span class="num"></span>Dúvidas comuns</h1>
 <p class="lead">Respostas rápidas para as situações mais frequentes.</p>
 
+<h3>O profissional diz que não recebeu o lembrete ou o resumo da manhã.</h3>
+<ul>
+  <li>Ele usa o <b>app do profissional</b> e <b>ativou os avisos</b> em Menu → Avisos no celular? Sem isso, o aviso fica só no sino.</li>
+  <li>O interruptor da categoria (<b>Lembretes</b> ou <b>Resumo da manhã</b>) está ligado no app dele?</li>
+  <li>O aviso está ligado em Mensagens → Ao profissional?</li>
+</ul>
+<h3>O resumo de pendências não chegou.</h3>
+<p>Ele só sai nos dias em que há algum item com número e a partir da hora escolhida, e só com os itens que o plano libera. Confira em Mensagens → Ao administrador se está ligado e se há ao menos um item marcado.</p>
 <h3>Não vejo o menu Mensagens.</h3>
 <p>O menu é só do administrador e precisa estar liberado no plano, junto com o Portal do cliente. Fale com o suporte do Orari.</p>
 <h3>Um cliente diz que não recebeu o lembrete.</h3>
@@ -141,7 +174,7 @@
   <li>Ele usa o app do Orari e <b>ativou os avisos</b> em Menu → Avisos?</li>
   <li>O interruptor <b>Lembretes e agendamentos</b> está ligado no app dele?</li>
   <li>O celular dele está com <b>Não Perturbe</b> ou outro Foco ligado?</li>
-  <li>O <b>Lembrete</b> está ligado em Mensagens → Automáticas, com o tempo escolhido?</li>
+  <li>O <b>Lembrete</b> está ligado em Mensagens → Ao cliente, com o tempo escolhido?</li>
   <li>O <b>portal</b> está ligado?</li>
 </ul>
 <h3>Aparece “Hoje já foi enviada uma mensagem”.</h3>

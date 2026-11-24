@@ -101,3 +101,23 @@ describe("validatePersonForm", () => {
     expect(personFieldOrder).toEqual(["name", "phone", "email", "document"]);
   });
 });
+
+describe("documento do fornecedor", () => {
+  const base = { name: "Distribuidora", phone: "11988887777", email: "" };
+
+  it("CNPJ só quando o fornecedor permite", () => {
+    expect(
+      validatePersonForm({ ...base, document: "11.222.333/0001-81" }).document,
+    ).toBe("Informe os 11 dígitos do CPF.");
+    expect(
+      validatePersonForm(
+        { ...base, document: "11.222.333/0001-81" },
+        { allowCnpj: true },
+      ),
+    ).toEqual({});
+    expect(
+      validatePersonForm({ ...base, document: "1122233" }, { allowCnpj: true })
+        .document,
+    ).toBe("Informe os 11 dígitos do CPF ou os 14 do CNPJ.");
+  });
+});

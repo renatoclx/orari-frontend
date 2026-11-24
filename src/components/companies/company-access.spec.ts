@@ -5,6 +5,8 @@ import {
   applyTemplate,
   emptyMatrix,
   entriesFromMatrix,
+  groupState,
+  toggleGroup,
   matrixFromEntries,
   isActionApplicable,
   limitWarning,
@@ -38,7 +40,7 @@ describe("toggleAccess", () => {
   });
 
   it("desmarcar Visualiza limpa a linha toda", () => {
-    const full = template("complete").matrix;
+    const full = template("clinical").matrix;
     const next = toggleAccess(full, "clients", "view", false);
     expect(next.clients).toEqual({
       view: false,
@@ -51,7 +53,7 @@ describe("toggleAccess", () => {
 
   it("desmarcar outra coluna mantém o Visualiza", () => {
     const next = toggleAccess(
-      template("complete").matrix,
+      template("clinical").matrix,
       "clients",
       "create",
       false,
@@ -71,66 +73,139 @@ describe("toggleAccess", () => {
   });
 });
 
-describe("modelos de plano", () => {
-  it("Essencial deixa de fora anamnese e turmas", () => {
-    const { matrix } = template("essential");
-    expect(matrix.anamnesis.view).toBe(false);
-    expect(matrix["class-groups"].view).toBe(false);
-    expect(matrix.appointments).toEqual({
-      view: true,
-      edit: true,
-      create: true,
-      remove: true,
-    });
+describe("caixa da seção", () => {
+  const group = (label: string) =>
+    ACCESS_GROUPS.find((g) => g.label === label)!.features;
+
+  it("vazia, parcial e cheia", () => {
+    const empty = emptyMatrix();
+    expect(groupState(empty, group("Cadastros"))).toBe("none");
+    const one = toggleAccess(empty, "clients", "view", true);
+    expect(groupState(one, group("Cadastros"))).toBe("some");
+    const full = toggleGroup(empty, group("Cadastros"), true);
+    expect(groupState(full, group("Cadastros"))).toBe("all");
   });
 
-  it("Profissional libera anamnese, mas não turmas", () => {
-    const { matrix } = template("professional");
-    expect(matrix.anamnesis.view).toBe(true);
-    expect(matrix["class-groups"].view).toBe(false);
-  });
-
-  it("Completo libera tudo o que existe (menos Portal e Mensagens); Auditoria e Configurações só têm as colunas aplicáveis", () => {
-    const { matrix } = template("complete");
-    expect(matrix["anamnesis-audit"]).toEqual({
+  it("marca só as colunas aplicáveis e não mexe nas outras seções", () => {
+    const next = toggleGroup(emptyMatrix(), group("Anamnese"), true);
+    expect(next["anamnesis-audit"]).toEqual({
       view: true,
       edit: false,
       create: false,
       remove: false,
     });
-    expect(matrix.settings).toEqual({
-      view: true,
-      edit: true,
-      create: false,
-      remove: false,
-    });
+    expect(groupState(next, group("Anamnese"))).toBe("all");
+    expect(next.clients.view).toBe(false);
   });
 
-  it("nenhum modelo inclui Portal do cliente e Mensagens (liberados empresa por empresa)", () => {
-    for (const key of ["essential", "professional", "complete"]) {
+  it("desmarcar limpa a seção inteira", () => {
+    const full = template("clinical").matrix;
+    const next = toggleGroup(full, group("Cadastros"), false);
+    expect(groupState(next, group("Cadastros"))).toBe("none");
+    expect(next.appointments.view).toBe(true);
+  });
+});
+
+describe("modelos de plano", () => {
+  const NONE = { view: false, edit: false, create: false, remove: false };
+  const ALL = { view: true, edit: true, create: true, remove: true };
+  const keys = ACCESS_TEMPLATES.map((item) => item.key);
+
+  it("são três: Essencial, Plus e Clinical", () => {
+    expect(ACCESS_TEMPLATES.map((item) => item.label)).toEqual([
+      "Essencial",
+      "Plus",
+      "Clinical",
+    ]);
+  });
+
+  it("app do cliente e mensagens entram nos três", () => {
+    for (const key of keys) {
       const { matrix } = template(key);
-      expect(matrix["client-portal"].view).toBe(false);
-      expect(matrix.messages).toEqual({
-        view: false,
-        edit: false,
-        create: false,
-        remove: false,
-      });
+      expect(matrix["client-portal"].view).toBe(true);
+      expect(matrix.messages.view).toBe(true);
+      expect(matrix["professional-app"].view).toBe(true);
     }
   });
 
-  it("aplicar o Essencial define 3 profissionais e 1 administrador; os outros mantêm os profissionais", () => {
-    const current = {
-      matrix: emptyMatrix(),
-      limits: { professionals: 5, admins: 1 },
-    };
-    expect(applyTemplate(template("essential"), current).limits).toEqual({
-      professionals: 3,
+  it("Essencial: agenda, cadastros, receber (comanda) e o Dashboard; sem gestão financeira, pacotes, produtos, anamnese e turmas", () => {
+    const { matrix } = template("essential");
+    for (const key of [
+      "appointments",
+      "recurrences",
+      "clients",
+      "tabs",
+      "payment-methods",
+    ]) {
+      expect(matrix[key]).toEqual(ALL);
+    }
+    for (const key of [
+      "dashboard",
+      "financial-report",
+      "appointments-report",
+    ]) {
+      expect(matrix[key].view).toBe(true);
+    }
+    // Contas a receber só para ver: o Recebido do Dashboard depende dele.
+    expect(matrix.payments).toEqual({ ...NONE, view: true });
+    for (const key of [
+      "payables",
+      "commissions",
+      "receivables",
+      "rankings",
+      "plans",
+      "contracts",
+      "products",
+      "anamnesis",
+      "class-groups",
+    ]) {
+      expect(matrix[key]).toEqual(NONE);
+    }
+  });
+
+  it("Plus: tudo menos anamnese e turmas", () => {
+    const { matrix } = template("plus");
+    for (const key of [
+      "payables",
+      "commissions",
+      "contracts",
+      "products",
+      "product-sales",
+      "payments",
+    ]) {
+      expect(matrix[key].view).toBe(true);
+    }
+    expect(matrix.payments).toEqual(ALL);
+    for (const key of [
+      "anamnesis",
+      "anamnesis-templates",
+      "anamnesis-audit",
+      "class-groups",
+    ]) {
+      expect(matrix[key]).toEqual(NONE);
+    }
+  });
+
+  it("Clinical: tudo; Auditoria e Configurações só com as colunas aplicáveis", () => {
+    const { matrix } = template("clinical");
+    expect(matrix["class-groups"]).toEqual(ALL);
+    expect(matrix.anamnesis).toEqual(ALL);
+    expect(matrix["anamnesis-audit"]).toEqual({ ...NONE, view: true });
+    expect(matrix.settings).toEqual({ ...NONE, view: true, edit: true });
+  });
+
+  it("aplicar o modelo define os limites: 2, 5 e 7 profissionais; 1, 2 e 3 administradores", () => {
+    expect(applyTemplate(template("essential")).limits).toEqual({
+      professionals: 2,
       admins: 1,
     });
-    expect(applyTemplate(template("complete"), current).limits).toEqual({
+    expect(applyTemplate(template("plus")).limits).toEqual({
       professionals: 5,
       admins: 2,
+    });
+    expect(applyTemplate(template("clinical")).limits).toEqual({
+      professionals: 7,
+      admins: 3,
     });
   });
 });
@@ -160,7 +235,7 @@ describe("limites", () => {
 
 describe("conversão com a API", () => {
   it("ida e volta mantém a matriz", () => {
-    const matrix = template("professional").matrix;
+    const matrix = template("plus").matrix;
     expect(matrixFromEntries(entriesFromMatrix(matrix))).toEqual(matrix);
   });
 

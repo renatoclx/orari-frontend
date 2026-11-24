@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import type { CheckoutAppointment, CheckoutItem } from "@/types/payment";
-import { checkoutState } from "@/utils/checkout";
+import { canReceive, checkoutState, receivableAhead } from "@/utils/checkout";
 
 type AppointmentPayment = NonNullable<CheckoutAppointment["payment"]>;
 type PreviousPayment = CheckoutItem["previousPayments"][number];
@@ -8,12 +8,13 @@ type PreviousPayment = CheckoutItem["previousPayments"][number];
 function appointment(
   payment: Pick<AppointmentPayment, "status"> | null,
   clientPlanId: string | null = null,
+  price: string | null = "120.00",
 ): CheckoutAppointment {
   return {
     id: "a1",
     startAt: "2026-10-23T22:30:00.000Z",
     status: "SCHEDULED",
-    service: { id: "s1", name: "Limpeza de Pele" },
+    service: { id: "s1", name: "Limpeza de Pele", price },
     professional: { id: "p1", name: "Helena" },
     recurringAppointmentId: null,
     clientPlanId,
@@ -28,6 +29,7 @@ function checkout(
   appointments: CheckoutAppointment[],
   options: {
     previousPayments?: PreviousPayment[];
+    productSales?: CheckoutItem["productSales"];
     todayPending?: string;
     previousPending?: string;
   } = {},
@@ -35,12 +37,41 @@ function checkout(
   return {
     client: { id: "c1", name: "Camila" },
     appointments,
+    productSales: options.productSales ?? [],
     previousPayments: options.previousPayments ?? [],
     todayPending: options.todayPending ?? "0.00",
     previousPending: options.previousPending ?? "0.00",
     paidToday: "0.00",
   };
 }
+
+// Venda de produtos de hoje, com o pagamento na situação pedida.
+const sale = (status: "PENDING" | "PAID") =>
+  ({
+    id: "sale-1",
+    createdAt: "2026-10-23T15:00:00.000Z",
+    items: [],
+    payment: { id: "pay-1", status },
+  }) as unknown as CheckoutItem["productSales"][number];
+
+describe("checkoutState com venda de produtos", () => {
+  it("só a venda paga: comanda paga (não fica aguardando)", () => {
+    expect(checkoutState(checkout([], { productSales: [sale("PAID")] }))).toBe(
+      "paid",
+    );
+  });
+
+  it("venda pendente: comanda aberta", () => {
+    expect(
+      checkoutState(
+        checkout([], {
+          productSales: [sale("PENDING")],
+          todayPending: "50.00",
+        }),
+      ),
+    ).toBe("open");
+  });
+});
 
 describe("checkoutState", () => {
   it("atendimento de hoje sem pagamento aguarda conclusão (não é Paga)", () => {
@@ -117,5 +148,19 @@ describe("checkoutState", () => {
 
   it("comanda vazia não quebra e não é Paga", () => {
     expect(checkoutState(checkout([]))).toBe("awaiting");
+  });
+});
+
+describe("receber antes da conclusão", () => {
+  it("avulso sem pagamento e com preço pode ser recebido", () => {
+    expect(receivableAhead(appointment(null))).toBe(true);
+    expect(canReceive(checkout([appointment(null)]))).toBe(true);
+  });
+
+  it("serviço sem preço, sessão de pacote ou já com pagamento: não", () => {
+    expect(receivableAhead(appointment(null, null, null))).toBe(false);
+    expect(receivableAhead(appointment(null, "plan-1"))).toBe(false);
+    expect(receivableAhead(appointment({ status: "PAID" }))).toBe(false);
+    expect(canReceive(checkout([appointment(null, null, null)]))).toBe(false);
   });
 });

@@ -1,4 +1,15 @@
-# Clientes, Funcionários e Profissionais
+# Clientes, Funcionários, Profissionais e Fornecedores
+
+> **Fornecedores** (2026-11-10): quarto tipo de pessoa (`SUPPLIER`), favorecido
+> das contas a pagar. Mesmas telas e campos dos demais (`PEOPLE_KINDS`), rota
+> `/fornecedores`, item **Pessoas → Fornecedores** (antes de Usuários) e
+> funcionalidade `suppliers` em Acessos e limites (Cadastros).
+> Diferenças do fornecedor: o documento aceita **CPF ou CNPJ** (rótulo
+> "CPF/CNPJ", máscara que vira CNPJ acima de 11 dígitos; nos demais tipos só
+> CPF); em "Mais informações" há a **Categoria principal** (Select das
+> categorias de despesa ativas, "Sem categoria" por padrão; só o ADMIN vê),
+> que pré-preenche as contas a pagar; a listagem mostra **CPF/CNPJ** e
+> **Categoria principal** no lugar de Data de nascimento e Profissão.
 
 ## Listagem
 
@@ -59,6 +70,7 @@
 - Foto é opcional.
 - Poderá adicionar uma foto ou tirar uma foto através do dispositivo.
 - Adicionar máscara para campo celular: (##) #####-####.
+  - O telefone é guardado **a partir do DDD**: quem cola ou o preenchimento automático traz "+55 31 99000-1111" (ou 12 ou 13 dígitos começando em 55), o 55 do país sai (`phoneDigits`, em `utils/masks.ts`). Um número de 11 dígitos começando em 55 é do DDD 55 (RS) e fica como está. O servidor aplica a mesma regra antes de enviar à API.
 - Adicionar máscara para campo de CPF: ###.###.###-##.
 - Os registros serão inseridos na base sem as máscara.
 - Nome obrigatório.
@@ -70,6 +82,11 @@
   - O cliente poderá ter mais de um endereço cadastrado;
 - Combobox para selecionar Estado.
   - Ao selecionar o Estado, habilita a seleção de Cidades (combobox), referente ao estado selecionado;
+- **Recebe comissão** (2026-11-10, só **profissional** e só o **ADMIN** vê):
+  chave abaixo de Observações, ligada por padrão, com a explicação "Desligue
+  para quem não recebe (ex.: o dono que atende). Religar vale para os
+  atendimentos daí em diante." Vale no cadastro e na alteração. O profissional
+  vinculado a um usuário ADMIN já vem desligado (ver Usuários).
 
 ---
 

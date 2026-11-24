@@ -28,7 +28,7 @@ export function ListSearch({
   search,
   label,
   query = {},
-  placeholder = "Buscar por nome",
+  placeholder = "Buscar por nome...",
   size = "default",
 }: ListSearchProps) {
   const router = useRouter();

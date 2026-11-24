@@ -42,7 +42,19 @@ export const PEOPLE_KINDS: Record<PeopleType, PeopleKind> = {
     singular: "profissional",
     singularTitle: "Profissional",
   },
+  // Favorecido das contas a pagar (2026-11-10).
+  SUPPLIER: {
+    type: "SUPPLIER",
+    path: "/fornecedores",
+    feature: "suppliers",
+    plural: "Fornecedores",
+    singular: "fornecedor",
+    singularTitle: "Fornecedor",
+  },
 };
+
+/** Valor do "Sem categoria" no Select do fornecedor (o Radix não aceita vazio). */
+export const NO_CATEGORY = "NONE";
 
 /** Confere um valor vindo do navegador (não confiável) contra os tipos. */
 export function isPeopleType(value: unknown): value is PeopleType {

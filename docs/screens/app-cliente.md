@@ -124,12 +124,12 @@ Barra de navegação embaixo, do app inteiro: **Início**, **Buscar** (marcada t
 - Topo: "‹ <estabelecimento>" (volta à página dele) e o título **Agendar**.
 - Uma página só, que se completa conforme as escolhas (mudar uma apaga as que dependem dela):
   1. **Escolha o serviço**: cartões separados, um por serviço (nome, duração, preço e uma **seta** à direita, que mostra que dá para tocar). O escolhido ganha o visto e um fundo suave com uma faixa à esquerda, sem virar um bloco cheio. Vindo da página do local (`?servico=<id>`), o serviço já vem escolhido e a lista **nem aparece**: a tela abre com o serviço num cartão ("1 · Serviço", com **Trocar**) e já nos passos seguintes; um id que não existe é ignorado e a lista aparece. Escolher na lista também a fecha no cartão, e **Trocar** a abre de novo. Os passos têm número (1 · serviço, 2 · profissional, 3 · dia, 4 · horário).
-  2. **Profissional**: quem atende o serviço; com um só, já vem escolhido.
-  3. **Dia**: faixa que rola de lado (dia da semana, número e mês), de hoje até os **dias à frente** da clínica (no máximo 60). Começa em hoje.
+  2. **Profissional**: quem atende o serviço, em círculos com a foto (ou as iniciais, como os estabelecimentos) e o nome embaixo, **centralizados**; com mais do que cabe na tela, a linha rola de lado. O escolhido ganha anel ciano e ✓. Com um só, já vem escolhido.
+  3. **Dia**: faixa que rola de lado (dia da semana, número e mês), de hoje até os **dias à frente** da clínica (no máximo 60). Começa em hoje, que aparece como "hoje". A mesma faixa (`DayStrip`) é usada na Agenda do app do profissional.
   4. **Horário · <dia por extenso>**: os horários livres do dia, calculados no servidor com as regras da clínica (antecedência, janelas, compromissos e turmas), agrupados em **Manhã**, **Tarde** e **Noite** (com a quantidade), 3 por linha, com contorno azul; o escolhido fica preenchido. Sem horário: "Nenhum horário livre neste dia. Escolha outro dia."
-- Profissional, dia e horário: botões de escolha com contorno e, escolhido, preenchido em azul (`aria-pressed`); o serviço usa a lista acima.
-- **Confirmar <dia>, <dd/mm> às <hh:mm>**: preso embaixo, logo acima da barra de navegação. Agendado: Início com o aviso.
-- Recusas da API aparecem no topo: horário que deixou de estar livre (e os horários são buscados de novo) e o limite do cliente não confirmado ("Até o estabelecimento confirmar o seu cadastro, você pode ter no máximo 2 agendamentos futuros.").
+- Dia e horário: botões de escolha com contorno e, escolhido, preenchido em ciano (`aria-pressed`); o serviço usa a lista acima e o profissional, os círculos.
+- **Revisar agendamento** (preso embaixo, logo acima da barra de navegação) abre a **confirmação** na própria página (não é diálogo: os diálogos ficam fora da área escura do app): estabelecimento, serviço (duração e preço), profissional, dia por extenso e horário com o fim ("15:15 às 16:15"). **Confirmar agendamento** grava; **Voltar** volta às escolhas sem perder nada. Agendado: Início com o aviso.
+- Recusas da API voltam às escolhas e aparecem no topo: horário que deixou de estar livre (e os horários são buscados de novo) e o limite do cliente não confirmado ("Até o estabelecimento confirmar o seu cadastro, você pode ter no máximo 2 agendamentos futuros.").
 - Só avulsos: recorrências, pacotes e turmas continuam sendo marcados pela clínica.
 
 ## Instalar no celular

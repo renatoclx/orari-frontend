@@ -3,7 +3,7 @@ import {
   periodOf,
   type Period,
 } from "@/components/agenda/agenda-availability";
-import { timeToMinutes } from "@/utils/time";
+import { minutesToTime, timeToMinutes } from "@/utils/time";
 
 // Horários livres do app agrupados por período (screens/app-cliente.md), com a
 // mesma divisão da agenda da clínica: manhã até 11:59, tarde até 17:59, noite.
@@ -25,4 +25,11 @@ export function groupSlotsByPeriod(slots: Slot[]): SlotGroup[] {
 /** "1 horário" ou "13 horários". */
 export function slotsLabel(count: number): string {
   return count === 1 ? "1 horário" : `${count} horários`;
+}
+
+/** "09:00 às 09:45": o horário com o fim, pela duração do serviço (minutos). */
+export function slotRange(time: string, duration: number): string {
+  // Passando da meia-noite, o fim volta a contar do zero ("23:30 às 00:30").
+  const end = (timeToMinutes(time) + duration) % (24 * 60);
+  return `${time} às ${minutesToTime(end)}`;
 }

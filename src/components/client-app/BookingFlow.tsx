@@ -1,26 +1,27 @@
 "use client";
 
 import { useEffect, useRef, useState, useTransition } from "react";
-import { CalendarCheck, Check, ChevronRight, Pencil } from "lucide-react";
+import { Check, ChevronRight, ClipboardCheck, Pencil } from "lucide-react";
 import { appAvailabilityAction, appBookAction } from "@/app/app/actions";
 import { AppFormMessage } from "@/components/client-app/AppFormMessage";
+import { DayStrip } from "@/components/client-app/DayStrip";
 import { BOTTOM_NAV_OFFSET } from "@/components/client-app/AppBottomNav";
 import {
   groupSlotsByPeriod,
   slotsLabel,
   type Slot,
 } from "@/components/client-app/booking-slots";
-import {
-  bookingDays,
-  dayChip,
-  longDate,
-} from "@/components/client-app/client-app";
+import { BookingReview } from "@/components/client-app/BookingReview";
+import { bookingDays, longDate } from "@/components/client-app/client-app";
+import { PlaceAvatar } from "@/components/client-app/PlaceAvatar";
 import { Button } from "@/components/ui/button";
 import type { PlaceService } from "@/types/client-app";
 import { formatDuration, formatPrice } from "@/utils/format";
 
 type BookingFlowProps = {
   slug: string;
+  /** O estabelecimento, para o resumo da confirmação. */
+  place: { name: string; logoUrl: string | null };
   services: PlaceService[];
   /** Serviço já escolhido (vindo da lista da página do local). */
   initialServiceId?: string;
@@ -30,23 +31,15 @@ type BookingFlowProps = {
   maxDaysAhead: number;
 };
 
-// Botão de escolha (serviço, profissional, dia, horário): contorno azul e,
-// escolhido, preenchido, como no esboço aprovado.
-const choiceClass = (selected: boolean) =>
-  `rounded-control border text-left transition-colors ${
-    selected
-      ? "border-primary bg-primary text-primary-foreground"
-      : "border-border bg-card hover:border-primary"
-  }`;
-
 /**
  * Agendar pelo app (screens/app-cliente.md): serviço → profissional → dia →
- * horário → confirmar, numa página só que vai se completando. Mudar uma escolha
+ * horário → revisar e confirmar, numa página só que vai se completando. Mudar uma escolha
  * apaga as que dependem dela. Os horários vêm do servidor, com as regras da
  * clínica (antecedência, dias à frente, janelas e compromissos).
  */
 export function BookingFlow({
   slug,
+  place,
   services,
   initialServiceId,
   today,
@@ -67,11 +60,16 @@ export function BookingFlow({
   const [slots, setSlots] = useState<Slot[]>();
   const [slot, setSlot] = useState<Slot>();
   const [message, setMessage] = useState<string>();
+  // Etapa de confirmação: o resumo do que foi escolhido, antes de gravar.
+  const [reviewing, setReviewing] = useState(false);
   const [reload, setReload] = useState(0);
   const [loading, startLoading] = useTransition();
   const [booking, startBooking] = useTransition();
 
   const service = services.find((item) => item.id === serviceId);
+  const professional = service?.professionals.find(
+    (person) => person.id === professionalId,
+  );
   const days = bookingDays(today, maxDaysAhead);
 
   function chooseService(id: string) {
@@ -135,13 +133,37 @@ export function BookingFlow({
         startAt: slot.startAt,
       });
       if (!result) return;
+      // Recusa (horário ocupado, limite do cliente): volta às escolhas, com o
+      // motivo no topo.
+      setReviewing(false);
       setMessage(result.message);
       // Alguém pegou o horário antes: busca os livres de novo.
       if (result.refresh) setReload((value) => value + 1);
     });
   }
 
+  // Abre e fecha a confirmação sempre do topo da página.
+  function showReview(open: boolean) {
+    setReviewing(open);
+    window.scrollTo({ top: 0 });
+  }
+
   const groups = slots ? groupSlotsByPeriod(slots) : [];
+
+  if (reviewing && service && professional && slot) {
+    return (
+      <BookingReview
+        place={place}
+        service={service}
+        professional={professional}
+        date={date}
+        time={slot.time}
+        booking={booking}
+        onConfirm={confirm}
+        onBack={() => showReview(false)}
+      />
+    );
+  }
 
   return (
     <div className="flex flex-1 flex-col gap-6">
@@ -221,21 +243,55 @@ export function BookingFlow({
       {service && (
         <section id="booking-professional" className="scroll-mt-4 space-y-2">
           <h2 className="font-semibold">2 · Profissional</h2>
-          <div className="flex flex-wrap gap-2">
-            {service.professionals.map((person) => (
-              <button
-                key={person.id}
-                type="button"
-                aria-pressed={person.id === professionalId}
-                onClick={() => {
-                  setProfessionalId(person.id);
-                  setMessage(undefined);
-                }}
-                className={`${choiceClass(person.id === professionalId)} px-4 py-2.5 text-sm font-medium`}
-              >
-                {person.name}
-              </button>
-            ))}
+          {/* Foto (ou iniciais) em círculo, como os estabelecimentos. A linha
+              interna (`w-max mx-auto`) fica no centro enquanto cabe e, com
+              muitos, rola de lado a partir do primeiro (um justify-center
+              cortaria o começo). */}
+          <div className="-mx-5 overflow-x-auto px-5 pt-1 pb-1">
+            <div className="mx-auto flex w-max gap-3">
+              {service.professionals.map((person) => {
+                const selected = person.id === professionalId;
+                return (
+                  <button
+                    key={person.id}
+                    type="button"
+                    aria-pressed={selected}
+                    onClick={() => {
+                      setProfessionalId(person.id);
+                      setMessage(undefined);
+                    }}
+                    className="flex w-20 shrink-0 flex-col items-center gap-2 text-center"
+                  >
+                    <span className="relative">
+                      <span
+                        className={`block rounded-full ring-2 ring-offset-2 ring-offset-background transition-colors ${
+                          selected ? "ring-primary" : "ring-transparent"
+                        }`}
+                      >
+                        <PlaceAvatar
+                          name={person.name}
+                          logoUrl={person.photoUrl}
+                          size="lg"
+                          alt=""
+                        />
+                      </span>
+                      {selected && (
+                        <span className="absolute -right-1 -bottom-1 flex size-6 items-center justify-center rounded-full bg-primary text-primary-foreground ring-2 ring-background">
+                          <Check className="size-4" aria-hidden="true" />
+                        </span>
+                      )}
+                    </span>
+                    <span
+                      className={`line-clamp-2 text-sm font-medium ${
+                        selected ? "text-primary" : ""
+                      }`}
+                    >
+                      {person.name}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
           </div>
         </section>
       )}
@@ -243,31 +299,15 @@ export function BookingFlow({
       {service && professionalId && (
         <section id="booking-day" className="scroll-mt-4 space-y-2">
           <h2 className="font-semibold">3 · Dia</h2>
-          {/* Faixa que rola de lado, como no AppBarber. */}
-          <div className="-mx-5 flex gap-2 overflow-x-auto px-5 pb-1">
-            {days.map((day) => {
-              const chip = dayChip(day);
-              return (
-                <button
-                  key={day}
-                  type="button"
-                  aria-pressed={day === date}
-                  aria-label={longDate(day)}
-                  onClick={() => {
-                    setDate(day);
-                    setMessage(undefined);
-                  }}
-                  className={`${choiceClass(day === date)} flex w-14 shrink-0 flex-col items-center py-2 text-center`}
-                >
-                  <span className="text-xs">{chip.weekday}</span>
-                  <span className="text-lg font-semibold tabular-nums">
-                    {chip.day}
-                  </span>
-                  <span className="text-xs">{chip.month}</span>
-                </button>
-              );
-            })}
-          </div>
+          <DayStrip
+            days={days}
+            selected={date}
+            today={today}
+            onSelect={(day) => {
+              setDate(day);
+              setMessage(undefined);
+            }}
+          />
         </section>
       )}
 
@@ -323,21 +363,18 @@ export function BookingFlow({
         </section>
       )}
 
-      {/* Confirmar fica preso embaixo, logo acima da barra de navegação. */}
+      {/* Revisar fica preso embaixo, logo acima da barra de navegação. */}
       {slot && service && (
         <div
           className={`sticky ${BOTTOM_NAV_OFFSET} -mx-5 mt-auto border-t border-border bg-background px-5 py-3`}
         >
           <Button
             type="button"
-            disabled={booking}
-            onClick={confirm}
+            onClick={() => showReview(true)}
             className="h-12 w-full text-base"
           >
-            <CalendarCheck aria-hidden="true" />
-            {booking
-              ? "Agendando…"
-              : `Confirmar ${dayChip(date).weekday}, ${dayChip(date).day}/${date.slice(5, 7)} às ${slot.time}`}
+            <ClipboardCheck aria-hidden="true" />
+            Revisar agendamento
           </Button>
         </div>
       )}

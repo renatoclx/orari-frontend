@@ -1,3 +1,4 @@
+import { useEffect, useRef } from "react";
 import { CalendarClock, ChevronsUpDown, Plus } from "lucide-react";
 import { Hint } from "@/components/shared/Hint";
 import { AppointmentBlock } from "@/components/agenda/AppointmentBlock";
@@ -22,6 +23,7 @@ import {
   DropdownMenuRadioItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { cn } from "@/lib/utils";
 import { minutesToTime, timeToMinutes } from "@/utils/time";
 
 // Altura de cada intervalo de 30 minutos.
@@ -75,6 +77,14 @@ type DayGridProps = {
   classSessions: AgendaClassSession[];
   /** Clique em uma sessão de turma (o bloco que junta os alunos). */
   onClassSessionSelect?: (session: AgendaClassSession) => void;
+  /** Minuto do dia em que a grade abre (agenda-day-position.ts). */
+  initialMinute?: number;
+  /**
+   * Muda quando a grade deve se posicionar de novo (outro dia, ou a grade
+   * voltando a aparecer no celular); a atualização automática não o muda.
+   */
+  scrollKey?: string;
+  className?: string;
 };
 
 /** Grade do dia: uma coluna por profissional, com expediente e agendamentos. */
@@ -96,7 +106,22 @@ export function DayGrid({
   onAppointmentSelect,
   classSessions: sessions,
   onClassSessionSelect,
+  initialMinute,
+  scrollKey,
+  className,
 }: DayGridProps) {
+  const scrollRef = useRef<HTMLDivElement>(null);
+
+  // Abre no horário certo (hoje, perto de agora; nos outros dias, no primeiro
+  // atendimento). O cabeçalho fica preso no topo, então a posição é a do
+  // horário na grade. Só ao trocar de dia: os 60 s de atualização não rolam.
+  useEffect(() => {
+    if (initialMinute === undefined || !scrollRef.current) return;
+    scrollRef.current.scrollTop = (initialMinute - range.start) * PX_PER_MINUTE;
+    // Só pelo scrollKey: rolar a cada renderização tiraria o usuário do lugar.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [scrollKey]);
+
   // Colunas dos outros profissionais somem no celular, quando há um escolhido.
   const mobileHidden = (professionalId: string) =>
     mobileProfessionalId !== undefined &&
@@ -198,7 +223,13 @@ export function DayGrid({
   const nowTop = showNow ? toPixels(now as string) : 0;
 
   return (
-    <div className="min-h-0 flex-1 overflow-auto rounded-card border border-border bg-card">
+    <div
+      ref={scrollRef}
+      className={cn(
+        "min-h-0 flex-1 overflow-auto rounded-card border border-border bg-card",
+        className,
+      )}
+    >
       <div
         // Celular: horários + uma coluna. A partir do md: uma coluna por
         // profissional, cada uma com largura mínima (a grade rola na horizontal).

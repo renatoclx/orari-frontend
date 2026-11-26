@@ -1,8 +1,8 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { DayStrip } from "@/components/client-app/DayStrip";
-import { agendaStripDays } from "./professional-agenda";
+import { DayStrip } from "@/components/shared/DayStrip";
+import { dayStripDays } from "@/utils/day-strip";
 
 /**
  * Faixa de dias da Agenda do profissional, igual à do Agendar do cliente. O dia
@@ -12,9 +12,10 @@ export function AgendaDayStrip({ day, today }: { day: string; today: string }) {
   const router = useRouter();
   return (
     <DayStrip
-      days={agendaStripDays(day, today)}
+      days={dayStripDays(day, today)}
       selected={day}
       today={today}
+      className="-mx-5 px-5"
       onSelect={(target) =>
         router.push(
           target === today ? "/app/agenda" : `/app/agenda?dia=${target}`,

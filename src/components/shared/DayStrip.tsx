@@ -2,6 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import { dayChip, longDate } from "@/components/client-app/client-app";
+import { cn } from "@/lib/utils";
 
 type DayStripProps = {
   /** Dias da faixa, em ordem ("AAAA-MM-DD"). */
@@ -11,14 +12,26 @@ type DayStripProps = {
   /** Hoje: o botão dele diz "hoje" no lugar do dia da semana. */
   today?: string;
   onSelect: (day: string) => void;
+  /**
+   * Recuo lateral da tela onde ela entra (ex.: "-mx-5 px-5" no app, "-mx-4
+   * px-4" no painel): a faixa vai até a borda e o primeiro dia alinha ao texto.
+   */
+  className?: string;
 };
 
 /**
  * Faixa de dias que rola de lado, como no AppBarber: usada no Agendar do
- * cliente e na Agenda do profissional, para as duas terem o mesmo jeito.
+ * cliente, na Agenda do profissional e na agenda do painel no celular, para
+ * todas terem o mesmo jeito.
  * O dia escolhido é rolado até o meio da faixa ao abrir e ao trocar.
  */
-export function DayStrip({ days, selected, today, onSelect }: DayStripProps) {
+export function DayStrip({
+  days,
+  selected,
+  today,
+  onSelect,
+  className,
+}: DayStripProps) {
   const stripRef = useRef<HTMLDivElement>(null);
   // Só o começo da faixa: a lista pode ser recriada a cada render da tela, e
   // rolar de novo a cada toque em outro lugar seria incômodo.
@@ -37,7 +50,7 @@ export function DayStrip({ days, selected, today, onSelect }: DayStripProps) {
   return (
     <div
       ref={stripRef}
-      className="relative -mx-5 flex gap-2 overflow-x-auto px-5 pb-1"
+      className={cn("relative flex gap-2 overflow-x-auto pb-1", className)}
     >
       {days.map((day) => {
         const chip = dayChip(day);

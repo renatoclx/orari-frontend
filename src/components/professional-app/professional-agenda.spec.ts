@@ -1,7 +1,6 @@
 import { describe, expect, it } from "vitest";
 import type { ProfessionalAgenda } from "@/types/professional-app";
 import {
-  agendaStripDays,
   buildEntries,
   parseDayParam,
   relativeDayLabel,
@@ -54,27 +53,6 @@ describe("shiftDay", () => {
   it("anda entre dias, virando o mês e o ano", () => {
     expect(shiftDay("2026-11-30", 1)).toBe("2026-12-01");
     expect(shiftDay("2027-01-01", -1)).toBe("2026-12-31");
-  });
-});
-
-describe("agendaStripDays", () => {
-  it("vai de 7 dias antes a 30 depois de hoje", () => {
-    const days = agendaStripDays("2026-11-24", "2026-11-24");
-    expect(days).toHaveLength(38);
-    expect(days[0]).toBe("2026-11-17");
-    expect(days.at(-1)).toBe("2026-12-24");
-  });
-
-  it("dia dentro da faixa não a desloca", () => {
-    expect(agendaStripDays("2026-12-24", "2026-11-24")[0]).toBe("2026-11-17");
-    expect(agendaStripDays("2026-11-17", "2026-11-24")[0]).toBe("2026-11-17");
-  });
-
-  it("dia fora da faixa (calendário) passa a ser o centro dela", () => {
-    const days = agendaStripDays("2027-03-10", "2026-11-24");
-    expect(days[0]).toBe("2027-03-03");
-    expect(days).toContain("2027-03-10");
-    expect(agendaStripDays("2026-10-01", "2026-11-24")).toContain("2026-10-01");
   });
 });
 

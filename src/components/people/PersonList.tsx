@@ -130,19 +130,12 @@ export function PersonList({
                     size="lg"
                   />
                   <div className="min-w-0 flex-1">
-                    <div className="flex items-start justify-between gap-2">
-                      <p className="truncate pt-2 font-medium">{person.name}</p>
-                      <PersonActions
-                        person={person}
-                        onView={setViewing}
-                        onDelete={setDeleting}
-                        onReactivate={reactivate}
-                        busy={reactivating}
-                        basePath={kind.path}
-                        withHistory={kind.type === "CLIENT"}
-                        portal={portal}
-                      />
-                    </div>
+                    {/* O nome ganha a linha toda e quebra, em vez de ser cortado:
+                        as ações (à vista, por decisão do produto) descem para o
+                        fim do cartão. */}
+                    <p className="pt-2 font-medium break-words">
+                      {person.name}
+                    </p>
                     <dl className="mt-1 grid grid-cols-[auto_1fr] gap-x-3 gap-y-0.5 text-sm [&_dd]:whitespace-nowrap">
                       <dt className="text-muted-foreground">Celular</dt>
                       <dd className="tabular-nums">
@@ -161,6 +154,18 @@ export function PersonList({
                         <StatusBadge active={person.deletedAt === null} />
                       </dd>
                     </dl>
+                    <div className="mt-2 flex justify-end">
+                      <PersonActions
+                        person={person}
+                        onView={setViewing}
+                        onDelete={setDeleting}
+                        onReactivate={reactivate}
+                        busy={reactivating}
+                        basePath={kind.path}
+                        withHistory={kind.type === "CLIENT"}
+                        portal={portal}
+                      />
+                    </div>
                   </div>
                 </li>
               ))}

@@ -72,7 +72,7 @@ export default async function AppHomePage({ searchParams }: PageProps<"/app">) {
       {agendado && (
         <AppNotice
           param="agendado"
-          message="Agendamento confirmado. Fique de olho na notificações!"
+          message="Agendamento confirmado. Fique de olho nas notificações!"
         />
       )}
 

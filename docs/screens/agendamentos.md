@@ -9,12 +9,13 @@
 - **Atualização automática:** a agenda renderiza de novo a cada 60 segundos (só com a aba visível e sem diálogo aberto) e quando chega notificação de agendamento (ver `notificacoes.md`), para mostrar o que entrou pelo celular ou por outro administrador. Filtros e rolagem não mudam.
 - Título: "Agendamentos".
 - Barra superior:
-  - Botões "Dia anterior", "Próximo dia" e "Hoje".
+  - Botões "Dia anterior", "Próximo dia" e "Hoje" (a partir de `md`; no celular, a faixa de dias, ver "Celular").
   - Data por extenso do dia exibido.
   - Filtro "Filtrar por profissional" (apenas no computador) e, quando há filtro, o botão "Mostrar Todos".
   - Botão "Encaixar horário", neutro, para agendar fora do horário de funcionamento (ver "Encaixe").
   - Botão "Novo Agendamento", sempre visível.
 - Grade do dia, que ocupa a largura e a altura da página, com rolagem própria:
+  - Abre no horário certo: hoje, meia hora antes de agora; nos outros dias, no primeiro atendimento ou, sem nenhum, na abertura da clínica. Só se posiciona ao trocar de dia (a atualização automática não mexe na rolagem).
   - Uma coluna por profissional exibido (ver "Profissionais exibidos"), com o nome e a quantidade de agendamentos do dia (cancelados não contam).
   - Coluna de horários fixa à esquerda, em intervalos de 30 minutos.
   - Linha do horário atual, somente quando o dia exibido é hoje.
@@ -77,7 +78,11 @@
 
 ### Celular
 
-- Exibe um profissional por vez. A troca é feita por um ícone de seleção ao lado do nome do profissional, no cabeçalho da coluna.
+- **Faixa de dias** abaixo do título (a mesma do app: 7 dias atrás a 30 à frente de hoje, que aparece como "hoje"; o dia aberto fica no meio), no lugar das setas e do "Hoje". O dia vai na URL e o profissional filtrado é mantido. Datas fora da faixa: o calendário do cabeçalho.
+- **Lista do dia** (padrão) ou **Grade**, escolhidas por dois botões ao lado da data ("Ver em lista" / "Ver em grade"); a última escolha fica guardada no aparelho.
+  - **Lista:** os atendimentos de todos os profissionais em ordem de horário (no mesmo horário, na ordem dos profissionais), com os mesmos critérios da grade (turma numa linha por sessão; cancelado só se o horário não foi reaproveitado). Cada linha: faixa com a cor do serviço, início e fim, cliente (ou serviço e "Turma · nomes"), profissional e situação (ou vagas, na turma). Tocar abre o mesmo diálogo da grade. Hoje, abre no que está acontecendo ou vem a seguir. Vazio: "Nenhum agendamento neste dia."
+  - **Grade:** um profissional por vez. A troca é feita por um ícone de seleção ao lado do nome do profissional, no cabeçalho da coluna.
+- **Topo em uma linha:** "Novo Agendamento" ocupa o espaço e "Encaixar horário" fica só com o ícone ao lado (nome na dica e para leitor de tela).
 - O filtro por profissional e o botão "Mostrar Todos" não existem no celular.
 
 ### Pendências (previstas)

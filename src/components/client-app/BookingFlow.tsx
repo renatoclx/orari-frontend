@@ -4,7 +4,6 @@ import { useEffect, useRef, useState, useTransition } from "react";
 import { Check, ChevronRight, ClipboardCheck, Pencil } from "lucide-react";
 import { appAvailabilityAction, appBookAction } from "@/app/app/actions";
 import { AppFormMessage } from "@/components/client-app/AppFormMessage";
-import { DayStrip } from "@/components/client-app/DayStrip";
 import { BOTTOM_NAV_OFFSET } from "@/components/client-app/AppBottomNav";
 import {
   groupSlotsByPeriod,
@@ -14,6 +13,7 @@ import {
 import { BookingReview } from "@/components/client-app/BookingReview";
 import { bookingDays, longDate } from "@/components/client-app/client-app";
 import { PlaceAvatar } from "@/components/client-app/PlaceAvatar";
+import { DayStrip } from "@/components/shared/DayStrip";
 import { Button } from "@/components/ui/button";
 import type { PlaceService } from "@/types/client-app";
 import { formatDuration, formatPrice } from "@/utils/format";
@@ -303,6 +303,7 @@ export function BookingFlow({
             days={days}
             selected={date}
             today={today}
+            className="-mx-5 px-5"
             onSelect={(day) => {
               setDate(day);
               setMessage(undefined);

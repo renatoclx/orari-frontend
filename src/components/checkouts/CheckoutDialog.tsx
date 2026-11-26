@@ -20,6 +20,7 @@ import { PaymentDescription } from "@/components/payments/PaymentDescription";
 import { SettleFields } from "@/components/payments/SettleFields";
 import { ProductSaleDialog } from "@/components/product-sales/ProductSaleDialog";
 import { ConfirmDialog } from "@/components/shared/ConfirmDialog";
+import { SelectionCheckbox } from "@/components/shared/SelectionCheckbox";
 import { Hint } from "@/components/shared/Hint";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -293,9 +294,7 @@ function CheckoutForm({
   }
 
   const checkbox = (id: string, label: string) => (
-    <input
-      type="checkbox"
-      className="size-4 shrink-0 accent-primary"
+    <SelectionCheckbox
       aria-label={label}
       checked={selected.has(id)}
       onChange={(event) => toggle(id, event.target.checked)}

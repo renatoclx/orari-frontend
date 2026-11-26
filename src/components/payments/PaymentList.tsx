@@ -13,6 +13,7 @@ import { PaymentDescription } from "@/components/payments/PaymentDescription";
 import { SettlePaymentsDialog } from "@/components/payments/SettlePaymentsDialog";
 import { RecurrenceSessionsDialog } from "@/components/recurrences/RecurrenceSessionsDialog";
 import { EmptyValue } from "@/components/shared/EmptyValue";
+import { SelectionCheckbox } from "@/components/shared/SelectionCheckbox";
 import { Hint } from "@/components/shared/Hint";
 import { Button } from "@/components/ui/button";
 import type { AgendaAppointment } from "@/types/agenda";
@@ -104,9 +105,7 @@ export function PaymentList({
     const otherClient =
       chosenClient !== undefined && chosenClient !== payment.client.id;
     const input = (
-      <input
-        type="checkbox"
-        className="size-4 accent-primary disabled:opacity-40"
+      <SelectionCheckbox
         aria-label={`Selecionar o pagamento de ${payment.client.name}`}
         checked={selected.has(payment.id)}
         disabled={otherClient}

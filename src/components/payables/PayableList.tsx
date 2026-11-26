@@ -25,6 +25,7 @@ import { receiptHref } from "@/components/commissions/commission-filters";
 import { payableTitle } from "@/components/payables/payable-filters";
 import { SettlePayablesDialog } from "@/components/payables/SettlePayablesDialog";
 import { ConfirmDialog } from "@/components/shared/ConfirmDialog";
+import { SelectionCheckbox } from "@/components/shared/SelectionCheckbox";
 import { EmptyValue } from "@/components/shared/EmptyValue";
 import { Hint } from "@/components/shared/Hint";
 import { Button } from "@/components/ui/button";
@@ -130,9 +131,7 @@ export function PayableList({
   function checkbox(payable: PayableItem) {
     if (!pendingOnly(payable) || !canEdit) return null;
     return (
-      <input
-        type="checkbox"
-        className="size-4 accent-primary"
+      <SelectionCheckbox
         aria-label={`Selecionar ${payableTitle(payable)}`}
         checked={selected.has(payable.id)}
         onChange={(event) => toggle(payable, event.target.checked)}

@@ -34,6 +34,8 @@ type AgendaToolbarProps = {
   filterId?: string | null;
   onFilterChange?: (professionalId: string) => void;
   onShowAll?: () => void;
+  /** Escolha entre Lista e Grade, ao lado da data (só no celular). */
+  viewToggle?: React.ReactNode;
 };
 
 // O dia (?date=) e o filtro de profissional (?professional=) ficam na URL: os
@@ -61,11 +63,13 @@ export function AgendaToolbar({
   filterId = null,
   onFilterChange,
   onShowAll,
+  viewToggle,
 }: AgendaToolbarProps) {
   return (
     <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
-      {/* Só a partir de sm: no celular, o calendário do cabeçalho já troca o dia. */}
-      <div className="hidden items-center gap-1 sm:flex">
+      {/* Só no computador (a partir de md): no celular, a faixa de dias acima da
+          agenda troca o dia. */}
+      <div className="hidden items-center gap-1 md:flex">
         <Hint label={`Ir para ${dayName(shiftDateString(date, -1))}`}>
           <Button variant="outline" size="icon" asChild>
             <Link
@@ -96,13 +100,17 @@ export function AgendaToolbar({
         </Hint>
       </div>
 
-      {/* No celular, a data ocupa a primeira linha e os botões descem. */}
-      <h2 className="text-lg font-semibold max-sm:order-first max-sm:w-full">
-        {dateLabel}
-      </h2>
+      {/* No celular, a data (com a escolha Lista/Grade) ocupa a primeira linha
+          e os botões descem. */}
+      <div className="flex min-w-0 items-center justify-between gap-2 max-sm:order-first max-sm:w-full">
+        <h2 className="truncate text-lg font-semibold">{dateLabel}</h2>
+        {viewToggle}
+      </div>
 
-      {/* No celular, as ações ficam empilhadas na largura toda, a principal em cima. */}
-      <div className="ml-auto flex flex-wrap items-center gap-2 max-sm:w-full max-sm:flex-col-reverse">
+      {/* No celular, as ações ficam numa linha só: "Novo Agendamento" ocupa o
+          espaço e o encaixe vira só o ícone, ao lado (row-reverse: no código o
+          encaixe vem antes). */}
+      <div className="ml-auto flex flex-wrap items-center gap-2 max-sm:w-full max-sm:flex-row-reverse max-sm:flex-nowrap">
         {/* Filtro por profissional: só no computador (no celular, a troca é no
             cabeçalho da coluna). */}
         {onFilterChange && professionals.length > 0 && (
@@ -153,14 +161,14 @@ export function AgendaToolbar({
             <Button
               variant="outline"
               onClick={onOverbooking}
-              className="max-sm:w-full"
+              className="max-sm:size-10 max-sm:shrink-0 max-sm:p-0"
             >
               <CalendarClock aria-hidden="true" />
-              Encaixar horário
+              <span className="max-sm:sr-only">Encaixar horário</span>
             </Button>
           </Hint>
 
-          <Button onClick={onNewAppointment} className="max-sm:w-full">
+          <Button onClick={onNewAppointment} className="max-sm:flex-1">
             <Plus aria-hidden="true" />
             Novo Agendamento
           </Button>

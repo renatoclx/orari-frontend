@@ -29,7 +29,14 @@ import type { TemplateQuestion } from "@/types/anamnesis";
 type NewAnamnesisFormProps = {
   client: { id: string; name: string };
   /** Modelos ativos que o cliente ainda não usou, com as perguntas da versão vigente. */
-  templates: { id: string; name: string; questions: TemplateQuestion[] }[];
+  templates: {
+    id: string;
+    name: string;
+    questions: TemplateQuestion[];
+    responsibilityTerm: string | null;
+  }[];
+  /** Atualizar ficha: o modelo já escolhido e as respostas trazidas da antiga. */
+  initial?: { templateId: string; drafts: Record<string, AnswerDraft> };
   /** Hoje no fuso da empresa ("aaaa-mm-dd"). */
   today: string;
 };
@@ -43,15 +50,18 @@ type NewAnamnesisFormProps = {
 export function NewAnamnesisForm({
   client,
   templates,
+  initial,
   today,
 }: NewAnamnesisFormProps) {
   const router = useRouter();
-  // Só um modelo disponível: já vem escolhido.
+  // Só um modelo disponível: já vem escolhido (ou o da ficha que se atualiza).
   const [templateId, setTemplateId] = useState(
-    templates.length === 1 ? templates[0].id : "",
+    initial?.templateId ?? (templates.length === 1 ? templates[0].id : ""),
   );
   const [consultationDate, setConsultationDate] = useState(today);
-  const [drafts, setDrafts] = useState<Record<string, AnswerDraft>>({});
+  const [drafts, setDrafts] = useState<Record<string, AnswerDraft>>(
+    initial?.drafts ?? {},
+  );
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [dateError, setDateError] = useState<string>();
   const [pending, startTransition] = useTransition();
@@ -180,6 +190,19 @@ export function NewAnamnesisForm({
                   error={errors[question.id]}
                 />
               ))}
+            </section>
+          )}
+
+          {/* Só leitura: o profissional pode ler o termo com o cliente antes de
+              imprimir a ficha para assinar. */}
+          {template?.responsibilityTerm && (
+            <section className="space-y-2 rounded-control border border-border bg-muted px-4 py-3">
+              <h2 className="text-sm font-semibold">
+                Termo de responsabilidade
+              </h2>
+              <p className="text-justify text-sm whitespace-pre-line text-muted-foreground">
+                {template.responsibilityTerm}
+              </p>
             </section>
           )}
         </div>

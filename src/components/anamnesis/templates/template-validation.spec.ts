@@ -27,6 +27,7 @@ const form = (
 ): TemplateFormValues => ({
   name: "Fisioterapia",
   description: "",
+  responsibilityTerm: "",
   questions: [question()],
   ...overrides,
 });
@@ -198,6 +199,19 @@ describe("toQuestionInputs", () => {
   });
 });
 
+describe("validateTemplateForm: termo de responsabilidade", () => {
+  it("é opcional e aceita até 3000 caracteres", () => {
+    expect(validateTemplateForm(form({ responsibilityTerm: "" }))).toEqual({});
+    expect(
+      validateTemplateForm(form({ responsibilityTerm: "a".repeat(3000) })),
+    ).toEqual({});
+    expect(
+      validateTemplateForm(form({ responsibilityTerm: "a".repeat(3001) }))
+        .responsibilityTerm,
+    ).toBe("O termo tem no máximo 3000 caracteres.");
+  });
+});
+
 describe("questionsChanged", () => {
   const template: TemplateItem = {
     id: "t1",
@@ -207,6 +221,7 @@ describe("questionsChanged", () => {
     currentVersion: {
       id: "v1",
       version: 1,
+      responsibilityTerm: null,
       questions: [
         {
           id: "q1",

@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ChevronLeft, Plus } from "lucide-react";
+import { ArrowRight, ChevronLeft, Info, Plus, RefreshCw } from "lucide-react";
 import { AnamnesisPdfDialog } from "@/components/anamnesis/records/AnamnesisPdfDialog";
 import { AnamnesisTimeline } from "@/components/anamnesis/records/AnamnesisTimeline";
 import { CurrentAnswers } from "@/components/anamnesis/records/CurrentAnswers";
@@ -8,7 +8,8 @@ import { Button } from "@/components/ui/button";
 import { isUuid } from "@/lib/uuid";
 import { requireAnamnesisAccess } from "@/lib/anamnesis-guard";
 import { ApiError } from "@/services/api";
-import { getAnamnesis } from "@/services/anamnesis.service";
+import { getAnamnesis, listAnamneses } from "@/services/anamnesis.service";
+import { getTemplate } from "@/services/anamnesis-template.service";
 import { getAppointment } from "@/services/appointment.service";
 import { getPerson } from "@/services/people.service";
 import { formatDateOnly } from "@/utils/format";
@@ -44,6 +45,32 @@ async function appointmentLabels(
 }
 
 /**
+ * Versão mais nova do modelo para a qual a ficha pode ser atualizada, ou nulo:
+ * o modelo precisa estar ativo, ter versão acima da ficha, e o cliente ainda não
+ * pode ter ficha dessa versão (uma por cliente e versão). Se o modelo não puder
+ * ser lido, a ficha só não oferece a atualização.
+ */
+async function newerVersion(
+  detail: Awaited<ReturnType<typeof getAnamnesis>>,
+): Promise<number | null> {
+  const [template, fichas] = await Promise.all([
+    getTemplate(detail.template.id).catch((error: unknown) => {
+      if (error instanceof ApiError) return null;
+      throw error;
+    }),
+    listAnamneses({ clientId: detail.client.id, page: 1, limit: 100 }),
+  ]);
+  if (!template?.isActive) return null;
+  const latest = template.currentVersion.version;
+  if (latest <= detail.version.version) return null;
+  const hasLatest = fichas.items.some(
+    (item) =>
+      item.template.id === template.id && item.templateVersion === latest,
+  );
+  return hasLatest ? null : latest;
+}
+
+/**
  * Ficha completa (somente leitura): situação atual à esquerda e histórico à
  * direita; empilhados no celular. Nada aqui altera a ficha.
  */
@@ -65,12 +92,20 @@ export async function AnamnesisDetailPage({
   // Ficha de outro cliente na URL: trata como inexistente.
   if (detail.client.id !== clientId) notFound();
 
-  const appointments = await appointmentLabels(
-    detail.entries.flatMap((entry) =>
-      entry.appointmentId ? [entry.appointmentId] : [],
+  const active = client.deletedAt === null;
+  // Substituída por uma versão nova: só consulta, sem acompanhamento nem atualização.
+  const replaced = detail.replacedBy !== null;
+  const [appointments, latest] = await Promise.all([
+    appointmentLabels(
+      detail.entries.flatMap((entry) =>
+        entry.appointmentId ? [entry.appointmentId] : [],
+      ),
+      user.company.timezone,
     ),
-    user.company.timezone,
-  );
+    // Cliente inativo não recebe ficha nova, e a substituída já foi atualizada:
+    // nem pergunta pelo modelo.
+    active && !replaced ? newerVersion(detail) : null,
+  ]);
 
   const backHref = `/clientes/${clientId}?aba=anamnese`;
   const sectionClass =
@@ -93,6 +128,23 @@ export async function AnamnesisDetailPage({
             {detail.entries[0] &&
               ` · registro inicial em ${formatDateOnly(detail.entries[0].consultationDate)}`}
           </p>
+          {/* A atual leva às versões anteriores, que ficam só para consulta. */}
+          {detail.previous.length > 0 && (
+            <p className="text-sm text-muted-foreground">
+              Versão anterior:{" "}
+              {detail.previous.map((item, index) => (
+                <span key={item.id}>
+                  {index > 0 && ", "}
+                  <Link
+                    href={`/clientes/${clientId}/anamnese/${item.id}`}
+                    className="font-medium text-primary hover:underline"
+                  >
+                    versão {item.version}
+                  </Link>
+                </span>
+              ))}
+            </p>
+          )}
         </div>
         <div className="flex flex-wrap items-center gap-2 max-sm:w-full">
           {/* Imprimir (PDF) só no computador. */}
@@ -100,7 +152,7 @@ export async function AnamnesisDetailPage({
             <AnamnesisPdfDialog clientId={clientId} anamnesisId={id} />
           </div>
           {/* Cliente inativo: a ficha só se consulta (a API recusa o acompanhamento). */}
-          {client.deletedAt === null && (
+          {active && !replaced && (
             <Button asChild className="max-sm:w-full">
               <Link
                 href={`/clientes/${clientId}/anamnese/${id}/acompanhamento`}
@@ -112,6 +164,52 @@ export async function AnamnesisDetailPage({
           )}
         </div>
       </div>
+
+      {detail.replacedBy && (
+        <div
+          role="note"
+          className="flex flex-wrap items-center justify-between gap-3 rounded-control border border-border bg-muted px-3 py-2 text-sm"
+        >
+          <p className="flex items-start gap-2">
+            <Info className="mt-0.5 size-4 shrink-0" aria-hidden="true" />
+            Esta ficha foi atualizada para a versão {
+              detail.replacedBy.version
+            }{" "}
+            e fica só para consulta. Os novos acompanhamentos vão na ficha
+            atual.
+          </p>
+          <Button asChild variant="outline" className="max-sm:w-full">
+            <Link
+              href={`/clientes/${clientId}/anamnese/${detail.replacedBy.id}`}
+            >
+              <ArrowRight aria-hidden="true" />
+              Abrir ficha atual
+            </Link>
+          </Button>
+        </div>
+      )}
+
+      {/* Modelo mudou (ex.: novo termo de responsabilidade): a ficha nova traz
+          as respostas desta, e esta fica guardada com o histórico. */}
+      {latest !== null && (
+        <div
+          role="note"
+          className="flex flex-wrap items-center justify-between gap-3 rounded-control border border-border bg-muted px-3 py-2 text-sm"
+        >
+          <p className="flex items-start gap-2">
+            <Info className="mt-0.5 size-4 shrink-0" aria-hidden="true" />
+            Há uma versão mais nova deste modelo (versão {latest}). Atualize a
+            ficha para usá-la: as respostas desta vêm preenchidas, e esta fica
+            guardada com o histórico.
+          </p>
+          <Button asChild variant="outline" className="max-sm:w-full">
+            <Link href={`/anamnese/fichas/nova?clienteId=${clientId}&de=${id}`}>
+              <RefreshCw aria-hidden="true" />
+              Atualizar ficha
+            </Link>
+          </Button>
+        </div>
+      )}
 
       <div className="grid min-h-0 flex-1 gap-4 overflow-auto lg:grid-cols-2 lg:overflow-hidden">
         <section aria-labelledby="current-title" className={sectionClass}>

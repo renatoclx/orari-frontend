@@ -46,10 +46,12 @@ export async function createTemplateAction(
   }
 
   const description = values.description.trim();
+  const responsibilityTerm = values.responsibilityTerm.trim();
   try {
     await createTemplate({
       name: values.name.trim(),
       ...(description && { description }),
+      ...(responsibilityTerm && { responsibilityTerm }),
       questions: toQuestionInputs(values.questions),
     });
   } catch (error) {
@@ -60,9 +62,10 @@ export async function createTemplateAction(
 }
 
 /**
- * Alteração. As perguntas só vão para a API quando mudaram em relação às da
- * versão vigente (relidas aqui, no servidor): renomear ou mudar a descrição não
- * cria uma versão nova, mas reenviar a lista cria, mesmo igual.
+ * Alteração. As perguntas e o termo só vão para a API quando um dos dois mudou
+ * em relação à versão vigente (relida aqui, no servidor): renomear ou mudar a
+ * descrição não cria uma versão nova, mas reenviar a lista cria, mesmo igual.
+ * O termo faz parte da versão, então vai sempre junto com as perguntas.
  */
 export async function updateTemplateAction(
   id: string,
@@ -91,12 +94,18 @@ export async function updateTemplateAction(
       }),
     );
     const description = values.description.trim();
+    const responsibilityTerm = values.responsibilityTerm.trim();
+    const newVersion =
+      questionsChanged(values.questions, initial) ||
+      responsibilityTerm !== (current.currentVersion.responsibilityTerm ?? "");
     const input: TemplateUpdateInput = {
       name: values.name.trim(),
       // A API não aceita descrição vazia: sem texto, o campo não é enviado.
       ...(description && { description }),
-      ...(questionsChanged(values.questions, initial) && {
+      // Termo apagado: a nova versão vai sem ele (o campo não é enviado).
+      ...(newVersion && {
         questions: toQuestionInputs(values.questions),
+        ...(responsibilityTerm && { responsibilityTerm }),
       }),
     };
     await updateTemplate(id, input);

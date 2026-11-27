@@ -38,7 +38,14 @@ export async function EntryFormPage({ clientId, id }: EntryFormPageProps) {
       limit: 100,
     }),
   ]);
-  if (detail.client.id !== clientId || client.deletedAt !== null) notFound();
+  // Ficha substituída por uma versão nova fica só para consulta (a API recusa).
+  if (
+    detail.client.id !== clientId ||
+    client.deletedAt !== null ||
+    detail.replacedBy !== null
+  ) {
+    notFound();
+  }
 
   const initial = detail.entries[0];
   return (

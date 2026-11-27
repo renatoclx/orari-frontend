@@ -79,6 +79,7 @@ Rotas: `/anamnese/modelos` (lista), `/anamnese/modelos/novo` e `/anamnese/modelo
 - **Agendamento vinculado:** cada acompanhamento mostra qual agendamento é ("Massagem · 21/01/2027 às 14:30 · com Carol"). A API devolve só o `appointmentId`, então a página busca cada agendamento (`getAppointment`, sem repetir ids). Se um não puder ser lido, aparece "Agendamento indisponível", sem quebrar a página.
 - Sem botões de editar ou excluir: a ficha e os acompanhamentos são imutáveis.
 - **Atualizar ficha:** quando o modelo tem versão mais nova que a da ficha (modelo ativo, cliente ativo e sem ficha dessa versão), um aviso abaixo do cabeçalho diz "Há uma versão mais nova deste modelo (versão N)" e traz o botão **Atualizar ficha** (`RefreshCw`). Ele abre a Nova ficha com o cliente, o modelo e as respostas preenchidos (`?de={fichaId}`); a ficha antiga fica guardada, com o histórico.
+- **Ficha substituída** (atualizada para uma versão nova): aviso "Esta ficha foi atualizada para a versão N e fica só para consulta…" com **Abrir ficha atual** (`ArrowRight`); somem Novo acompanhamento e Atualizar ficha, e a página de acompanhamento dela é 404. A ficha atual mostra "Versão anterior: versão N" abaixo do título, com link. As listas do cliente (aba Anamnese e dialog) mostram só as fichas atuais: o corte vem da API (`replacedBy` e `previous` na ficha).
 
 ### Novo acompanhamento (`/clientes/[id]/anamnese/[fichaId]/acompanhamento`)
 

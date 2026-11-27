@@ -39,9 +39,10 @@ Rotas: `/anamnese/modelos` (lista), `/anamnese/modelos/novo` e `/anamnese/modelo
 
 ### Versões (destaque técnico)
 
-- Cada modelo tem **versões** numeradas. Criar o modelo cria a versão 1. **Mudar as perguntas** (texto, tipo, opções, ordem, incluir ou remover) cria uma **nova versão**; renomear, mudar a descrição ou inativar **não** cria.
+- Cada modelo tem **versões** numeradas. Criar o modelo cria a versão 1. **Mudar as perguntas** (texto, tipo, opções, ordem, incluir ou remover) **ou o termo de responsabilidade** cria uma **nova versão**; renomear, mudar a descrição ou inativar **não** cria.
 - As fichas já abertas continuam presas à versão em que nasceram: editar o modelo só vale para as **próximas** fichas. A tela avisa isso na alteração, com o número da versão que será criada.
-- Para não criar versões à toa, a alteração só envia `questions` quando elas realmente mudaram em relação à versão vigente (a Server Action relê o modelo na API e compara). Reenviar a mesma lista criaria uma versão igual.
+- Para não criar versões à toa, a alteração só envia `questions` quando elas ou o termo realmente mudaram em relação à versão vigente (a Server Action relê o modelo na API e compara). Reenviar a mesma lista criaria uma versão igual. O termo vai sempre junto com as perguntas (a API recusa o termo sozinho); apagado, a nova versão vai sem ele.
+- **Termo de responsabilidade** (opcional, até 3.000 caracteres): seção depois das perguntas, com uma caixa de texto. Sai no PDF, justificado, logo acima da assinatura do cliente.
 - **Limite da API:** a descrição, uma vez preenchida, não pode ser apagada (só trocada por outro texto); a tela recusa deixá-la vazia na alteração.
 
 ### Reordenar por arrastar e soltar (destaque técnico)
@@ -77,6 +78,7 @@ Rotas: `/anamnese/modelos` (lista), `/anamnese/modelos/novo` e `/anamnese/modelo
 - **404** quando a ficha não existe, é de outro cliente que o da URL ou o usuário não tem acesso (`requireAnamnesisAccess`).
 - **Agendamento vinculado:** cada acompanhamento mostra qual agendamento é ("Massagem · 21/01/2027 às 14:30 · com Carol"). A API devolve só o `appointmentId`, então a página busca cada agendamento (`getAppointment`, sem repetir ids). Se um não puder ser lido, aparece "Agendamento indisponível", sem quebrar a página.
 - Sem botões de editar ou excluir: a ficha e os acompanhamentos são imutáveis.
+- **Atualizar ficha:** quando o modelo tem versão mais nova que a da ficha (modelo ativo, cliente ativo e sem ficha dessa versão), um aviso abaixo do cabeçalho diz "Há uma versão mais nova deste modelo (versão N)" e traz o botão **Atualizar ficha** (`RefreshCw`). Ele abre a Nova ficha com o cliente, o modelo e as respostas preenchidos (`?de={fichaId}`); a ficha antiga fica guardada, com o histórico.
 
 ### Novo acompanhamento (`/clientes/[id]/anamnese/[fichaId]/acompanhamento`)
 
@@ -98,9 +100,11 @@ Rotas: `/anamnese/modelos` (lista), `/anamnese/modelos/novo` e `/anamnese/modelo
 
 - **Duas entradas, uma tela:** o botão **Nova ficha** da tela **Fichas preenchidas** (e do dialog dela), em que se escolhe o cliente, e o botão **Nova ficha** da aba Anamnese do cliente (some com cliente inativo), que chega com o cliente já escolhido (`?clienteId=`, só o id na URL). Assim ninguém precisa abrir o cliente, a aba e só então lançar a ficha.
 - **Cliente:** seletor com busca no servidor (`useClientSearch`, os mesmos clientes ativos do agendamento). Escolher leva à mesma página com o cliente na URL; `?clienteId=` inválido é 404 e cliente inativo mostra o aviso.
-- **Modelo:** só os modelos **ativos** que o cliente **ainda não usou** (uma ficha por cliente e modelo). Com um só, já vem escolhido. Sem nenhum disponível, a tela explica o motivo: **o cliente já tem ficha de todos os modelos ativos** (com o caminho para abrir a ficha e usar Novo acompanhamento e o botão "Ver fichas do cliente") ou **não há modelo ativo** na empresa (o ADMIN ganha o link para os Modelos). **Trocar o modelo descarta as respostas digitadas**, porque as perguntas mudam.
+- **Modelo:** só os modelos **ativos** cuja **versão atual** o cliente ainda não tem (uma ficha por cliente e por versão do modelo). Com um só, já vem escolhido. Sem nenhum disponível, a tela explica o motivo: **o cliente já tem ficha da versão atual de todos os modelos ativos** (com o caminho para abrir a ficha e usar Novo acompanhamento e o botão "Ver fichas do cliente") ou **não há modelo ativo** na empresa (o ADMIN ganha o link para os Modelos). **Trocar o modelo descarta as respostas digitadas**, porque as perguntas mudam.
 - **Data da consulta:** hoje no fuso da empresa; pode ser passada, nunca futura (`validateConsultationDate`, compartilhada com o acompanhamento).
 - **Perguntas:** as da versão vigente do modelo, com o mesmo `AnswerField` do acompanhamento (os 8 tipos), agora com `*` nas obrigatórias. **Destaque técnico:** `buildNewAnswers` envia as respondidas, **omite a opcional vazia** (nunca `null`) e acusa a obrigatória vazia no campo; o foco vai ao primeiro erro.
+- **Termo de responsabilidade:** quando a versão tem termo, ele aparece só para leitura no fim do formulário, para o profissional ler com o cliente antes de imprimir.
+- **Vindo de "Atualizar ficha"** (`?de=`): o modelo vem escolhido e as respostas preenchidas. **Destaque técnico:** `carryOverAnswers` (`carry-over.ts`, com testes) leva a resposta mais recente de cada pergunta da ficha antiga para a pergunta da versão nova com o mesmo texto (sem acento nem maiúscula) e o mesmo tipo, porque cada versão tem ids próprios; nas escolhas, descarta as opções que deixaram de existir; pergunta nova fica em branco. Ficha antiga inválida ou de outro cliente: o formulário abre vazio.
 - Ao criar, abre a ficha completa. Erros da API (409, 400) aparecem como vieram; o rascunho fica só em memória.
 
 ### Impressão (PDF)

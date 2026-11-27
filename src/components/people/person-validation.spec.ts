@@ -16,8 +16,9 @@ const valid = (
 });
 
 describe("validatePersonForm", () => {
-  it("nome e telefone bastam; e-mail e CPF são opcionais", () => {
+  it("só o nome é obrigatório; telefone, e-mail e CPF são opcionais", () => {
     expect(validatePersonForm(valid())).toEqual({});
+    expect(validatePersonForm(valid({ phone: "" }))).toEqual({});
   });
 
   it("o nome é obrigatório", () => {
@@ -26,14 +27,12 @@ describe("validatePersonForm", () => {
     );
   });
 
-  describe("telefone", () => {
-    it("é obrigatório", () => {
-      expect(validatePersonForm(valid({ phone: "" })).phone).toBe(
-        "Informe um contato.",
-      );
-      expect(validatePersonForm(valid({ phone: "(  )  -" })).phone).toBe(
-        "Informe um contato.",
-      );
+  describe("telefone (só quando preenchido)", () => {
+    it("é opcional (fichas antigas sem telefone): vazio ou só a máscara passa", () => {
+      expect(validatePersonForm(valid({ phone: "" })).phone).toBeUndefined();
+      expect(
+        validatePersonForm(valid({ phone: "(  )  -" })).phone,
+      ).toBeUndefined();
     });
 
     it("precisa de DDD: pelo menos 10 dígitos", () => {

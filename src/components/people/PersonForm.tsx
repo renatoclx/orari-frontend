@@ -47,7 +47,7 @@ import type {
   PersonListItem,
 } from "@/types/people";
 import { contactTypeLabels } from "@/utils/format";
-import { maskCpf, maskCpfOrCnpj, maskPhone } from "@/utils/masks";
+import { maskCpf, maskCpfOrCnpj, maskPhone, phoneDigits } from "@/utils/masks";
 
 /** Dados da pessoa na alteração (vêm do servidor). */
 export type EditablePerson = {
@@ -87,6 +87,8 @@ export function PersonForm({
   const [errors, setErrors] = useState<PersonFormErrors>({});
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [personName, setPersonName] = useState("");
+  // Cadastro sem telefone: a confirmação avisa que dá para incluir depois.
+  const [withoutPhone, setWithoutPhone] = useState(false);
   const [pending, startTransition] = useTransition();
   const formRef = useRef<HTMLFormElement>(null);
   const router = useRouter();
@@ -111,6 +113,7 @@ export function PersonForm({
     }
 
     setPersonName(values.name.trim());
+    setWithoutPhone(!phoneDigits(values.phone));
 
     if (editing) {
       save(data, values.name.trim());
@@ -240,12 +243,7 @@ export function PersonForm({
               </FormField>
 
               <div className="grid grid-cols-[3fr_2fr] gap-3">
-                <FormField
-                  id="phone"
-                  label="Contato"
-                  required
-                  error={errors.phone}
-                >
+                <FormField id="phone" label="Contato" error={errors.phone}>
                   <MaskedInput
                     id="phone"
                     aria-invalid={errors.phone ? true : undefined}
@@ -490,7 +488,11 @@ export function PersonForm({
           open={confirmOpen}
           onOpenChange={setConfirmOpen}
           title={`Cadastrar ${kind.singular}?`}
-          description={`O cadastro de ${personName} será criado com os dados informados.`}
+          description={
+            withoutPhone
+              ? `O cadastro de ${personName} será criado sem telefone. Você poderá incluir posteriormente na função Alterar.`
+              : `O cadastro de ${personName} será criado com os dados informados.`
+          }
           confirmLabel="Cadastrar"
           icon={Plus}
           pendingLabel="Cadastrando…"

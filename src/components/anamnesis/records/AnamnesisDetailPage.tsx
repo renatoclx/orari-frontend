@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ChevronLeft, Info, Plus, RefreshCw } from "lucide-react";
+import { ArrowRight, ChevronLeft, Info, Plus, RefreshCw } from "lucide-react";
 import { AnamnesisPdfDialog } from "@/components/anamnesis/records/AnamnesisPdfDialog";
 import { AnamnesisTimeline } from "@/components/anamnesis/records/AnamnesisTimeline";
 import { CurrentAnswers } from "@/components/anamnesis/records/CurrentAnswers";
@@ -93,6 +93,8 @@ export async function AnamnesisDetailPage({
   if (detail.client.id !== clientId) notFound();
 
   const active = client.deletedAt === null;
+  // Substituída por uma versão nova: só consulta, sem acompanhamento nem atualização.
+  const replaced = detail.replacedBy !== null;
   const [appointments, latest] = await Promise.all([
     appointmentLabels(
       detail.entries.flatMap((entry) =>
@@ -100,8 +102,9 @@ export async function AnamnesisDetailPage({
       ),
       user.company.timezone,
     ),
-    // Cliente inativo não recebe ficha nova: nem pergunta pelo modelo.
-    active ? newerVersion(detail) : null,
+    // Cliente inativo não recebe ficha nova, e a substituída já foi atualizada:
+    // nem pergunta pelo modelo.
+    active && !replaced ? newerVersion(detail) : null,
   ]);
 
   const backHref = `/clientes/${clientId}?aba=anamnese`;
@@ -125,6 +128,23 @@ export async function AnamnesisDetailPage({
             {detail.entries[0] &&
               ` · registro inicial em ${formatDateOnly(detail.entries[0].consultationDate)}`}
           </p>
+          {/* A atual leva às versões anteriores, que ficam só para consulta. */}
+          {detail.previous.length > 0 && (
+            <p className="text-sm text-muted-foreground">
+              Versão anterior:{" "}
+              {detail.previous.map((item, index) => (
+                <span key={item.id}>
+                  {index > 0 && ", "}
+                  <Link
+                    href={`/clientes/${clientId}/anamnese/${item.id}`}
+                    className="font-medium text-primary hover:underline"
+                  >
+                    versão {item.version}
+                  </Link>
+                </span>
+              ))}
+            </p>
+          )}
         </div>
         <div className="flex flex-wrap items-center gap-2 max-sm:w-full">
           {/* Imprimir (PDF) só no computador. */}
@@ -132,7 +152,7 @@ export async function AnamnesisDetailPage({
             <AnamnesisPdfDialog clientId={clientId} anamnesisId={id} />
           </div>
           {/* Cliente inativo: a ficha só se consulta (a API recusa o acompanhamento). */}
-          {active && (
+          {active && !replaced && (
             <Button asChild className="max-sm:w-full">
               <Link
                 href={`/clientes/${clientId}/anamnese/${id}/acompanhamento`}
@@ -144,6 +164,30 @@ export async function AnamnesisDetailPage({
           )}
         </div>
       </div>
+
+      {detail.replacedBy && (
+        <div
+          role="note"
+          className="flex flex-wrap items-center justify-between gap-3 rounded-control border border-border bg-muted px-3 py-2 text-sm"
+        >
+          <p className="flex items-start gap-2">
+            <Info className="mt-0.5 size-4 shrink-0" aria-hidden="true" />
+            Esta ficha foi atualizada para a versão {
+              detail.replacedBy.version
+            }{" "}
+            e fica só para consulta. Os novos acompanhamentos vão na ficha
+            atual.
+          </p>
+          <Button asChild variant="outline" className="max-sm:w-full">
+            <Link
+              href={`/clientes/${clientId}/anamnese/${detail.replacedBy.id}`}
+            >
+              <ArrowRight aria-hidden="true" />
+              Abrir ficha atual
+            </Link>
+          </Button>
+        </div>
+      )}
 
       {/* Modelo mudou (ex.: novo termo de responsabilidade): a ficha nova traz
           as respostas desta, e esta fica guardada com o histórico. */}

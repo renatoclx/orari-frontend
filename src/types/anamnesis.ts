@@ -126,6 +126,10 @@ export type AnamnesisDetail = {
   >;
   /** Do registro inicial ao último acompanhamento. */
   entries: AnamnesisEntry[];
+  /** Ficha atual do mesmo modelo, se esta foi atualizada (fica só para consulta). */
+  replacedBy: { id: string; version: number } | null;
+  /** Fichas das versões anteriores do mesmo modelo, da mais recente à mais antiga. */
+  previous: { id: string; version: number }[];
 };
 
 /** Corpo de POST /anamnesis/:id/entries (acompanhamento). */

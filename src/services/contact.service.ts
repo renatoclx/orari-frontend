@@ -12,10 +12,11 @@ export async function listContacts(peopleId: string): Promise<ContactRecord[]> {
   return items;
 }
 
-// Telefone e e-mail são opcionais, mas a API exige ao menos um.
+// Telefone e e-mail são opcionais, mas a API exige ao menos um. Na alteração,
+// null limpa o campo.
 type ContactInput = {
   type: ContactType;
-  phone?: string;
+  phone?: string | null;
   email?: string | null;
   isPrincipal?: boolean;
 };

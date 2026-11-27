@@ -74,7 +74,7 @@
 - Adicionar máscara para campo de CPF: ###.###.###-##.
 - Os registros serão inseridos na base sem as máscara.
 - Nome obrigatório.
-- Ao menos um contato (celular) obrigatório.
+- Contato (celular) opcional (há fichas antigas sem telefone); se informado, com DDD (10 ou 11 dígitos). No cadastro sem telefone, a confirmação avisa: "O cadastro de <nome> será criado sem telefone. Você poderá incluir posteriormente na função Alterar."
 - Campo de E-mail opcional abaixo dos campos obrigatórios
 - Contatos.
   - O cliente poderá ter mais de um contato cadastrado;
@@ -118,7 +118,7 @@
 - Os registros serão inseridos na base sem as máscara.
 - Campo de data de nascimento do tipo Date (Calendário).
 - Nome obrigatório.
-- Ao menos um contato (celular) obrigatório.
+- Contato (celular) opcional; se informado, com DDD (10 ou 11 dígitos). Apagar o telefone só é aceito se o contato tiver e-mail (a API recusa contato sem nenhum meio; o motivo aparece como aviso).
 - Campo de E-mail opcional abaixo dos campos obrigatórios
 - Contatos.
 - Endereços.

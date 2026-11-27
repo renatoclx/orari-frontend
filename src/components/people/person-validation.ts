@@ -24,7 +24,8 @@ export const personFieldOrder: (keyof PersonFormValues)[] = [
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 /**
- * Obrigatórios (screens/pessoas.md): nome e um contato (celular). Os opcionais só são
+ * Obrigatório (screens/pessoas.md): o nome. O contato (celular) é opcional, como
+ * na API: há clínicas com fichas antigas sem telefone. Os opcionais só são
  * conferidos quando preenchidos, para não falharem depois, no cadastro.
  */
 export function validatePersonForm(
@@ -39,9 +40,7 @@ export function validatePersonForm(
   }
 
   const phone = phoneDigits(values.phone);
-  if (!phone) {
-    errors.phone = "Informe um contato.";
-  } else if (phone.length < 10) {
+  if (phone && phone.length < 10) {
     errors.phone = "Informe um telefone válido, com DDD.";
   }
 

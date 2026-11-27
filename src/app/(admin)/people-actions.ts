@@ -131,12 +131,18 @@ export async function createPersonAction(
   }
 
   const contactType = formText(data, "contactType") as ContactType;
-  const mainContact: NewContactInput = {
-    type: CONTACT_TYPES.includes(contactType) ? contactType : "MAIN",
-    phone: phoneDigits(values.phone),
-    ...(values.email && { email: values.email }),
-    isPrincipal: true,
-  };
+  const mainPhone = phoneDigits(values.phone);
+  // Telefone e e-mail são opcionais: sem nenhum dos dois, não há contato
+  // principal (a API recusa contato vazio).
+  const mainContact: NewContactInput | null =
+    mainPhone || values.email
+      ? {
+          type: CONTACT_TYPES.includes(contactType) ? contactType : "MAIN",
+          ...(mainPhone && { phone: mainPhone }),
+          ...(values.email && { email: values.email }),
+          isPrincipal: true,
+        }
+      : null;
 
   const extraContacts: NewContactInput[] = parseList(
     formText(data, "extraContacts"),
@@ -183,7 +189,7 @@ export async function createPersonAction(
       ...(note && { note }),
       ...commissionOf(data),
       ...categoryOf(data),
-      contacts: [mainContact, ...extraContacts],
+      contacts: mainContact ? [mainContact, ...extraContacts] : extraContacts,
       ...(addresses.length > 0 && { addresses }),
     });
     personId = person.id;
@@ -333,17 +339,21 @@ export async function updatePersonAction(
   const contactType = formText(data, "contactType") as ContactType;
   const type_ = CONTACT_TYPES.includes(contactType) ? contactType : "MAIN";
   const mainContactId = formText(data, "mainContactId");
+  const mainPhone = phoneDigits(values.phone);
   try {
     if (mainContactId) {
+      // Campo vazio vira null (a API limpa); ela só recusa se o contato ficar
+      // sem telefone e sem e-mail, e aí o motivo vira aviso.
       await updateContact(mainContactId, {
         type: type_,
-        phone: phoneDigits(values.phone),
+        phone: mainPhone || null,
         email: values.email || null,
       });
-    } else {
+    } else if (mainPhone || values.email) {
+      // Sem contato principal ainda: só cria se houver o que guardar.
       await createContact(id, {
         type: type_,
-        phone: phoneDigits(values.phone),
+        ...(mainPhone && { phone: mainPhone }),
         ...(values.email && { email: values.email }),
         isPrincipal: true,
       });

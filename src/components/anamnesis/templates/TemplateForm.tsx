@@ -40,6 +40,7 @@ function initialValues(template?: TemplateItem): TemplateFormValues {
   return {
     name: template?.name ?? "",
     description: template?.description ?? "",
+    responsibilityTerm: template?.currentVersion.responsibilityTerm ?? "",
     questions: template
       ? draftFromTemplate(template, key)
       : [emptyQuestion(key())],
@@ -97,6 +98,8 @@ export function TemplateForm({ template }: TemplateFormProps) {
       return document.getElementById("template-description")?.focus();
     if (found.questions)
       return document.getElementById("add-question")?.focus();
+    if (found.responsibilityTerm)
+      return document.getElementById("template-term")?.focus();
     const first = values.questions.find(
       (question) => found.items?.[question.key],
     );
@@ -210,7 +213,7 @@ export function TemplateForm({ template }: TemplateFormProps) {
                 className="flex items-start gap-2 rounded-control border border-border bg-muted px-3 py-2 text-sm"
               >
                 <Info className="mt-0.5 size-4 shrink-0" aria-hidden="true" />
-                Mudar as perguntas cria a versão{" "}
+                Mudar as perguntas ou o termo de responsabilidade cria a versão{" "}
                 {template.currentVersion.version + 1} do modelo e vale para as
                 próximas fichas; as já preenchidas não mudam. Renomear não cria
                 versão.
@@ -225,6 +228,34 @@ export function TemplateForm({ template }: TemplateFormProps) {
               listError={errors.questions}
               newKey={newKey}
             />
+          </section>
+
+          {/* O termo fica depois das perguntas, como na ficha impressa: vai
+              logo acima da assinatura do cliente. */}
+          <section className="space-y-4">
+            <div>
+              <h2 className="font-semibold">Termo de responsabilidade</h2>
+              <p className="text-sm text-muted-foreground">
+                Opcional. Sai na ficha impressa, logo acima da assinatura do
+                cliente.
+              </p>
+            </div>
+            <FormField
+              id="template-term"
+              label="Texto do termo"
+              error={errors.responsibilityTerm}
+            >
+              <Textarea
+                id="template-term"
+                className="min-h-28"
+                value={values.responsibilityTerm}
+                onChange={(event) =>
+                  set("responsibilityTerm", event.target.value)
+                }
+                placeholder="Ex.: Declaro que as informações acima são verdadeiras…"
+                aria-invalid={errors.responsibilityTerm ? true : undefined}
+              />
+            </FormField>
           </section>
         </div>
       </div>

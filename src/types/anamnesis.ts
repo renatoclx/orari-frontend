@@ -34,6 +34,8 @@ export type TemplateItem = {
   currentVersion: {
     id: string;
     version: number;
+    /** Termo de responsabilidade impresso acima da assinatura; nulo sem termo. */
+    responsibilityTerm: string | null;
     questions: TemplateQuestion[];
   };
 };
@@ -52,6 +54,8 @@ export type TemplateQuestionInput = {
 export type TemplateInput = {
   name: string;
   description?: string;
+  /** Faz parte da versão: na alteração, só vai junto com `questions`. */
+  responsibilityTerm?: string;
   questions: TemplateQuestionInput[];
 };
 
@@ -110,7 +114,12 @@ export type AnamnesisDetail = {
   createdAt: string;
   client: { id: string; name: string };
   template: { id: string; name: string };
-  version: { id: string; version: number; questions: AnamnesisQuestion[] };
+  version: {
+    id: string;
+    version: number;
+    responsibilityTerm: string | null;
+    questions: AnamnesisQuestion[];
+  };
   /** Resposta mais recente de cada pergunta já respondida. */
   current: Array<
     AnamnesisAnswer & { entryId: string; consultationDate: string }

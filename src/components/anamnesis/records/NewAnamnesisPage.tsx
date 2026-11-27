@@ -2,12 +2,13 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ChevronLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { carryOverAnswers } from "@/components/anamnesis/records/carry-over";
 import { ClientPicker } from "@/components/anamnesis/records/ClientPicker";
 import { NewAnamnesisForm } from "@/components/anamnesis/records/NewAnamnesisForm";
 import { isUuid } from "@/lib/uuid";
 import { requireAnamnesisAccess } from "@/lib/anamnesis-guard";
 import { ApiError } from "@/services/api";
-import { listAnamneses } from "@/services/anamnesis.service";
+import { getAnamnesis, listAnamneses } from "@/services/anamnesis.service";
 import { listTemplates } from "@/services/anamnesis-template.service";
 import { getPerson, listPeople } from "@/services/people.service";
 import { anamnesisAccess } from "@/utils/anamnesis-access";
@@ -16,14 +17,23 @@ import { toDateString } from "@/utils/time";
 type NewAnamnesisPageProps = {
   /** Cliente da URL (`?clienteId=`), se já escolhido. */
   clientId?: string;
+  /**
+   * Ficha antiga (`?de=`), ao atualizar para a versão nova do modelo: o modelo
+   * vem escolhido e as respostas, preenchidas.
+   */
+  fromId?: string;
 };
 
 /**
  * Nova ficha: escolhe o cliente e, com ele, mostra o formulário com os modelos
- * que ele ainda não usou. Serve ao menu Anamnese e ao botão da aba do cliente
- * (que chega com o cliente já escolhido).
+ * cuja versão vigente ele ainda não tem. Serve ao menu Anamnese, ao botão da aba
+ * do cliente (que chega com o cliente já escolhido) e ao "Atualizar ficha" (que
+ * chega também com a ficha antiga).
  */
-export async function NewAnamnesisPage({ clientId }: NewAnamnesisPageProps) {
+export async function NewAnamnesisPage({
+  clientId,
+  fromId,
+}: NewAnamnesisPageProps) {
   const user = await requireAnamnesisAccess();
   const initialClients = await listPeople({
     type: "CLIENT",
@@ -46,19 +56,47 @@ export async function NewAnamnesisPage({ clientId }: NewAnamnesisPageProps) {
 
   let form: React.ReactNode = null;
   if (client && !inactive) {
-    // Modelos ativos que o cliente ainda não usou (uma ficha por cliente e modelo).
+    // Modelos ativos cuja versão vigente o cliente ainda não tem (uma ficha por
+    // cliente e por versão do modelo).
     const [templates, used] = await Promise.all([
       listTemplates({ isActive: true, page: 1, limit: 100 }),
       listAnamneses({ clientId: client.id, page: 1, limit: 100 }),
     ]);
-    const usedIds = new Set(used.items.map((item) => item.template.id));
+    const usedVersions = new Set(
+      used.items.map((item) => `${item.template.id}:${item.templateVersion}`),
+    );
     const available = templates.items
-      .filter((item) => !usedIds.has(item.id))
+      .filter(
+        (item) =>
+          !usedVersions.has(`${item.id}:${item.currentVersion.version}`),
+      )
       .map((item) => ({
         id: item.id,
         name: item.name,
         questions: item.currentVersion.questions,
+        responsibilityTerm: item.currentVersion.responsibilityTerm,
       }));
+
+    // Atualizar ficha: a antiga precisa ser deste cliente e o modelo dela estar
+    // disponível; senão, o formulário abre vazio, como uma ficha nova comum.
+    const from =
+      fromId && isUuid(fromId)
+        ? await getAnamnesis(fromId).catch((error: unknown) => {
+            if (error instanceof ApiError) return undefined;
+            throw error;
+          })
+        : undefined;
+    const target =
+      from && from.client.id === client.id
+        ? available.find((item) => item.id === from.template.id)
+        : undefined;
+    const initial =
+      from && target
+        ? {
+            templateId: target.id,
+            drafts: carryOverAnswers(from, target.questions),
+          }
+        : undefined;
 
     form =
       available.length === 0 ? (
@@ -80,11 +118,11 @@ export async function NewAnamnesisPage({ clientId }: NewAnamnesisPageProps) {
               )}
             </>
           ) : (
-            // Há modelos ativos, mas o cliente já tem ficha de todos (uma por modelo).
+            // Há modelos ativos, mas o cliente já tem ficha da versão atual de todos.
             <>
               <p>
-                Este cliente já tem ficha de todos os modelos ativos. Para
-                registrar a evolução, abra a ficha dele e use{" "}
+                Este cliente já tem ficha da versão atual de todos os modelos
+                ativos. Para registrar a evolução, abra a ficha dele e use{" "}
                 <strong>Novo acompanhamento</strong>.
               </p>
               <Button asChild variant="outline">
@@ -101,6 +139,7 @@ export async function NewAnamnesisPage({ clientId }: NewAnamnesisPageProps) {
           key={client.id}
           client={{ id: client.id, name: client.name }}
           templates={available}
+          initial={initial}
           today={toDateString(new Date(), user.company.timezone)}
         />
       );

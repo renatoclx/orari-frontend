@@ -12,6 +12,7 @@ export const LABEL_MAX = 400;
 export const HELP_MAX = 500;
 export const OPTION_MAX = 100;
 export const MAX_OPTIONS = 50;
+export const RESPONSIBILITY_TERM_MAX = 3000;
 const MIN_CHOICE_OPTIONS = 2;
 
 /** Opção como o editor a vê: a chave estável permite remover e reordenar sem trocar o foco. */
@@ -31,6 +32,8 @@ export type QuestionDraft = {
 export type TemplateFormValues = {
   name: string;
   description: string;
+  /** Termo de responsabilidade (opcional), impresso acima da assinatura. */
+  responsibilityTerm: string;
   questions: QuestionDraft[];
 };
 
@@ -44,6 +47,7 @@ export type QuestionErrors = {
 export type TemplateFormErrors = {
   name?: string;
   description?: string;
+  responsibilityTerm?: string;
   /** Erro da lista inteira (nenhuma pergunta ou pergunta demais). */
   questions?: string;
   /** Erro de cada pergunta, pela chave da linha. */
@@ -98,6 +102,10 @@ export function validateTemplateForm(
   if (descriptionRequired && !values.description.trim()) {
     errors.description =
       "A descrição não pode ser removida; altere o texto se for preciso.";
+  }
+
+  if (values.responsibilityTerm.trim().length > RESPONSIBILITY_TERM_MAX) {
+    errors.responsibilityTerm = `O termo tem no máximo ${RESPONSIBILITY_TERM_MAX} caracteres.`;
   }
 
   if (values.questions.length === 0) {

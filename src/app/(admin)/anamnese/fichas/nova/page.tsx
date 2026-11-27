@@ -8,10 +8,11 @@ export const metadata: Metadata = {
 export default async function NewAnamnesisRoute({
   searchParams,
 }: PageProps<"/anamnese/fichas/nova">) {
-  const { clienteId } = await searchParams;
+  const { clienteId, de } = await searchParams;
   return (
     <NewAnamnesisPage
       clientId={typeof clienteId === "string" ? clienteId : undefined}
+      fromId={typeof de === "string" ? de : undefined}
     />
   );
 }
